@@ -1,0 +1,30 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:style field="first">
+		
+	</ui:style>
+	<ui:style field="second" src="styles/styles.css"/>
+	<ui:style field="third" src="styles/bootstrap.css"/>
+	<ui:style field="forth" src="styles/bootstrap-theme.min.css"/>
+	<g:HTMLPanel>
+		<div id="max-container" class="max-container">
+			<div id="up" class="up"><g:Image url="/images/OrgulloUNn.png"/></div>
+			<div class="main-text lead" style="width: 862px">
+				<br></br>
+				<nav class="navbar navbar-default" role="navigation">
+					<ul class="nav navbar-nav">
+						<li style="width: 260px"><g:Anchor href="#create" ui:field="createButton" styleName="{second.buttonCursor}">Mi plan de estudio</g:Anchor></li>
+						<li style="width: 170px"><g:Anchor href="#dnd" ui:field="commingSoonButton" styleName="{second.buttonCursor}">Pronto ...</g:Anchor></li>
+						<li style="width: 180px"><g:Anchor href="#gedad" ui:field="GEDAD" styleName="{second.buttonCursor}" title="Sobre el Grupo de Estudio en Desarrollo de Aplicaciones Distribuidas">Sobre GEDAD</g:Anchor></li>
+						<li style="width: 250px"><g:Anchor href="#aboutUs" ui:field="aboutUsButton" styleName="{second.buttonCursor}">Sobre #SomosUN</g:Anchor></li>
+					</ul>
+				</nav>
+			</div>
+			<div class="main-text">
+				<p class="lead">Este proyecto es una iniciativa de estudiantes de la Universidad Nacional de Colombia.</p>
+				<h1>#SomosUN</h1>
+			</div>
+		</div>
+	</g:HTMLPanel>
+</ui:UiBinder> 
