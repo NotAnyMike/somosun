@@ -41,22 +41,21 @@
 	      <tr>
 	        <td width="45%" align="right" valign="middle" style="font-size:20px; text-align:right; width:49%" class="lead main-text">
               	<span style="font-size:18px; font-weight:bold">¿Qué hacemos?</span><br></br>
-              	Desarrollamos aplicaciones distribuidas<br></br><br></br>
+              	Desarrollamos aplicaciones distribuidas (i.e. Web)<br></br><br></br>
               	<span style="font-size:18px; font-weight:bold">¿Qué haremos en el futuro?</span><br></br>
               	¿¡Quien sabe!? Desarrollaremos lo que nos parezca divertido<br></br><br></br>
               	<span style="font-size:18px; font-weight:bold">¿Cómo lo hacemos?</span><br></br>
               	Nos reunimos cada semana, distribuimos trabajo<br></br>y a programar<br></br><br></br>
-              	(:<br></br><br></br>
             </td>
 	        <td width="45%" height="400" align="left" valign="middle" style="font-size:20px; text-align:left" class="lead main-text">
+            	<span style="font-size:18px; font-weight:bold">¿Qué usamos?</span><br></br>
+				Google App Engine, Jnario, BDD, etc.<br></br><br></br>
             	<span style="font-size:18px; font-weight:bold">¿Por qué lo hacemos?</span><br></br>
 				¡Porque nos gusta!<br></br><br></br>
             	<span style="font-size:18px; font-weight:bold">¿Quien nos ayuda?</span><br></br>
 				Varios profesores, principalmente Gabriel Mañana<br></br><br></br>
-				<span style="font-size:18px; font-weight:bold">¿Quieres ayudar?</span><br></br>
+				<span style="font-size:18px; font-weight:bold">Si quieres ayudar o contactarnos</span><br></br>
 				Avísanos al correo gedad.unal@gmail.com<br></br><br></br>
-				<span style="font-size:18px; font-weight:bold">¿Cómo contactarnos?</span><br></br>
-				Al mismo correo de arriba<br></br><br></br>
             </td>
         </tr>
       </table>
