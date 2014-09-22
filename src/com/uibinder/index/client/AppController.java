@@ -15,11 +15,13 @@ import com.uibinder.index.client.presenter.AboutGedadPresenter;
 import com.uibinder.index.client.presenter.CreatePresenter;
 import com.uibinder.index.client.presenter.DndPresenter;
 import com.uibinder.index.client.presenter.IndexPresenter;
+import com.uibinder.index.client.presenter.PlanPresenter;
 import com.uibinder.index.client.presenter.Presenter;
 import com.uibinder.index.client.presenter.TopBarPresenter;
 import com.uibinder.index.client.view.AboutGedadViewImpl;
 import com.uibinder.index.client.view.DndViewImpl;
 import com.uibinder.index.client.view.IndexViewImpl;
+import com.uibinder.index.client.view.PlanViewImpl;
 import com.uibinder.index.client.view.TopBarViewImpl;
 import com.uibinder.index.client.view.CreateViewImpl;
 
@@ -32,6 +34,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	Presenter topBarPresenter = null;
 	Presenter dndPresenter = null;
 	Presenter createPresenter = null;
+	Presenter planPresenter = null;
 	
 	private HasWidgets container;
 	private final HandlerManager eventBus;
@@ -39,6 +42,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	private TopBarViewImpl topBarView;
 	private DndViewImpl dndView;
 	private CreateViewImpl createView;
+	private PlanViewImpl planView;
 	
 	public AppController(HandlerManager eventBus){
 		this.eventBus = eventBus;
@@ -99,18 +103,15 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 			}
 			
 			
-			if(token.equals("index")){
-				History.newItem("gedad");
-				/*if(indexView == null){
+			/*if(token.equals("index")){
+				if(indexView == null){
 					indexView = new IndexViewImpl();
 				}
 				if(indexPresenter == null){
 					indexPresenter = new IndexPresenter(eventBus, indexView);					
 				}
-				indexPresenter.go(RootPanel.get("centerArea"));*/
+				indexPresenter.go(RootPanel.get("centerArea"));
 			} else if(token.equals("dnd")){ //dnd stands for Drag and Drop
-				History.newItem("gedad");
-				/*
 				if(dndView == null){
 					dndView = new DndViewImpl();
 				}
@@ -118,10 +119,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 					dndPresenter = new DndPresenter(eventBus, dndView);
 				}
 				dndPresenter.go(RootPanel.get("centerArea"));					
-				*/
 			} else if(token.equals("create")){
-				History.newItem("gedad");
-				/*
 				if(createView == null){
 					createView = new CreateViewImpl();
 				}
@@ -129,16 +127,21 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 					createPresenter = new CreatePresenter(eventBus, createView);					
 				}
 				createPresenter.go(RootPanel.get("centerArea"));
-				*/
-			} else if(token.equals("gedad")) {
+			} else if(token.equals("plan")) {
+				if(planView == null){
+					planView = new PlanViewImpl();
+				}
+				if(planPresenter == null){
+					planPresenter = new PlanPresenter(eventBus, planView);
+				}
+				planPresenter.go(RootPanel.get("centerArea"));
+			} else */if(token.equals("gedad")) {
 				AboutGedadViewImpl aboutGedadView = new AboutGedadViewImpl();
 				Presenter aboutGedadPresenter = new AboutGedadPresenter(eventBus, aboutGedadView);
 				aboutGedadPresenter.go(RootPanel.get("centerArea"));
 			} else {
+				//History.newItem("index");
 				History.newItem("gedad");
-				/*
-				History.newItem("index");
-				*/
 			}
 			
 		}

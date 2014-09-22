@@ -13,24 +13,25 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
-public class AboutGedadViewImpl extends Composite implements AboutGedadView {
+public class PlanViewImpl extends Composite implements PlanView {
 	
 	private Presenter presenter;
 
-	private static AboutGedadViewUiBinder uiBinder = GWT
-			.create(AboutGedadViewUiBinder.class);
+	private static PlanViewUiBinder uiBinder = GWT
+			.create(PlanViewUiBinder.class);
 
 	@UiTemplate("AboutGedadView.ui.xml")
-	interface AboutGedadViewUiBinder extends UiBinder<Widget, AboutGedadViewImpl> {
+	interface PlanViewUiBinder extends UiBinder<Widget, PlanViewImpl> {
 	}
 
-	public AboutGedadViewImpl() {
+	public PlanViewImpl() {
 		initWidget(uiBinder.createAndBindUi(this));
 	}
 
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
+		
 	}
 
 }
