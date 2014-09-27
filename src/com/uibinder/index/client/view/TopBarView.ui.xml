@@ -6,6 +6,7 @@
 	</ui:style>
 	<ui:style field="second" src="styles/styles.css"/>
 	<ui:style field="third" src="styles/bootstrap.css"/>
+	<ui:style field="forth" src="styles/malla.css"/>
 	<g:HTMLPanel>
 	    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation" style="font-size:14px;">
 	    	<div class="container">
@@ -27,6 +28,7 @@
 					<li id="log-hyperlink"></li>
 					<li id="adminPanel"></li>
 				</ul>
+				<g:Label ui:field="pageNameLabel" styleName="{forth.mainLabelNamePageTopBar} {third.lead} {third.main-text} {third.navbar-text}">Plan de Estudios</g:Label>
 			</div>
 	    	</div>
 	    </div>

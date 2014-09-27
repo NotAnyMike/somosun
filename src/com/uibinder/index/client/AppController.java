@@ -102,22 +102,14 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 				topBarPresenter.go(RootPanel.get("topArea"));
 			}
 			
-			
-			/*if(token.equals("index")){
-				if(indexView == null){
-					indexView = new IndexViewImpl();
-				}
-				if(indexPresenter == null){
-					indexPresenter = new IndexPresenter(eventBus, indexView);					
-				}
-				indexPresenter.go(RootPanel.get("centerArea"));
-			} else if(token.equals("dnd")){ //dnd stands for Drag and Drop
+			if(token.equals("dnd")){ //dnd stands for Drag and Drop
 				if(dndView == null){
 					dndView = new DndViewImpl();
 				}
 				if(dndPresenter == null){
 					dndPresenter = new DndPresenter(eventBus, dndView);
 				}
+				topBarView.setMainLabel("You shouldn't be here!");
 				dndPresenter.go(RootPanel.get("centerArea"));					
 			} else if(token.equals("create")){
 				if(createView == null){
@@ -126,6 +118,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 				if(createPresenter == null){
 					createPresenter = new CreatePresenter(eventBus, createView);					
 				}
+				topBarView.setMainLabel("Plan de Estudios");
 				createPresenter.go(RootPanel.get("centerArea"));
 			} else if(token.equals("plan")) {
 				if(planView == null){
@@ -134,14 +127,22 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 				if(planPresenter == null){
 					planPresenter = new PlanPresenter(eventBus, planView);
 				}
+				topBarView.setMainLabel("Plan de Estudios");
 				planPresenter.go(RootPanel.get("centerArea"));
-			} else */if(token.equals("gedad")) {
+			} else if(token.equals("gedad")) {
 				AboutGedadViewImpl aboutGedadView = new AboutGedadViewImpl();
 				Presenter aboutGedadPresenter = new AboutGedadPresenter(eventBus, aboutGedadView);
 				aboutGedadPresenter.go(RootPanel.get("centerArea"));
+				topBarView.setMainLabel("Estudia para la vida, no para los exámenes!");
 			} else {
-				//History.newItem("index");
-				History.newItem("gedad");
+				if(indexView == null){
+					indexView = new IndexViewImpl();
+				}
+				if(indexPresenter == null){
+					indexPresenter = new IndexPresenter(eventBus, indexView);					
+				}
+				topBarView.setMainLabel("");
+				indexPresenter.go(RootPanel.get("centerArea"));
 			}
 			
 		}

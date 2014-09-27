@@ -5,9 +5,11 @@ import com.google.gwt.user.client.ui.Widget;
 public interface TopBarView {
 	
 	public interface Presenter {
+		void setNameOfThePage(String s);
 	  }
 	
 	void setPresenter(Presenter presenter);
-	  Widget asWidget();
+	Widget asWidget();
+	public abstract void setMainLabel(String string);
 
 }

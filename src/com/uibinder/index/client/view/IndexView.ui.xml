@@ -23,7 +23,7 @@
 			</div>
 			<div class="main-text">
 				<p class="lead">Este proyecto es una iniciativa de estudiantes de la Universidad Nacional de Colombia.</p>
-				<h1>#SomosUN</h1>
+				<h1 class="lead main-text" style="font-size:24px">#SomosUN</h1>
 			</div>
 		</div>
 	</g:HTMLPanel>

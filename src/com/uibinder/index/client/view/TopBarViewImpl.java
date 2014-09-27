@@ -2,12 +2,16 @@ package com.uibinder.index.client.view;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 public class TopBarViewImpl extends Composite implements TopBarView {
 	private Presenter presenter;
+	
+	@UiField Label pageNameLabel;
 
 	private static TopBarViewUiBinder uiBinder = GWT
 			.create(TopBarViewUiBinder.class);
@@ -28,6 +32,11 @@ public class TopBarViewImpl extends Composite implements TopBarView {
 	@Override
 	public Widget asWidget(){
 		return this;
+	}
+
+	@Override
+	public void setMainLabel(String s) {
+		pageNameLabel.setText(s);
 	}
 
 }
