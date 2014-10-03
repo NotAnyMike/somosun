@@ -12,6 +12,7 @@ public class TopBarViewImpl extends Composite implements TopBarView {
 	private Presenter presenter;
 	
 	@UiField Label pageNameLabel;
+	@UiField Label userNameLabel;
 
 	private static TopBarViewUiBinder uiBinder = GWT
 			.create(TopBarViewUiBinder.class);
@@ -37,6 +38,11 @@ public class TopBarViewImpl extends Composite implements TopBarView {
 	@Override
 	public void setMainLabel(String s) {
 		pageNameLabel.setText(s);
+	}
+
+	@Override
+	public void setUserName(String s) {
+		userNameLabel.setText(s);
 	}
 
 }

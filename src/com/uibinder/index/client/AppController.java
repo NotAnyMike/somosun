@@ -109,7 +109,6 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 				if(dndPresenter == null){
 					dndPresenter = new DndPresenter(eventBus, dndView);
 				}
-				topBarView.setMainLabel("You shouldn't be here!");
 				dndPresenter.go(RootPanel.get("centerArea"));					
 			} else if(token.equals("create")){
 				if(createView == null){
@@ -118,7 +117,6 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 				if(createPresenter == null){
 					createPresenter = new CreatePresenter(eventBus, createView);					
 				}
-				topBarView.setMainLabel("Plan de Estudios");
 				createPresenter.go(RootPanel.get("centerArea"));
 			} else if(token.equals("plan")) {
 				if(planView == null){
@@ -127,13 +125,11 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 				if(planPresenter == null){
 					planPresenter = new PlanPresenter(eventBus, planView);
 				}
-				topBarView.setMainLabel("Plan de Estudios");
 				planPresenter.go(RootPanel.get("centerArea"));
 			} else if(token.equals("gedad")) {
 				AboutGedadViewImpl aboutGedadView = new AboutGedadViewImpl();
 				Presenter aboutGedadPresenter = new AboutGedadPresenter(eventBus, aboutGedadView);
 				aboutGedadPresenter.go(RootPanel.get("centerArea"));
-				topBarView.setMainLabel("Estudia para la vida, no para los exámenes!");
 			} else {
 				if(indexView == null){
 					indexView = new IndexViewImpl();
@@ -141,12 +137,26 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 				if(indexPresenter == null){
 					indexPresenter = new IndexPresenter(eventBus, indexView);					
 				}
-				topBarView.setMainLabel("");
 				indexPresenter.go(RootPanel.get("centerArea"));
 			}
-			
+			setLabelsOnTopBar(token);
 		}
 		
+	}
+
+	private void setLabelsOnTopBar(String token) {
+		if(token.equals("dnd")){
+			topBarView.setMainLabel("You shouldn't be here!");
+		} else if (token.equals("create")){
+			topBarView.setMainLabel("Plan de Estudios");
+		} else if(token.equals("plan")){
+			topBarView.setMainLabel("Plan de Estudios");
+		} else if(token.equals("gedad")){
+			topBarView.setMainLabel("Estudia para la vida, no para los exámenes!");
+		} else {
+			topBarView.setMainLabel("");
+		}
+		topBarView.setUserName("Invitado");
 	}
 	
 }

@@ -22,8 +22,12 @@ public class TopBarPresenter implements Presenter, TopBarView.Presenter {
 
 	@Override
 	public void setNameOfThePage(String s) {
-		//TODO change the label 
 		view.setMainLabel(s);
+	}
+
+	@Override
+	public void setUserName(String s) {
+		view.setUserName(s);
 	}
 
 }

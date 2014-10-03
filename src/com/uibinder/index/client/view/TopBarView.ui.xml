@@ -24,11 +24,11 @@
 	    		</div>
 	    		<div class="collapse navbar-collapse">
 				<ul class="nav navbar-nav">
-					<p id="user-name" class="navbar-text" style="cursor:default"></p>
-					<li id="log-hyperlink"></li>
-					<li id="adminPanel"></li>
+					<p class="navbar-text" style="cursor:default"><g:Label ui:field="userNameLabel"></g:Label></p>
+					<li id="log-hyperlink"><g:Anchor ui:field="LogLabel"></g:Anchor></li>
+					<li id="panel"><g:Anchor ui:field="adminPanelLabel"></g:Anchor></li>
 				</ul>
-				<g:Label ui:field="pageNameLabel" styleName="{forth.mainLabelNamePageTopBar} {third.lead} {third.main-text} {third.navbar-text}">Plan de Estudios</g:Label>
+				<g:Label ui:field="pageNameLabel" addStyleNames="{forth.mainLabelNamePageTopBar} {third.lead} {third.main-text} {third.navbar-text}">Plan de Estudios</g:Label>
 			</div>
 	    	</div>
 	    </div>
