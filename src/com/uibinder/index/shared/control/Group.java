@@ -1,4 +1,4 @@
-package com.uibinder.index.server.control;
+package com.uibinder.index.shared.control;
 
 import java.util.List;
 

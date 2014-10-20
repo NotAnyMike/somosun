@@ -6,6 +6,15 @@
          xmlns="http://java.sun.com/xml/ns/javaee">
 
   <!-- Servlets -->
+  <servlet>
+      <servlet-name>SUNServiceImpl</servlet-name>
+      <servlet-class>com.uibinder.index.server.serviceImpl.SUNServiceImpl</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+      <servlet-name>SUNServiceImpl</servlet-name>
+      <url-pattern>/uibinderindex/sunService</url-pattern>
+  </servlet-mapping>
   
   <!-- Default page to serve -->
   <welcome-file-list>

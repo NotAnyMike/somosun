@@ -16,11 +16,16 @@
   <!-- <inherits name='com.google.gwt.user.theme.standard.Standard'/> -->
   <!-- <inherits name='com.google.gwt.user.theme.chrome.Chrome'/> -->
   <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
-
+  
   <!-- Other module inherits                                      -->
+  
+  <!--  DND support												  -->
+  <inherits name='com.allen_sauer.gwt.dnd.gwt-dnd'/>
 
   <!-- Specify the app entry point class.                         -->
   <entry-point class='com.uibinder.index.client.UiBinderIndex'/>
+  
+  <!-- You can also test remote services during a JUnit run.       -->
 
   <!-- Specify the paths for translatable code                    -->
   <source path='client'/>
