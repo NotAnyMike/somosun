@@ -18,6 +18,7 @@ import com.uibinder.index.client.view.PlanViewImpl;
 import com.uibinder.index.client.widget.PlanWidget;
 import com.uibinder.index.client.widget.SubjectWidget;
 import com.uibinder.index.client.dnd.PickUpDragController;
+import com.uibinder.index.shared.control.Plan;
 import com.uibinder.index.shared.control.Subject;
 
 /**
@@ -27,9 +28,16 @@ import com.uibinder.index.shared.control.Subject;
  * perhaps later on it will be expanded to some broader functions
  */
 public class PlanPresenter implements Presenter, PlanView.Presenter {
+	
 	private final HandlerManager eventBus;
 	private PlanViewImpl view;
-	private PlanWidget plan;
+	private final SUNServiceAsync rpcService;
+	
+	//Control classes
+	private Plan plan;
+
+	//Widget classes
+	private PlanWidget planWidget;
 	
 	private VerticalPanel subContainer = new VerticalPanel();
 	private VerticalPanelDropController dropController; 
@@ -40,29 +48,74 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 	//This one is to allow or not drag items wherever
 	private final boolean allowDroppingOnBoundaryPanel = false;
 	
-	public PlanPresenter(HandlerManager eventBus, PlanViewImpl view){
+	/**
+	 * This is the constructor to create an empty plan, that means no subjects
+	 * at all, to make it 100% customizable for the user
+	 * 
+	 * @param eventBus
+	 * @param view
+	 */
+	public PlanPresenter(SUNServiceAsync rpcService, HandlerManager eventBus, PlanViewImpl view){
+		this.rpcService = rpcService;
 		this.eventBus = eventBus;
 		this.view = view;
 		this.view.setPresenter(this);
 		
-		if(plan == null) init();
+		plan = new Plan();
+		
+		if(planWidget == null) init();
+	}
+	
+	/**
+	 * Constructor to create a Plan based on one plan send by user
+	 * 
+	 * @param eventBus
+	 * @param view
+	 * @param plan
+	 */
+	public PlanPresenter(SUNServiceAsync rpcService, HandlerManager eventBus, PlanViewImpl view, Plan plan){
+		this.rpcService = rpcService;
+		this.eventBus = eventBus;
+		this.view = view;
+		this.view.setPresenter(this);
+		
+		this.plan = plan;
+		
+		if(planWidget == null) init();
+	}
+	
+	/**
+	 * Constructor to create a Plan based on one career
+	 * 
+	 * @param eventBus
+	 * @param view
+	 * @param career
+	 */
+	public PlanPresenter(SUNServiceAsync rpcService, HandlerManager eventBus, PlanViewImpl view, String career){
+		this.rpcService = rpcService;
+		this.eventBus = eventBus;
+		this.view = view;
+		this.view.setPresenter(this);
+		
+		this.plan = plan;
+		
+		if(planWidget == null) init();
 	}
 	
 	private void init() {
+		
 		//Create the dnd stuff
 		boundaryPanel = new AbsolutePanel();
 		dragController = new PickUpDragController(boundaryPanel, allowDroppingOnBoundaryPanel);
 		
-		plan = new PlanWidget();
+		planWidget = new PlanWidget();
 		
 		/************* to remove later on **************/
 		//It is just for design purposes
 		
 		createSemesters(11);
 		
-		SUNServiceAsync sunServiceSvc = GWT.create(SUNService.class);
-		
-		sunServiceSvc.getSubjectByCode(123, callback);
+		rpcService.getSubjectByCode(123, chargeSubjectByCode);
 		
 		SubjectWidget subject1 = new SubjectWidget("Introducciónallavidasocialdemamertos peruanos del siglo XI","0000r42",0,true,1);
 		SubjectWidget subject2 = new SubjectWidget("Introducciónallavidasocialdemamertos peruanos del siglo XI","0000r42",0,true,1);
@@ -82,32 +135,32 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 		SubjectWidget subject12 = new SubjectWidget("Introducciónallavidasocialdemamertos peruanos del siglo XI","0000r42",0,true,1);
 		SubjectWidget subject13 = new SubjectWidget("Introducciónallavidasocialdemamertos peruanos del siglo XI","0000r42",0,true,1);
 		SubjectWidget subject14 = new SubjectWidget("Introducciónallavidasocialdemamertos peruanos del siglo XI","0000r42",0,true,1);
-		plan.addSubject(0, subject1);
-		plan.addSubject(0, subject2);
-		plan.addSubject(0, subject3);
-		plan.addSubject(1, subject4);
-		plan.addSubject(2, subject5);
-		plan.addSubject(3, subject6);
-		plan.addSubject(4, subject7);
-		plan.addSubject(5, subject8);
-		plan.addSubject(6, subject9);
-		plan.addSubject(7, subject10);
-		plan.addSubject(8, subject11);
-		plan.addSubject(9, subject12);
-		plan.addSubject(10, subject13);
+		planWidget.addSubject(0, subject1);
+		planWidget.addSubject(0, subject2);
+		planWidget.addSubject(0, subject3);
+		planWidget.addSubject(1, subject4);
+		planWidget.addSubject(2, subject5);
+		planWidget.addSubject(3, subject6);
+		planWidget.addSubject(4, subject7);
+		planWidget.addSubject(5, subject8);
+		planWidget.addSubject(6, subject9);
+		planWidget.addSubject(7, subject10);
+		planWidget.addSubject(8, subject11);
+		planWidget.addSubject(9, subject12);
+		planWidget.addSubject(10, subject13);
 	}
 	
 	//this method must be deleted later on
 	private void methodToBeDeleted(Subject result) {
 		SubjectWidget subjectxxx = new SubjectWidget(result.getName(),result.getCode(),result.getCredits(),true,1);;
 		makeSubjectDraggable(subjectxxx);
-		plan.addSubject(1, subjectxxx);
+		planWidget.addSubject(1, subjectxxx);
 	}
 	
 	/**
 	 * The callback function the one that will be run when the call returns 
 	 */
-	AsyncCallback<Subject> callback = new AsyncCallback<Subject>(){
+	AsyncCallback<Subject> chargeSubjectByCode = new AsyncCallback<Subject>(){
 		public void onFailure(Throwable caught){
 			//Window.alert("RPC to sendEmail() failed.");
 		}
@@ -127,8 +180,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 	}
 	
 	private void createSemester(){
-		plan.addSemester();
-		dropController = new VerticalPanelDropController(plan.getMainPanelFromSemester(plan.getNumberOfSemesters()-1));
+		planWidget.addSemester();
+		dropController = new VerticalPanelDropController(planWidget.getMainPanelFromSemester(planWidget.getNumberOfSemesters()-1));
 		dragController.registerDropController(dropController);
 	}
 
@@ -152,7 +205,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 		container.add(view.asWidget());
 		
 		subContainer.addStyleName("subContainerForPlan");
-		boundaryPanel.add(plan);
+		boundaryPanel.add(planWidget);
 		subContainer.add(boundaryPanel);
 		
 		subContainer.setHorizontalAlignment(HorizontalPanel.ALIGN_CENTER);

@@ -18,6 +18,7 @@ import com.uibinder.index.client.presenter.IndexPresenter;
 import com.uibinder.index.client.presenter.PlanPresenter;
 import com.uibinder.index.client.presenter.Presenter;
 import com.uibinder.index.client.presenter.TopBarPresenter;
+import com.uibinder.index.client.service.SUNServiceAsync;
 import com.uibinder.index.client.view.AboutGedadViewImpl;
 import com.uibinder.index.client.view.DndViewImpl;
 import com.uibinder.index.client.view.IndexViewImpl;
@@ -36,15 +37,18 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	Presenter createPresenter = null;
 	Presenter planPresenter = null;
 	
-	private HasWidgets container;
 	private final HandlerManager eventBus;
+	private final SUNServiceAsync rpcService;
+	
+	private HasWidgets container;
 	private IndexViewImpl indexView;
 	private TopBarViewImpl topBarView;
 	private DndViewImpl dndView;
 	private CreateViewImpl createView;
 	private PlanViewImpl planView;
 	
-	public AppController(HandlerManager eventBus){
+	public AppController(SUNServiceAsync rpcService, HandlerManager eventBus){
+		this.rpcService = rpcService;
 		this.eventBus = eventBus;
 		bind();
 	}
@@ -98,8 +102,19 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 			
 			if(topBarView == null){
 				topBarView = new TopBarViewImpl();
-				topBarPresenter = new TopBarPresenter(eventBus, topBarView);
+				topBarPresenter = new TopBarPresenter(rpcService, eventBus, topBarView);
 				topBarPresenter.go(RootPanel.get("topArea"));
+			}
+			
+			/**
+			 * This part will take care of the stability of the plan widget when its height changes due
+			 * to the changes on the number of max subjects on one semester
+			 */
+			if(token.equals("plan")){
+				if(RootPanel.get("centerArea").getElement().getAttribute("valign") != "top")
+				RootPanel.get("centerArea").getElement().setAttribute("valign","top");
+			}else if(RootPanel.get("centerArea").getElement().getAttribute("valign")!="middle"){
+				RootPanel.get("centerArea").getElement().setAttribute("valign","middle");
 			}
 			
 			if(token.equals("dnd")){ //dnd stands for Drag and Drop
@@ -107,7 +122,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 					dndView = new DndViewImpl();
 				}
 				if(dndPresenter == null){
-					dndPresenter = new DndPresenter(eventBus, dndView);
+					dndPresenter = new DndPresenter(rpcService, eventBus, dndView);
 				}
 				dndPresenter.go(RootPanel.get("centerArea"));					
 			} else if(token.equals("create")){
@@ -115,7 +130,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 					createView = new CreateViewImpl();
 				}
 				if(createPresenter == null){
-					createPresenter = new CreatePresenter(eventBus, createView);					
+					createPresenter = new CreatePresenter(rpcService, eventBus, createView);					
 				}
 				createPresenter.go(RootPanel.get("centerArea"));
 			} else if(token.equals("plan")) {
@@ -123,19 +138,19 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 					planView = new PlanViewImpl();
 				}
 				if(planPresenter == null){
-					planPresenter = new PlanPresenter(eventBus, planView);
+					planPresenter = new PlanPresenter(rpcService, eventBus, planView);
 				}
 				planPresenter.go(RootPanel.get("centerArea"));
 			} else if(token.equals("gedad")) {
 				AboutGedadViewImpl aboutGedadView = new AboutGedadViewImpl();
-				Presenter aboutGedadPresenter = new AboutGedadPresenter(eventBus, aboutGedadView);
+				Presenter aboutGedadPresenter = new AboutGedadPresenter(rpcService, eventBus, aboutGedadView);
 				aboutGedadPresenter.go(RootPanel.get("centerArea"));
 			} else {
 				if(indexView == null){
 					indexView = new IndexViewImpl();
 				}
 				if(indexPresenter == null){
-					indexPresenter = new IndexPresenter(eventBus, indexView);					
+					indexPresenter = new IndexPresenter(rpcService, eventBus, indexView);					
 				}
 				indexPresenter.go(RootPanel.get("centerArea"));
 			}
