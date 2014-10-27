@@ -5,6 +5,7 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.uibinder.index.client.event.AboutUsEvent;
@@ -167,11 +168,25 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 		} else if(token.equals("plan")){
 			topBarView.setMainLabel("Plan de Estudios");
 		} else if(token.equals("gedad")){
-			topBarView.setMainLabel("Estudia para la vida, no para los exámenes!");
+			rpcService.getRandomPhrase(gettingRandomPhrase);
 		} else {
 			topBarView.setMainLabel("");
 		}
 		topBarView.setUserName("Invitado");
 	}
+	
+	AsyncCallback<String> gettingRandomPhrase = new AsyncCallback<String>(){
+
+		@Override
+		public void onFailure(Throwable caught) {
+			topBarView.setMainLabel("Estudia para la vida, no para los exámenes!2");
+		}
+
+		@Override
+		public void onSuccess(String result) {
+			topBarView.setMainLabel(result);
+		}
+		
+	};
 	
 }

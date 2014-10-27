@@ -40,4 +40,9 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		return null;
 	}
 
+	@Override
+	public String getRandomPhrase() {
+		return "Estudia para la vida, no para los exámenes!";
+	}
+
 }

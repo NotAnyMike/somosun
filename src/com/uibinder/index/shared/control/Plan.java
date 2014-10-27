@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,7 +20,7 @@ import java.util.regex.Pattern;
  *
  * @author Cesar A. Villamizar C.
  */
-public class Plan {
+public class Plan implements Serializable {
 
     Career career;
     List<Semester> semesters;
@@ -34,15 +35,15 @@ public class Plan {
 
     }
 
-    public void parseHistory(String history) {
+    /*public void parseHistory(String history) {
 
         semesters= new ArrayList<>();
         
 //////////////////////////////////////"<option value=\"(\\d+)\">\\((\\d+)\\) ([^<]+)</option>"
-        Pattern careerPattern= Pattern.compile("	(\\d+) \\| (.+[\\S])");
+        //Pattern careerPattern= Pattern.compile("	(\\d+) \\| (.+[\\S])");
         //group1: careerCode ; group2: carrerName
         
-        Pattern semesterPattern = Pattern.compile("(\\d+)	periodo acad��mico \\| (\\d+-\\w+)");
+        Pattern semesterPattern = Pattern.compile("(\\d+)	periodo académico \\| (\\d+-\\w+)");
         //group1: semesterNumber ; group2: semesterDate (year-sem).
 
         Pattern subjectPattern = Pattern.compile("(\\d+)-(\\d+)	(.+)	(\\d+)	(\\d+)	(\\d+)	(\\w)*	(\\d+)	(\\d+)	(\\w)*	(\\d+)");
@@ -61,11 +62,11 @@ public class Plan {
 
 //////////////////////////////////////
         
-        Matcher careerMatcher = careerPattern.matcher(history);
+        //Matcher careerMatcher = careerPattern.matcher(history);
         
-        if(careerMatcher.find()){            
-            career= new Career(careerMatcher.group(1),careerMatcher.group(2));            
-        }
+        //if(careerMatcher.find()){            
+          //  career= new Career(careerMatcher.group(1),careerMatcher.group(2));            
+        //}
         
         Matcher semesterMatcher = semesterPattern.matcher(history);
 
@@ -104,13 +105,13 @@ public class Plan {
 
         }
 
-    }
+    }*/
 
     public void addSubject() {
 
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
 
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("historia.txt"), "UTF8"));
@@ -131,6 +132,6 @@ public class Plan {
         } catch (IOException ex) {
             Logger.getLogger(Plan.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
+    }*/
 
 }

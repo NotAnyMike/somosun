@@ -1,0 +1,91 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:style>
+	.important {
+		font-weight: bold;
+	}
+	</ui:style>
+	<ui:style field="second" src="styles/styles.css"/>
+	<ui:style field="third" src="styles/bootstrap.css"/>
+	<ui:style field="forth" src="styles/bootstrap-theme.min.css"/>
+	<ui:style field="fifth" src="styles/malla.css"/>
+	<g:HTMLPanel>
+		<table width="100%" border="0" cellspacing="0" cellpadding="0">
+		  <tr>
+		    <td height="10" colspan="3"></td>
+		  </tr>
+		  <tr>
+		    <td width="10"></td>
+		    <td align="center" valign="middle"><table border="0" cellspacing="0" cellpadding="0">
+		      <tr>
+		        <td align="center" valign="middle"><table border="0" cellpadding="0" cellspacing="0" class="planSummary">
+		          <tr>
+		            <td height="5" colspan="3"></td>
+		          </tr>
+		          <tr>
+		            <td width="150" align="right" valign="middle">PAPA:</td>
+		            <td width="10" rowspan="4"></td>
+		            <td width="50">4.4</td>
+		          </tr>
+		          <tr>
+		            <td width="150" align="right" valign="middle">Avance:</td>
+		            <td width="50">58%</td>
+		          </tr>
+		          <tr>
+		            <td width="150" align="right" valign="middle">Creditos aprobados:</td>
+		            <td width="50">75</td>
+		          </tr>
+		          <tr>
+		            <td width="150" align="right" valign="middle">Creditos adicionales:</td>
+		            <td>80</td>
+		          </tr>
+		          <tr>
+		            <td height="5" colspan="3"></td>
+		          </tr>
+		        </table></td>
+		        <td width="30" align="center" valign="middle"></td>
+		        <td align="center" valign="middle"><table border="0" cellpadding="0" cellspacing="0" class="academicHistorySummary">
+		          <tr class="planSummaryTitle">
+		            <td width="130" align="right" class="smallCaptionPlanSummary rightBorder">tipología </td>
+		            <td width="100" align="center" nowrap="nowrap" class="smallCaptionPlanSummary">Aprobados</td>
+		            <td width="90" align="center" class="smallCaptionPlanSummary">Exigidos</td>
+		            <td width="80" align="center" class="smallCaptionPlanSummary">%</td>
+		          </tr>
+		          <tr>
+		            <td width="130" align="right" class="topBorder rightBorder planSummaryTitle">Fundamentación </td>
+		            <td width="100" align="center" nowrap="nowrap" class="topBorder planSummaryText">50</td>
+		            <td width="90" align="center" class="topBorder planSummaryText">50</td>
+		            <td width="80" align="center" class="topBorder planSummaryText">100%</td>
+		          </tr>
+		          <tr>
+		            <td width="130" align="right" class="rightBorder  planSummaryTitle">Disciplinar </td>
+		            <td width="100" align="center" nowrap="nowrap" class="planSummaryText">40</td>
+		            <td width="90" align="center" class="planSummaryText">54</td>
+		            <td width="80" align="center" class="planSummaryText">80%</td>
+		          </tr>
+		          <tr>
+		            <td width="130" align="right" class="rightBorder  planSummaryTitle">Libre Elección </td>
+		            <td width="100" align="center" nowrap="nowrap" class="planSummaryText">56</td>
+		            <td width="90" align="center" class="planSummaryText">40</td>
+		            <td width="80" align="center" class="planSummaryText">100%</td>
+		          </tr>
+		          <tr>
+		            <td width="130" align="right" class="topBorder rightBorder planSummaryTitle smallCaptionPlanSummary">totales</td>
+		            <td width="100" align="center" nowrap="nowrap" class="topBorder  planSummaryTotals smallCaptionPlanSummary">146</td>
+		            <td width="90" align="center" class="topBorder planSummaryTotals smallCaptionPlanSummary">100%</td>
+		            <td width="80" align="center" class="topBorder  planSummaryTotals smallCaptionPlanSummary">90%</td>
+		          </tr>
+		        </table></td>
+		      </tr>
+		    </table></td>
+		    <td width="10"></td>
+		  </tr>
+		  <tr>
+		    <td height="10"></td>
+		    <td height="10"></td>
+		    <td height="10"></td>
+		  </tr>
+		</table>
+	</g:HTMLPanel>
+</ui:UiBinder> 

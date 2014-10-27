@@ -15,6 +15,7 @@ import com.uibinder.index.client.service.SUNService;
 import com.uibinder.index.client.service.SUNServiceAsync;
 import com.uibinder.index.client.view.PlanView;
 import com.uibinder.index.client.view.PlanViewImpl;
+import com.uibinder.index.client.view.SiaSummary;
 import com.uibinder.index.client.widget.PlanWidget;
 import com.uibinder.index.client.widget.SubjectWidget;
 import com.uibinder.index.client.dnd.PickUpDragController;
@@ -38,6 +39,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 
 	//Widget classes
 	private PlanWidget planWidget;
+	private SiaSummary siaSummary;
 	
 	private VerticalPanel subContainer = new VerticalPanel();
 	private VerticalPanelDropController dropController; 
@@ -109,6 +111,9 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 		dragController = new PickUpDragController(boundaryPanel, allowDroppingOnBoundaryPanel);
 		
 		planWidget = new PlanWidget();
+		
+		//creating the Summary
+		siaSummary = new SiaSummary();
 		
 		/************* to remove later on **************/
 		//It is just for design purposes
@@ -207,6 +212,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 		subContainer.addStyleName("subContainerForPlan");
 		boundaryPanel.add(planWidget);
 		subContainer.add(boundaryPanel);
+		
+		subContainer.add(siaSummary.asWidget());
 		
 		subContainer.setHorizontalAlignment(HorizontalPanel.ALIGN_CENTER);
 		

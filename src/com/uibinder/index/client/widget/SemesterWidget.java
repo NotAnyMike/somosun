@@ -13,6 +13,7 @@ public class SemesterWidget extends VerticalPanel {
 	
 	private static final String[] SEMESTER_ROMAN = {"I", "II", "III", "IV", "V", "VI", 
 		"VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII"};
+	private static final String CREDITS_STRING = "créditos: ";
 	
 	private int semester = 0;
 	private int subjects = 0;
@@ -29,7 +30,7 @@ public class SemesterWidget extends VerticalPanel {
 		this.semester = semester;
 		
 		semesterLabel = new Label(SEMESTER_ROMAN[semester]);
-		creditsLabel = new Label("cr: " + Integer.toString(credits));
+		creditsLabel= new Label(CREDITS_STRING + Integer.toString(credits));
 		addImage.setUrl("images/add.png");
 
 		this.addStyleName("semesterPanel");
@@ -42,8 +43,9 @@ public class SemesterWidget extends VerticalPanel {
 		
 		semesterLabel.addStyleName("semesterLabelSemesterPanel");
 		
-		addImage.setStyleName("addImageSemesterPanel");
+		addImage.addStyleName("addImageSemesterPanel");
 		
+		//This part is the little box of "credits: x"
 		bottomPart.addStyleName("bottomPartSemesterPanel");
 		bottomPart.setHorizontalAlignment(ALIGN_CENTER);
 		bottomPart.setVerticalAlignment(ALIGN_MIDDLE);
@@ -65,7 +67,7 @@ public class SemesterWidget extends VerticalPanel {
 	}
 	
 	private void updateCredits() {
-		creditsLabel.setText("cr: " + credits);
+		creditsLabel.setText(CREDITS_STRING + credits);
 	}
 
 	public void clearSemester(){
