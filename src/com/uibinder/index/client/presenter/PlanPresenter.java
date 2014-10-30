@@ -19,6 +19,7 @@ import com.uibinder.index.client.view.SiaSummary;
 import com.uibinder.index.client.widget.PlanWidget;
 import com.uibinder.index.client.widget.SubjectWidget;
 import com.uibinder.index.client.dnd.PickUpDragController;
+import com.uibinder.index.client.dnd.SemesterDropController;
 import com.uibinder.index.shared.control.Plan;
 import com.uibinder.index.shared.control.Subject;
 
@@ -42,7 +43,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 	private SiaSummary siaSummary;
 	
 	private VerticalPanel subContainer = new VerticalPanel();
-	private VerticalPanelDropController dropController; 
+	private SemesterDropController dropController; 
 	
 	//Dnd Stuff
 	private PickUpDragController dragController;
@@ -186,7 +187,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 	
 	private void createSemester(){
 		planWidget.addSemester();
-		dropController = new VerticalPanelDropController(planWidget.getMainPanelFromSemester(planWidget.getNumberOfSemesters()-1));
+		dropController = new SemesterDropController(planWidget.getMainPanelFromSemester(planWidget.getNumberOfSemesters()-1), planWidget.getSemester(planWidget.getNumberOfSemesters()-1));
 		dragController.registerDropController(dropController);
 	}
 

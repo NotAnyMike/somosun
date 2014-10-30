@@ -16,7 +16,7 @@ public class SubjectWidget extends FlowPanel {
 	private String name = null;
 	private String code = null;
 	private boolean obligatoriness = false;
-	private int credits = 0;
+	public int credits = 0;
 	private double grade = 0.0;
 	private int type = 0;
 	private boolean selected = false;
@@ -56,6 +56,9 @@ public class SubjectWidget extends FlowPanel {
 		createWidget();
 	}
 
+	public SubjectWidget() {
+		// TODO Auto-generated constructor stub
+	}
 	private void createWidget() {
 		nameLabel = new Label(name);
 		codeLabel = new Label(code);

@@ -69,6 +69,11 @@ public class SemesterWidget extends VerticalPanel {
 	private void updateCredits() {
 		creditsLabel.setText(CREDITS_STRING + credits);
 	}
+	
+	public void addCredits(int x){
+		credits+=x;
+		updateCredits();
+	}
 
 	public void clearSemester(){
 		subjectList.clear();

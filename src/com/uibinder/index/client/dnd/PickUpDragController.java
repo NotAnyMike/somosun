@@ -136,7 +136,6 @@ public class PickUpDragController extends AbstractDragController {
 	    movablePanel.removeFromParent();
 	    movablePanel = null;
 	    super.dragEnd();
-	    //Window.alert("hola");
 	  }
 
 	  @Override
