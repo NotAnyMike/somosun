@@ -32,11 +32,11 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	/*
 	* Creating all the views that will exist once for all to save them to let users go back to their view
 	*/
-	Presenter indexPresenter = null;
-	Presenter topBarPresenter = null;
-	Presenter dndPresenter = null;
-	Presenter createPresenter = null;
-	Presenter planPresenter = null;
+	IndexPresenter indexPresenter = null;
+	TopBarPresenter topBarPresenter = null;
+	DndPresenter dndPresenter = null;
+	CreatePresenter createPresenter = null;
+	PlanPresenter planPresenter = null;
 	
 	private final HandlerManager eventBus;
 	private final SUNServiceAsync rpcService;
@@ -162,29 +162,29 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 
 	private void setLabelsOnTopBar(String token) {
 		if(token.equals("dnd")){
-			topBarView.setMainLabel("You shouldn't be here!");
+			topBarPresenter.setNameOfThePage("You shouldn't be here!");
 		} else if (token.equals("create")){
-			topBarView.setMainLabel("Plan de Estudios");
+			topBarPresenter.setNameOfThePage("Plan de Estudios");
 		} else if(token.equals("plan")){
-			topBarView.setMainLabel("Plan de Estudios");
+			topBarPresenter.setNameOfThePage("Plan de Estudios");
 		} else if(token.equals("gedad")){
 			rpcService.getRandomPhrase(gettingRandomPhrase);
 		} else {
-			topBarView.setMainLabel("");
+			topBarPresenter.setNameOfThePage("");
 		}
-		topBarView.setUserName("Invitado");
+		topBarPresenter.setUserName("Invitado");
 	}
 	
-	AsyncCallback<String> gettingRandomPhrase = new AsyncCallback<String>(){
+	AsyncCallback<String[]> gettingRandomPhrase = new AsyncCallback<String[]>(){
 
 		@Override
 		public void onFailure(Throwable caught) {
-			topBarView.setMainLabel("Estudia para la vida, no para los exámenes!2");
+			topBarPresenter.setNameOfThePage("Estudia para la vida, no para los exámenes!2");
 		}
 
 		@Override
-		public void onSuccess(String result) {
-			topBarView.setMainLabel(result);
+		public void onSuccess(String[] result) {
+			topBarPresenter.setNameOfThePage(result[0], result[1]);
 		}
 		
 	};

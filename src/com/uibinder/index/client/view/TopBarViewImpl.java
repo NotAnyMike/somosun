@@ -36,13 +36,18 @@ public class TopBarViewImpl extends Composite implements TopBarView {
 	}
 
 	@Override
+	public void setUserName(String s) {
+		userNameLabel.setText(s);
+	}
+	
+	@Override
 	public void setMainLabel(String s) {
 		pageNameLabel.setText(s);
 	}
 
 	@Override
-	public void setUserName(String s) {
-		userNameLabel.setText(s);
+	public void setMainLabelTitle(String s) {
+		pageNameLabel.setTitle(s);
 	}
 
 }

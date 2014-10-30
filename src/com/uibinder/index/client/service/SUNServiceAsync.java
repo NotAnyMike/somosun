@@ -23,6 +23,6 @@ public interface SUNServiceAsync {
 
 	void getSubjectByName(String name, String career, AsyncCallback<Subject> callback);
 
-	void getRandomPhrase(AsyncCallback<String> callback);
+	void getRandomPhrase(AsyncCallback<String[]> callback);
 
 }

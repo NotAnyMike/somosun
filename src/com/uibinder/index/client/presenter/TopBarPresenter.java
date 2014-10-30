@@ -25,13 +25,28 @@ public class TopBarPresenter implements Presenter, TopBarView.Presenter {
 	}
 
 	@Override
-	public void setNameOfThePage(String s) {
-		view.setMainLabel(s);
+	public void setUserName(String s) {
+		view.setUserName(s);
 	}
 
 	@Override
-	public void setUserName(String s) {
-		view.setUserName(s);
+	public void setNameOfThePage(String phrase, String author) {
+		setMainTitle(phrase, author);
+	}
+
+	@Override
+	public void setNameOfThePage(String phrase) {
+		setMainTitle(phrase, "");
+	}
+
+	private void setMainTitle(String phrase, String author) {
+		if(author==""){
+			author=phrase;
+		}else{
+			author = phrase + " - " + author;
+		}
+		view.setMainLabel(phrase);
+		view.setMainLabelTitle(author);
 	}
 
 }

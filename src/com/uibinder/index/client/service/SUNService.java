@@ -22,6 +22,6 @@ public interface SUNService extends RemoteService{
 	Subject getSubjectByName(String name);
 	Subject getSubjectByName(String name, String career);
 	
-	String getRandomPhrase();
+	String[] getRandomPhrase();
 	
 }

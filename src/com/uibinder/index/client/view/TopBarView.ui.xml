@@ -28,7 +28,7 @@
 					<li id="log-hyperlink"><g:Anchor ui:field="LogLabel"></g:Anchor></li>
 					<li id="panel"><g:Anchor ui:field="adminPanelLabel"></g:Anchor></li>
 				</ul>
-				<g:Label ui:field="pageNameLabel" addStyleNames="{forth.mainLabelNamePageTopBar} {third.lead} {third.main-text} {third.navbar-text}">Plan de Estudios</g:Label>
+				<g:Label ui:field="pageNameLabel" addStyleNames="{third.lead} {third.main-text} {third.navbar-text} {forth.mainLabelNamePageTopBar} "></g:Label>
 			</div>
 	    	</div>
 	    </div>

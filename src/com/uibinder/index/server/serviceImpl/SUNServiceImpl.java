@@ -41,8 +41,11 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 	}
 
 	@Override
-	public String getRandomPhrase() {
-		return "Estudia para la vida, no para los exámenes!";
+	public String[] getRandomPhrase() {
+		String[] rtrn = new String[2];
+		rtrn[0] = "Estudia para la vida, no para los exámenes!"; //phrase
+		rtrn[1] = "Anónimo"; //author
+		return rtrn;
 	}
 
 }
