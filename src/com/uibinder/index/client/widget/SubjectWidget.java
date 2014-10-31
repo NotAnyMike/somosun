@@ -16,7 +16,7 @@ public class SubjectWidget extends FlowPanel {
 	private String name = null;
 	private String code = null;
 	private boolean obligatoriness = false;
-	public int credits = 0;
+	private int credits = 0;
 	private double grade = 0.0;
 	private int type = 0;
 	private boolean selected = false;
@@ -43,8 +43,11 @@ public class SubjectWidget extends FlowPanel {
 		this.obligatoriness = obligatoriness;
 		this.type = type;
 		
+		setAttributes();
+		
 		createWidget();
 	}
+	
 	public SubjectWidget(String name, String code, int credits, boolean obligatoriness, int type){
 		this.name = name;
 		this.code = code;
@@ -53,12 +56,25 @@ public class SubjectWidget extends FlowPanel {
 		this.obligatoriness = obligatoriness;
 		this.type = type;
 		
+		setAttributes();
+		
 		createWidget();
 	}
 
-	public SubjectWidget() {
-		// TODO Auto-generated constructor stub
+	/**
+	 * This method adds the attributes to the HTML code to be read later on by the dnd controllers
+	 */
+	private void setAttributes() {
+		
+		this.getElement().setAttribute("name", name);
+		this.getElement().setAttribute("code", code);
+		this.getElement().setAttribute("Credits", Integer.toString(credits));
+		this.getElement().setAttribute("grade", Double.toString(grade));
+		this.getElement().setAttribute("obligatoriness", Boolean.toString(obligatoriness));
+		this.getElement().setAttribute("type", Integer.toString(type));
+		
 	}
+
 	private void createWidget() {
 		nameLabel = new Label(name);
 		codeLabel = new Label(code);
@@ -182,5 +198,9 @@ public class SubjectWidget extends FlowPanel {
 	
 	public List<SubjectWidget> getPosList(){
 		return posList;
+	}
+	
+	public String getCode(){
+		return code;
 	}
 }

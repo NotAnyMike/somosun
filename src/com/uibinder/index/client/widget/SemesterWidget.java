@@ -7,6 +7,7 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.uibinder.index.client.presenter.PlanPresenter;
 import com.uibinder.index.client.widget.SubjectWidget;
 
 public class SemesterWidget extends VerticalPanel {
@@ -16,8 +17,8 @@ public class SemesterWidget extends VerticalPanel {
 	private static final String CREDITS_STRING = "créditos: ";
 	
 	private int semester = 0;
-	private int subjects = 0;
-	private List<SubjectWidget> subjectList = new ArrayList<SubjectWidget>();
+	//private int subjects = 0;
+	//private List<SubjectWidget> subjectList = new ArrayList<SubjectWidget>();
 	private int credits = 0;
 	
 	private Image addImage = new Image();
@@ -26,7 +27,8 @@ public class SemesterWidget extends VerticalPanel {
 	private HorizontalPanel bottomPart = new HorizontalPanel();
 	private VerticalPanel subjectPanel = new SubjectPanel();
 	
-	public SemesterWidget (int semester){
+	public SemesterWidget (int semester, PlanPresenter planPresenter){
+	
 		this.semester = semester;
 		
 		semesterLabel = new Label(SEMESTER_ROMAN[semester]);
@@ -66,7 +68,7 @@ public class SemesterWidget extends VerticalPanel {
 		this.semester = semester;
 	}
 	
-	private void updateCredits() {
+	public void updateCredits() {
 		creditsLabel.setText(CREDITS_STRING + credits);
 	}
 	
@@ -74,31 +76,36 @@ public class SemesterWidget extends VerticalPanel {
 		credits+=x;
 		updateCredits();
 	}
+	
+	public void removeCredits(int x){
+		credits-=x;
+		updateCredits();
+	}
 
 	public void clearSemester(){
-		subjectList.clear();
+		//subjectList.clear();
 		subjectPanel.clear();
-		subjects = 0;
+		//subjects = 0;
 	}
 	
-	public void deleteSubject(SubjectWidget subject){
+	/*public void deleteSubject(SubjectWidget subject){
 		if(subjectList.contains(subject) == true){
 			subjectList.remove(subject);
 			subjects--;
 		}
-	}
+	}*/
 
-	public List<SubjectWidget> getSubjectList() {
+	/*public List<SubjectWidget> getSubjectList() {
 		return subjectList;
-	}
+	}*/
 	
-	public int getSubjectsNumbers(){
+	/*public int getSubjectsNumbers(){
 		return subjects;
 	}
 
 	public SubjectWidget getSubject(int subject) {
 		return subjectList.get(subject);
-	}
+	}*/
 	
 	public VerticalPanel getMainPanel(){
 		return subjectPanel;
@@ -109,11 +116,11 @@ public class SemesterWidget extends VerticalPanel {
 	}
 
 	public void addSubject(SubjectWidget subject) {
-		subjectList.add(subject);
+		//subjectList.add(subject);
 		subjectPanel.add(subject);
 		
 		this.credits+= subject.getCredits();
-		subjects++;
+		//subjects++;
 		
 		updateCredits();
 	}

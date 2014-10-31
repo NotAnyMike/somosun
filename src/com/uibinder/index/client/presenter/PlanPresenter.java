@@ -1,25 +1,25 @@
 package com.uibinder.index.client.presenter;
 
-import java.awt.Window;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
-import com.allen_sauer.gwt.dnd.client.drop.VerticalPanelDropController;
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.uibinder.index.client.service.SUNService;
+import com.uibinder.index.client.dnd.PickUpDragController;
+import com.uibinder.index.client.dnd.SemesterDropController;
 import com.uibinder.index.client.service.SUNServiceAsync;
 import com.uibinder.index.client.view.PlanView;
 import com.uibinder.index.client.view.PlanViewImpl;
 import com.uibinder.index.client.view.SiaSummary;
 import com.uibinder.index.client.widget.PlanWidget;
+import com.uibinder.index.client.widget.SemesterWidget;
 import com.uibinder.index.client.widget.SubjectWidget;
-import com.uibinder.index.client.dnd.PickUpDragController;
-import com.uibinder.index.client.dnd.SemesterDropController;
 import com.uibinder.index.shared.control.Plan;
 import com.uibinder.index.shared.control.Subject;
 
@@ -34,6 +34,12 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 	private final HandlerManager eventBus;
 	private PlanViewImpl view;
 	private final SUNServiceAsync rpcService;
+	
+	private HashMap<SubjectWidget,SemesterWidget> subjectsBySemester = new HashMap<SubjectWidget, SemesterWidget>();
+	private List<SubjectWidget> subjectList = new ArrayList<SubjectWidget>();
+	private List<SemesterWidget> semesterList = new ArrayList<SemesterWidget>();
+	private int semesters = 0;
+	private int subjects = 0;
 	
 	//Control classes
 	private Plan plan;
@@ -119,54 +125,69 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 		/************* to remove later on **************/
 		//It is just for design purposes
 		
-		createSemesters(11);
+		createSemesters(2);
 		
-		rpcService.getSubjectByCode(123, chargeSubjectByCode);
+		//rpcService.getSubjectByCode(123, chargeSubjectByCode);
 		
-		SubjectWidget subject1 = new SubjectWidget("Introducciónallavidasocialdemamertos peruanos del siglo XI","0000r42",0,true,1);
-		SubjectWidget subject2 = new SubjectWidget("Introducciónallavidasocialdemamertos peruanos del siglo XI","0000r42",0,true,1);
-		SubjectWidget subject3 = new SubjectWidget("Introducciónallavidasocialdemamertos peruanos del siglo XI","0000r42",0,true,1);
-		SubjectWidget subject4 = new SubjectWidget("Introducciónallavidasocialdemamertos peruanos del siglo XI","0000r42",0,true,1);
-		makeSubjectDraggable(subject1);
-		makeSubjectDraggable(subject2);
-		makeSubjectDraggable(subject3);
-		makeSubjectDraggable(subject4);
-		SubjectWidget subject5 = new SubjectWidget("Introducciónallavidasocialdemamertos peruanos del siglo XI","0000r42",0,true,1);
-		SubjectWidget subject6 = new SubjectWidget("Introducciónallavidasocialdemamertos peruanos del siglo XI","0000r42",0,true,1);
-		SubjectWidget subject7 = new SubjectWidget("Introducciónallavidasocialdemamertos peruanos del siglo XI","0000r42",0,true,1);
-		SubjectWidget subject8 = new SubjectWidget("Introducciónallavidasocialdemamertos peruanos del siglo XI","0000r42",0,true,1);
-		SubjectWidget subject9 = new SubjectWidget("Introducciónallavidasocialdemamertos peruanos del siglo XI","0000r42",0,true,1);
-		SubjectWidget subject10 = new SubjectWidget("Introducciónallavidasocialdemamertos peruanos del siglo XI","0000r42",0,true,1);
-		SubjectWidget subject11 = new SubjectWidget("Introducciónallavidasocialdemamertos peruanos del siglo XI","0000r42",0,true,1);
-		SubjectWidget subject12 = new SubjectWidget("Introducciónallavidasocialdemamertos peruanos del siglo XI","0000r42",0,true,1);
-		SubjectWidget subject13 = new SubjectWidget("Introducciónallavidasocialdemamertos peruanos del siglo XI","0000r42",0,true,1);
-		SubjectWidget subject14 = new SubjectWidget("Introducciónallavidasocialdemamertos peruanos del siglo XI","0000r42",0,true,1);
-		planWidget.addSubject(0, subject1);
-		planWidget.addSubject(0, subject2);
-		planWidget.addSubject(0, subject3);
-		planWidget.addSubject(1, subject4);
-		planWidget.addSubject(2, subject5);
-		planWidget.addSubject(3, subject6);
-		planWidget.addSubject(4, subject7);
-		planWidget.addSubject(5, subject8);
-		planWidget.addSubject(6, subject9);
-		planWidget.addSubject(7, subject10);
-		planWidget.addSubject(8, subject11);
-		planWidget.addSubject(9, subject12);
-		planWidget.addSubject(10, subject13);
+		createSubject("Introducciónallavidasocialdemamertos peruanos del siglo XI","0000r42",3,true,1,0);
+
+	}
+	
+	private void createSubject(String name, String code, int credits, boolean isObligatory, int type, int semester){
+		SubjectWidget subject = new SubjectWidget(name,code,credits,isObligatory,type);
+		
+		if(semesters < semester){
+			createSemesters(semester - semesters);
+		}
+		
+		addSubject(subject, semester);
+		subjects++;
+	}
+	
+	private void deleteSubject(SubjectWidget subject){
+		
+		subject.removeFromParent();
+		subjects--;
+
+		if(subjectList.contains(subject)==true){
+			subjectList.get(subjectList.indexOf(subject)).removeFromParent();
+		}
+		
+		if(subjectsBySemester.containsKey(subject)==true){
+			subjectsBySemester.remove(subject);
+		}
+		
+	}
+	
+	/**
+	 * This method must be used all the times to add a subject to a semester
+	 * it makes the subject draggable too
+	 * @param subject
+	 * @param semester
+	 */
+	private void addSubject(SubjectWidget subject, int semester){
+		if(subjectsBySemester.containsKey(subject)==true){
+			subjectsBySemester.remove(subject);
+		}
+		subjectsBySemester.put(subject, semesterList.get(semester));
+		
+		if(semesterList.get(semester)!=null){
+			makeSubjectDraggable(subject);
+			semesterList.get(semester).getMainPanel().add(subject);
+		}
 	}
 	
 	//this method must be deleted later on
-	private void methodToBeDeleted(Subject result) {
+	/*private void methodToBeDeleted(Subject result) {
 		SubjectWidget subjectxxx = new SubjectWidget(result.getName(),result.getCode(),result.getCredits(),true,1);;
 		makeSubjectDraggable(subjectxxx);
 		planWidget.addSubject(1, subjectxxx);
-	}
+	}*/
 	
 	/**
 	 * The callback function the one that will be run when the call returns 
 	 */
-	AsyncCallback<Subject> chargeSubjectByCode = new AsyncCallback<Subject>(){
+	/*AsyncCallback<Subject> chargeSubjectByCode = new AsyncCallback<Subject>(){
 		public void onFailure(Throwable caught){
 			//Window.alert("RPC to sendEmail() failed.");
 		}
@@ -176,7 +197,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 			methodToBeDeleted(result);
 		}
 
-	};
+	};*/
 
 
 	@Override
@@ -186,8 +207,13 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 	}
 	
 	private void createSemester(){
-		planWidget.addSemester();
-		dropController = new SemesterDropController(planWidget.getMainPanelFromSemester(planWidget.getNumberOfSemesters()-1), planWidget.getSemester(planWidget.getNumberOfSemesters()-1));
+		
+		SemesterWidget semester = new SemesterWidget(semesters, this);
+		planWidget.add(semester);
+		semesterList.add(semester);
+		semesters++;
+		
+		dropController = new SemesterDropController(semester.getMainPanel(), semester, this);
 		dragController.registerDropController(dropController);
 	}
 
@@ -219,6 +245,22 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 		subContainer.setHorizontalAlignment(HorizontalPanel.ALIGN_CENTER);
 		
 		container.add(subContainer);
+	}
+	
+	/**
+	 * To keep the presenter and all the plan updated using the observer patter (actually this is the quick and dirty way)
+	 */
+	public void update(String code, int semester){
+		Window.alert(code + " al semestre " + semester);
+	}
+	
+	private SubjectWidget getSubjectByCodeFromList(String code){
+		for(SubjectWidget subject : subjectList){
+			if(subject.getCode()==code){
+				return subject;
+			}
+		}
+		return null;
 	}
 
 }

@@ -108,8 +108,7 @@ public class PickUpDragController extends AbstractDragController {
 	    dropControllerCollection = new DropControllerCollection(dropControllerList);
 	  }
 
-	  @SuppressWarnings("unused")
-	@Override
+	  @Override
 	  public void dragEnd() {
 	    assert context.finalDropController == null == (context.vetoException != null);
 	    if (context.vetoException != null) {
@@ -124,7 +123,7 @@ public class PickUpDragController extends AbstractDragController {
 			        restoreSelectedWidgetsLocation();
 		      //}
 	      }
-	    } else {
+	    } else {  
 	      context.dropController.onDrop(context);
 	      context.dropController.onLeave(context);
 	      context.dropController = null;
