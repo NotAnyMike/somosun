@@ -1,6 +1,9 @@
 package com.uibinder.index.client.service;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.uibinder.index.shared.RandomPhrase;
 import com.uibinder.index.shared.control.Subject;
 
 /**
@@ -23,6 +26,9 @@ public interface SUNServiceAsync {
 
 	void getSubjectByName(String name, String career, AsyncCallback<Subject> callback);
 
-	void getRandomPhrase(AsyncCallback<String[]> callback);
+	void getRandomPhrase(AsyncCallback<List<RandomPhrase>> callback);
+
+	void saveRandomPhrase(String phrase, String author,
+			AsyncCallback<Void> callback);
 
 }

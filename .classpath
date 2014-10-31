@@ -8,6 +8,6 @@
 	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
 	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-dnd-3.3.0.jar" sourcepath="/Users/Mike/.m2/repository/com/allen-sauer/gwt/dnd/gwt-dnd/3.3.0/gwt-dnd-3.3.0-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/User/Downloads/gwt-dnd-3.3.0.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

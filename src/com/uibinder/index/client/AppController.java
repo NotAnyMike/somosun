@@ -1,5 +1,8 @@
 package com.uibinder.index.client;
 
+import java.util.List;
+import java.util.Random;
+
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerManager;
@@ -26,6 +29,7 @@ import com.uibinder.index.client.view.IndexViewImpl;
 import com.uibinder.index.client.view.PlanViewImpl;
 import com.uibinder.index.client.view.TopBarViewImpl;
 import com.uibinder.index.client.view.CreateViewImpl;
+import com.uibinder.index.shared.*;
 
 public class AppController implements Presenter, ValueChangeHandler<String> {
 
@@ -37,6 +41,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	DndPresenter dndPresenter = null;
 	CreatePresenter createPresenter = null;
 	PlanPresenter planPresenter = null;
+	List<RandomPhrase> phrases = null;
 	
 	private final HandlerManager eventBus;
 	private final SUNServiceAsync rpcService;
@@ -168,14 +173,22 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 		} else if(token.equals("plan")){
 			topBarPresenter.setNameOfThePage("Plan de Estudios");
 		} else if(token.equals("gedad")){
-			rpcService.getRandomPhrase(gettingRandomPhrase);
+			if(phrases==null){
+				rpcService.getRandomPhrase(gettingRandomPhrase);
+			}else{
+				Random r = new Random();
+				double h = Math.floor(r.nextDouble()*phrases.size());
+				int ra = (int)h;
+				RandomPhrase current = phrases.get(ra);
+				topBarPresenter.setNameOfThePage(current.getRandomPhrase()+" "+current.getAuthor());
+			}
 		} else {
 			topBarPresenter.setNameOfThePage("");
 		}
 		topBarPresenter.setUserName("Invitado");
 	}
 	
-	AsyncCallback<String[]> gettingRandomPhrase = new AsyncCallback<String[]>(){
+	AsyncCallback<List<RandomPhrase>> gettingRandomPhrase = new AsyncCallback<List<RandomPhrase>>(){
 
 		@Override
 		public void onFailure(Throwable caught) {
@@ -183,8 +196,17 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 		}
 
 		@Override
-		public void onSuccess(String[] result) {
-			topBarPresenter.setNameOfThePage(result[0], result[1]);
+		public void onSuccess(List<RandomPhrase> result) {
+			phrases = result;
+			Random r = new Random();
+			double h = Math.floor(r.nextDouble()*phrases.size());
+			int ra = (int)h;
+			try{
+				RandomPhrase current = phrases.get(ra);
+				topBarPresenter.setNameOfThePage(current.getRandomPhrase()+" "+current.getAuthor());
+			}catch(Exception e){
+				topBarPresenter.setNameOfThePage("Mike is a world class whore");
+			}
 		}
 		
 	};

@@ -1,7 +1,10 @@
 package com.uibinder.index.client.service;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import com.uibinder.index.shared.RandomPhrase;
 import com.uibinder.index.shared.control.Subject;
 
 /**
@@ -22,6 +25,8 @@ public interface SUNService extends RemoteService{
 	Subject getSubjectByName(String name);
 	Subject getSubjectByName(String name, String career);
 	
-	String[] getRandomPhrase();
+	List<RandomPhrase> getRandomPhrase();
+	
+	void saveRandomPhrase(String phrase, String author);
 	
 }
