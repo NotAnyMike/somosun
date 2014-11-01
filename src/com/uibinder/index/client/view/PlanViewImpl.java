@@ -31,7 +31,6 @@ public class PlanViewImpl extends Composite implements PlanView {
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
-		
 	}
 
 }

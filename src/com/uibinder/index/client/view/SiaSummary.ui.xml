@@ -26,19 +26,19 @@
 		          <tr>
 		            <td width="150" align="right" valign="middle">PAPA:</td>
 		            <td width="10" rowspan="4"></td>
-		            <td width="50">4.4</td>
+		            <td width="50"><g:Label ui:field="papaLabel">-</g:Label></td>
 		          </tr>
 		          <tr>
 		            <td width="150" align="right" valign="middle">Avance:</td>
-		            <td width="50">58%</td>
+		            <td width="50"><g:Label ui:field="avanceLabel">58%</g:Label></td>
 		          </tr>
 		          <tr>
 		            <td width="150" align="right" valign="middle">Creditos aprobados:</td>
-		            <td width="50">75</td>
+		            <td width="50"><g:Label ui:field="aprovedLabel">75</g:Label></td>
 		          </tr>
 		          <tr>
 		            <td width="150" align="right" valign="middle">Creditos adicionales:</td>
-		            <td>80</td>
+		            <td><g:Label ui:field="aditionalLabel">80</g:Label></td>
 		          </tr>
 		          <tr>
 		            <td height="5" colspan="3"></td>

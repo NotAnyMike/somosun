@@ -28,6 +28,8 @@ import com.uibinder.index.shared.control.Subject;
  * 
  * This manage all the UI regarding the plan display at the moment, 
  * perhaps later on it will be expanded to some broader functions
+ * 
+ * Be very precise with the subjects' code, because it will work (no errors will be made) when all the codes are different.   
  */
 public class PlanPresenter implements Presenter, PlanView.Presenter {
 	
@@ -36,10 +38,12 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 	private final SUNServiceAsync rpcService;
 	
 	private HashMap<SubjectWidget,SemesterWidget> subjectsBySemester = new HashMap<SubjectWidget, SemesterWidget>();
+	private HashMap<SemesterWidget, Integer> credits = new HashMap<SemesterWidget, Integer>();
 	private List<SubjectWidget> subjectList = new ArrayList<SubjectWidget>();
 	private List<SemesterWidget> semesterList = new ArrayList<SemesterWidget>();
 	private int semesters = 0;
 	private int subjects = 0;
+	private int totalCredits = 0;
 	
 	//Control classes
 	private Plan plan;
@@ -133,15 +137,22 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 
 	}
 	
+	/**
+	 * it creates a subject from zero and it makes the subject draggable too
+	 * @param name
+	 * @param code
+	 * @param credits
+	 * @param isObligatory
+	 * @param type
+	 * @param semester
+	 */
 	private void createSubject(String name, String code, int credits, boolean isObligatory, int type, int semester){
 		SubjectWidget subject = new SubjectWidget(name,code,credits,isObligatory,type);
+		makeSubjectDraggable(subject);
+		subjectList.add(subject); //adding the subject to its list
 		
-		if(semesters < semester){
-			createSemesters(semester - semesters);
-		}
-		
-		addSubject(subject, semester);
 		subjects++;
+		addSubject(subject, semester);
 	}
 	
 	private void deleteSubject(SubjectWidget subject){
@@ -160,21 +171,61 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 	}
 	
 	/**
-	 * This method must be used all the times to add a subject to a semester
-	 * it makes the subject draggable too
+	 * This method is for times where we just know the number of the semester and nothing else
 	 * @param subject
 	 * @param semester
 	 */
 	private void addSubject(SubjectWidget subject, int semester){
-		if(subjectsBySemester.containsKey(subject)==true){
-			subjectsBySemester.remove(subject);
+		if(semesterList.size()<=semester){
+			createSemesters(semester - semesterList.size()+1);
 		}
-		subjectsBySemester.put(subject, semesterList.get(semester));
+		addSubject(subject, semesterList.get(semester));
+	}
+	
+	private void addSubject(SubjectWidget subject, SemesterWidget semester){
+		setCredits(semester, credits.get(semester) + subject.getCredits());
+		subjectsBySemester.put(subject, semester);
+		semester.addSubject(subject);
+	}
+	
+	public void subjectMoved(SubjectWidget subject, SemesterWidget semester){
 		
-		if(semesterList.get(semester)!=null){
-			makeSubjectDraggable(subject);
-			semesterList.get(semester).getMainPanel().add(subject);
+		int creditsTemp = 0;
+		int semesterNumber = semesterList.indexOf(semester);
+		
+		//creating enough semesters to be able to add the subject to its semester
+		if(semesters < semesterNumber){
+			createSemesters(semesterNumber - semesters);
 		}
+		
+		//if Subject already exist
+		if(subjectList.contains(subject)==true){
+			
+			SemesterWidget semesterTo = semester;
+			
+			if(subjectsBySemester.containsKey(subject)==true){ //means that this subject is not new				
+				SemesterWidget semesterFrom = subjectsBySemester.get(subject);
+				
+				//getting the credits from its original semester and removing the ones from the subject which is leaving
+				setCredits(semesterFrom, - subject.getCredits());
+			}
+			
+			creditsTemp = 0;
+			
+			//Add the new information about its semester
+			setCredits(semesterTo, subject.getCredits());
+			
+			subjectsBySemester.put(subject, semesterTo);
+			
+		}
+		
+	}
+	
+	private void setCredits(SemesterWidget semester, int creditsValue){
+		credits.put(semester, credits.get(semester) + creditsValue);
+		semester.setCredits(credits.get(semester));
+		
+		totalCredits += creditsValue;
 	}
 	
 	//this method must be deleted later on
@@ -209,12 +260,17 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 	private void createSemester(){
 		
 		SemesterWidget semester = new SemesterWidget(semesters, this);
+		semester.setSemester(semesters);
+		semester.setCredits(0);
+
 		planWidget.add(semester);
 		semesterList.add(semester);
+		credits.put(semester, 0);
 		semesters++;
 		
 		dropController = new SemesterDropController(semester.getMainPanel(), semester, this);
 		dragController.registerDropController(dropController);
+		
 	}
 
 	private void createSemesters(int k){
@@ -248,19 +304,37 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 	}
 	
 	/**
-	 * To keep the presenter and all the plan updated using the observer patter (actually this is the quick and dirty way)
+	 * To keep the presenter and all the plan updated using the observer pattern (actually this is the quick and dirty way)
+	 * 
+	 * TODO: implement the interface of the Observer pattern, ie the Observer and Observable interface
+	 *
+	 * @param code
+	 * @param semester
 	 */
-	public void update(String code, int semester){
-		Window.alert(code + " al semestre " + semester);
+	public void updateSemesters(String code, SemesterWidget semester){
+		if(getSubjectByCodeFromList(code) != null){
+			subjectMoved(getSubjectByCodeFromList(code), semester);
+		}
 	}
 	
+	public void onSubjectDelete(SubjectWidget subject){
+		//TODO update semesters and delete the subject
+	}
+	
+	/**
+	 * When this method is called it is STRICTLY necessary to have and IF statement when this method return null.
+	 * 
+	 * @param code
+	 * @return
+	 */
 	private SubjectWidget getSubjectByCodeFromList(String code){
+		SubjectWidget subjectToReturn = null;
 		for(SubjectWidget subject : subjectList){
-			if(subject.getCode()==code){
-				return subject;
+			if(subject.getCode().equals(code)){
+				subjectToReturn = subject;
 			}
 		}
-		return null;
+		return subjectToReturn;
 	}
 
 }
