@@ -3,7 +3,6 @@ package com.uibinder.index.server.serviceImpl;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.uibinder.index.shared.*;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
@@ -12,6 +11,7 @@ import com.google.appengine.api.datastore.Transaction;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.uibinder.index.client.service.SUNService;
 import com.uibinder.index.client.widget.SubjectWidget;
+import com.uibinder.index.shared.RandomPhrase;
 import com.uibinder.index.shared.control.Subject;
 
 /**
@@ -55,7 +55,6 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 	 * It allows the admins to retrieve and store data in & out of the database infrastructure. 
 	 * 
 	 */
-	
 	@Override
 	public List<RandomPhrase> getRandomPhrase() {
 		

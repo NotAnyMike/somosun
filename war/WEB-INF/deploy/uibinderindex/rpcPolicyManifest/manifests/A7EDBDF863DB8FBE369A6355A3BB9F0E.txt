@@ -1,2 +1,2 @@
 serviceClass: com.uibinder.index.client.service.SUNService
-path: E6A0609CDD91752E7FD25968FE64CC1B.gwt.rpc
+path: 825B198327D117CE6002D2EEE780787B.gwt.rpc
