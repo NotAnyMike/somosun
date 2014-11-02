@@ -61,7 +61,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 		Query q = new Query("RandomPhrase");
 		List<RandomPhrase> lista = new LinkedList<RandomPhrase>();
-		if(lista.isEmpty()){
+		/*if(lista.isEmpty()){
 			Entity daPhrase = new Entity("RandomPhrase");
 			daPhrase.setProperty("random", "El que hace puede equivocarse, el que no, ya está equivocado.");
 			daPhrase.setProperty("author", "Anonimo");
@@ -84,7 +84,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 			daPhrase.setProperty("random", "Si el compañero tiene un mensaje, que lo de pero que no lo de");
 			daPhrase.setProperty("author", "Mamerta de la loma");
 			datastore.put(daPhrase);	
-		}
+		}*/
 		for(Entity n: datastore.prepare(q).asIterable()){
 			String random = (String) n.getProperty("random");
 			String author = (String) n.getProperty("author");
