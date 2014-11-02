@@ -40,6 +40,9 @@ public class TopBarPresenter implements Presenter, TopBarView.Presenter {
 	}
 
 	private void setMainTitle(String phrase, String author) {
+		if(phrase != "" && phrase != null){			
+			phrase = "'" + phrase + "'";
+		}
 		if(author==""){
 			author=phrase;
 		}else{

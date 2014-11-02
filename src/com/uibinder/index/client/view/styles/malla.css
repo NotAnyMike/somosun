@@ -231,12 +231,12 @@ h1 {
 }
 .mainLabelNamePageTopBar {
 	 position: fixed;
-	 width:400px;
+	 width:700px;
 	 left:50%;
 	 margin-right:0px;
 	 font-size:18px;
 	 alignment-baseline:central;
-	 margin-left:-200px;
+	 margin-left:-350px;
 	 color:#CACACA;
 	 margin-top:12px;
 	 cursor:default;
