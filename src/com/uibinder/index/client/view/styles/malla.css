@@ -1,0 +1,290 @@
+/** Add css rules here for your application. */
+
+
+/** Example rules used by the template application (remove for your app) */
+h1 {
+  font-size: 2em;
+  font-weight: bold;
+  color: #777777;
+  margin: 40px 0px 70px;
+  text-align: center;
+}
+
+.sendButton {
+  display: block;
+  font-size: 16pt;
+}
+
+/** Most GWT widgets already have a style name defined */
+.gwt-DialogBox {
+  width: 400px;
+}
+
+.dialogVPanel {
+  margin: 5px;
+}
+
+.serverResponseLabelError {
+  color: red;
+}
+
+/** Set ids using widget.getElement().setId("idOfElement") */
+#closeButton {
+  margin: 15px 6px 6px;
+}
+
+.cosa {
+	background-color:#000;
+}
+
+.cosa2 {
+	background-color:#999;
+	min-height: 50px;
+	width:200px;
+}
+.cosa2 tr ts{
+	margin-left: auto;
+    margin-right: auto;
+}
+.cosa3 {
+	width:200px;
+}
+.cosa4 {
+	background-color: #FFF;
+	height: 150px;
+	width: 100%;
+}
+.subjectBox {
+	margin:10px;
+	float:none;
+	font-family: 'Open Sans', sans-serif;
+	text-align:center;
+	background-color:#FFF;
+	width:180px;
+	min-height:130px;
+	border:1px solid #666;
+	-webkit-box-shadow: 0px 0px 20px 0px rgba(50, 50, 50, 0.75);
+	-moz-box-shadow:    0px 0px 20px 0px rgba(50, 50, 50, 0.75);
+	box-shadow:         0px 0px 20px 0px rgba(50, 50, 50, 0.75);
+}
+.otra{
+	background-color:#F90;
+	vertical-align:central;
+	alignment-adjust:central;
+}
+.nivelacion{
+	background-color:#636;
+	vertical-align:central;
+	alignment-adjust:central;
+}
+.fundamentacion{
+	background-color:#F90;
+	vertical-align:central;
+	alignment-adjust:central
+}
+.disciplinar {
+	background-color:#093;
+	vertical-align:central;
+	alignment-adjust:central;
+}
+.libreEleccion {
+	background-color:#06F;
+	vertical-align:central;
+	alignment-adjust:central;
+}
+.topSubjectBox {
+	padding-top:3px;
+	line-height:18px;
+	vertical-align: middle;
+	float:none;
+	text-align: center;
+	width:180px;
+	font-family: inherit;
+	height:18px;
+	color:#BBB;
+}
+.mainSubjectBox {
+	font-family: 'Open Sans', sans-serif;
+	display: table-cell;
+	text-align: center;
+	vertical-align: middle;
+	width:180px;
+	height:93px;
+	font-family:inherit;
+	padding-left:10px;
+	padding-right:10px;	
+}
+.bottomSubjectBox {
+	text-align:inherit;
+	width:100%;
+	font-family:inherit;
+	background-color: #EEE;
+	height:21px;
+	color:#999;
+	border-top: 1px #CCC solid;
+}
+.gradeBottomSubjectBox {
+	padding-top:3px;
+	float: left;
+	font-family:inherit;
+	width:34px;
+	height:18px;
+	border-right: 1px #CCC solid;
+}
+.creditsBottomSubjectBox {
+	padding-top:3px;
+	float: left;
+	font-family:inherit;
+	width: 44px;
+	height:18px;
+	border-right: 1px #CCC solid;
+}
+.obligBottomSubjectBox {
+	padding-top:3px;
+	float: left;
+	font-family:inherit;
+	width: 64px;
+	border-right: 1px #CCC solid;
+	height:18px;
+}
+.typeBottomSubjectBox {
+	padding-top:3px;
+	float: left;
+	font-family:inherit;
+	width: 35px;
+	height:18px;
+	color:#000;
+}
+.wrapword{
+	 white-space: -moz-pre-wrap !important;  /*Mozilla, since 1999 */
+	white-space: -pre-wrap;      /* Opera 4-6 */
+	white-space: -o-pre-wrap;    /* Opera 7 */
+	white-space: pre-wrap;      /*  css-3 */
+	word-wrap: break-word;       /* Internet Explorer 5.5+ */
+	/*word-break: break-all;*/
+	word-break: break-word;
+	/*text-wrap: unrestricted;*/
+	width:170px;
+	webkit-hyphens: auto;
+   -moz-hyphens: auto;
+        hyphens: auto;
+	
+}
+.semesterPanel {
+	text-align:center;
+	/*background-color:#FFF;*/
+	min-height:200px;
+	width:200px;
+	vertical-align: top;
+}
+.semesterLabelSemesterPanel {
+	text-align:center;
+	border-bottom: 1px solid #666;
+}
+.mainPanelSemesterPanel {
+	width:200px;
+	min-height:200px;
+	/*background-color: #FFF;*/
+	vertical-align:top;
+}
+.planPanel {
+	/*background-color:#CCC;*/
+}
+.bottomPartSemesterPanel{
+	opacity: 0.6;
+	width:100px;
+	margin:10px;
+	padding:15px;
+	background-color:#EEE;
+	border: 1px solid #999;
+}
+.addImageSemesterPanel {
+	padding:5px;
+}
+.pre {
+	-webkit-box-shadow: 0px 0px 21px 0px #C00;
+	-moz-box-shadow:    0px 0px 21px 0px #C00;
+	box-shadow:         0px 0px 21px 0px #C00;
+}
+.co {
+	-webkit-box-shadow: 0px 0px 21px 0px #F90;
+	-moz-box-shadow:    0px 0px 21px 0px #F90;
+	box-shadow:         0px 0px 21px 0px #F90;
+}
+.pos {
+	-webkit-box-shadow: 0px 0px 21px 0px #06F;
+	-moz-box-shadow:    0px 0px 21px 0px #06F;
+	box-shadow:         0px 0px 21px 0px #06F;
+}
+.non {
+	opacity:0.5;
+}
+.selected {
+	border:2px solid #666;
+}
+.subContainerForPlan {
+	margin:20px;
+	border-bottom: 1px solid #666;
+	border-top: 1px solid #666;
+	position: static ;
+	display:block;
+}
+.mainLabelNamePageTopBar {
+	 position: fixed;
+	 width:400px;
+	 left:50%;
+	 margin-right:0px;
+	 font-size:18px;
+	 alignment-baseline:central;
+	 margin-left:-200px;
+	 color:#CACACA;
+	 margin-top:12px;
+	 cursor:default;
+}
+
+
+
+
+.siaSummaryContainer {
+	border-top-style: none;
+	border-right-style: none;
+	border-bottom-style: none;
+	border-left-style: none;
+}
+.academicHistorySummary{
+	color:#333;
+	opacity:0.8;
+	border: 1px solid #999;
+}
+.planSummary{
+	opacity:0.8;
+	border: 1px #CCC solid;
+	background-color: #E9E9E9;
+	color:#333;
+}
+.planSummaryTitle{
+	background-color:#CCC;
+	padding:2px;
+}
+.planSummaryText{
+	background-color: #E9E9E9;
+}
+.planSummaryTotals{
+	background-color:#E4E4E4;
+}
+.topBorder{
+	border-top: 1px #999 solid;
+}
+.bottomBorder{
+	border-bottom: 1px #999 solid;
+}
+.rightBorder{
+	border-right: 1px #999 solid;
+}
+.leftBorder{
+	border-left: 1px #999 solid;
+}
+.smallCaptionPlanSummary{
+	font-size:12px;
+	padding:2px;
+}

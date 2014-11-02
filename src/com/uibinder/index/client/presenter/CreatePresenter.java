@@ -3,14 +3,18 @@ package com.uibinder.index.client.presenter;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.uibinder.index.client.event.GenerateAcademicHistoryFromStringEvent;
+import com.uibinder.index.client.service.SUNServiceAsync;
 import com.uibinder.index.client.view.CreateView;
 import com.uibinder.index.client.view.CreateViewImpl;
 
 public class CreatePresenter implements Presenter, CreateView.Presenter {
+	
+	private final SUNServiceAsync rpcService;
 	private final HandlerManager eventBus;
 	private CreateViewImpl view;
 	
-	public CreatePresenter(HandlerManager eventBus, CreateViewImpl view){
+	public CreatePresenter(SUNServiceAsync rpcService, HandlerManager eventBus, CreateViewImpl view){
+		this.rpcService = rpcService;
 		this.eventBus = eventBus;
 		this.view = view;
 		this.view.setPresenter(this);

@@ -8,6 +8,6 @@
 	<ui:style field="third" src="styles/bootstrap.css"/>
 	<ui:style field="forth" src="styles/bootstrap-theme.min.css"/>
 	<g:HTMLPanel>
-		lol
+
 	</g:HTMLPanel>
 </ui:UiBinder> 

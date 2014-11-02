@@ -15,6 +15,7 @@ package com.uibinder.index.client.dnd;
 
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.allen_sauer.gwt.dnd.client.DragContext;
@@ -169,5 +170,9 @@ class DropControllerCollection {
 
     sortedCandidates = list.toArray(new Candidate[list.size()]);
     Arrays.sort(sortedCandidates);
+  }
+  
+  public void onDrop(DragContext context){
+	  Window.alert("hola");
   }
 }

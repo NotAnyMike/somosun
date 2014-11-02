@@ -6,6 +6,7 @@
 	</ui:style>
 	<ui:style field="second" src="styles/styles.css"/>
 	<ui:style field="third" src="styles/bootstrap.css"/>
+	<ui:style field="forth" src="styles/malla.css"/>
 	<g:HTMLPanel>
 	    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation" style="font-size:14px;">
 	    	<div class="container">
@@ -23,10 +24,11 @@
 	    		</div>
 	    		<div class="collapse navbar-collapse">
 				<ul class="nav navbar-nav">
-					<p id="user-name" class="navbar-text" style="cursor:default"></p>
-					<li id="log-hyperlink"></li>
-					<li id="adminPanel"></li>
+					<p class="navbar-text" style="cursor:default"><g:Label ui:field="userNameLabel"></g:Label></p>
+					<li id="log-hyperlink"><g:Anchor ui:field="LogLabel"></g:Anchor></li>
+					<li id="panel"><g:Anchor ui:field="adminPanelLabel"></g:Anchor></li>
 				</ul>
+				<g:Label ui:field="pageNameLabel" addStyleNames="{third.lead} {third.main-text} {third.navbar-text} {forth.mainLabelNamePageTopBar} "></g:Label>
 			</div>
 	    	</div>
 	    </div>

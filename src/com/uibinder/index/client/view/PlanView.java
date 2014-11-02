@@ -4,7 +4,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public interface PlanView {
 
-	public interface Presenter { 
+	public interface Presenter {
 	}
 	
 	void setPresenter(Presenter presenter);

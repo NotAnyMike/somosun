@@ -1,5 +1,6 @@
 body {
 	font-family: 'Open Sans', sans-serif;
+	line-height: 1.4;
 	background-color: #000;
 	background-color: /*#741C1B*/ #A5A5A5;
 	background-image:url(../images/OrgulloUNn.jpg);
@@ -14,6 +15,7 @@ body {
 
 .mainContainer {
 	height:100%;
+	line-height: 1.4;
 	font-family: 'Open Sans', sans-serif;
 }
 
@@ -24,6 +26,7 @@ body {
 
 .centerArea {
 	font-family: 'Open Sans', sans-serif;
+	line-height: 1.4;
 }
 
 .bottomArea{

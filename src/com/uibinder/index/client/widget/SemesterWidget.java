@@ -7,29 +7,24 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.uibinder.index.client.presenter.PlanPresenter;
 import com.uibinder.index.client.widget.SubjectWidget;
 
 public class SemesterWidget extends VerticalPanel {
 	
 	private static final String[] SEMESTER_ROMAN = {"I", "II", "III", "IV", "V", "VI", 
 		"VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII"};
-	
-	private int semester = 0;
-	private int subjects = 0;
-	private List<SubjectWidget> subjectList = new ArrayList<SubjectWidget>();
-	private int credits = 0;
+	private static final String CREDITS_STRING = "créditos: ";
 	
 	private Image addImage = new Image();
-	private Label creditsLabel = null;
-	private Label semesterLabel = null;
+	private Label creditsLabel = new Label();
+	private Label semesterLabel = new Label();
 	private HorizontalPanel bottomPart = new HorizontalPanel();
 	private VerticalPanel subjectPanel = new SubjectPanel();
 	
-	public SemesterWidget (int semester){
-		this.semester = semester;
+	public SemesterWidget (int semester, PlanPresenter planPresenter){
 		
 		semesterLabel = new Label(SEMESTER_ROMAN[semester]);
-		creditsLabel = new Label("cr: " + Integer.toString(credits));
 		addImage.setUrl("images/add.png");
 
 		this.addStyleName("semesterPanel");
@@ -42,8 +37,9 @@ public class SemesterWidget extends VerticalPanel {
 		
 		semesterLabel.addStyleName("semesterLabelSemesterPanel");
 		
-		addImage.setStyleName("addImageSemesterPanel");
+		addImage.addStyleName("addImageSemesterPanel");
 		
+		//This part is the little box of "credits: x"
 		bottomPart.addStyleName("bottomPartSemesterPanel");
 		bottomPart.setHorizontalAlignment(ALIGN_CENTER);
 		bottomPart.setVerticalAlignment(ALIGN_MIDDLE);
@@ -61,53 +57,22 @@ public class SemesterWidget extends VerticalPanel {
 	}
 
 	public void setSemester(int semester) {
-		this.semester = semester;
+		semesterLabel.setText(SEMESTER_ROMAN[semester]);
 	}
 	
-	private void updateCredits() {
-		creditsLabel.setText("cr: " + credits);
+	public void setCredits(int credits) {
+		creditsLabel.setText(CREDITS_STRING + credits);
 	}
 
 	public void clearSemester(){
-		subjectList.clear();
 		subjectPanel.clear();
-		subjects = 0;
-	}
-	
-	public void deleteSubject(SubjectWidget subject){
-		if(subjectList.contains(subject) == true){
-			subjectList.remove(subject);
-			subjects--;
-		}
-	}
-
-	public List<SubjectWidget> getSubjectList() {
-		return subjectList;
-	}
-	
-	public int getSubjectsNumbers(){
-		return subjects;
-	}
-
-	public SubjectWidget getSubject(int subject) {
-		return subjectList.get(subject);
 	}
 	
 	public VerticalPanel getMainPanel(){
 		return subjectPanel;
 	}
-	
-	public int getSemester(){
-		return semester;
-	}
 
 	public void addSubject(SubjectWidget subject) {
-		subjectList.add(subject);
-		subjectPanel.add(subject);
-		
-		this.credits+= subject.getCredits();
-		subjects++;
-		
-		updateCredits();
+		subjectPanel.add(subject);		
 	}
 }

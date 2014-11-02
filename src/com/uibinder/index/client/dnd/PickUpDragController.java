@@ -5,8 +5,8 @@ import java.util.HashMap;
 
 import com.allen_sauer.gwt.dnd.client.AbstractDragController;
 import com.allen_sauer.gwt.dnd.client.DragContext;
-import com.allen_sauer.gwt.dnd.client.PickupDragController;
 import com.allen_sauer.gwt.dnd.client.VetoDragException;
+import com.allen_sauer.gwt.dnd.client.PickupDragController;
 //import com.allen_sauer.gwt.dnd.client.PickupDragController.SavedWidgetInfo;
 import com.allen_sauer.gwt.dnd.client.drop.AbsolutePositionDropController;
 import com.allen_sauer.gwt.dnd.client.drop.BoundaryDropController;
@@ -108,8 +108,7 @@ public class PickUpDragController extends AbstractDragController {
 	    dropControllerCollection = new DropControllerCollection(dropControllerList);
 	  }
 
-	  @SuppressWarnings("unused")
-	@Override
+	  @Override
 	  public void dragEnd() {
 	    assert context.finalDropController == null == (context.vetoException != null);
 	    if (context.vetoException != null) {
@@ -124,7 +123,7 @@ public class PickUpDragController extends AbstractDragController {
 			        restoreSelectedWidgetsLocation();
 		      //}
 	      }
-	    } else {
+	    } else {  
 	      context.dropController.onDrop(context);
 	      context.dropController.onLeave(context);
 	      context.dropController = null;
@@ -136,7 +135,6 @@ public class PickUpDragController extends AbstractDragController {
 	    movablePanel.removeFromParent();
 	    movablePanel = null;
 	    super.dragEnd();
-	    //Window.alert("hola");
 	  }
 
 	  @Override

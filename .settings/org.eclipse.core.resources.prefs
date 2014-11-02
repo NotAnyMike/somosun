@@ -1,7 +1,10 @@
 eclipse.preferences.version=1
+encoding//src/com/uibinder/index/client/AppController.java=UTF-8
 encoding//src/com/uibinder/index/client/presenter/AboutGedadPresenter.java=UTF-8
 encoding//src/com/uibinder/index/client/presenter/CreatePresenter.java=UTF-8
 encoding//src/com/uibinder/index/client/presenter/PlanPresenter.java=UTF-8
 encoding//src/com/uibinder/index/client/widget/PlanWidget.java=UTF-8
+encoding//src/com/uibinder/index/client/widget/SemesterWidget.java=UTF-8
 encoding//src/com/uibinder/index/client/widget/SubjectWidget.java=UTF-8
-encoding//src/com/uibinder/index/server/control/Plan.java=UTF-8
+encoding//src/com/uibinder/index/server/serviceImpl/SUNServiceImpl.java=UTF-8
+encoding//src/com/uibinder/index/shared/control/Plan.java=UTF-8

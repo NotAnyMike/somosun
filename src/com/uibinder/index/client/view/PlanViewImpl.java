@@ -20,7 +20,7 @@ public class PlanViewImpl extends Composite implements PlanView {
 	private static PlanViewUiBinder uiBinder = GWT
 			.create(PlanViewUiBinder.class);
 
-	@UiTemplate("AboutGedadView.ui.xml")
+	@UiTemplate("PlanView.ui.xml")
 	interface PlanViewUiBinder extends UiBinder<Widget, PlanViewImpl> {
 	}
 
@@ -31,7 +31,6 @@ public class PlanViewImpl extends Composite implements PlanView {
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
-		
 	}
 
 }
