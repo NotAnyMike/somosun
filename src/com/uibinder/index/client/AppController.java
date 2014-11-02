@@ -203,7 +203,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 			int ra = (int)h;
 			try{
 				RandomPhrase current = phrases.get(ra);
-				topBarPresenter.setNameOfThePage(current.getRandomPhrase()+" "+current.getAuthor());
+				topBarPresenter.setNameOfThePage(current.getRandomPhrase(),current.getAuthor());
 			}catch(Exception e){
 				topBarPresenter.setNameOfThePage("Mike is a world class whore");
 			}
