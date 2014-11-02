@@ -203,7 +203,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 			
 			SemesterWidget semesterTo = semester;
 			
-			if(subjectsBySemester.containsKey(subject)==true){ //means that this subject is not new				
+			if(subjectsBySemester.containsKey(subject)==true){ //means that this subject is not new and it is coming from some semester				
 				SemesterWidget semesterFrom = subjectsBySemester.get(subject);
 				
 				//getting the credits from its original semester and removing the ones from the subject which is leaving
