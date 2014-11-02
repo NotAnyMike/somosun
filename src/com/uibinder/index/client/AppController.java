@@ -29,7 +29,7 @@ import com.uibinder.index.client.view.IndexViewImpl;
 import com.uibinder.index.client.view.PlanViewImpl;
 import com.uibinder.index.client.view.TopBarViewImpl;
 import com.uibinder.index.client.view.CreateViewImpl;
-import com.uibinder.index.shared.*;
+import com.uibinder.index.shared.RandomPhrase;
 
 public class AppController implements Presenter, ValueChangeHandler<String> {
 
@@ -176,11 +176,11 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 			if(phrases==null){
 				rpcService.getRandomPhrase(gettingRandomPhrase);
 			}else{
-				Random r = new Random();
-				double h = Math.floor(r.nextDouble()*phrases.size());
-				int ra = (int)h;
-				RandomPhrase current = phrases.get(ra);
-				topBarPresenter.setNameOfThePage(current.getRandomPhrase()+" "+current.getAuthor());
+				Random randomNumberClass = new Random();
+				double randomNumberDouble = Math.floor(randomNumberClass.nextDouble()*phrases.size());
+				int radomNumber = (int) randomNumberDouble;
+				RandomPhrase current = phrases.get(radomNumber);
+				topBarPresenter.setNameOfThePage(current.getRandomPhrase(), current.getAuthor());
 			}
 		} else {
 			topBarPresenter.setNameOfThePage("");
