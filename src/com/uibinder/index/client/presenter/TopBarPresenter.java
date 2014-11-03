@@ -40,6 +40,9 @@ public class TopBarPresenter implements Presenter, TopBarView.Presenter {
 	}
 
 	private void setMainTitle(String phrase, String author) {
+		if(phrase != "" && phrase != null){	//for the case when there will be no phrase but just a message or a name of the page	
+			phrase = "'" + phrase + "'";
+		}
 		if(author==""){
 			author=phrase;
 		}else{

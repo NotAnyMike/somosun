@@ -36,12 +36,14 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	/*
 	* Creating all the views that will exist once for all to save them to let users go back to their view
 	*/
-	IndexPresenter indexPresenter = null;
-	TopBarPresenter topBarPresenter = null;
-	DndPresenter dndPresenter = null;
-	CreatePresenter createPresenter = null;
-	PlanPresenter planPresenter = null;
-	List<RandomPhrase> phrases = null;
+	private IndexPresenter indexPresenter = null;
+	private TopBarPresenter topBarPresenter = null;
+	private DndPresenter dndPresenter = null;
+	private CreatePresenter createPresenter = null;
+	private PlanPresenter planPresenter = null;
+	private List<RandomPhrase> phrases = null;
+	
+	private RandomPhrase phrase;
 	
 	private final HandlerManager eventBus;
 	private final SUNServiceAsync rpcService;
@@ -57,6 +59,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 		this.rpcService = rpcService;
 		this.eventBus = eventBus;
 		bind();
+		getRandomPhrases();
 	}
 	
 	private void bind(){
@@ -173,40 +176,46 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 		} else if(token.equals("plan")){
 			topBarPresenter.setNameOfThePage("Plan de Estudios");
 		} else if(token.equals("gedad")){
-			if(phrases==null){
-				rpcService.getRandomPhrase(gettingRandomPhrase);
-			}else{
-				Random randomNumberClass = new Random();
-				double randomNumberDouble = Math.floor(randomNumberClass.nextDouble()*phrases.size());
-				int radomNumber = (int) randomNumberDouble;
-				RandomPhrase current = phrases.get(radomNumber);
-				topBarPresenter.setNameOfThePage(current.getRandomPhrase(), current.getAuthor());
-			}
+			phrase = getAPhrase();
+			topBarPresenter.setNameOfThePage(phrase.getRandomPhrase(), phrase.getAuthor());
 		} else {
 			topBarPresenter.setNameOfThePage("");
 		}
 		topBarPresenter.setUserName("Invitado");
 	}
 	
+	private void getRandomPhrases(){
+		rpcService.getRandomPhrase(gettingRandomPhrase);
+	}
+	
+	private RandomPhrase getAPhrase(){
+		
+		if(phrases==null){
+			getRandomPhrases();
+			RandomPhrase toReturn = new RandomPhrase("Estudia para la vida, no para los exámenes", "Anónimo");
+			return toReturn;
+		}else{
+			
+			Random randomNumberClass = new Random();
+			double randomNumberDouble = Math.floor(randomNumberClass.nextDouble()*phrases.size());
+			int radomNumber = (int) randomNumberDouble;
+			RandomPhrase current = phrases.get(radomNumber);
+			return current;
+			
+		}
+
+	}
+	
 	AsyncCallback<List<RandomPhrase>> gettingRandomPhrase = new AsyncCallback<List<RandomPhrase>>(){
 
 		@Override
 		public void onFailure(Throwable caught) {
-			topBarPresenter.setNameOfThePage("Estudia para la vida, no para los exámenes!2");
+			//TODO what to do?
 		}
 
 		@Override
 		public void onSuccess(List<RandomPhrase> result) {
 			phrases = result;
-			Random r = new Random();
-			double h = Math.floor(r.nextDouble()*phrases.size());
-			int ra = (int)h;
-			try{
-				RandomPhrase current = phrases.get(ra);
-				topBarPresenter.setNameOfThePage(current.getRandomPhrase(),current.getAuthor());
-			}catch(Exception e){
-				topBarPresenter.setNameOfThePage("Mike is a world class whore");
-			}
 		}
 		
 	};

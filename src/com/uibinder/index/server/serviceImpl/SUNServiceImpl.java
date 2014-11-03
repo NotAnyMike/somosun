@@ -25,6 +25,11 @@ import com.uibinder.index.shared.control.Subject;
  */
 public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@Override
 	public Subject getSubjectByCode(int code) {
 		Subject subject = new Subject(3,"1231231","Just bullshit");
