@@ -1,0 +1,77 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:style field="first">
+
+	</ui:style>
+	<ui:style field="second" src="styles/styles.css"/>
+	<ui:style field="third" src="styles/bootstrap.css"/>
+	<ui:style field="forth" src="styles/bootstrap-theme.min.css"/>
+	<g:HTMLPanel>
+		<table width="100%" border="0" cellpadding="0" cellspacing="0">
+	      <tr>
+	        <td align="right" valign="middle">
+	        	<p class="lead main-text" style="font-size:26px; text-align:right"><br></br>#Somos UN</p>
+            </td>
+	        <td width="100" rowspan="2">
+            	<table width="100%" border="0" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td align="center"><table width="2" border="0" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td width="1" height="170" bgcolor="#666666"></td>
+                      </tr>
+                    </table></td>
+                  </tr>
+                  <tr>
+                    <td  align="center" valign="bottom" class="lead main-text" style="font-size:26px; text-align:center"></td>
+                  </tr>
+                  <tr>
+                    <td align="center"><table width="2" border="0" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td width="1" height="300" bgcolor="#666666"></td>
+                      </tr>
+                    </table></td>
+                  </tr>
+                </table>            
+            </td>
+	        <td align="left" valign="middle">
+            	<p class="lead main-text" style="font-size:26px; text-align:left"><br></br>GEDAD</p>
+            </td>
+        </tr>
+	      <tr>
+	        <td width="45%" align="right" valign="middle" style="font-size:20px; text-align:right; width:47%" class="lead main-text">
+              	<span style="font-size:18px; font-weight:bold">El proyecto #Somos UN</span><br></br>
+              	Primero que todo, Somos UN (o sea está pág)<br></br>
+              	es un proyecto por iniciativa de los de estudiantes<br></br>
+              	de la Nacional (GEDAD) y no tiene ninguna<br></br>
+              	relación formal con la universidad<br></br><br></br>
+              	El proyecto busca crear proyectos (y agruparlos<br></br>
+              	bajo Somos UN) que utilicen la nube y que <br></br>
+              	sirvan a la comunidad académica.<br></br><br></br>
+              	<span style="font-size:18px; font-weight:bold">"De los estudiantes, para los estudiantes".</span><br></br> 
+              	El proyecto está enmarcado bajo esa frase, lo<br></br>
+              	que significa que cualquier estudiante puede<br></br>
+              	utilizar Somos UN y también participar en su desarrollo.<br></br>
+              	GEDAD y Somos UN tienen como objetivo fomentar<br></br>
+              	el aprendizaje sobre aplicaciones como esta,<br></br>
+              	lo que significa que el no saber NADA sobre<br></br>
+              	el tema no es un limintante para participar, el<br></br>
+              	objetivo es aprender durante el desarrollo del proyecto.
+              	<br></br><br></br><br></br>
+            </td>
+	        <td width="45%" height="400" align="left" valign="middle" style="font-size:20px; text-align:left" class="lead main-text">
+	            <span style="font-size:18px; font-weight:bold">Grupo de Estudio en Desarrollo de Aplicaciones Distribuidas</span><br></br><br></br>
+	            <span style="font-size:18px; font-weight:bold">¿Qué estamos haciendo?</span><br></br>
+              	Estamos desarrollando un sistema escalable para<br></br>administrar los planes de estudio de los estudiantes<br></br><br></br>
+              	<span style="font-size:18px; font-weight:bold">¿Por qué lo hacemos?</span><br></br>
+				¡Porque nos gusta!<br></br><br></br>
+            	<span style="font-size:18px; font-weight:bold">¿Qué usamos? ¿Quién nos ayuda?</span><br></br>
+				Usamos Google App Engine, Jnario y nos ayudan <br></br>
+				varios profesores, principalmente Gabriel Mañana<br></br><br></br>
+				<span style="font-size:18px; font-weight:bold">Si quieres ayudar o contactarnos</span><br></br>
+				El correo es gedad.unal@gmail.com<br></br><br></br><br></br><br></br><br></br><br></br><br></br>
+            </td>
+        </tr>
+      </table>
+	</g:HTMLPanel>
+</ui:UiBinder> 

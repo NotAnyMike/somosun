@@ -66,30 +66,6 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 		Query q = new Query("RandomPhrase");
 		List<RandomPhrase> lista = new LinkedList<RandomPhrase>();
-		/*if(lista.isEmpty()){
-			Entity daPhrase = new Entity("RandomPhrase");
-			daPhrase.setProperty("random", "El que hace puede equivocarse, el que no, ya está equivocado.");
-			daPhrase.setProperty("author", "Anonimo");
-			datastore.put(daPhrase);
-			daPhrase.setProperty("random", "El que hace puede equivocarse, el que no, ya está equivocado.Nadie frena más a uno que uno mismo.");
-			daPhrase.setProperty("author", "Anonimo");
-			datastore.put(daPhrase);
-			daPhrase.setProperty("random", "Los de GEDAD son unos vagos que no hacen nada.");
-			daPhrase.setProperty("author", "Anonimo");
-			datastore.put(daPhrase);
-			daPhrase.setProperty("random", "El hombre, en su orgullo, creó a Dios a su imagen y semejanza.");
-			daPhrase.setProperty("author", "Anonimo");
-			datastore.put(daPhrase);
-			daPhrase.setProperty("random", "El dinero no es nada, pero mucho dinero ya es otra cosa.");
-			daPhrase.setProperty("author", "Anonimo");
-			datastore.put(daPhrase);
-			daPhrase.setProperty("random", "Nunca dejes que la universidad evite que aprendas.");
-			daPhrase.setProperty("author", "Anonimo");
-			datastore.put(daPhrase);
-			daPhrase.setProperty("random", "Si el compañero tiene un mensaje, que lo de pero que no lo de");
-			daPhrase.setProperty("author", "Mamerta de la loma");
-			datastore.put(daPhrase);	
-		}*/
 		for(Entity n: datastore.prepare(q).asIterable()){
 			String random = (String) n.getProperty("random");
 			String author = (String) n.getProperty("author");

@@ -38,12 +38,4 @@ public class IndexViewImpl extends Composite implements IndexView {
 	public Widget asWidget(){
 		return this;
 	}
-	
-	//Bullshit to remove because it is not an important event
-	@UiHandler("aboutUsButton")
-	void onAboutUsButtonClicked(ClickEvent event){
-		if(presenter != null){
-			presenter.onAboutUsButtonClicked();			
-		}
-	}
 }

@@ -25,10 +25,5 @@ public class IndexPresenter implements Presenter, IndexView.Presenter {
 		container.clear();
 		container.add(view.asWidget());
 	}
-	
-	@Override
-	public void onAboutUsButtonClicked(){
-		eventBus.fireEvent(new AboutUsEvent());
-	}
 
 }

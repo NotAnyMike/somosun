@@ -16,6 +16,7 @@ import com.uibinder.index.client.event.AboutUsEventHandler;
 import com.uibinder.index.client.event.GenerateAcademicHistoryFromStringEvent;
 import com.uibinder.index.client.event.GenerateAcademicHistoryFromStringEventHandler;
 import com.uibinder.index.client.presenter.AboutGedadPresenter;
+import com.uibinder.index.client.presenter.AboutUsPresenter;
 import com.uibinder.index.client.presenter.CreatePresenter;
 import com.uibinder.index.client.presenter.DndPresenter;
 import com.uibinder.index.client.presenter.IndexPresenter;
@@ -24,6 +25,7 @@ import com.uibinder.index.client.presenter.Presenter;
 import com.uibinder.index.client.presenter.TopBarPresenter;
 import com.uibinder.index.client.service.SUNServiceAsync;
 import com.uibinder.index.client.view.AboutGedadViewImpl;
+import com.uibinder.index.client.view.AboutUsViewImpl;
 import com.uibinder.index.client.view.DndViewImpl;
 import com.uibinder.index.client.view.IndexViewImpl;
 import com.uibinder.index.client.view.PlanViewImpl;
@@ -33,20 +35,13 @@ import com.uibinder.index.shared.RandomPhrase;
 
 public class AppController implements Presenter, ValueChangeHandler<String> {
 
-	/*
-	* Creating all the views that will exist once for all to save them to let users go back to their view
-	*/
+	// Creating all the views that will exist once for all to save them to let users go back to their view
 	private IndexPresenter indexPresenter = null;
 	private TopBarPresenter topBarPresenter = null;
 	private DndPresenter dndPresenter = null;
 	private CreatePresenter createPresenter = null;
 	private PlanPresenter planPresenter = null;
-	private List<RandomPhrase> phrases = null;
-	
-	private RandomPhrase phrase;
-	
-	private final HandlerManager eventBus;
-	private final SUNServiceAsync rpcService;
+	private AboutUsPresenter aboutUsPresenter = null;
 	
 	private HasWidgets container;
 	private IndexViewImpl indexView;
@@ -54,6 +49,14 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	private DndViewImpl dndView;
 	private CreateViewImpl createView;
 	private PlanViewImpl planView;
+	private AboutUsViewImpl aboutUsView;
+	
+	//Taking care of the random phrase funtionality variables 
+	private List<RandomPhrase> phrases = null;
+	private RandomPhrase phrase;
+	
+	private final HandlerManager eventBus;
+	private final SUNServiceAsync rpcService;
 	
 	public AppController(SUNServiceAsync rpcService, HandlerManager eventBus){
 		this.rpcService = rpcService;
@@ -65,14 +68,6 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	private void bind(){
 		History.addValueChangeHandler(this);
 		
-		eventBus.addHandler(AboutUsEvent.TYPE, 
-				new AboutUsEventHandler(){
-					@Override
-					public void onAboutUs(AboutUsEvent event){
-						doOnAboutUs();
-					}
-				}
-				);
 		eventBus.addHandler(GenerateAcademicHistoryFromStringEvent.TYPE, 
 				new GenerateAcademicHistoryFromStringEventHandler(){
 					@Override
@@ -85,10 +80,6 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	public void generateAcademicHistoryFromString(String academicHistory){
 		Window.alert("This should create an academic history from the string: " + academicHistory);
 		//TODO call the method cesar is working on to get the academic history
-	}
-	
-	public void doOnAboutUs(){
-		Window.alert("hola");
 	}
 	
 	@Override
@@ -150,10 +141,14 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 					planPresenter = new PlanPresenter(rpcService, eventBus, planView);
 				}
 				planPresenter.go(RootPanel.get("centerArea"));
-			} else if(token.equals("gedad")) {
-				AboutGedadViewImpl aboutGedadView = new AboutGedadViewImpl();
-				Presenter aboutGedadPresenter = new AboutGedadPresenter(rpcService, eventBus, aboutGedadView);
-				aboutGedadPresenter.go(RootPanel.get("centerArea"));
+			} else if(token.equals("aboutUs")) {
+				if(aboutUsView == null){
+					aboutUsView = new AboutUsViewImpl();
+				}
+				if(aboutUsPresenter == null){
+					aboutUsPresenter = new AboutUsPresenter(rpcService, eventBus, aboutUsView);
+				}
+				aboutUsPresenter.go(RootPanel.get("centerArea"));
 			} else {
 				if(indexView == null){
 					indexView = new IndexViewImpl();
@@ -175,7 +170,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 			topBarPresenter.setNameOfThePage("Plan de Estudios");
 		} else if(token.equals("plan")){
 			topBarPresenter.setNameOfThePage("Plan de Estudios");
-		} else if(token.equals("gedad")){
+		} else if(token.equals("aboutUs")){
 			phrase = getAPhrase();
 			topBarPresenter.setNameOfThePage(phrase.getRandomPhrase(), phrase.getAuthor());
 		} else {
