@@ -2,7 +2,7 @@ package com.uibinder.index.client.view;
 
 import com.google.gwt.user.client.ui.Widget;
 
-public interface AboutGedadView {
+public interface AnnouncementView {
 
 	public interface Presenter { 
 	}

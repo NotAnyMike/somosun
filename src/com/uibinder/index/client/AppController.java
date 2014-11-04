@@ -15,7 +15,7 @@ import com.uibinder.index.client.event.AboutUsEvent;
 import com.uibinder.index.client.event.AboutUsEventHandler;
 import com.uibinder.index.client.event.GenerateAcademicHistoryFromStringEvent;
 import com.uibinder.index.client.event.GenerateAcademicHistoryFromStringEventHandler;
-import com.uibinder.index.client.presenter.AboutGedadPresenter;
+import com.uibinder.index.client.presenter.AnnouncementPresenter;
 import com.uibinder.index.client.presenter.AboutUsPresenter;
 import com.uibinder.index.client.presenter.CreatePresenter;
 import com.uibinder.index.client.presenter.DndPresenter;
@@ -24,7 +24,7 @@ import com.uibinder.index.client.presenter.PlanPresenter;
 import com.uibinder.index.client.presenter.Presenter;
 import com.uibinder.index.client.presenter.TopBarPresenter;
 import com.uibinder.index.client.service.SUNServiceAsync;
-import com.uibinder.index.client.view.AboutGedadViewImpl;
+import com.uibinder.index.client.view.AnnouncementViewImpl;
 import com.uibinder.index.client.view.AboutUsViewImpl;
 import com.uibinder.index.client.view.DndViewImpl;
 import com.uibinder.index.client.view.IndexViewImpl;
@@ -42,14 +42,15 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	private CreatePresenter createPresenter = null;
 	private PlanPresenter planPresenter = null;
 	private AboutUsPresenter aboutUsPresenter = null;
+	private AnnouncementPresenter announcementPresenter = null;
 	
-	private HasWidgets container;
 	private IndexViewImpl indexView;
 	private TopBarViewImpl topBarView;
 	private DndViewImpl dndView;
 	private CreateViewImpl createView;
 	private PlanViewImpl planView;
 	private AboutUsViewImpl aboutUsView;
+	private AnnouncementViewImpl announcementView;
 	
 	//Taking care of the random phrase funtionality variables 
 	private List<RandomPhrase> phrases = null;
@@ -57,6 +58,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	
 	private final HandlerManager eventBus;
 	private final SUNServiceAsync rpcService;
+	private HasWidgets container;
 	
 	public AppController(SUNServiceAsync rpcService, HandlerManager eventBus){
 		this.rpcService = rpcService;
@@ -149,6 +151,14 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 					aboutUsPresenter = new AboutUsPresenter(rpcService, eventBus, aboutUsView);
 				}
 				aboutUsPresenter.go(RootPanel.get("centerArea"));
+			} else if(token.equals("announcement")) {
+				if(aboutUsView == null){
+					announcementView = new AnnouncementViewImpl();
+				}
+				if(aboutUsPresenter == null){
+					announcementPresenter = new AnnouncementPresenter(rpcService, eventBus, announcementView);
+				}
+				announcementPresenter.go(RootPanel.get("centerArea"));
 			} else {
 				if(indexView == null){
 					indexView = new IndexViewImpl();
@@ -170,7 +180,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 			topBarPresenter.setNameOfThePage("Plan de Estudios");
 		} else if(token.equals("plan")){
 			topBarPresenter.setNameOfThePage("Plan de Estudios");
-		} else if(token.equals("aboutUs")){
+		} else if(token.equals("aboutUs") || token.equals("announcement")){
 			phrase = getAPhrase();
 			topBarPresenter.setNameOfThePage(phrase.getRandomPhrase(), phrase.getAuthor());
 		} else {

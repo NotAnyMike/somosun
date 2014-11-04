@@ -4,16 +4,16 @@ import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.uibinder.index.client.event.GenerateAcademicHistoryFromStringEvent;
 import com.uibinder.index.client.service.SUNServiceAsync;
-import com.uibinder.index.client.view.AboutGedadView;
-import com.uibinder.index.client.view.AboutGedadViewImpl;
+import com.uibinder.index.client.view.AnnouncementView;
+import com.uibinder.index.client.view.AnnouncementViewImpl;
 
-public class AboutGedadPresenter implements Presenter, AboutGedadView.Presenter {
+public class AnnouncementPresenter implements Presenter, AnnouncementView.Presenter {
 	
 	private final SUNServiceAsync rpcService;
 	private final HandlerManager eventBus;
-	private AboutGedadViewImpl view;
+	private AnnouncementViewImpl view;
 	
-	public AboutGedadPresenter(SUNServiceAsync rpcService, HandlerManager eventBus, AboutGedadViewImpl view){
+	public AnnouncementPresenter(SUNServiceAsync rpcService, HandlerManager eventBus, AnnouncementViewImpl view){
 		this.rpcService = rpcService;
 		this.eventBus = eventBus;
 		this.view = view;

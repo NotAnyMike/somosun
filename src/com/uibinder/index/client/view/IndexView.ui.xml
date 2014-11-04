@@ -16,7 +16,7 @@
 					<ul class="nav navbar-nav">
 						<li style="width: 260px"><g:Anchor href="#create" ui:field="createButton" styleName="{second.buttonCursor}">Mi plan de estudio</g:Anchor></li>
 						<li style="width: 170px"><g:Anchor href="#dnd" ui:field="commingSoonButton" styleName="{second.buttonCursor}">Pronto ...</g:Anchor></li>
-						<li style="width: 180px"><g:Anchor href="#gedad" ui:field="GEDAD" styleName="{second.buttonCursor}" title="Sobre el Grupo de Estudio en Desarrollo de Aplicaciones Distribuidas">Sobre GEDAD</g:Anchor></li>
+						<li style="width: 180px"><g:Anchor href="#announcement" ui:field="announcementButton" styleName="{second.buttonCursor}" title="Convocatoria">Convocatoria</g:Anchor></li>
 						<li style="width: 250px"><g:Anchor href="#aboutUs" ui:field="aboutUsButton" styleName="{second.buttonCursor}">Sobre #SomosUN</g:Anchor></li>
 					</ul>
 				</nav>

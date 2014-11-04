@@ -13,18 +13,18 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
-public class AboutGedadViewImpl extends Composite implements AboutGedadView {
+public class AnnouncementViewImpl extends Composite implements AnnouncementView {
 	
 	private Presenter presenter;
 
 	private static AboutGedadViewUiBinder uiBinder = GWT
 			.create(AboutGedadViewUiBinder.class);
 
-	@UiTemplate("AboutGedadView.ui.xml")
-	interface AboutGedadViewUiBinder extends UiBinder<Widget, AboutGedadViewImpl> {
+	@UiTemplate("AnnouncementView.ui.xml")
+	interface AboutGedadViewUiBinder extends UiBinder<Widget, AnnouncementViewImpl> {
 	}
 
-	public AboutGedadViewImpl() {
+	public AnnouncementViewImpl() {
 		initWidget(uiBinder.createAndBindUi(this));
 	}
 
