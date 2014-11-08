@@ -41,13 +41,12 @@
 	      <tr>
 	        <td width="45%" align="right" valign="middle" style="font-size:20px; text-align:right; width:47%" class="lead main-text">
               	<span style="font-size:18px; font-weight:bold">El proyecto #Somos UN</span><br></br>
-              	Primero que todo, Somos UN (o sea está pág)<br></br>
-              	es un proyecto por iniciativa de los de estudiantes<br></br>
-              	de la Nacional (GEDAD) y no tiene ninguna<br></br>
-              	relación formal con la universidad<br></br><br></br>
-              	El proyecto busca crear proyectos (y agruparlos<br></br>
-              	bajo Somos UN) que utilicen la nube y que <br></br>
-              	sirvan a la comunidad académica.<br></br><br></br>
+              	Primero que todo, Somos UN es un proyectopor iniciativa<br></br>
+              	de los de estudiantes de la UN y no tiene ninguna<br></br>
+              	relación formal con la Universidad Nacional<br></br><br></br>
+              	El (macro)proyecto busca crear proyectos que utilicen<br></br>
+              	la nube y que sirvan a la comunidad académica<br></br>
+              	y agruparlos aquí (o sea SomosUn.com).<br></br><br></br>
               	<span style="font-size:18px; font-weight:bold">"De los estudiantes, para los estudiantes".</span><br></br> 
               	El proyecto está enmarcado bajo esa frase, lo<br></br>
               	que significa que cualquier estudiante puede<br></br>
@@ -60,7 +59,7 @@
               	<br></br><br></br><br></br>
             </td>
 	        <td width="45%" height="400" align="left" valign="middle" style="font-size:20px; text-align:left" class="lead main-text">
-	            <span style="font-size:18px; font-weight:bold">Grupo de Estudio en Desarrollo de Aplicaciones Distribuidas</span><br></br><br></br>
+	            <span style="font-size:18px; font-weight:bold">Grupo de Estudio en Desarrollo de</span><br></br><span style="font-size:18px; font-weight:bold">Aplicaciones Distribuidas</span><br></br><br></br>
 	            <span style="font-size:18px; font-weight:bold">¿Qué estamos haciendo?</span><br></br>
               	Estamos desarrollando un sistema escalable para<br></br>administrar los planes de estudio de los estudiantes<br></br><br></br>
               	<span style="font-size:18px; font-weight:bold">¿Por qué lo hacemos?</span><br></br>
@@ -69,7 +68,7 @@
 				Usamos Google App Engine, Jnario y nos ayudan <br></br>
 				varios profesores, principalmente Gabriel Mañana<br></br><br></br>
 				<span style="font-size:18px; font-weight:bold">Si quieres ayudar o contactarnos</span><br></br>
-				El correo es gedad.unal@gmail.com<br></br><br></br><br></br><br></br><br></br><br></br><br></br>
+				El correo es gedad.unal@gmail.com<br></br><br></br><br></br><br></br><br></br><br></br>
             </td>
         </tr>
       </table>
