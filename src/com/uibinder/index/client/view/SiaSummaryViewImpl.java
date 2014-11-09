@@ -29,7 +29,7 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 	@UiField Label levelingCreditsNecessaryLabel;
 	@UiField Label levelingCreditsPerCentLabel;
 	@UiField Label totalApprovedLabel;
-	@UiField Label totalNeccesaryLabel;
+	@UiField Label totalNecessaryLabel;
 	@UiField Label totalPerCentLabel;
 
 	@UiTemplate("SiaSummary.ui.xml")
@@ -52,7 +52,7 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 	}
 
 	@Override
-	public void setGPA(int x) {
+	public void setGPA(double x) {
 		gpaLabel.setText(""+x);
 	}
 
@@ -97,6 +97,21 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 		levelingCreditsApprovedLabel.setText(""+approved);
 		levelingCreditsNecessaryLabel.setText(""+necessary);
 		levelingCreditsPerCentLabel.setText(approved/necessary*100+"%");
+	}
+
+	@Override
+	public void setTotalApproved(int x) {
+		totalApprovedLabel.setText("" + x);
+	}
+
+	@Override
+	public void setTotalNecessary(int x) {
+		totalNecessaryLabel.setText(""+ x);
+	}
+
+	@Override
+	public void setTotalPerCent(int x) {
+		totalPerCentLabel.setText(x + "%");
 	}
 
 }

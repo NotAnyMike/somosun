@@ -16,7 +16,6 @@ import com.uibinder.index.client.dnd.SemesterDropController;
 import com.uibinder.index.client.service.SUNServiceAsync;
 import com.uibinder.index.client.view.PlanView;
 import com.uibinder.index.client.view.PlanViewImpl;
-import com.uibinder.index.client.view.SiaSummary;
 import com.uibinder.index.client.view.SiaSummaryView;
 import com.uibinder.index.client.view.SiaSummaryViewImpl;
 import com.uibinder.index.client.widget.PlanWidget;
@@ -49,9 +48,9 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	
 	//Credits variables
 	/**
-	 * Here variable[0] = total of the plan, [1] Approved until now, [2]taken until now
+	 * Here variable[0] = total of the plan, [1] Approved until now, [2]taken until now, [3]Total of the plan (a final an default value which depends on the career)
 	 */
-	private int[] totalCredits = {0,0,0};
+	private int[] totalCredits = {0,0,0,0};
 	/**
 	 * Here variable[0] = total, [1] Approved, [2]Necessary to graduate, the [2] item is a default and it is a final value set a the begging.
 	 */
@@ -202,12 +201,14 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 			disciplinaryCredits[2] = 999;
 			freeElectionCredits[2] = 999;
 			levelingCredits[2] = 999;
+			totalCredits[3] = 999;
 		}else{
 			//TODO get by a service the amount of credits needed to graduate for every type
 			foundationCredits[2] = 60;
 			disciplinaryCredits[2] = 60;
 			freeElectionCredits[2] = 60;
 			levelingCredits[2] = 12;
+			totalCredits[3] = foundationCredits[2] + disciplinaryCredits[2] + freeElectionCredits[2] + levelingCredits[2];
 		}
 		
 	}
@@ -338,10 +339,12 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		
 		totalCredits[0] += creditsValue;
 		if(approved) totalCredits[1] += creditsValue;
-		if(taken) totalCredits[2] += creditsValue;
+		if(taken == true || approved == true) totalCredits[2] += creditsValue;
 		
+		siaSummaryView.setAvance(totalCredits[1]/totalCredits[3]);
+		siaSummaryView.setAdditionalyCredits(((totalCredits[1]*2-(totalCredits[2]-totalCredits[1]) > 80) ? 80 : totalCredits[1]*2-(totalCredits[2]-totalCredits[1])));
 		siaSummaryView.setApprovedCredits(totalCredits[1]);
-		//TODO setAdditionallyCredits
+		siaSummaryView.setGPA(getGPA());
 		
 		
 		switch(typology){
@@ -367,6 +370,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 			siaSummaryView.setFreeElectionCredits(freeElectionCredits[1], freeElectionCredits[2]);
 			break;
 		}
+		
+		updateTotalsOnSiaSummaryView();
 	}
 	
 	//this method must be deleted later on
@@ -459,6 +464,23 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 			}
 		}
 		return subjectToReturn;
+	}
+	
+	private double getGPA(){
+		double gpa = 0;
+		for(SubjectWidget subject : subjectList){
+			if(subject.getTaken()==true){
+				gpa += subject.getCredits()*subject.getGrade();
+			}
+		}
+		gpa = (double) Math.round((gpa/totalCredits[2]) * 100) / 100;;
+		return gpa;
+	}
+	
+	private void updateTotalsOnSiaSummaryView(){
+		siaSummaryView.setTotalApproved(totalCredits[1]);
+		siaSummaryView.setTotalNecessary(totalCredits[3]);
+		siaSummaryView.setTotalPerCent(Math.round(totalCredits[1]/totalCredits[3]));
 	}
 
 }

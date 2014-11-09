@@ -235,6 +235,10 @@ public class SubjectWidget extends FlowPanel {
 		return approved;
 	}
 	
+	public double getGrade(){
+		return grade;
+	}
+	
 	/**
 	 * Type = 0 Nivelación, 1 Fundamentación, 2 Disiplinar, 3 libre elección, 4 Añadir para posgrado
 	 */

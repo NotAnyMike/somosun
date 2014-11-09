@@ -79,7 +79,7 @@
 		          <tr>
 		            <td width="130" align="right" class="topBorder rightBorder planSummaryTitle smallCaptionPlanSummary">totales</td>
 		            <td width="100" align="center" nowrap="nowrap" class="topBorder  planSummaryTotals smallCaptionPlanSummary"><g:Label ui:field="totalApprovedLabel">-</g:Label></td>
-		            <td width="90" align="center" class="topBorder planSummaryTotals smallCaptionPlanSummary"><g:Label ui:field="totalNeccesaryLabel">-</g:Label></td>
+		            <td width="90" align="center" class="topBorder planSummaryTotals smallCaptionPlanSummary"><g:Label ui:field="totalNecessaryLabel">-</g:Label></td>
 		            <td width="80" align="center" class="topBorder  planSummaryTotals smallCaptionPlanSummary"><g:Label ui:field="totalPerCentLabel">-</g:Label></td>
 		          </tr>
 		        </table></td>
