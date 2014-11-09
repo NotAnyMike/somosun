@@ -22,10 +22,10 @@ import java.util.regex.Pattern;
  */
 public class Plan implements Serializable {
 
-    Career career;
-    List<Semester> semesters;
-    double PAPA;
-    Map<Subject, SubjectValues> subMap;
+    private Career career;
+    private List<Semester> semesters;
+    private double PAPA;
+    private Map<Subject, SubjectValues> subMap;
 
     public Plan() {
         career = new Career("Unknown","Unknown");
@@ -33,6 +33,10 @@ public class Plan implements Serializable {
         PAPA = 0;
         subMap = new HashMap<>();
 
+    }
+    
+    public String getCareer(){
+    	return career.getCode();
     }
 
     /*public void parseHistory(String history) {

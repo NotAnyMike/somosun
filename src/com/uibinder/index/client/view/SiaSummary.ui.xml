@@ -26,19 +26,19 @@
 		          <tr>
 		            <td width="150" align="right" valign="middle">PAPA:</td>
 		            <td width="10" rowspan="4"></td>
-		            <td width="50"><g:Label ui:field="papaLabel">-</g:Label></td>
+		            <td width="50"><g:Label ui:field="gpaLabel">-</g:Label></td>
 		          </tr>
 		          <tr>
 		            <td width="150" align="right" valign="middle">Avance:</td>
-		            <td width="50"><g:Label ui:field="avanceLabel">58%</g:Label></td>
+		            <td width="50"><g:Label ui:field="avanceLabel">-</g:Label></td>
 		          </tr>
 		          <tr>
 		            <td width="150" align="right" valign="middle">Creditos aprobados:</td>
-		            <td width="50"><g:Label ui:field="aprovedLabel">75</g:Label></td>
+		            <td width="50"><g:Label ui:field="approvedLabel">-</g:Label></td>
 		          </tr>
 		          <tr>
 		            <td width="150" align="right" valign="middle">Creditos adicionales:</td>
-		            <td><g:Label ui:field="aditionalLabel">80</g:Label></td>
+		            <td><g:Label ui:field="aditionalLabel">-</g:Label></td>
 		          </tr>
 		          <tr>
 		            <td height="5" colspan="3"></td>
@@ -54,27 +54,33 @@
 		          </tr>
 		          <tr>
 		            <td width="130" align="right" class="topBorder rightBorder planSummaryTitle">Fundamentación </td>
-		            <td width="100" align="center" nowrap="nowrap" class="topBorder planSummaryText">50</td>
-		            <td width="90" align="center" class="topBorder planSummaryText">50</td>
-		            <td width="80" align="center" class="topBorder planSummaryText">100%</td>
+		            <td width="100" align="center" nowrap="nowrap" class="topBorder planSummaryText"><g:Label ui:field="foundationCreditsApprovedLabel">-</g:Label></td>
+		            <td width="90" align="center" class="topBorder planSummaryText"><g:Label ui:field="foundationCreditsNecessaryLabel">-</g:Label></td>
+		            <td width="80" align="center" class="topBorder planSummaryText"><g:Label ui:field="foundationCreditsPerCentLabel">-</g:Label></td>
 		          </tr>
 		          <tr>
 		            <td width="130" align="right" class="rightBorder  planSummaryTitle">Disciplinar </td>
-		            <td width="100" align="center" nowrap="nowrap" class="planSummaryText">40</td>
-		            <td width="90" align="center" class="planSummaryText">54</td>
-		            <td width="80" align="center" class="planSummaryText">80%</td>
+		            <td width="100" align="center" nowrap="nowrap" class="planSummaryText"><g:Label ui:field="disciplinaryCreditsApprovedLabel">-</g:Label></td>
+		            <td width="90" align="center" class="planSummaryText"><g:Label ui:field="disciplinaryCreditsNecessaryLabel">-</g:Label></td>
+		            <td width="80" align="center" class="planSummaryText"><g:Label ui:field="disciplinaryCreditsPerCentLabel">-</g:Label></td>
 		          </tr>
 		          <tr>
 		            <td width="130" align="right" class="rightBorder  planSummaryTitle">Libre Elección </td>
-		            <td width="100" align="center" nowrap="nowrap" class="planSummaryText">56</td>
-		            <td width="90" align="center" class="planSummaryText">40</td>
-		            <td width="80" align="center" class="planSummaryText">100%</td>
+		            <td width="100" align="center" nowrap="nowrap" class="planSummaryText"><g:Label ui:field="freeElectionCreditsApprovedLabel">-</g:Label></td>
+		            <td width="90" align="center" class="planSummaryText"><g:Label ui:field="freeElectionCreditsNecessaryLabel">-</g:Label></td>
+		            <td width="80" align="center" class="planSummaryText"><g:Label ui:field="freeElectionCreditsPerCentLabel">-</g:Label></td>
+		          </tr>
+		           <tr>
+		            <td width="130" align="right" class="rightBorder  planSummaryTitle">Nivelación</td>
+		            <td width="100" align="center" nowrap="nowrap" class="planSummaryText"><g:Label ui:field="levelingCreditsApprovedLabel">-</g:Label></td>
+		            <td width="90" align="center" class="planSummaryText"><g:Label ui:field="levelingCreditsNecessaryLabel">-</g:Label></td>
+		            <td width="80" align="center" class="planSummaryText"><g:Label ui:field="levelingCreditsPerCentLabel">-</g:Label></td>
 		          </tr>
 		          <tr>
 		            <td width="130" align="right" class="topBorder rightBorder planSummaryTitle smallCaptionPlanSummary">totales</td>
-		            <td width="100" align="center" nowrap="nowrap" class="topBorder  planSummaryTotals smallCaptionPlanSummary">146</td>
-		            <td width="90" align="center" class="topBorder planSummaryTotals smallCaptionPlanSummary">100%</td>
-		            <td width="80" align="center" class="topBorder  planSummaryTotals smallCaptionPlanSummary">90%</td>
+		            <td width="100" align="center" nowrap="nowrap" class="topBorder  planSummaryTotals smallCaptionPlanSummary"><g:Label ui:field="totalApprovedLabel">-</g:Label></td>
+		            <td width="90" align="center" class="topBorder planSummaryTotals smallCaptionPlanSummary"><g:Label ui:field="totalNeccesaryLabel">-</g:Label></td>
+		            <td width="80" align="center" class="topBorder  planSummaryTotals smallCaptionPlanSummary"><g:Label ui:field="totalPerCentLabel">-</g:Label></td>
 		          </tr>
 		        </table></td>
 		      </tr>

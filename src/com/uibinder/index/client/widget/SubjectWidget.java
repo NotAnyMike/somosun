@@ -18,6 +18,8 @@ public class SubjectWidget extends FlowPanel {
 	private boolean obligatoriness = false;
 	private int credits = 0;
 	private double grade = 0.0;
+	private boolean approved = false; //it could happen that it took the class and fail it
+	private boolean taken = false; //because to calculate the credits requirement I need to know if it was(not) taken and (not) passed/failed  
 	private int type = 0;
 	private boolean selected = false;
 	
@@ -32,14 +34,23 @@ public class SubjectWidget extends FlowPanel {
 	private List<SubjectWidget> posList = new ArrayList<SubjectWidget>();
 	private List<SubjectWidget> coList = new ArrayList<SubjectWidget>();
 	
-	/*
-	 * Type = 0 Nivelación, 1 Fundamentación, 2 Disiplinar, 3 libre elección, 4 Añadir para posgrado
+	/**
+	 * Type = 0 Leveling, 1 Foundations, 2 Disciplinary, 3 Free Election, 4 Add to post-grade.
+	 * if it comes with grade means that the class was taken (= true)
+	 * @param name
+	 * @param code
+	 * @param credits
+	 * @param grade
+	 * @param obligatoriness
+	 * @param type
 	 */
 	public SubjectWidget(String name, String code, int credits, double grade, boolean obligatoriness, int type){
 		this.name = name;
 		this.code = code;
 		this.credits = credits;
 		this.grade = grade;
+		this.approved = ((grade >= 3) ? true : false);
+		this.taken = true;
 		this.obligatoriness = obligatoriness;
 		this.type = type;
 		
@@ -48,11 +59,21 @@ public class SubjectWidget extends FlowPanel {
 		createWidget();
 	}
 	
+	/**
+	 * Type = 0 Nivelación, 1 Fundamentación, 2 Disiplinar, 3 libre elección, 4 Añadir para posgrado
+	 * @param name
+	 * @param code
+	 * @param credits
+	 * @param obligatoriness
+	 * @param type
+	 */
 	public SubjectWidget(String name, String code, int credits, boolean obligatoriness, int type){
 		this.name = name;
 		this.code = code;
 		this.credits = credits;
 		this.grade = 0.0;
+		this.approved = false;
+		this.taken = false;
 		this.obligatoriness = obligatoriness;
 		this.type = type;
 		
@@ -68,10 +89,12 @@ public class SubjectWidget extends FlowPanel {
 		
 		this.getElement().setAttribute("name", name);
 		this.getElement().setAttribute("code", code);
-		this.getElement().setAttribute("Credits", Integer.toString(credits));
+		this.getElement().setAttribute("credits", Integer.toString(credits));
 		this.getElement().setAttribute("grade", Double.toString(grade));
 		this.getElement().setAttribute("obligatoriness", Boolean.toString(obligatoriness));
 		this.getElement().setAttribute("type", Integer.toString(type));
+		this.getElement().setAttribute("approved", ((approved == true) ? "1" : "0"));
+		this.getElement().setAttribute("taken", ((taken == true) ? "1" : "0"));
 		
 	}
 
@@ -202,5 +225,20 @@ public class SubjectWidget extends FlowPanel {
 	
 	public String getCode(){
 		return code;
+	}
+	
+	public boolean getTaken(){
+		return taken;
+	}
+	
+	public boolean getApproved(){
+		return approved;
+	}
+	
+	/**
+	 * Type = 0 Nivelación, 1 Fundamentación, 2 Disiplinar, 3 libre elección, 4 Añadir para posgrado
+	 */
+	public int getType(){
+		return type;
 	}
 }

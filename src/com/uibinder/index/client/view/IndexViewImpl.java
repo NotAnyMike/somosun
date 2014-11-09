@@ -17,7 +17,6 @@ public class IndexViewImpl extends Composite implements IndexView {
 	private static IndexViewUiBinder uiBinder = GWT
 			.create(IndexViewUiBinder.class);
 	
-	
 	@UiField Anchor createButton;
 	@UiField Anchor commingSoonButton;
 	@UiField Anchor aboutUsButton;

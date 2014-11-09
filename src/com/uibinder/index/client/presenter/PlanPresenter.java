@@ -17,6 +17,8 @@ import com.uibinder.index.client.service.SUNServiceAsync;
 import com.uibinder.index.client.view.PlanView;
 import com.uibinder.index.client.view.PlanViewImpl;
 import com.uibinder.index.client.view.SiaSummary;
+import com.uibinder.index.client.view.SiaSummaryView;
+import com.uibinder.index.client.view.SiaSummaryViewImpl;
 import com.uibinder.index.client.widget.PlanWidget;
 import com.uibinder.index.client.widget.SemesterWidget;
 import com.uibinder.index.client.widget.SubjectWidget;
@@ -31,10 +33,11 @@ import com.uibinder.index.shared.control.Subject;
  * 
  * Be very precise with the subjects' code, because it will work (no errors will be made) when all the codes are different.   
  */
-public class PlanPresenter implements Presenter, PlanView.Presenter {
+public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryView.Presenter {
 	
 	private final HandlerManager eventBus;
 	private PlanViewImpl view;
+	private SiaSummaryViewImpl siaSummaryView;
 	private final SUNServiceAsync rpcService;
 	
 	private HashMap<SubjectWidget,SemesterWidget> subjectsBySemester = new HashMap<SubjectWidget, SemesterWidget>();
@@ -43,14 +46,26 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 	private List<SemesterWidget> semesterList = new ArrayList<SemesterWidget>();
 	private int semesters = 0;
 	private int subjects = 0;
-	private int totalCredits = 0;
+	
+	//Credits variables
+	/**
+	 * Here variable[0] = total of the plan, [1] Approved until now, [2]taken until now
+	 */
+	private int[] totalCredits = {0,0,0};
+	/**
+	 * Here variable[0] = total, [1] Approved, [2]Necessary to graduate, the [2] item is a default and it is a final value set a the begging.
+	 */
+	private int[] foundationCredits = {0,0,0};
+	private int[] disciplinaryCredits = {0,0,0};
+	private int[] freeElectionCredits = {0,0,0};
+	private int[] levelingCredits = {0,0,0};
 	
 	//Control classes
 	private Plan plan;
 
 	//Widget classes
 	private PlanWidget planWidget;
-	private SiaSummary siaSummary;
+	//private SiaSummary siaSummary;
 	
 	private VerticalPanel subContainer = new VerticalPanel();
 	private SemesterDropController dropController; 
@@ -61,20 +76,26 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 	//This one is to allow or not drag items wherever
 	private final boolean allowDroppingOnBoundaryPanel = false;
 	
+	
 	/**
 	 * This is the constructor to create an empty plan, that means no subjects
 	 * at all, to make it 100% customizable for the user
 	 * 
+	 * 
 	 * @param eventBus
 	 * @param view
 	 */
-	public PlanPresenter(SUNServiceAsync rpcService, HandlerManager eventBus, PlanViewImpl view){
+	public PlanPresenter(SUNServiceAsync rpcService, HandlerManager eventBus, PlanViewImpl view, SiaSummaryViewImpl siaSummaryView){
+		
 		this.rpcService = rpcService;
 		this.eventBus = eventBus;
 		this.view = view;
 		this.view.setPresenter(this);
+		this.siaSummaryView = siaSummaryView;
 		
 		plan = new Plan();
+		
+		addDefaultToCredits(null);
 		
 		if(planWidget == null) init();
 	}
@@ -86,17 +107,22 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 	 * @param view
 	 * @param plan
 	 */
-	public PlanPresenter(SUNServiceAsync rpcService, HandlerManager eventBus, PlanViewImpl view, Plan plan){
+	public PlanPresenter(SUNServiceAsync rpcService, HandlerManager eventBus, PlanViewImpl view, SiaSummaryViewImpl siaSummaryView, Plan plan){
+		
+		this.plan = plan;
+
 		this.rpcService = rpcService;
 		this.eventBus = eventBus;
 		this.view = view;
 		this.view.setPresenter(this);
+		this.siaSummaryView = siaSummaryView;
 		
-		this.plan = plan;
+		addDefaultToCredits(plan.getCareer());
 		
 		if(planWidget == null) init();
+		
 	}
-	
+
 	/**
 	 * Constructor to create a Plan based on one career
 	 * 
@@ -104,27 +130,36 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 	 * @param view
 	 * @param career
 	 */
-	public PlanPresenter(SUNServiceAsync rpcService, HandlerManager eventBus, PlanViewImpl view, String career){
+	public PlanPresenter(SUNServiceAsync rpcService, HandlerManager eventBus, PlanViewImpl view, SiaSummaryViewImpl siaSummaryView, String career){
+		this.plan = plan;
+		
 		this.rpcService = rpcService;
 		this.eventBus = eventBus;
 		this.view = view;
 		this.view.setPresenter(this);
+		this.siaSummaryView = siaSummaryView;
 		
-		this.plan = plan;
+		addDefaultToCredits(career);
 		
 		if(planWidget == null) init();
+	}
+	
+	@Override
+	public void go(HasWidgets container) {
+		container.clear();
+		addWidgets(container);
 	}
 	
 	private void init() {
 		
 		//Create the dnd stuff
 		boundaryPanel = new AbsolutePanel();
-		dragController = new PickUpDragController(boundaryPanel, allowDroppingOnBoundaryPanel);
+		dragController = new PickUpDragController(boundaryPanel, allowDroppingOnBoundaryPanel, this);
 		
 		planWidget = new PlanWidget();
 		
 		//creating the Summary
-		siaSummary = new SiaSummary();
+		//siaSummary = new SiaSummary();
 		
 		/************* to remove later on **************/
 		//It is just for design purposes
@@ -133,12 +168,66 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 		
 		//rpcService.getSubjectByCode(123, chargeSubjectByCode);
 		
-		createSubject("Introducciónallavidasocialdemamertos peruanos del siglo XI","0000r42",3,true,1,0);
+		//TODO Delete it
+		createSubject("Introducciónallavidasocialdemamertos peruanos del siglo XI", "0000r42", 3, 3.2, true, 0, 0);
+		createSubject("La globalización es buena", "00s0r42", 3, 5, true, 2, 1);
+		createSubject("Si toca, toca!", "0asf0r42", 3, true, 1, 0);
+		createSubject("Avanza más la Uniminuto que este proyecto", "021r42", 3, 4.2, true, 3, 2);
 
 	}
 	
+	private void addWidgets(HasWidgets container) {
+		
+		container.add(view.asWidget());
+		
+		subContainer.addStyleName("subContainerForPlan");
+		boundaryPanel.add(planWidget);
+		subContainer.add(boundaryPanel);
+		
+		subContainer.add(siaSummaryView.asWidget());
+		
+		subContainer.setHorizontalAlignment(HorizontalPanel.ALIGN_CENTER);
+		
+		container.add(subContainer);
+	}
+	
 	/**
-	 * it creates a subject from zero and it makes the subject draggable too
+	 * This method fills the necessary credits in each type  to be able to graduate,
+	 * if careerCode == null then it will have infinite credits 
+	 * @param careerCode
+	 */
+	private void addDefaultToCredits(String careerCode){
+		if(careerCode==null){
+			foundationCredits[2] = 999;
+			disciplinaryCredits[2] = 999;
+			freeElectionCredits[2] = 999;
+			levelingCredits[2] = 999;
+		}else{
+			//TODO get by a service the amount of credits needed to graduate for every type
+			foundationCredits[2] = 60;
+			disciplinaryCredits[2] = 60;
+			freeElectionCredits[2] = 60;
+			levelingCredits[2] = 12;
+		}
+		
+	}
+	
+	/**
+	 * it creates a subject with a grade from zero and it makes the subject draggable too,
+	 * @param name
+	 * @param code
+	 * @param credits
+	 * @param isObligatory
+	 * @param type
+	 * @param semester
+	 */
+	private void createSubject(String name, String code, int credits, double grade ,boolean isObligatory, int type, int semester){
+		SubjectWidget subject = new SubjectWidget(name,code,credits,grade,isObligatory,type);
+		createSubjectGeneric(subject, semester);
+	}
+	
+	/**
+	 * it creates a subject without a grade from zero and it makes the subject draggable too,
 	 * @param name
 	 * @param code
 	 * @param credits
@@ -148,30 +237,42 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 	 */
 	private void createSubject(String name, String code, int credits, boolean isObligatory, int type, int semester){
 		SubjectWidget subject = new SubjectWidget(name,code,credits,isObligatory,type);
+		createSubjectGeneric(subject, semester);
+	}
+	
+	/**
+	 * The generic method, the procedures that both creatSubject have in common 
+	 * @param subject
+	 * @param semester
+	 */
+	private void createSubjectGeneric(SubjectWidget subject, int semester){
 		makeSubjectDraggable(subject);
 		subjectList.add(subject); //adding the subject to its list
 		
 		subjects++;
-		addSubject(subject, semester);
+		addSubject(subject, semester);		
 	}
 	
 	private void deleteSubject(SubjectWidget subject){
 		
-		subject.removeFromParent();
-		subjects--;
-
 		if(subjectList.contains(subject)==true){
-			subjectList.get(subjectList.indexOf(subject)).removeFromParent();
+			subjectList.remove((subjectList.indexOf(subject)));
+			subjects--;
 		}
 		
 		if(subjectsBySemester.containsKey(subject)==true){
+			//remove the credits
+			setCredits(subjectsBySemester.get(subject), -subject.getCredits(), subject.getType(), subject.getApproved(), subject.getTaken());
 			subjectsBySemester.remove(subject);
 		}
+		
+		dragController.makeNotDraggable(subject);
+		subject.removeFromParent();
 		
 	}
 	
 	/**
-	 * This method is for times where we just know the number of the semester and nothing else
+	 * This method finds the semesterWidget which correspond to the int semester and call addSubject(subjectW, SemesterW)
 	 * @param subject
 	 * @param semester
 	 */
@@ -182,15 +283,19 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 		addSubject(subject, semesterList.get(semester));
 	}
 	
+	/**
+	 * Add a semester to its corresponding semester, it also takes care of the credits part
+	 * @param subject
+	 * @param semester
+	 */
 	private void addSubject(SubjectWidget subject, SemesterWidget semester){
-		setCredits(semester, credits.get(semester) + subject.getCredits());
+		setCredits(semester, subject.getCredits(), subject.getType(), subject.getApproved(), subject.getTaken());
 		subjectsBySemester.put(subject, semester);
 		semester.addSubject(subject);
 	}
 	
 	public void subjectMoved(SubjectWidget subject, SemesterWidget semester){
 		
-		int creditsTemp = 0;
 		int semesterNumber = semesterList.indexOf(semester);
 		
 		//creating enough semesters to be able to add the subject to its semester
@@ -207,25 +312,61 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 				SemesterWidget semesterFrom = subjectsBySemester.get(subject);
 				
 				//getting the credits from its original semester and removing the ones from the subject which is leaving
-				setCredits(semesterFrom, - subject.getCredits());
+				setCredits(semesterFrom, - subject.getCredits(), subject.getType(), subject.getApproved(), subject.getTaken());
 			}
 			
-			creditsTemp = 0;
-			
 			//Add the new information about its semester
-			setCredits(semesterTo, subject.getCredits());
+			setCredits(semesterTo, subject.getCredits(), subject.getType(), subject.getApproved(), subject.getTaken());
 			
 			subjectsBySemester.put(subject, semesterTo);
-			
+
 		}
 		
 	}
 	
-	private void setCredits(SemesterWidget semester, int creditsValue){
+	/**
+	 * TODO add the part of approved credits and necessary credits (if it was taken)
+	 * TODO update the view (siaSummary)
+	 * 
+	 * @param semester
+	 * @param creditsValue
+	 * @param typology
+	 */
+	private void setCredits(SemesterWidget semester, int creditsValue, int typology, boolean approved, boolean taken){
 		credits.put(semester, credits.get(semester) + creditsValue);
 		semester.setCredits(credits.get(semester));
 		
-		totalCredits += creditsValue;
+		totalCredits[0] += creditsValue;
+		if(approved) totalCredits[1] += creditsValue;
+		if(taken) totalCredits[2] += creditsValue;
+		
+		siaSummaryView.setApprovedCredits(totalCredits[1]);
+		//TODO setAdditionallyCredits
+		
+		
+		switch(typology){
+		//Type = 0 Nivelación, 1 Fundamentación, 2 Disiplinar, 3 libre elección, 4 Añadir para posgrado
+		case 0: //Nivelación 
+			levelingCredits[0] += creditsValue;
+			if(approved) levelingCredits[1] += creditsValue;
+			siaSummaryView.setLevelingCredits(levelingCredits[1], levelingCredits[2]);
+			break;
+		case 1: //Fundamentación
+			foundationCredits[0] += creditsValue;
+			if(approved) foundationCredits[1] += creditsValue;
+			siaSummaryView.setFoundationCredits(foundationCredits[1], foundationCredits[2]);
+			break;
+		case 2: //Disciplinary
+			disciplinaryCredits[0] += creditsValue;
+			if(approved) disciplinaryCredits[1] += creditsValue;
+			siaSummaryView.setDisciplinaryCredits(disciplinaryCredits[1], disciplinaryCredits[2]);
+			break;
+		case 3: //Libre
+			freeElectionCredits[0] += creditsValue;
+			if(approved) freeElectionCredits[1] += creditsValue;
+			siaSummaryView.setFreeElectionCredits(freeElectionCredits[1], freeElectionCredits[2]);
+			break;
+		}
 	}
 	
 	//this method must be deleted later on
@@ -250,12 +391,6 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 
 	};*/
 
-
-	@Override
-	public void go(HasWidgets container) {
-		container.clear();
-		addWidgets(container);
-	}
 	
 	private void createSemester(){
 		
@@ -288,21 +423,6 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 		dragController.makeDraggable(subject, subject.getTypeLabel());
 	}
 	
-	private void addWidgets(HasWidgets container) {
-		
-		container.add(view.asWidget());
-		
-		subContainer.addStyleName("subContainerForPlan");
-		boundaryPanel.add(planWidget);
-		subContainer.add(boundaryPanel);
-		
-		subContainer.add(siaSummary.asWidget());
-		
-		subContainer.setHorizontalAlignment(HorizontalPanel.ALIGN_CENTER);
-		
-		container.add(subContainer);
-	}
-	
 	/**
 	 * To keep the presenter and all the plan updated using the observer pattern (actually this is the quick and dirty way)
 	 * 
@@ -317,8 +437,12 @@ public class PlanPresenter implements Presenter, PlanView.Presenter {
 		}
 	}
 	
-	public void onSubjectDelete(SubjectWidget subject){
-		//TODO update semesters and delete the subject
+	/**
+	 * This method is usually used by the pickUpController when some subject is dropped outside of any dropController
+	 * @param code
+	 */
+	public void onSubjectDelete(String code){
+		deleteSubject(getSubjectByCodeFromList(code));
 	}
 	
 	/**

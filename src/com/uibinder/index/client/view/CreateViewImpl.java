@@ -37,7 +37,6 @@ public class CreateViewImpl extends Composite implements CreateView {
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
-		
 	}
 
 	@Override

@@ -29,6 +29,7 @@ import com.uibinder.index.client.view.AboutUsViewImpl;
 import com.uibinder.index.client.view.DndViewImpl;
 import com.uibinder.index.client.view.IndexViewImpl;
 import com.uibinder.index.client.view.PlanViewImpl;
+import com.uibinder.index.client.view.SiaSummaryViewImpl;
 import com.uibinder.index.client.view.TopBarViewImpl;
 import com.uibinder.index.client.view.CreateViewImpl;
 import com.uibinder.index.shared.RandomPhrase;
@@ -51,6 +52,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	private PlanViewImpl planView;
 	private AboutUsViewImpl aboutUsView;
 	private AnnouncementViewImpl announcementView;
+	private SiaSummaryViewImpl siaSummaryView;
 	
 	//Taking care of the random phrase funtionality variables 
 	private List<RandomPhrase> phrases = null;
@@ -138,9 +140,10 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 			} else if(token.equals("plan")) {
 				if(planView == null){
 					planView = new PlanViewImpl();
+					siaSummaryView = new SiaSummaryViewImpl();
 				}
 				if(planPresenter == null){
-					planPresenter = new PlanPresenter(rpcService, eventBus, planView);
+					planPresenter = new PlanPresenter(rpcService, eventBus, planView, siaSummaryView);
 				}
 				planPresenter.go(RootPanel.get("centerArea"));
 			} else if(token.equals("aboutUs")) {
