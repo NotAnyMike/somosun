@@ -21,7 +21,20 @@
   </tr>
   <tr>
     <td width="20"></td>
-    <td height="60" align="center" valign="middle" class="wrapword"><g:Label ui:field="subjectName"></g:Label>
+    <td height="60" align="center" valign="middle" class="wrapword">
+        
+        <div name="Avanza más la Uniminuto que este proyecto" code="021r42" credits="3" grade="4.2" obligatoriness="true" type="3" approved="1" taken="1" class="subjectBox dragdrop-draggable">
+            <div class=" topSubjectBox "><g:Label ui:field="subjectCode"></g:Label></div>
+            <div class=" mainSubjectBox wrapword "><g:Label ui:field="subjectName"></g:Label></div>
+            <div class="bottomSubjectBox">
+                <div class="gwt-Label gradeBottomSubjectBox " title="nota de la clase: 4.2">4.2</div>
+                <div class=" creditsBottomSubjectBox " title="créditos: 3">cr: 3</div>
+                <div class="obligBottomSubjectBox" title="Es obligatoria: Si">oblig: Si</div>
+                <div class="typeBottomSubjectBox" title="Tipología: Libre Elección">L</div>
+            </div>
+            
+            </div>
+        
     </td>
     <td width="20" align="center" valign="middle"></td>
     <td align="center" valign="middle"><table border="0" cellspacing="0" cellpadding="0">
