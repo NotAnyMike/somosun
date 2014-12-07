@@ -223,6 +223,10 @@ public class SubjectWidget extends FlowPanel {
 		return posList;
 	}
 	
+	public String getName(){
+		return name;
+	}
+	
 	public String getCode(){
 		return code;
 	}

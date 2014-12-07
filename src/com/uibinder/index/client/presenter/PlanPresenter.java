@@ -18,6 +18,8 @@ import com.uibinder.index.client.view.PlanView;
 import com.uibinder.index.client.view.PlanViewImpl;
 import com.uibinder.index.client.view.SiaSummaryView;
 import com.uibinder.index.client.view.SiaSummaryViewImpl;
+import com.uibinder.index.client.view.WarningDeleteSubjectView;
+import com.uibinder.index.client.view.WarningDeleteSubjectViewImpl;
 import com.uibinder.index.client.widget.PlanWidget;
 import com.uibinder.index.client.widget.SemesterWidget;
 import com.uibinder.index.client.widget.SubjectWidget;
@@ -32,11 +34,12 @@ import com.uibinder.index.shared.control.Subject;
  * 
  * Be very precise with the subjects' code, because it will work (no errors will be made) when all the codes are different.   
  */
-public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryView.Presenter {
+public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryView.Presenter, WarningDeleteSubjectView.Presenter {
 	
 	private final HandlerManager eventBus;
 	private PlanViewImpl view;
 	private SiaSummaryViewImpl siaSummaryView;
+	private WarningDeleteSubjectViewImpl warningDeleteSubjectView = new WarningDeleteSubjectViewImpl();
 	private final SUNServiceAsync rpcService;
 	
 	private HashMap<SubjectWidget,SemesterWidget> subjectsBySemester = new HashMap<SubjectWidget, SemesterWidget>();
@@ -90,7 +93,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		this.eventBus = eventBus;
 		this.view = view;
 		this.view.setPresenter(this);
-		this.siaSummaryView = siaSummaryView;
+		warningDeleteSubjectView.setPresenter(this);
+		this.siaSummaryView = siaSummaryView; 
 		
 		plan = new Plan();
 		
@@ -114,6 +118,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		this.eventBus = eventBus;
 		this.view = view;
 		this.view.setPresenter(this);
+		warningDeleteSubjectView.setPresenter(this);
 		this.siaSummaryView = siaSummaryView;
 		
 		addDefaultToCredits(plan.getCareer());
@@ -136,6 +141,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		this.eventBus = eventBus;
 		this.view = view;
 		this.view.setPresenter(this);
+		warningDeleteSubjectView.setPresenter(this);
 		this.siaSummaryView = siaSummaryView;
 		
 		addDefaultToCredits(career);
@@ -187,6 +193,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		
 		subContainer.setHorizontalAlignment(HorizontalPanel.ALIGN_CENTER);
 		
+		container.add(warningDeleteSubjectView);
+		warningDeleteSubjectView.hideIt();
 		container.add(subContainer);
 	}
 	
@@ -254,8 +262,26 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		addSubject(subject, semester);		
 	}
 	
+	/**
+	 * To confirm the deletion of the subject
+	 * @param code
+	 */
+	private void confirmDeleteSubject(String code){
+		warningDeleteSubjectView.setSubjectName(code, getSubjectByCodeFromList(code).getName());
+		warningDeleteSubjectView.showIt();		
+	}
+	
+	/**
+	 * When it was confirmed that the subject must be deleted
+	 * @param b
+	 * @param code
+	 */
+	public void confirmedDeleteSubject(String code){
+		deleteSubject(getSubjectByCodeFromList(code));
+		warningDeleteSubjectView.hideIt();
+	}
+	
 	private void deleteSubject(SubjectWidget subject){
-		
 		if(subjectList.contains(subject)==true){
 			subjectList.remove((subjectList.indexOf(subject)));
 			subjects--;
@@ -447,7 +473,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	 * @param code
 	 */
 	public void onSubjectDelete(String code){
-		deleteSubject(getSubjectByCodeFromList(code));
+		confirmDeleteSubject(code);
+		//deleteSubject(getSubjectByCodeFromList(code));
 	}
 	
 	/**

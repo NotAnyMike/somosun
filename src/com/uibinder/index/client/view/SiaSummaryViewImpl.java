@@ -32,7 +32,7 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 	@UiField Label totalNecessaryLabel;
 	@UiField Label totalPerCentLabel;
 
-	@UiTemplate("SiaSummary.ui.xml")
+	@UiTemplate("SiaSummaryView.ui.xml")
 	interface SiaSummaryViewUiBinder extends UiBinder<Widget, SiaSummaryViewImpl> {}
 	private static SiaSummaryViewUiBinder uiBinder = GWT
 			.create(SiaSummaryViewUiBinder.class);
