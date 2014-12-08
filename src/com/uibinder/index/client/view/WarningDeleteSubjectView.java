@@ -13,6 +13,6 @@ public interface WarningDeleteSubjectView {
 	Widget asWidget();
 	void hideIt();
 	void showIt();
-	void setSubjectName(String code, String name);
+	void setSubject(String code, String name, double grade, int credits, boolean oblg, int type);
 
 }

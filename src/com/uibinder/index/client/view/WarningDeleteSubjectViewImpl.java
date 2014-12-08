@@ -16,6 +16,11 @@ import com.uibinder.index.client.presenter.PlanPresenter;
 public class WarningDeleteSubjectViewImpl extends Composite implements WarningDeleteSubjectView {
 	
 	@UiField Label subjectName;
+	@UiField Label subjectGrade;
+	@UiField Label subjectCode;
+	@UiField Label subjectOblig;
+	@UiField Label subjectCredits;
+	@UiField Label subjectType;
 	@UiField Button cancelButton;
 	@UiField Button deleteButton;
 	
@@ -63,12 +68,6 @@ public class WarningDeleteSubjectViewImpl extends Composite implements WarningDe
 	}
 
 	@Override
-	public void setSubjectName(String code, String name) {
-		subjectName.setText("Eliminar " + name + "?");
-		this.code = code;
-	}
-
-	@Override
 	public void hideIt() {
 		this.asWidget().setVisible(false);
 	}
@@ -76,6 +75,27 @@ public class WarningDeleteSubjectViewImpl extends Composite implements WarningDe
 	@Override
 	public void showIt() {
 		this.asWidget().setVisible(true);
+	}
+
+	@Override
+	public void setSubject(String code, String name, double grade,
+		int credits, boolean oblg, int type) {
+		subjectName.setText(name);
+		subjectCode.setText(code);
+		subjectGrade.setText(Double.toString(grade));
+		subjectCredits.setText(Integer.toString(credits));
+		subjectOblig.setText((oblg == true ? "Oblig: Si" : "Oblig: No"));
+		//Type = 0 Leveling, 1 Foundations, 2 Disciplinary, 3 Free Election, 4 Add to post-grade.
+		if(type==0){
+			subjectType.setText("N");			
+		} else if(type == 1){
+			subjectType.setText("F");
+		} else if(type == 2){
+			subjectType.setText("D");
+		} else if(type == 3){
+			subjectType.setText("L");
+		}
+		this.code = code;
 	}
 
 }

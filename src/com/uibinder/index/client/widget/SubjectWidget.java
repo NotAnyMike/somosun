@@ -243,6 +243,10 @@ public class SubjectWidget extends FlowPanel {
 		return grade;
 	}
 	
+	public boolean isOblig(){
+		return obligatoriness;
+	}
+	
 	/**
 	 * Type = 0 Nivelación, 1 Fundamentación, 2 Disiplinar, 3 libre elección, 4 Añadir para posgrado
 	 */

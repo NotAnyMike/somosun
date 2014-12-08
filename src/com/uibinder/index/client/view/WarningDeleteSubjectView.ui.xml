@@ -17,42 +17,39 @@
 <div class="warning_box">
 <table border="0" cellpadding="0" cellspacing="0" class="warning">
   <tr>
-    <td height="10" colspan="5"></td>
+    <td height="30" colspan="5"></td>
   </tr>
   <tr>
-    <td width="20"></td>
-    <td height="60" align="center" valign="middle" class="wrapword">
-        
-        <div name="Avanza más la Uniminuto que este proyecto" code="021r42" credits="3" grade="4.2" obligatoriness="true" type="3" approved="1" taken="1" class="subjectBox dragdrop-draggable">
-            <div class=" topSubjectBox "><g:Label ui:field="subjectCode"></g:Label></div>
+    <td width="40"></td>
+    <td align="center" valign="middle">
+        <div class="subjectBox">
+            <div class=" topSubjectBox"><g:Label ui:field="subjectCode">34567890</g:Label></div>
             <div class=" mainSubjectBox wrapword "><g:Label ui:field="subjectName"></g:Label></div>
             <div class="bottomSubjectBox">
-                <div class="gwt-Label gradeBottomSubjectBox " title="nota de la clase: 4.2">4.2</div>
-                <div class=" creditsBottomSubjectBox " title="créditos: 3">cr: 3</div>
-                <div class="obligBottomSubjectBox" title="Es obligatoria: Si">oblig: Si</div>
-                <div class="typeBottomSubjectBox" title="Tipología: Libre Elección">L</div>
+                <div class="gradeBottomSubjectBox"><g:Label ui:field="subjectGrade">-</g:Label></div>
+                <div class=" creditsBottomSubjectBox "><g:Label ui:field="subjectCredits">c: </g:Label></div>
+                <div class="obligBottomSubjectBox"><g:Label ui:field="subjectOblig">Oblig: Si</g:Label></div>
+                <div class="typeBottomSubjectBox"><g:Label ui:field="subjectType"></g:Label></div>
             </div>
-            
-            </div>
-        
+        </div>
     </td>
-    <td width="20" align="center" valign="middle"></td>
+    <td width="40" align="center" valign="middle"></td>
     <td align="center" valign="middle"><table border="0" cellspacing="0" cellpadding="0">
       <tr>
         <td align="left" valign="middle"><g:Button ui:field="cancelButton" addStyleNames="{third.btn} {forth.btn-info}">Cancelar</g:Button></td>
       </tr>
       <tr>
-        <td height="10" align="left" valign="middle"></td>
+        <td height="30" align="left" valign="middle"></td>
       </tr>
       <tr>
         <td align="left" valign="middle"><g:Button ui:field="deleteButton" addStyleNames="{third.btn} {forth.btn-warning}">Eliminar</g:Button>
 </td>
       </tr>
     </table></td>
-    <td width="20"></td>
+    <td width="40"></td>
   </tr>
   <tr>
-    <td height="10" colspan="5"></td>
+    <td height="30" colspan="5"></td>
   </tr>
 </table>
 </div>

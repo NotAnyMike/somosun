@@ -267,7 +267,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	 * @param code
 	 */
 	private void confirmDeleteSubject(String code){
-		warningDeleteSubjectView.setSubjectName(code, getSubjectByCodeFromList(code).getName());
+		SubjectWidget subjectToSend = getSubjectByCodeFromList(code);
+		warningDeleteSubjectView.setSubject(code, subjectToSend.getName(), subjectToSend.getGrade(), subjectToSend.getCredits(), subjectToSend.isOblig(), subjectToSend.getType());
 		warningDeleteSubjectView.showIt();		
 	}
 	
