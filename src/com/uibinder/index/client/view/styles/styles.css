@@ -95,16 +95,16 @@ body {
 	-moz-box-shadow:    0px 0px 30px 0px rgba(50, 50, 50, 0.25);
 	box-shadow:         0px 0px 30px 0px rgba(50, 50, 50, 0.25);
 	z-index:2;
-	width:300px;
-	min-height:120px;
+	width:360px;
+	min-height:200px;
 }
 .warning_box{
 	z-index:2;
 	position:fixed;
 	left:50%;
 	top:50%;
-	margin-left:-150px;
-	margin-top:-60px;
+	margin-left:-180px;
+	margin-top:-100px;
 }
 .transparent_background{
 	background-color:#000;

@@ -101,7 +101,7 @@ public class SubjectWidget extends FlowPanel {
 	private void createWidget() {
 		nameLabel = new Label(name);
 		codeLabel = new Label(code);
-		creditsLabel = new Label("cr: " + Integer.toString(credits));
+		creditsLabel = new Label("c: " + Integer.toString(credits));
 		gradeLabel = new Label((grade == 0) ? "-" : Double.toString(grade));
 		obligatorinessLabel = new Label("oblig: " + ((obligatoriness == true) ? "Si" : "No"));
 		

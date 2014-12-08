@@ -1,9 +1,12 @@
 package com.uibinder.index.client.presenter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -11,6 +14,7 @@ import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.uibinder.index.client.dnd.PickUpDragController;
 import com.uibinder.index.client.dnd.SemesterDropController;
 import com.uibinder.index.client.service.SUNServiceAsync;
@@ -44,8 +48,10 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	
 	private HashMap<SubjectWidget,SemesterWidget> subjectsBySemester = new HashMap<SubjectWidget, SemesterWidget>();
 	private HashMap<SemesterWidget, Integer> credits = new HashMap<SemesterWidget, Integer>();
+	private HashMap<SemesterWidget, SemesterDropController> controllersBySemester= new HashMap<SemesterWidget, SemesterDropController>();
 	private List<SubjectWidget> subjectList = new ArrayList<SubjectWidget>();
 	private List<SemesterWidget> semesterList = new ArrayList<SemesterWidget>();
+	private List<SemesterDropController> semesterDropControllerList = new ArrayList<SemesterDropController>();
 	private int semesters = 0;
 	private int subjects = 0;
 	
@@ -70,7 +76,6 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	//private SiaSummary siaSummary;
 	
 	private VerticalPanel subContainer = new VerticalPanel();
-	private SemesterDropController dropController; 
 	
 	//Dnd Stuff
 	private PickUpDragController dragController;
@@ -149,6 +154,76 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		if(planWidget == null) init();
 	}
 	
+	private void addClickHandlerAddSemester(){
+		planWidget.getLabelAddSemester().addClickHandler(new ClickHandler(){
+
+			@Override
+			public void onClick(ClickEvent event) {
+				onClickAddSemester();
+			}});
+		planWidget.getImageAddSemester().addClickHandler(new ClickHandler(){
+
+			@Override
+			public void onClick(ClickEvent event) {
+				onClickAddSemester();
+			}
+			
+		});
+	}
+	
+	private void addClickHandlerDeleteSemesterButton(SemesterWidget semester){
+		semester.getDeleteSemesterButton().addClickHandler(new ClickHandler(){
+
+			@Override
+			public void onClick(ClickEvent event) {
+				deleteSemesterClicked(event);
+			}
+			});
+	}
+	
+	private void deleteSemesterClicked(ClickEvent event) {
+		Widget w = (Widget) event.getSource();
+		deleteSemester(Integer.valueOf(w.getElement().getAttribute("semester")));
+	}
+	
+	private void deleteSemester(int semester) {
+		//Getting all the subjects of the semester
+		
+		SemesterWidget semesterWidget = semesterList.get(semester);
+		
+		//true is it has some subjets on that semester
+		if(subjectsBySemester.containsValue(semesterWidget)){
+			//DELTE ALL THE SUBJECTS
+			for(SubjectWidget subject : subjectsBySemester.keySet()){
+				if(subjectsBySemester.get(subject) == semesterWidget){
+					deleteSubject(subject);					
+				}
+			}
+		}
+		
+		if(semesterList.contains(semesterWidget)==true && semesterList.size()>1){
+			semesterList.remove((semesterList.indexOf(semesterWidget)));
+			semesters--;
+			
+			dragController.unregisterDropController(controllersBySemester.get(semesterWidget));
+			planWidget.remove(semesterWidget);
+			
+			//Update the number of the semesters
+			updateSemesterNumbersByRemoved(semester);
+		}			
+			
+	}
+
+	private void onClickAddSemester(){
+		createSemester();
+	}
+	
+	private void updateSemesterNumbersByRemoved(int semesterDeleted){
+		for(int i= semesterDeleted; i < semesters;i++){
+			semesterList.get(i).setSemester(i);
+		}
+	}
+	
 	@Override
 	public void go(HasWidgets container) {
 		container.clear();
@@ -162,6 +237,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		dragController = new PickUpDragController(boundaryPanel, allowDroppingOnBoundaryPanel, this);
 		
 		planWidget = new PlanWidget();
+		
+		addClickHandlerAddSemester();
 		
 		//creating the Summary
 		//siaSummary = new SiaSummary();
@@ -435,8 +512,13 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		credits.put(semester, 0);
 		semesters++;
 		
-		dropController = new SemesterDropController(semester.getMainPanel(), semester, this);
+		addClickHandlerDeleteSemesterButton(semester);
+		
+		//dropController = new SemesterDropController(semester.getMainPanel(), semester, this);
+		SemesterDropController dropController = new SemesterDropController(semester.getMainPanel(), semester, this);		
 		dragController.registerDropController(dropController);
+		semesterDropControllerList.add(dropController);
+		controllersBySemester.put(semester, dropController);
 		
 	}
 
