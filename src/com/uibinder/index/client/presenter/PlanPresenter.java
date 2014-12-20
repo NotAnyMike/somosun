@@ -20,6 +20,7 @@ import com.uibinder.index.client.dnd.SemesterDropController;
 import com.uibinder.index.client.service.SUNServiceAsync;
 import com.uibinder.index.client.view.PlanView;
 import com.uibinder.index.client.view.PlanViewImpl;
+import com.uibinder.index.client.view.SearchSubjectViewImpl;
 import com.uibinder.index.client.view.SiaSummaryView;
 import com.uibinder.index.client.view.SiaSummaryViewImpl;
 import com.uibinder.index.client.view.WarningDeleteSubjectView;
@@ -44,6 +45,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	private PlanViewImpl view;
 	private SiaSummaryViewImpl siaSummaryView;
 	private WarningDeleteSubjectViewImpl warningDeleteSubjectView = new WarningDeleteSubjectViewImpl();
+	private SearchSubjectViewImpl searchSubjectView = new SearchSubjectViewImpl();
 	private final SUNServiceAsync rpcService;
 	
 	private HashMap<SubjectWidget,SemesterWidget> subjectsBySemester = new HashMap<SubjectWidget, SemesterWidget>();
@@ -99,6 +101,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		this.view = view;
 		this.view.setPresenter(this);
 		warningDeleteSubjectView.setPresenter(this);
+		searchSubjectView.setPresenter(this);
+		searchSubjectView.fill();
 		this.siaSummaryView = siaSummaryView; 
 		
 		plan = new Plan();
@@ -124,6 +128,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		this.view = view;
 		this.view.setPresenter(this);
 		warningDeleteSubjectView.setPresenter(this);
+		searchSubjectView.setPresenter(this);
+		searchSubjectView.fill();
 		this.siaSummaryView = siaSummaryView;
 		
 		addDefaultToCredits(plan.getCareer());
@@ -147,6 +153,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		this.view = view;
 		this.view.setPresenter(this);
 		warningDeleteSubjectView.setPresenter(this);
+		searchSubjectView.setPresenter(this);
+		searchSubjectView.fill();
 		this.siaSummaryView = siaSummaryView;
 		
 		addDefaultToCredits(career);
@@ -271,6 +279,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		subContainer.setHorizontalAlignment(HorizontalPanel.ALIGN_CENTER);
 		
 		container.add(warningDeleteSubjectView);
+		container.add(searchSubjectView);
 		warningDeleteSubjectView.hideIt();
 		container.add(subContainer);
 	}

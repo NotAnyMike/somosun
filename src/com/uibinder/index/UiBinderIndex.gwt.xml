@@ -20,8 +20,12 @@
   <!-- Other module inherits                                      -->
   
   <!--  DND support												  -->
-  <inherits name='com.allen_sauer.gwt.dnd.gwt-dnd'/>
-
+  <inherits name="com.allen_sauer.gwt.dnd.gwt-dnd"/>
+  
+  <!-- Bootstrap GWT support -->
+  <inherits name="org.gwtbootstrap3.GwtBootstrap3"/>
+  <inherits name="org.gwtbootstrap3.extras.respond.Respond"/>
+  
   <!-- Specify the app entry point class.                         -->
   <entry-point class='com.uibinder.index.client.UiBinderIndex'/>
   

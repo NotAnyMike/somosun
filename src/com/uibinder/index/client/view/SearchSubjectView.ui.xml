@@ -1,0 +1,198 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+	xmlns:b.html="urn:import:org.gwtbootstrap3.client.ui.html">
+	<ui:style>
+	
+	</ui:style>
+	<ui:style field="second" src="styles/styles.css" />
+	<ui:style field="third" src="styles/bootstrap.css" />
+	<ui:style field="forth" src="styles/bootstrap-theme.min.css" />
+	<g:HTMLPanel>
+	    <html ng-app="ui.bootstrapdemo">
+	        <head>
+			    <script src="angular.min.js"></script>
+			    <script src="bootstrap-gh-pages/ui-bootstrap-tpls-0.12.0.js"></script>
+			    <script src="example.js"></script>  
+  			</head>
+ 			<body>
+		<div style="height:100%; width:100%; top:0px; left:0px; position:fixed; background:#000; opacity:.4; z-index:9999"></div>
+		<div style="position: absolute; top:50px; left:50%; width:1070px; margin-left:-535px; z-index:10000; padding-bottom:50px">
+			<table border="0" cellspacing="0" cellpadding="0">
+				<tr>
+					<td width="250" rowspan="2" align="left" valign="top">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title">Buscar asignaturas</h3>
+							</div>
+							<div class="panel-body">
+								<div class="input-group">
+									<input type="text" class="form-control">
+										<span class="input-group-btn">
+											<button class="btn btn-default" type="button">
+												<span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+											</button>
+										</span>
+									</input>
+								</div>
+								<div class="radio disabled">
+									<label>
+										<input type="radio" name="optionsRadios" id="optionsRadios3" value="option1" disabled="true"></input>
+											Buscar por profesor
+									</label>
+								</div>
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<small>Tipologia</small>
+									</div>
+									<div class="panel-body">
+										<div class="radio ">
+											<label>
+												<input type="radio" name="optionsRadios" id="optionsRadios3"
+													value="option1" checked="true"></input>
+													Todas
+											</label>
+										</div>
+										<div class="radio">
+											<label>
+												<input type="radio" name="optionsRadios" id="optionsRadios3"
+													value="option2"></input>
+													Libre eleccion
+											</label>
+										</div>
+										<div class="radio">
+											<label>
+												<input type="radio" name="optionsRadios" id="optionsRadios3"
+													value="option3"></input>
+													Fundamentacion
+											</label>
+										</div>
+										<div class="radio">
+											<label>
+												<input type="radio" name="optionsRadios" id="optionsRadios3"
+													value="option4"></input>
+													Disciplinar
+											</label>
+										</div>
+										<div class="radio">
+											<label>
+												<input type="radio" name="optionsRadios" id="optionsRadios3"
+													value="option5"></input>
+													Nivelacion
+											</label>
+										</div>
+									</div>
+								</div>
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<small>Seleccionadas</small>
+									</div>
+									<div class="panel-body" style="padding:0px;">
+										<table border="0" cellspacing="0" cellpadding="0"
+											class="table table-hover table-condensed" style="margin:0px;">
+											<tbody>
+												<tr>
+													<td>
+														<button type="button" class="btn btn-danger btn-xs"
+															style="padding:1px;margin:1px; height:20px">
+															<span class="glyphicon glyphicon-remove"
+																aria-hidden="true"></span>
+														</button>
+														Calculo vectorial avanzado
+													</td>
+												</tr>
+												<tr>
+													<td>
+														<button type="button" class="btn btn-danger btn-xs"
+															style="padding:1px;margin:1px; height:20px">
+															<span class="glyphicon glyphicon-remove"
+																aria-hidden="true"></span>
+														</button>
+														Musica y arte
+													</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</div>
+								<button type="button" class="btn btn-success">Finalizar</button>
+							</div>
+						</div>
+					</td>
+					<td width="20" rowspan="2" align="center" valign="top"></td>
+					<td valign="top">
+
+                    <b:PanelGroup b:id="accordion">
+  					<b:Panel>
+					    <b:PanelHeader dataToggle="COLLAPSE" dataParent="#accordion2" dataTarget="#collapseOne" ui:field="header">
+					      <b:Heading size="H4">
+						      <g:HorizontalPanel>
+						      	<b:Button type="SUCCESS" icon="PLUS" size="EXTRA_SMALL"/>
+						      	<g:Label ui:field="codeFieldSearchSubject">34896747</g:Label>
+						      	<g:Label ui:field="nameFieldSearchSubject">Modelación estática</g:Label>
+						      	<g:HorizontalPanel ui:field="infoHolderSearchSubject">
+							      	<g:Label ui:field="typeFieldSearchSubject">L</g:Label>
+							      	<g:Label ui:field="creditsFieldSearchSubject">c:3</g:Label>
+						      	</g:HorizontalPanel>
+						      </g:HorizontalPanel>
+					      </b:Heading>
+					    </b:PanelHeader>
+					    <b:PanelCollapse b:id="collapseOne">
+					      <b:PanelBody>
+					        <b.html:Paragraph>
+                                You can also use the plugin without the accordion
+                                markup. Make a button toggle the expanding and collapsing of
+                                another element.
+                            </b.html:Paragraph>
+					      </b:PanelBody>
+					    </b:PanelCollapse>
+					  </b:Panel>
+					  </b:PanelGroup>
+						
+					</td>
+				</tr>
+				<tr>
+					<td height="50" align="center" valign="top">
+						<nav>
+							<ul class="pagination">
+								<li class="disabled">
+									<a href="#">
+										<span aria-hidden="true">&laquo;</span>
+										<span class="sr-only">Previous</span>
+									</a>
+								</li>
+								<li class="active">
+									<a href="#">
+										1
+										<span class="sr-only">(current)</span>
+									</a>
+								</li>
+								<li>
+									<a href="#">2</a>
+								</li>
+								<li>
+									<a href="#">3</a>
+								</li>
+								<li>
+									<a href="#">4</a>
+								</li>
+								<li>
+									<a href="#">5</a>
+								</li>
+								<li>
+									<a href="#">
+										<span aria-hidden="true">&raquo;</span>
+										<span class="sr-only">Next</span>
+									</a>
+								</li>
+							</ul>
+						</nav>
+					</td>
+				</tr>
+			</table>
+		</div>
+		</body>
+		</html>
+	</g:HTMLPanel>
+</ui:UiBinder> 
