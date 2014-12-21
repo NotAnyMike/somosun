@@ -6,8 +6,8 @@ package com.uibinder.index.shared.control;
  */
 public class User {
 
-    String name;
-    String username;
+    private String name;
+    private String username;
 
     public User(String name, String username) {
         this.name = name;

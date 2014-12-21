@@ -9,8 +9,8 @@ import java.util.List;
  * @author Cesar A. Villamizar C.
  */
 public class Semester implements Serializable {
-    List<Subject> subjects;
-    String date;
+	private List<Subject> subjects;
+	private String date;
     
     public Semester(String date){
         subjects= new ArrayList<>();

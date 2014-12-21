@@ -86,6 +86,17 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 		//TODO call the method cesar is working on to get the academic history
 	}
 	
+	private boolean isUserLoggedIn(){
+		return false;
+	}
+	
+	private String getUserNickName(){
+		if(isUserLoggedIn()==true){
+			return "lol";
+		}
+		return "lo";
+	}
+	
 	@Override
 	public void go(HasWidgets container){
 		this.container = container;
@@ -189,7 +200,11 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 		} else {
 			topBarPresenter.setNameOfThePage("");
 		}
-		topBarPresenter.setUserName("Invitado");
+		if(isUserLoggedIn()==true){
+			topBarPresenter.setUserName("lo");
+		}else{
+			topBarPresenter.setUserName("Invitado");
+		}
 	}
 	
 	private void getRandomPhrases(){

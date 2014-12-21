@@ -4,6 +4,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -13,6 +14,7 @@ public class TopBarViewImpl extends Composite implements TopBarView {
 	
 	@UiField Label pageNameLabel;
 	@UiField Label userNameLabel;
+	@UiField Anchor logLabel;
 
 	private static TopBarViewUiBinder uiBinder = GWT
 			.create(TopBarViewUiBinder.class);
@@ -48,6 +50,18 @@ public class TopBarViewImpl extends Composite implements TopBarView {
 	@Override
 	public void setMainLabelTitle(String s) {
 		pageNameLabel.setTitle(s);
+	}
+
+	@Override
+	public void setLogOutUrl(String s) {
+		logLabel.setText("Salir");
+		logLabel.setHref(s);
+	}
+
+	@Override
+	public void setLogInUrl(String s) {
+		logLabel.setText("Ingresar");
+		logLabel.setHref(s);
 	}
 
 }
