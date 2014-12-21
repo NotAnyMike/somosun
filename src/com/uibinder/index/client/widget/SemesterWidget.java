@@ -28,7 +28,7 @@ public class SemesterWidget extends VerticalPanel {
 	private HorizontalPanel bottomPart = new HorizontalPanel();
 	private VerticalPanel subjectPanel = new SubjectPanel();
 	private VerticalPanel bottomBigPanel = new VerticalPanel();
-	private Button deleteSemesterButton = new Button("Eliminar");
+	private Button deleteSemesterButton = new Button("Eliminar semestre");
 	
 	public SemesterWidget (int semester, PlanPresenter planPresenter){
 		
