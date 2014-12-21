@@ -192,14 +192,30 @@ h1 {
 }
 .bottomPartSemesterPanel{
 	opacity: 0.6;
-	width:100px;
+	width:110px;
 	margin:10px;
 	padding:15px;
 	background-color:#EEE;
 	border: 1px solid #999;
 }
 .addImageSemesterPanel {
-	padding:5px;
+	margin:5px;
+	display: inline-block;
+	font-weight: 400;
+	text-align: center;
+	vertical-align: middle;
+	cursor: pointer;
+	background-image: none;
+	border: 1px solid transparent;
+	white-space: nowrap;
+	padding: 6px 12px;
+	font-size: 14px;
+	line-height: 1.42857143;
+	border-radius: 4px;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 .pre {
 	-webkit-box-shadow: 0px 0px 21px 0px #C00;
