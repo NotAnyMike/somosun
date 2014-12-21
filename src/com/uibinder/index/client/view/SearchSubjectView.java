@@ -10,5 +10,8 @@ public interface SearchSubjectView {
 	
 	void setPresenter(PlanPresenter presenter);
 	Widget asWidget();
+	void fill();
+	void hideIt();
+	void showIt();
 
 }

@@ -3,7 +3,12 @@ package com.uibinder.index.client.widget;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.constants.IconSize;
+import org.gwtbootstrap3.client.ui.constants.IconType;
+
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -17,7 +22,7 @@ public class SemesterWidget extends VerticalPanel {
 		"VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII"};
 	private static final String CREDITS_STRING = "créditos: ";
 	
-	private Image addImage = new Image();
+	private Button addButton = new Button();
 	private Label creditsLabel = new Label();
 	private Label semesterLabel = new Label();
 	private HorizontalPanel bottomPart = new HorizontalPanel();
@@ -28,7 +33,6 @@ public class SemesterWidget extends VerticalPanel {
 	public SemesterWidget (int semester, PlanPresenter planPresenter){
 		
 		semesterLabel = new Label(SEMESTER_ROMAN[semester]);
-		addImage.setUrl("images/addSemester.png");
 
 		this.addStyleName("semesterPanel");
 		this.setHorizontalAlignment(ALIGN_CENTER);
@@ -40,7 +44,12 @@ public class SemesterWidget extends VerticalPanel {
 		
 		semesterLabel.addStyleName("semesterLabelSemesterPanel");
 		
-		addImage.addStyleName("addImageSemesterPanel");
+		addButton.setStyleName("addImageSemesterPanel");
+		addButton.setIcon(IconType.PLUS);
+		addButton.setSize(ButtonSize.EXTRA_SMALL);
+		addButton.setType(ButtonType.SUCCESS);
+		addButton.setIconSize(IconSize.LARGE);
+		addButton.setTitle("Agregar Clase");
 		
 		//This part is the little box of "credits: x"
 		bottomPart.addStyleName("bottomPartSemesterPanel");
@@ -48,16 +57,19 @@ public class SemesterWidget extends VerticalPanel {
 		bottomPart.setVerticalAlignment(ALIGN_MIDDLE);
 		
 		//arranging everything about the Delete semester button
-		deleteSemesterButton.addStyleName("btn-warning");
-		deleteSemesterButton.setStylePrimaryName("btn");
+		/*deleteSemesterButton.addStyleName("btn-warning");
+		deleteSemesterButton.setStylePrimaryName("btn");*/
 		deleteSemesterButton.asWidget().getElement().setAttribute("semester", Integer.toString(semester));
+		deleteSemesterButton.setIcon(IconType.TIMES_CIRCLE);
+		deleteSemesterButton.setType(ButtonType.DANGER);
+		deleteSemesterButton.setSize(ButtonSize.EXTRA_SMALL);
 		
 		generateWidget();
 	}
 	
 	private void generateWidget() {
 		bottomPart.add(creditsLabel);
-		bottomPart.add(addImage);
+		bottomPart.add(addButton);
 		
 		bottomBigPanel.setHorizontalAlignment(ALIGN_CENTER);
 		
@@ -93,5 +105,9 @@ public class SemesterWidget extends VerticalPanel {
 	
 	public Button getDeleteSemesterButton(){
 		return deleteSemesterButton;
+	}
+	
+	public Button getAddButton(){
+		return addButton;
 	}
 }

@@ -179,6 +179,15 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		});
 	}
 	
+	private void addClickHandlerAddSubject(SemesterWidget semester){
+		semester.getAddButton().addClickHandler(new ClickHandler(){
+
+			@Override
+			public void onClick(ClickEvent event) {
+				searchSubjectView.showIt();
+			}});
+	}
+	
 	private void addClickHandlerDeleteSemesterButton(SemesterWidget semester){
 		semester.getDeleteSemesterButton().addClickHandler(new ClickHandler(){
 
@@ -281,6 +290,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		container.add(warningDeleteSubjectView);
 		container.add(searchSubjectView);
 		warningDeleteSubjectView.hideIt();
+		searchSubjectView.hideIt();
 		container.add(subContainer);
 	}
 	
@@ -522,6 +532,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		semesters++;
 		
 		addClickHandlerDeleteSemesterButton(semester);
+		addClickHandlerAddSubject(semester);
 		
 		//dropController = new SemesterDropController(semester.getMainPanel(), semester, this);
 		SemesterDropController dropController = new SemesterDropController(semester.getMainPanel(), semester, this);		
