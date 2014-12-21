@@ -211,9 +211,18 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		//true is it has some subjets on that semester
 		if(subjectsBySemester.containsValue(semesterWidget)){
 			//DELTE ALL THE SUBJECTS
-			for(SubjectWidget subject : subjectsBySemester.keySet()){
+			/*for(SubjectWidget subject : subjectsBySemester.keySet()){
 				if(subjectsBySemester.get(subject) == semesterWidget){
 					deleteSubject(subject);					
+				}
+			}*/
+			//TODO Improve the algorithm, is completely wrong!
+			for(int i=0;i<subjectList.size();i++){
+				//DELTE ALL THE SUBJECTS
+				Window.alert(Integer.toString(subjectsBySemester.size()));
+				if(subjectsBySemester.get(subjectList.get(i)) == semesterWidget){
+					deleteSubject(subjectList.get(i));
+					i--;
 				}
 			}
 		}
