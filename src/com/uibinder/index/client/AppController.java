@@ -3,6 +3,7 @@ package com.uibinder.index.client;
 import java.util.List;
 import java.util.Random;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerManager;
@@ -23,6 +24,8 @@ import com.uibinder.index.client.presenter.IndexPresenter;
 import com.uibinder.index.client.presenter.PlanPresenter;
 import com.uibinder.index.client.presenter.Presenter;
 import com.uibinder.index.client.presenter.TopBarPresenter;
+import com.uibinder.index.client.service.LoginService;
+import com.uibinder.index.client.service.LoginServiceAsync;
 import com.uibinder.index.client.service.SUNServiceAsync;
 import com.uibinder.index.client.view.AnnouncementViewImpl;
 import com.uibinder.index.client.view.AboutUsViewImpl;
@@ -32,6 +35,7 @@ import com.uibinder.index.client.view.PlanViewImpl;
 import com.uibinder.index.client.view.SiaSummaryViewImpl;
 import com.uibinder.index.client.view.TopBarViewImpl;
 import com.uibinder.index.client.view.CreateViewImpl;
+import com.uibinder.index.shared.LoginInfo;
 import com.uibinder.index.shared.RandomPhrase;
 
 public class AppController implements Presenter, ValueChangeHandler<String> {
@@ -62,6 +66,9 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	private final SUNServiceAsync rpcService;
 	private HasWidgets container;
 	
+	private LoginInfo loginInfo = new LoginInfo();
+	private LoginServiceAsync loginService;
+	
 	public AppController(SUNServiceAsync rpcService, HandlerManager eventBus){
 		this.rpcService = rpcService;
 		this.eventBus = eventBus;
@@ -86,17 +93,6 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 		//TODO call the method cesar is working on to get the academic history
 	}
 	
-	private boolean isUserLoggedIn(){
-		return false;
-	}
-	
-	private String getUserNickName(){
-		if(isUserLoggedIn()==true){
-			return "lol";
-		}
-		return "lo";
-	}
-	
 	@Override
 	public void go(HasWidgets container){
 		this.container = container;
@@ -112,6 +108,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	public void onValueChange(ValueChangeEvent<String> event) {
 		
 		String token = event.getValue();
+		getLoginInfo();
 		
 		if(token != null){
 			
@@ -200,11 +197,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 		} else {
 			topBarPresenter.setNameOfThePage("");
 		}
-		if(isUserLoggedIn()==true){
-			topBarPresenter.setUserName("lo");
-		}else{
-			topBarPresenter.setUserName("Invitado");
-		}
+		topBarPresenter.setUserName(loginInfo.getEmail());
 	}
 	
 	private void getRandomPhrases(){
@@ -242,5 +235,32 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 		}
 		
 	};
+	
+	private void loadLogin(){
+		if(loginInfo.isLoggedIn()==true){
+			topBarPresenter.setLogOutUrl(loginInfo.getLogoutUrl());
+			topBarPresenter.setUserName(loginInfo.getName());
+		} else {
+			topBarPresenter.setLogInUrl(loginInfo.getLoginUrl());
+			topBarPresenter.setUserName("invitado");
+		}
+	}
+	
+	public void getLoginInfo(){
+		loginService = GWT.create(LoginService.class);
+		loginService.login(GWT.getHostPageBaseURL(), new AsyncCallback<LoginInfo>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				loginInfo.setLoggedIn(false);
+				loginInfo.setName("invitado");
+			}
+
+			@Override
+			public void onSuccess(LoginInfo result) {
+				loginInfo = result;
+				loadLogin();
+			}});
+	}
 	
 }

@@ -1,10 +1,12 @@
 package com.uibinder.index.client.view;
 
+import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.constants.IconType;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -56,12 +58,14 @@ public class TopBarViewImpl extends Composite implements TopBarView {
 	public void setLogOutUrl(String s) {
 		logLabel.setText("Salir");
 		logLabel.setHref(s);
+		logLabel.setIcon(IconType.EXCLAMATION_TRIANGLE);
 	}
 
 	@Override
 	public void setLogInUrl(String s) {
 		logLabel.setText("Ingresar");
 		logLabel.setHref(s);
+		logLabel.setIcon(IconType.CHILD);
 	}
 
 }

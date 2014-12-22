@@ -16,6 +16,16 @@
       <url-pattern>/uibinderindex/sunService</url-pattern>
   </servlet-mapping>
   
+  <servlet>
+      <servlet-name>LoginService</servlet-name>
+      <servlet-class>com.uibinder.index.server.serviceImpl.LoginServiceImpl</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+      <servlet-name>LoginService</servlet-name>
+      <url-pattern>/uibinderindex/loginService</url-pattern>
+  </servlet-mapping>
+  
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>UiBinderIndex.html</welcome-file>

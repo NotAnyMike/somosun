@@ -8,9 +8,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-dnd-3.3.2.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-bootstrap-2.0.4.0.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-bootstrap-2.2.2.0-SNAPSHOT-sources.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/gwtbootstrap3-0.8.1.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/gwtbootstrap3-extras-0.6.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>
