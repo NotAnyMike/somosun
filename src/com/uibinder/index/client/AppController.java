@@ -38,6 +38,7 @@ import com.uibinder.index.client.view.TopBarViewImpl;
 import com.uibinder.index.client.view.CreateViewImpl;
 import com.uibinder.index.shared.LoginInfo;
 import com.uibinder.index.shared.RandomPhrase;
+import com.uibinder.index.shared.control.UserSun;
 
 public class AppController implements Presenter, ValueChangeHandler<String> {
 
@@ -69,6 +70,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	private String token;
 	
 	private LoginInfo loginInfo = new LoginInfo();
+	private UserSun user;
 	private LoginServiceAsync loginService;
 	
 	public AppController(SUNServiceAsync rpcService, HandlerManager eventBus){
@@ -104,13 +106,14 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 		} else {
 			History.fireCurrentHistoryState();
 		}
+		
+		getLoginInfo();
 	}
 
 	@Override
 	public void onValueChange(ValueChangeEvent<String> event) {
 		
 		token = event.getValue();
-		getLoginInfo();
 		
 		if(token != null){
 			
@@ -199,7 +202,6 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 		} else {
 			topBarPresenter.setNameOfThePage("");
 		}
-		//topBarPresenter.setUserName(loginInfo.getName());
 	}
 	
 	private void getRandomPhrases(){
@@ -242,7 +244,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 		if(isThereAUrl == true){
 			if(loginInfo.isLoggedIn()==true){
 				topBarPresenter.setLogOutUrl(loginInfo.getLogoutUrl());
-				topBarPresenter.setUserName(loginInfo.getName());
+				topBarPresenter.setUserName(user.getName());
 			} else {
 				topBarPresenter.setLogInUrl(loginInfo.getLoginUrl());
 				topBarPresenter.setUserName("invitado");
@@ -259,17 +261,16 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 			@Override
 			public void onFailure(Throwable caught) {
 				loginInfo.setLoggedIn(false);
-				loginInfo.setName("invitado");
+				loginInfo = null;
+				user = null;
 				loadLogin(false);
-				Window.alert("not success");
 			}
 
 			@Override
 			public void onSuccess(LoginInfo result) {
 				loginInfo = result;
+				user = loginInfo.getUser();
 				loadLogin(true);
-				Window.alert("success");
-				if(loginInfo.isLoggedIn()) Window.alert("loged in");
 			}});
 	}
 	

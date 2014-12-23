@@ -6,6 +6,7 @@ import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.uibinder.index.client.service.LoginService;
 import com.uibinder.index.shared.LoginInfo;
+import com.uibinder.index.shared.control.UserSun;
 
 public class LoginServiceImpl extends RemoteServiceServlet implements LoginService {
 	
@@ -15,22 +16,27 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 	private static final long serialVersionUID = 1L;
 	private LoginInfo loginInfo = new LoginInfo();
 	private UserService userService = UserServiceFactory.getUserService();
-	private User user = userService.getCurrentUser();
+	private User user;
+	private UserSun userSun;
 
 	@Override
 	public LoginInfo login(String requestUri) {
+		user = userService.getCurrentUser();
 		if(userService.isUserLoggedIn()){
 			loginInfo.setLoggedIn(true);
-			loginInfo.setName(user.getNickname());
-			loginInfo.setEmail(user.getEmail());
+			setUser();
+			loginInfo.setUser(userSun);
 			loginInfo.setLogoutUrl(userService.createLogoutURL(requestUri));
 		} else {
 			loginInfo.setLoggedIn(false);
 			loginInfo.setLoginUrl(userService.createLoginURL(requestUri));
-			loginInfo.setName(null);
-			loginInfo.setEmail(null);
+			loginInfo.setUser(null);
 		}
 		return loginInfo;
+	}
+	
+	private void setUser(){
+		userSun = new UserSun(user.getNickname(), "nrgiraldor", user.getEmail(), user.getUserId());
 	}
 
 }

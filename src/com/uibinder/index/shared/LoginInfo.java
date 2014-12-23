@@ -2,6 +2,8 @@ package com.uibinder.index.shared;
 
 import java.io.Serializable;
 
+import com.uibinder.index.shared.control.UserSun;
+
 public class LoginInfo implements Serializable {
 	
 	/**
@@ -11,15 +13,18 @@ public class LoginInfo implements Serializable {
 	private boolean loggedIn = false;
 	private String loginUrl;
 	private String logoutUrl;
-	private String name;
-	private String email;
-	
-	public String getEmail() {
-		return email;
+	public String getLogoutUrl() {
+		return logoutUrl;
 	}
 
-	public void setEmail(String email) {
-		this.email = email;
+	private UserSun user;
+
+	public UserSun getUser() {
+		return user;
+	}
+
+	public void setUser(UserSun user) {
+		this.user = user;
 	}
 
 	public boolean isLoggedIn(){
@@ -33,21 +38,9 @@ public class LoginInfo implements Serializable {
 	public void setLoginUrl(String loginUrl) {
 		this.loginUrl = loginUrl;
 	}
-
-	public String getLogoutUrl() {
-		return logoutUrl;
-	}
-
+	
 	public void setLogoutUrl(String logoutUrl) {
 		this.logoutUrl = logoutUrl;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public void setLoggedIn(boolean loggedIn) {
