@@ -12,7 +12,6 @@ public class LoginInfo implements Serializable {
 	private String loginUrl;
 	private String logoutUrl;
 	private String name;
-	private String id;
 	private String email;
 	
 	public String getEmail() {
@@ -49,14 +48,6 @@ public class LoginInfo implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
 	}
 
 	public void setLoggedIn(boolean loggedIn) {

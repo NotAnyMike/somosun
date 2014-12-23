@@ -7,6 +7,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -65,6 +66,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	private final HandlerManager eventBus;
 	private final SUNServiceAsync rpcService;
 	private HasWidgets container;
+	private String token;
 	
 	private LoginInfo loginInfo = new LoginInfo();
 	private LoginServiceAsync loginService;
@@ -107,7 +109,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	@Override
 	public void onValueChange(ValueChangeEvent<String> event) {
 		
-		String token = event.getValue();
+		token = event.getValue();
 		getLoginInfo();
 		
 		if(token != null){
@@ -197,7 +199,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 		} else {
 			topBarPresenter.setNameOfThePage("");
 		}
-		topBarPresenter.setUserName(loginInfo.getEmail());
+		//topBarPresenter.setUserName(loginInfo.getName());
 	}
 	
 	private void getRandomPhrases(){
@@ -236,30 +238,38 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 		
 	};
 	
-	private void loadLogin(){
-		if(loginInfo.isLoggedIn()==true){
-			topBarPresenter.setLogOutUrl(loginInfo.getLogoutUrl());
-			topBarPresenter.setUserName(loginInfo.getName());
+	private void loadLogin(boolean isThereAUrl){
+		if(isThereAUrl == true){
+			if(loginInfo.isLoggedIn()==true){
+				topBarPresenter.setLogOutUrl(loginInfo.getLogoutUrl());
+				topBarPresenter.setUserName(loginInfo.getName());
+			} else {
+				topBarPresenter.setLogInUrl(loginInfo.getLoginUrl());
+				topBarPresenter.setUserName("invitado");
+			}
 		} else {
-			topBarPresenter.setLogInUrl(loginInfo.getLoginUrl());
 			topBarPresenter.setUserName("invitado");
 		}
 	}
 	
 	public void getLoginInfo(){
 		loginService = GWT.create(LoginService.class);
-		loginService.login(GWT.getHostPageBaseURL(), new AsyncCallback<LoginInfo>() {
+		loginService.login(GWT.getHostPageBaseURL() + "#" + token, new AsyncCallback<LoginInfo>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
 				loginInfo.setLoggedIn(false);
 				loginInfo.setName("invitado");
+				loadLogin(false);
+				Window.alert("not success");
 			}
 
 			@Override
 			public void onSuccess(LoginInfo result) {
 				loginInfo = result;
-				loadLogin();
+				loadLogin(true);
+				Window.alert("success");
+				if(loginInfo.isLoggedIn()) Window.alert("loged in");
 			}});
 	}
 	

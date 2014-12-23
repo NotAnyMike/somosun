@@ -17,12 +17,12 @@
   </servlet-mapping>
   
   <servlet>
-      <servlet-name>LoginService</servlet-name>
+      <servlet-name>LoginServiceImpl</servlet-name>
       <servlet-class>com.uibinder.index.server.serviceImpl.LoginServiceImpl</servlet-class>
   </servlet>
   
   <servlet-mapping>
-      <servlet-name>LoginService</servlet-name>
+      <servlet-name>LoginServiceImpl</servlet-name>
       <url-pattern>/uibinderindex/loginService</url-pattern>
   </servlet-mapping>
   
