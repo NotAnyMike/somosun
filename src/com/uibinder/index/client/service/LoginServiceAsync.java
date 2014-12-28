@@ -7,4 +7,6 @@ public interface LoginServiceAsync {
 
 	void login(String requestUri, AsyncCallback<LoginInfo> callback);
 
+	void getSubject(AsyncCallback<String> callback);
+
 }

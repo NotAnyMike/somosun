@@ -13,11 +13,11 @@ public class LoginInfo implements Serializable {
 	private boolean loggedIn = false;
 	private String loginUrl;
 	private String logoutUrl;
+	private UserSun user;
+	
 	public String getLogoutUrl() {
 		return logoutUrl;
 	}
-
-	private UserSun user;
 
 	public UserSun getUser() {
 		return user;

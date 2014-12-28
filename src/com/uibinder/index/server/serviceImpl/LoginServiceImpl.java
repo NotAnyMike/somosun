@@ -3,8 +3,10 @@ package com.uibinder.index.server.serviceImpl;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.uibinder.index.client.service.LoginService;
+import com.uibinder.index.server.dao.UserSunDao;
 import com.uibinder.index.shared.LoginInfo;
 import com.uibinder.index.shared.control.UserSun;
 
@@ -22,11 +24,13 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 	@Override
 	public LoginInfo login(String requestUri) {
 		user = userService.getCurrentUser();
+		UserSunDao UserSunDao = new UserSunDao();
+		
 		if(userService.isUserLoggedIn()){
 			loginInfo.setLoggedIn(true);
-			setUser();
-			loginInfo.setUser(userSun);
 			loginInfo.setLogoutUrl(userService.createLogoutURL(requestUri));
+			userSun = UserSunDao.getUserByUser(user);
+			loginInfo.setUser(userSun);
 		} else {
 			loginInfo.setLoggedIn(false);
 			loginInfo.setLoginUrl(userService.createLoginURL(requestUri));
@@ -34,9 +38,10 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 		}
 		return loginInfo;
 	}
-	
-	private void setUser(){
-		userSun = new UserSun(user.getNickname(), "nrgiraldor", user.getEmail(), user.getUserId());
+
+	@Override
+	public String getSubject() {
+		return "hola";
 	}
 
 }

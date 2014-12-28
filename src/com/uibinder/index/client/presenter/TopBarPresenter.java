@@ -62,4 +62,8 @@ public class TopBarPresenter implements Presenter, TopBarView.Presenter {
 		view.setLogOutUrl(s);
 	}
 
+	public void showAdminLink(boolean admin) {
+		view.showAdminLink(admin);
+	}
+
 }

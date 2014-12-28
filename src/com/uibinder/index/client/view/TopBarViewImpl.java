@@ -16,7 +16,8 @@ public class TopBarViewImpl extends Composite implements TopBarView {
 	
 	@UiField Label pageNameLabel;
 	@UiField Label userNameLabel;
-	@UiField Anchor logLabel;
+	@UiField Anchor logAnchor;
+	@UiField Anchor adminPanelAnchor;
 
 	private static TopBarViewUiBinder uiBinder = GWT
 			.create(TopBarViewUiBinder.class);
@@ -56,16 +57,24 @@ public class TopBarViewImpl extends Composite implements TopBarView {
 
 	@Override
 	public void setLogOutUrl(String s) {
-		logLabel.setText("Salir");
-		logLabel.setHref(s);
-		logLabel.setIcon(IconType.EXCLAMATION_TRIANGLE);
+		logAnchor.setText("Salir");
+		logAnchor.setHref(s);
+		logAnchor.setIcon(IconType.EXCLAMATION_TRIANGLE);
 	}
 
 	@Override
 	public void setLogInUrl(String s) {
-		logLabel.setText("Ingresar");
-		logLabel.setHref(s);
-		logLabel.setIcon(IconType.CHILD);
+		logAnchor.setText("Ingresar");
+		logAnchor.setHref(s);
+		logAnchor.setIcon(IconType.CHILD);
+	}
+
+	public void showAdminLink(boolean b) {
+		if(b==true) {
+			adminPanelAnchor.setText("cPanel");
+			adminPanelAnchor.setIcon(IconType.GEAR);
+		}
+		else adminPanelAnchor.removeFromParent();
 	}
 
 }

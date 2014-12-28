@@ -27,8 +27,8 @@
 	    		<div class="collapse navbar-collapse">
 				<ul class="nav navbar-nav navbar-right">
 					<p class="navbar-text" style="cursor:default"><g:Label ui:field="userNameLabel"></g:Label></p>
-					<li id="log-hyperlink"><b:Anchor ui:field="logLabel"></b:Anchor></li>
-					<li id="panel"><b:Anchor ui:field="adminPanelLabel"></b:Anchor></li>
+					<li id="log-hyperlink"><b:Anchor ui:field="logAnchor"></b:Anchor></li>
+					<li id="panel"><b:Anchor ui:field="adminPanelAnchor"></b:Anchor></li>
 				</ul>
 				<g:Label ui:field="pageNameLabel" addStyleNames="{third.lead} {third.main-text} {third.navbar-text} {forth.mainLabelNamePageTopBar} "></g:Label>
 			</div>

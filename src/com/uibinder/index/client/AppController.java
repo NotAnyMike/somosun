@@ -252,6 +252,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 		} else {
 			topBarPresenter.setUserName("invitado");
 		}
+		topBarPresenter.showAdminLink(user.isAdmin());
 	}
 	
 	public void getLoginInfo(){
@@ -272,6 +273,24 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 				user = loginInfo.getUser();
 				loadLogin(true);
 			}});
+		getSubject();
+	}
+	
+	public void getSubject(){
+		loginService = GWT.create(LoginService.class);
+		loginService.getSubject(new AsyncCallback<String>(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("failed");
+			}
+
+			@Override
+			public void onSuccess(String result) {
+				Window.alert(result);
+			}
+			
+		});
 	}
 	
 }
