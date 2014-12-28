@@ -32,8 +32,8 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 
 	@Override
 	public Subject getSubjectByCode(int code) {
-		Subject subject = new Subject(3,"1231231","Just bullshit");
-		return subject;
+		//Subject subject = new Subject(3,"1231231","Just bullshit");
+		return null;
 	}
 
 	@Override

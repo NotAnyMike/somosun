@@ -1,12 +1,25 @@
 package com.uibinder.index.shared.control;
 
+import java.io.Serializable;
+
+import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Index;
+
 /**
  *
  * @author Cesar A. Villamizar C.
  */
-public class Student extends UserSun{
+@Entity
+public class Student extends UserSun implements Serializable{
 
-    Plan plan;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	Plan plan = null;
+	
+	public Student(){
+	}
     
     public Student(String name, String username, String email, String id) {
         super(name, username, email, id);

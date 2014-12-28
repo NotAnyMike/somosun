@@ -2,6 +2,7 @@ package com.uibinder.index.shared;
 
 import java.io.Serializable;
 
+import com.uibinder.index.shared.control.Student;
 import com.uibinder.index.shared.control.UserSun;
 
 public class LoginInfo implements Serializable {
@@ -13,18 +14,21 @@ public class LoginInfo implements Serializable {
 	private boolean loggedIn = false;
 	private String loginUrl;
 	private String logoutUrl;
-	private UserSun user;
+	private Student student;
 	
+	public LoginInfo(){
+	}
+
+	public Student getStudent() {
+		return student;
+	}
+
+	public void setStudent(Student student) {
+		this.student = student;
+	}
+
 	public String getLogoutUrl() {
 		return logoutUrl;
-	}
-
-	public UserSun getUser() {
-		return user;
-	}
-
-	public void setUser(UserSun user) {
-		this.user = user;
 	}
 
 	public boolean isLoggedIn(){

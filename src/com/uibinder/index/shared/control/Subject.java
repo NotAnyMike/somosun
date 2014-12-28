@@ -2,50 +2,73 @@ package com.uibinder.index.shared.control;
 
 import java.io.Serializable;
 
+import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Index;
+
 /**
  *
- * @author Cesar A. Villamizar C.
+ * @author Mike
  * 
- * Mike added the Serializable part to allow server-client communication, hope you don't mind 
+ * The Serializable part to allow server-client communication, hope you don't mind 
  * and moved it to the shared package cuz the client-side will use it
  *  
  */
+@Entity
 public class Subject implements Serializable {
 
-    private int credits;
-    private String code;    
-    private String name;
+	private static final long serialVersionUID = 1L;
+	@Id private Long id = null;
+    private int credits = 0;
+    @Index private String name = null;
+    @Index private String code = null;    
+    private String location = null;
     
     /**
-     * This one is to handle serialization to allow client-server communication (RPC services)
-     * The other way to solve it is to create a customFieldSerialization class but it is not as simple
-     * or it requires the use of other frameworks 
+     * This will not allow the search by location, jut by Id, Name and Code.
      * 
-     * But the use of this constructor is discourage  
+     * The use of this constructor is discourage  
      */
     public Subject(){
-    	credits=0;
-    	code="";
-    	name="empty";
     }
     
-    public String getName() {
-        return name;
-    }
-    
-    public String getCode(){
-        return code;
-    }
-   
-    public int getCredits() {
-        return credits;
+    public Subject(int credits, String code, String name, String location) {
+    	this.credits = credits;
+    	this.code = code;
+    	this.name = name;
+    	this.location = location;
     }
 
-    public Subject(int credits, String code, String name) {
-        this.credits = credits;
-        this.code = code;
-        this.name = name;
-    }
-        
+	public int getCredits() {
+		return credits;
+	}
+
+	public void setCredits(int credits) {
+		this.credits = credits;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
 }
    

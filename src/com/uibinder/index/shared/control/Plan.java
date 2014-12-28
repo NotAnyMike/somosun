@@ -1,38 +1,33 @@
 package com.uibinder.index.shared.control;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Index;
+import com.googlecode.objectify.annotation.Stringify;
 
 /**
  *
  * @author Cesar A. Villamizar C.
  */
+@Entity
 public class Plan implements Serializable {
 
-    private Career career;
-    private List<Semester> semesters;
-    private double PAPA;
-    private Map<Subject, SubjectValues> subMap;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	@Id Long id=null;
+	@Index private Career career = null;
+    private List<Semester> semesters = null;
+    private double PAPA = 0;
+    @Stringify(com.googlecode.objectify.stringifier.KeyStringifier.class)
+    private Map<Subject, SubjectValues> subMap = null;
 
     public Plan() {
-        career = new Career("Unknown","Unknown");
-        semesters = new ArrayList<>();
-        PAPA = 0;
-        subMap = new HashMap<>();
-
     }
     
     public String getCareer(){
