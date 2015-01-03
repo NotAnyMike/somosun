@@ -30,5 +30,21 @@ public class Semester implements Serializable {
     public List<Subject> getSubjects(){
         return this.subjects;
     }
+
+	public Long getId() {
+		return id;
+	}
+
+	public String getDate() {
+		return date;
+	}
+
+	public void setDate(String date) {
+		this.date = date;
+	}
+
+	public void setSubjects(List<Subject> subjects) {
+		this.subjects = subjects;
+	}
     
 }

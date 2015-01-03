@@ -20,6 +20,7 @@ public class Career implements Serializable {
 	@Id private Long id=null;
 	@Index private String code;
     @Index private String name;
+    @Index private String sede;
     
     public Career(){
     }
@@ -31,6 +32,30 @@ public class Career implements Serializable {
 
 	public String getCode() {
 		return code;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	public String getSede() {
+		return sede;
+	}
+
+	public void setSede(String sede) {
+		this.sede = sede;
 	}
 
 }

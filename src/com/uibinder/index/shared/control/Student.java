@@ -24,5 +24,13 @@ public class Student extends UserSun implements Serializable{
     public Student(String name, String username, String email, String id) {
         super(name, username, email, id);
     }
+
+	public Plan getPlan() {
+		return plan;
+	}
+
+	public void setPlan(Plan plan) {
+		this.plan = plan;
+	}
     
 }

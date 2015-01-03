@@ -23,5 +23,41 @@ public class Block implements Serializable {
 	
 	public Block(){
 	}
+
+	public Long getId() {
+		return id;
+	}
+	
+	public int getStarHour() {
+		return starHour;
+	}
+
+	public void setStarHour(int starHour) {
+		this.starHour = starHour;
+	}
+
+	public int getEndHour() {
+		return endHour;
+	}
+
+	public void setEndHour(int endHour) {
+		this.endHour = endHour;
+	}
+
+	public int getDay() {
+		return day;
+	}
+
+	public void setDay(int day) {
+		this.day = day;
+	}
+
+	public String getClassRoom() {
+		return classRoom;
+	}
+
+	public void setClassRoom(String classRoom) {
+		this.classRoom = classRoom;
+	}
     
 }

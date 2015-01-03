@@ -110,6 +110,38 @@ public class Plan implements Serializable {
 
     }
 
+	public Long getId() {
+		return id;
+	}
+
+	public List<Semester> getSemesters() {
+		return semesters;
+	}
+
+	public void setSemesters(List<Semester> semesters) {
+		this.semesters = semesters;
+	}
+
+	public double getPAPA() {
+		return PAPA;
+	}
+
+	public void setPAPA(double pAPA) {
+		PAPA = pAPA;
+	}
+
+	public Map<Subject, SubjectValues> getSubMap() {
+		return subMap;
+	}
+
+	public void setSubMap(Map<Subject, SubjectValues> subMap) {
+		this.subMap = subMap;
+	}
+
+	public void setCareer(Career career) {
+		this.career = career;
+	}
+
     /*public static void main(String[] args) {
 
         try {

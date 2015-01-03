@@ -29,4 +29,44 @@ public class SubjectValues implements Serializable {
         this.timesSeen=timesSeen;
         this.typology=type;
     }
+
+	public Group getGroup() {
+		return group;
+	}
+
+	public void setGroup(Group group) {
+		this.group = group;
+	}
+
+	public double getGrade() {
+		return grade;
+	}
+
+	public void setGrade(double grade) {
+		this.grade = grade;
+	}
+
+	public int getTimesSeen() {
+		return timesSeen;
+	}
+
+	public void setTimesSeen(int timesSeen) {
+		this.timesSeen = timesSeen;
+	}
+
+	public String getTypology() {
+		return typology;
+	}
+
+	public void setTypology(String typology) {
+		this.typology = typology;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	public Long getId() {
+		return id;
+	}
 }

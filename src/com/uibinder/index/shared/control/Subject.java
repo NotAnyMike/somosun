@@ -21,7 +21,8 @@ public class Subject implements Serializable {
 	@Id private Long id = null;
     private int credits = 0;
     @Index private String name = null;
-    @Index private String code = null;    
+    @Index private String code = null;   
+    @Index private String siaCode = null;
     private String location = null;
     
     /**
@@ -32,9 +33,10 @@ public class Subject implements Serializable {
     public Subject(){
     }
     
-    public Subject(int credits, String code, String name, String location) {
+    public Subject(int credits, String code, String siaCode, String name, String location) {
     	this.credits = credits;
     	this.code = code;
+    	this.siaCode = siaCode;
     	this.name = name;
     	this.location = location;
     }
@@ -69,6 +71,18 @@ public class Subject implements Serializable {
 
 	public void setLocation(String location) {
 		this.location = location;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public String getSiaCode() {
+		return siaCode;
+	}
+
+	public void setSiaCode(String siaCode) {
+		this.siaCode = siaCode;
 	}
 }
    
