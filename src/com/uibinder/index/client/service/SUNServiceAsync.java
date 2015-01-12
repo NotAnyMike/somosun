@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.uibinder.index.shared.RandomPhrase;
+import com.uibinder.index.shared.SiaResultGroups;
+import com.uibinder.index.shared.SiaResultSubjects;
 import com.uibinder.index.shared.control.Subject;
 
 /**
@@ -30,5 +32,38 @@ public interface SUNServiceAsync {
 
 	void saveRandomPhrase(String phrase, String author,
 			AsyncCallback<Void> callback);
+
+	/**
+	 * For more information goto SiaProxy.class
+	 * @param subject
+	 * @param sede
+	 * @param callback
+	 */
+	void getGroupsFromSia(Subject subject, String sede,
+			AsyncCallback<SiaResultGroups> callback);
+	
+	/**
+	 * For more information goto SiaProxy.class
+	 * @param subjectSiaCode
+	 * @param sede
+	 * @param callback
+	 */
+	void getGroupsFromSia(String subjectSiaCode, String sede,
+			AsyncCallback<SiaResultGroups> callback);
+
+	/**
+	 * For more information goto SiaProxy.class
+	 * @param nameOrCode
+	 * @param typology
+	 * @param career
+	 * @param scheduleCP
+	 * @param page
+	 * @param ammount
+	 * @param sede
+	 * @param callback
+	 */
+	void getSubjectFromSia(String nameOrCode, String typology, String career,
+			String scheduleCP, int page, int ammount, String sede,
+			AsyncCallback<SiaResultSubjects> callback);
 
 }

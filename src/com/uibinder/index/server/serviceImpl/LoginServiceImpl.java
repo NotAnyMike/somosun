@@ -41,10 +41,4 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 		return loginInfo;
 	}
 
-	@Override
-	public String getSubject() {
-		SiaProxy.getSubjects("plantas", "", "", "", 1, 10, "bog");
-		return SiaProxy.getGroupsFromSubject("2015877", "bog");
-	}
-
 }

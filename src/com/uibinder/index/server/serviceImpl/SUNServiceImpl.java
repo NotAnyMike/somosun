@@ -11,7 +11,10 @@ import com.google.appengine.api.datastore.Transaction;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.uibinder.index.client.service.SUNService;
 import com.uibinder.index.client.widget.SubjectWidget;
+import com.uibinder.index.server.SiaProxy;
 import com.uibinder.index.shared.RandomPhrase;
+import com.uibinder.index.shared.SiaResultGroups;
+import com.uibinder.index.shared.SiaResultSubjects;
 import com.uibinder.index.shared.control.Subject;
 
 /**
@@ -89,8 +92,45 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 				tx.rollback();
 			}
 		}
-		
-		
+	}
+	
+	/**
+	 * For more information goto SiaProxy.class
+	 * @param subject
+	 * @param sede
+	 * @return
+	 */
+	@Override
+	public SiaResultGroups getGroupsFromSia(Subject subject, String sede){
+		return SiaProxy.getGroupsFromSubject(subject, sede);
+	}
+
+	/**
+	 * For more information goto SiaProxy.class
+	 * @param subjectSiaCode
+	 * @param sede
+	 * @return
+	 */
+	@Override
+	public SiaResultGroups getGroupsFromSia(String subjectSiaCode, String sede) {
+		return SiaProxy.getGroupsFromSubject(subjectSiaCode, sede);
+	}
+
+	/**
+	 * For more information goto SiaProxy.class
+	 * @param nameOrCode
+	 * @param typology
+	 * @param career
+	 * @param scheduleCP
+	 * @param page
+	 * @param ammount
+	 * @param sede
+	 * @return
+	 */
+	@Override
+	public SiaResultSubjects getSubjectFromSia(String nameOrCode, String typology,
+			String career, String scheduleCP, int page, int ammount, String sede) {
+		return SiaProxy.getSubjects(nameOrCode, typology, career, scheduleCP, page, ammount, sede);
 	}
 
 }

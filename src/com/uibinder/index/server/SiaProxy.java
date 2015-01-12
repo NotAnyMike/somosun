@@ -164,9 +164,9 @@ public class SiaProxy {
 		return siaResult;
 	}
 	
-	public static String getGroupsFromSubject(String siaCode, String sede){
+	public static SiaResultGroups getGroupsFromSubject(String subjectSiaCode, String sede){
 		SubjectDao subjectDao = new SubjectDao();
-		Subject s = subjectDao.getSubjectBySiaCode(siaCode);
+		Subject s = subjectDao.getSubjectBySiaCode(subjectSiaCode);
 		if(s!=null){
 			return getGroupsFromSubject(s, sede);
 		} else {
@@ -182,7 +182,7 @@ public class SiaProxy {
 	 * @param sede: it is used to know to which sia connect 
 	 * @return SiaResultGroup
 	 */
-	public static String getGroupsFromSubject(Subject subject, String sede){
+	public static SiaResultGroups getGroupsFromSubject(Subject subject, String sede){
 		
 		String respString = null;
 		List<Group> groupList = new ArrayList<Group>();
@@ -194,11 +194,10 @@ public class SiaProxy {
 		if(respString == "IOException" || respString == "MalformedURLException" || respString == null){
 			siaResult.setError(true);
 		}else{
-			//siaResult = parseGroupsJSON(respString);
-			respString = parseGroupsJSON(respString, subject, sede);
+			siaResult = parseGroupsJSON(respString, subject, sede);
 		}
 		
-		return respString;
+		return siaResult;
 		
 	}
 	
@@ -248,7 +247,7 @@ public class SiaProxy {
 	 * @param sede: string "bog" "ama" "med", etc. this one is used to save info of the groups (or the blocks)
 	 * @return
 	 */
-	private static String parseGroupsJSON(String jsonString, Subject subject, String sede){
+	private static SiaResultGroups parseGroupsJSON(String jsonString, Subject subject, String sede){
 		
 		SiaResultGroups siaResult = new SiaResultGroups();
 		
@@ -353,9 +352,8 @@ public class SiaProxy {
 			}
 		
 		siaResult.setList(groupList);
-		//return siaResultGroups;
 		}
-		return bullshit +  " " + jsonArray.toString() + "";
+		return siaResult;
 		
 	}
 	

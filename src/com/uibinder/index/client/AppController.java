@@ -274,24 +274,6 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 				student = loginInfo.getStudent();
 				loadLogin(true);
 			}});
-		getSubject();
-	}
-	
-	public void getSubject(){
-		loginService = GWT.create(LoginService.class);
-		loginService.getSubject(new AsyncCallback<String>(){
-
-			@Override
-			public void onFailure(Throwable caught) {
-				Window.alert("failed");
-			}
-
-			@Override
-			public void onSuccess(String result) {
-				Window.alert(result);
-			}
-			
-		});
 	}
 	
 }
