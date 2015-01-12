@@ -6,28 +6,41 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Id;
 
-/**
- *
- * @author Cesar A. Villamizar C.
- */
 @Entity
 public class Career implements Serializable {
 
-    /**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	@Id private Long id=null;
+	@Index private String name;
 	@Index private String code;
-    @Index private String name;
     @Index private String sede;
     
     public Career(){
     }
 
-    public Career(String code, String name) {
+    /**
+     * 
+     * @param code
+     * @param name
+     * @param sede: "ama", "bog", "car", "man", "med", "ori", "pal", "tum" or "" in that case will be "bog"
+     */
+    public Career(String name, String code, String sede) {
+    	
+    	if(sede != "ama" && sede != "bog" && sede != "car" && sede != "man" && sede != "med" && sede != "ori" && sede != "pal" && sede != "tum"){
+    		sede = "bog";
+    	}
+    	
         this.code = code;
         this.name = name;
+        this.sede = sede;
+    }
+    
+    public boolean equal(Career career){
+    	if(this.getCode() == career.getCode() && this.getSede() == career.getSede() && this.getName() == career.getName()){
+    		return true;
+    	}else{
+    		return false;
+    	}
     }
 
 	public String getCode() {
@@ -55,6 +68,9 @@ public class Career implements Serializable {
 	}
 
 	public void setSede(String sede) {
+		if(sede != "ama" && sede != "bog" && sede != "car" && sede != "man" && sede != "med" && sede != "ori" && sede != "pal" && sede != "tum"){
+    		sede = "bog";
+    	}
 		this.sede = sede;
 	}
 

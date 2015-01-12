@@ -1,5 +1,7 @@
 package com.uibinder.index.server.serviceImpl;
 
+import java.io.IOException;
+
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -41,8 +43,8 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 
 	@Override
 	public String getSubject() {
-		return SiaProxy.getGroupsFromSubject("6000297");
-        //return SiaProxy.getSubjects("mat", "", "", "", 1, 10).getSubjectList().get(0).getSiaCode();
+		SiaProxy.getSubjects("plantas", "", "", "", 1, 10, "bog");
+		return SiaProxy.getGroupsFromSubject("2015877", "bog");
 	}
 
 }

@@ -10,19 +10,31 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
+import com.uibinder.index.server.dao.BlockDao;
+import com.uibinder.index.server.dao.CareerDao;
 import com.uibinder.index.server.dao.GroupDao;
+import com.uibinder.index.server.dao.SemesterValueDao;
 import com.uibinder.index.server.dao.SubjectDao;
+import com.uibinder.index.server.dao.TeacherDao;
 import com.uibinder.index.shared.SiaResultGroups;
 import com.uibinder.index.shared.SiaResultSubjects;
+import com.uibinder.index.shared.control.Block;
+import com.uibinder.index.shared.control.Career;
 import com.uibinder.index.shared.control.Group;
 import com.uibinder.index.shared.control.Subject;
+import com.uibinder.index.shared.control.Teacher;
 
 /**
  * 
- * This class manage all the connection between the sia and the server,
+ * This class manages all the connections between the sia and the server,
  * this class will not work in the client side, and every other class must
  * use this class to communicate with the sia
  * 
@@ -31,8 +43,22 @@ import com.uibinder.index.shared.control.Subject;
  */
 public class SiaProxy {
 
-	public final static String SIA_URL_AMAZONIA = "http://unsia.unal.edu.co/buscador/JSON-RPC";
-	public final static String SIA_URL_BOG = "http://unsia.unal.edu.co/buscador/JSON-RPC";
+	public final static String SIA_URL_AMA_RPC = "http://unsia.unal.edu.co/buscador/JSON-RPC";
+	public final static String SIA_URL_BOG_RPC = "http://www.sia.unal.edu.co/buscador/JSON-RPC";
+	public final static String SIA_URL_CAR_RPC = "http://www.sia.unal.edu.co/buscador/JSON-RPC";
+	public final static String SIA_URL_MAN_RPC = "http://www.sia.unal.edu.co/buscador/JSON-RPC";
+	public final static String SIA_URL_MED_RPC = "http://www.sia.unal.edu.co/buscador/JSON-RPC";
+	public final static String SIA_URL_ORI_RPC = "http://www.sia.unal.edu.co/buscador/JSON-RPC";
+	public final static String SIA_URL_PAL_RPC = "http://www.sia.unal.edu.co/buscador/JSON-RPC";
+	public final static String SIA_URL_TUM_RPC = "http://www.sia.unal.edu.co/buscador/JSON-RPC";
+	public final static String SIA_URL_AMA_BUSCADOR = "http://www.sia.unal.edu.co/buscador/service/action.pub";
+	public final static String SIA_URL_BOG_BUSCADOR = "http://www.sia.unal.edu.co/buscador/service/action.pub";
+	public final static String SIA_URL_CAR_BUSCADOR = "http://www.sia.unal.edu.co/buscador/service/action.pub";
+	public final static String SIA_URL_MAN_BUSCADOR = "http://www.sia.unal.edu.co/buscador/service/action.pub";
+	public final static String SIA_URL_MED_BUSCADOR = "http://www.sia.unal.edu.co/buscador/service/action.pub";
+	public final static String SIA_URL_ORI_BUSCADOR = "http://www.sia.unal.edu.co/buscador/service/action.pub";
+	public final static String SIA_URL_PAL_BUSCADOR = "http://www.sia.unal.edu.co/buscador/service/action.pub";
+	public final static String SIA_URL_TUM_BUSCADOR = "http://www.sia.unal.edu.co/buscador/service/action.pub";
 	public final static String VALOR_NIVELACADEMICO_TIPOLOGIA_PRE = "PRE";
 	public final static String VALOR_NIVELACADEMICO_TIPOLOGIA_POS = "POS";
 	public final static String VALOR_NIVELACADEMICO_PLANESTUDIO_PRE = "PRE";
@@ -41,6 +67,8 @@ public class SiaProxy {
 	public final static String GET_GROUPS_METHOD = "obtenerGruposAsignaturas";
 	public final static String GET_SUBJECT_INFO = "obtenerInfoAsignatura";
 	
+	public final static String DAY[] = {"lunes","martes", "miercoles", "jueves", "viernes", "sabado", "domingo"};
+	
 	/**
 	 * This method is the only one that will connect to the Sia, it will
 	 * return the crude string coming from the sia.
@@ -48,11 +76,14 @@ public class SiaProxy {
 	 * @param data: the json string to send
 	 * @return
 	 */
-	private static String connectToSia(String data){
+	private static String connectToSia(String data, String sede){
+		
+		sede = confirmSede(sede);
+		String URLToConnect = getSedeRpcUrl(sede);
 		String respString = null;
 		
 		try {
-            URL url = new URL(SIA_URL_BOG);
+            URL url = new URL(URLToConnect);
             HttpURLConnection request = ( HttpURLConnection ) url.openConnection();
             
             request.setDoOutput(true);
@@ -115,13 +146,15 @@ public class SiaProxy {
 	 * returned will have the name of ERROR, if it is empty there were no errors so the
 	 * search returned a empty json string
 	 */
-	public static SiaResultSubjects getSubjects(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount){
+	public static SiaResultSubjects getSubjects(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede){
+		
+		sede = confirmSede(sede);
 		
 		String respString = null;
 		SiaResultSubjects siaResult = new SiaResultSubjects();
 		String data = "{method:buscador.obtenerAsignaturas,params:['"+nameOrCode+"','"+VALOR_NIVELACADEMICO_TIPOLOGIA_PRE+"','"+typology+"','"+VALOR_NIVELACADEMICO_PLANESTUDIO_PRE+"','"+career+"','"+scheduleCP+"',"+page+","+ammount+"]}";
 		
-		respString = connectToSia(data);
+		respString = connectToSia(data, sede);
 		
 		if(respString == "IOException" || respString == "MalformedURLException" || respString == null){
 			siaResult.setError(true);
@@ -131,18 +164,38 @@ public class SiaProxy {
 		return siaResult;
 	}
 	
-	public static String getGroupsFromSubject(String siaCode){
+	public static String getGroupsFromSubject(String siaCode, String sede){
+		SubjectDao subjectDao = new SubjectDao();
+		Subject s = subjectDao.getSubjectBySiaCode(siaCode);
+		if(s!=null){
+			return getGroupsFromSubject(s, sede);
+		} else {
+			return null;
+		}
+	}
+	
+	/**
+	 * This method will return a SiaResultGroups class, if there was any error then siaReuslt.isError will be true.
+	 * To use it first make sure that there was no error, otherwise could create an exception 
+	 * 
+	 * @param subject: the subject to which its groups will be found
+	 * @param sede: it is used to know to which sia connect 
+	 * @return SiaResultGroup
+	 */
+	public static String getGroupsFromSubject(Subject subject, String sede){
 		
 		String respString = null;
+		List<Group> groupList = new ArrayList<Group>();
 		SiaResultGroups siaResult = new SiaResultGroups();
-		String data = "{method:buscador.obtenerGruposAsignaturas,params:['"+siaCode+"','0']}";
+		String data = "{method:buscador.obtenerGruposAsignaturas,params:['"+subject.getSiaCode()+"','0']}";
 		
-		respString = connectToSia(data);
+		respString = connectToSia(data, sede);
 		
 		if(respString == "IOException" || respString == "MalformedURLException" || respString == null){
 			siaResult.setError(true);
 		}else{
-			//siaResult = parseSubjectJSON(respString);
+			//siaResult = parseGroupsJSON(respString);
+			respString = parseGroupsJSON(respString, subject, sede);
 		}
 		
 		return respString;
@@ -166,7 +219,7 @@ public class SiaProxy {
 		for(int i=0; i<ammountOfResults; i++){
 			jsonObject = jsonArray.getJSONObject(i);
 			Subject subject = new Subject(jsonObject.getInt("creditos"), jsonObject.getString("id_asignatura"), jsonObject.getString("codigo"),jsonObject.getString("nombre"), "bog");
-			subject = subjectDao.getSubjectbySubject(subject);
+			subject = subjectDao.getSubjectbySubject(subject, true);
 			subjectList.add(subject);
 		}
 		
@@ -177,27 +230,249 @@ public class SiaProxy {
 		return siaResult;
 	}
 	
-	private static String parseGroupsJSON(String jsonString){
+	/**
+	 * This method returns a SiaResultGroups class, if there is an error then siaResult.isError will be true.
+	 * 
+	 * TODO: There is a problem here, there must be a updateFromSia method, because with the
+	 * current methods it will just update the existing ones, and if no one search for a group
+	 * it remains outdated, and if one group is deleted as USUAL (THIS IS VERY USAUL IN THE SIA)
+	 * then the group will never ever be deleted from our db and it will appear over an over to users 
+	 * 
+	 * TODO: correct the email for other sedes.
+	 * TODO: IMPROVE THE WAY BLOCKS ARE HANDLED, TWO GROUPS COULD BE USING THE SAME BLOCK, SO IF SOME BLOCK IS MODIFYED OR DELETED THEN THE OTHER GROUP WILL LOSE THE BLOCK IT WAS USING
+	 * TODO: Error when no groups are found, it ignores it, but it should add a new block.
+	 * TODO: add try and catch for all cases: 1. When the jsonString is not a JSONString, 2. When the jsonString is a JSONString but its field and arrays are incomplete or somehow damaged
+	 * 
+	 * @param jsonString: a string coming from a JSON request
+	 * @param subject: the subject itself, the parent of the groups, it is used to save the group
+	 * @param sede: string "bog" "ama" "med", etc. this one is used to save info of the groups (or the blocks)
+	 * @return
+	 */
+	private static String parseGroupsJSON(String jsonString, Subject subject, String sede){
+		
 		SiaResultGroups siaResult = new SiaResultGroups();
 		
-		List<Group> groupList = new ArrayList<Group>();
-		JSONArray jsonArray = new JSONObject(jsonString).getJSONObject("result").getJSONArray("list");
-		JSONObject jsonObject = null;
+		SubjectDao subjectDao = new SubjectDao();
 		GroupDao groupDao = new GroupDao();
+		TeacherDao teacherDao = new TeacherDao();
+		BlockDao blockDao = new BlockDao();
+		CareerDao careerDao = new CareerDao();
+		int cuposDisponibles = 0;
+		int cuposTotal = 0;
+		int groupNumber = -1;
+		SemesterValueDao semesterValueDao = new SemesterValueDao();
+		String bullshit = null;
 		
-		jsonArray.length();
+		JSONArray jsonArray = new JSONObject(jsonString).getJSONObject("result").getJSONArray("list");
+		JSONObject j = null;
+		JSONArray careersJSON = null;
+		JSONObject careerJSON = null; 
 		
-		//TODO loop
+		List<Group> listFromDb = groupDao.getGroups(subject); //To compare the two lists
 		
-		return null;
+		if(subject != null){
+		
+		List<Group> groupList = new ArrayList<Group>();
+		Group group = null;
+		Teacher teacher = null;
+		List<Block> blocks = null;
+		List<Career> careers = null;
+		Career career = null;
+		Block block = null;
+		
+			for(int i = 0; i<jsonArray.length(); i++){
+				
+				j = jsonArray.getJSONObject(i);
+				group = new Group();
+	
+				blocks = new ArrayList<Block>();
+				careers = new ArrayList<Career>();
+				teacher = new Teacher(j.getString("nombredocente"), j.get("usuariodocente").toString(), j.get("usuariodocente").toString(), sede);
+				teacher = teacherDao.getTeacherByTeacher(teacher, true);
+				cuposDisponibles = j.getInt("cuposdisponibles");
+				cuposTotal = j.getInt("cuposdisponibles");
+				try {
+					groupNumber = Integer.valueOf(j.getString("codigo")); //be careful here, because it could be some group that has no number and instead a char					
+				} catch(NumberFormatException e){
+				}
+				
+				//getting the plan limitación information
+				careersJSON = j.getJSONObject("planlimitacion").getJSONArray("list");
+				for(int r = 0; r < careersJSON.length(); r++){
+					careerJSON = careersJSON.getJSONObject(r);
+					career = null;
+					career = careerDao.getCareerByCode(careerJSON.get("plan").toString());
+					if(career != null) {
+						if(careers.contains(career) == false) careers.add(career);
+					}
+				}
+				
+				//create the blocks
+				for(int days = 0; days<7; days++){
+					
+					String times = j.getString("horario_"+DAY[days]); 
+					String places = j.getString("aula_" + DAY[days]);
+					
+					if(times != "--"){
+						//creating blocks
+						for(int n = 0; n < StringUtils.countMatches(times, " ")+1; n++){
+							block = new Block(days, StringUtils.substringBefore(times, " "), StringUtils.substringBefore(places, " "));
+							for(Group g : listFromDb){
+								if(g.getGroupNumber() == groupNumber && g.getSemesterValue().isCurrentSemester() == true){
+									for(Block b : g.getSchedule()){
+										if(block.equals(b)==true  || (block.getClassRoom().equals(b.getClassRoom()) && block.getDay() == b.getDay() && block.getEndHour() == b.getEndHour() && block.getStartHour() == b.getStartHour() )){
+											block = b;
+											g.getSchedule().remove(b);
+											break;
+										} 
+									}
+									break;
+								}
+							}
+							if(block.getId() == null){											
+								block = blockDao.getBlockByBlock(block);
+							}
+							blocks.add(block);
+	
+							times = StringUtils.substringAfter(times, " ");
+							places = StringUtils.substringAfter(places, " ");
+						}
+					}
+				}
+				group.setSubject(subject);
+				group.setSchedule(blocks);
+				group.setTeacher(teacher);
+				group.setFreePlaces(cuposDisponibles);
+				group.setTotalPlaces(cuposTotal);
+				group.setGroupNumber(groupNumber); //be careful here, because it could be some group that has no number and instead a char
+				group.setSemesterValue(semesterValueDao.getCurrentSemester());
+				if(careers != null && careers.size() != 0) group.setCareers(careers);
+				group = groupDao.getGroupByGroup(group, true); //TODO remove the synchronized call i.e. .now()
+				if(group != null) if(groupList.contains(group) == false) groupList.add(group);
+				if(group.getId() != null) bullshit = group.getId() + " ";
+			}
+		
+		siaResult.setList(groupList);
+		//return siaResultGroups;
+		}
+		return bullshit +  " " + jsonArray.toString() + "";
 		
 	}
 	
 	/**
-	 * This will return only the groups available for that career
+	 * This method is working just for bogota. And to make it work, modify the function saveOrUpdate
+	 * on careerDao, the instructions are in the same class.
+	 * 
+	 * @param sede: "ama", "bog", "car", "man", "med", "ori", "pal", "tum" or "" in that case will be "bog"
 	 * @return
 	 */
-	public static List<Group> getGroupsFromSubjectByCareer(){
+	public static void updateCareersFromSia(String sede){
+		
+		sede = confirmSede(sede);
+		String siaURL = getSedeUrl(sede);
+
+		try {
+			Career career = null;
+			CareerDao careerDao = new CareerDao();
+			Document html = Jsoup.connect(siaURL).get();
+			Elements options = html.getElementById("valor_criterio_planestudio_PRE").getElementsByTag("option");
+			
+			for(Element option : options){
+				if(option.attr("value") != null && option.attr("value") != ""){
+					career = new Career(option.text(), option.attr("value"), sede);
+					careerDao.saveOrUpdate(career);
+				}
+			}
+		} catch (IOException e) {
+			//DO nothing
+		}
+	}
+	
+	private static String confirmSede(String sede){
+		if(sede != "ama" && sede!= "bog" && sede!= "car" && sede!= "man" && sede!= "med" && sede!= "ori" && sede!= "pal" && sede!= "tum"){
+			sede = "bog";
+		}
+		return sede;
+	}
+	
+	private static String getSedeUrl(String sede){
+		String siaURL = SIA_URL_BOG_BUSCADOR;
+
+		switch(sede){
+		case "ama": 
+			siaURL = SIA_URL_AMA_BUSCADOR;
+			break;
+		case "bog": 
+			siaURL = SIA_URL_BOG_BUSCADOR;
+			break;
+		case "car": 
+			siaURL = SIA_URL_CAR_BUSCADOR;
+			break;
+		case "man": 
+			siaURL = SIA_URL_MAN_BUSCADOR;
+			break;
+		case "med": 
+			siaURL = SIA_URL_MED_BUSCADOR;
+			break;
+		case "ori": 
+			siaURL = SIA_URL_ORI_BUSCADOR;
+			break;
+		case "pal": 
+			siaURL = SIA_URL_PAL_BUSCADOR;
+			break;
+		case "tum": 
+			siaURL = SIA_URL_TUM_BUSCADOR;
+			break;
+		default: 
+			siaURL = SIA_URL_BOG_BUSCADOR;
+			break;
+		}
+		return siaURL;
+	}
+	
+	private static String getSedeRpcUrl(String sede){
+		String siaURL = SIA_URL_BOG_BUSCADOR;
+
+		switch(sede){
+		case "ama": 
+			siaURL = SIA_URL_AMA_RPC;
+			break;
+		case "bog": 
+			siaURL = SIA_URL_BOG_RPC;
+			break;
+		case "car": 
+			siaURL = SIA_URL_CAR_RPC;
+			break;
+		case "man": 
+			siaURL = SIA_URL_MAN_RPC;
+			break;
+		case "med": 
+			siaURL = SIA_URL_MED_RPC;
+			break;
+		case "ori": 
+			siaURL = SIA_URL_ORI_RPC;
+			break;
+		case "pal": 
+			siaURL = SIA_URL_PAL_RPC;
+			break;
+		case "tum": 
+			siaURL = SIA_URL_TUM_RPC;
+			break;
+		default: 
+			siaURL = SIA_URL_BOG_RPC;
+			break;
+		}
+		return siaURL;
+	}
+	
+	/**
+	 * teachers have the same url regardless of their sede e.g. http://www.docentes.unal.edu.co/apechac/
+	 * 
+	 * @param username
+	 * @return
+	 */
+	public Teacher getTeacherFromSiaByUsername(String username){
+		//TODO
 		return null;
 	}
 	

@@ -40,6 +40,19 @@ public class Subject implements Serializable {
     	this.name = name;
     	this.location = location;
     }
+    
+    /**
+     * true if everything but he id is equal 
+     * @param subject
+     * @return
+     */
+    public boolean equals(Subject subject){
+    	if(this.credits == subject.getCredits() && this.name.equals(subject.getName()) && this.code.equals(subject.getCode()) && this.siaCode.equals(subject.getSiaCode()) && this.location.equals(subject.getLocation())){
+    		return true;
+    	} else {
+    		return false;
+    	}
+    }
 
 	public int getCredits() {
 		return credits;

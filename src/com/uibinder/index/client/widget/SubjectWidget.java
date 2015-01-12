@@ -6,6 +6,7 @@ import java.util.List;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
+import com.uibinder.index.shared.control.Subject;
 
 public class SubjectWidget extends FlowPanel {
 	
@@ -76,6 +77,25 @@ public class SubjectWidget extends FlowPanel {
 		this.taken = false;
 		this.obligatoriness = obligatoriness;
 		this.type = type;
+		
+		setAttributes();
+		
+		createWidget();
+	}
+	
+	/**
+	 * TODO: fix the obligatoriness
+	 * @param s
+	 */
+	public SubjectWidget(Subject s){
+		this.name = s.getName();
+		this.code = s.getCode();
+		this.credits = s.getCredits();
+		this.grade = 0.0;
+		this.approved = false;
+		this.taken = false;
+		this.obligatoriness = true;
+		this.type = 0;
 		
 		setAttributes();
 		

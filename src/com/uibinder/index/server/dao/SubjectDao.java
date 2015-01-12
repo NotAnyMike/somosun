@@ -34,24 +34,54 @@ public class SubjectDao {
 		return null;
 	}
 	
+	public Subject getSubjectBySiaCode(String siaCode) {
+		return (Subject) ofy().load().type(Subject.class).filter("siaCode", siaCode).first().now();
+	}
+	
 	public Subject getSubjectByCode(String code){
 		return (Subject) ofy().load().type(Subject.class).filter("code", code).first().now();
 	}
 	
-	public Subject getSubjectbySubject(Subject subject){
+	/**
+	 * This method can update the subject if the isSiaProxy is set to true, but it must done only if the request come from the siaProxy class
+	 * 
+	 * @param subject
+	 * @param isSiaProxy: gives rights to update (delete and add) a subject
+	 * @return
+	 */
+	public Subject getSubjectbySubject(Subject subject, boolean isSiaProxy){
 		Subject subjectToReturn = null;
 		if(subject != null){
 			subjectToReturn = getSubjectByCode(subject.getCode());
 			if(subjectToReturn==null){
 				subjectToReturn = subject;
 				addSubject(subject);
-			};
+			} else {
+				if(isSiaProxy && subjectToReturn.equals(subject)==false){ //takes care of the update just if the info is coming from the siaProxy class
+					subjectToReturn.setCode(subject.getCode());
+					subjectToReturn.setCredits(subject.getCredits());
+					subjectToReturn.setLocation(subject.getLocation());
+					subjectToReturn.setName(subject.getName());
+					subjectToReturn.setSiaCode(subject.getSiaCode());
+					updateSubject(subjectToReturn);
+				}
+			}
 		}
 		return subjectToReturn;
 	}
 	
-	public List<Subject> getSubjectsByCareer(){
+	public List<Subject> getSubjectsByCareer(String career){
 		return null;
+	}
+	
+	private void deleteSubject(Long id){
+		Key<Subject> key = Key.create(Subject.class, id);
+		ofy().delete().key(key).now();
+	}
+	
+	private void updateSubject(Subject s){
+		deleteSubject(s.getId());
+		addSubject(s);		
 	}
 	
 	private void addSubject(Subject subject){

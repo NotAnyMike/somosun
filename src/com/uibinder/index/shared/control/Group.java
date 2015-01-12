@@ -9,7 +9,7 @@ import com.googlecode.objectify.annotation.Index;
 
 /**
  *
- * @author Cesar A. Villamizar C.
+ * @author Mike
  */
 @Entity
 public class Group implements Serializable {
@@ -21,19 +21,25 @@ public class Group implements Serializable {
 	@Id private Long id=null;
     @Index private Subject subject = null;
     @Index private Teacher teacher=null;
-    @Index private Semester semester=null;
+    @Index private SemesterValue semesterValue=null;
+    @Index private int groupNumber;
     @Index private int freePlaces;
-    private int groupNumber;
     private int totalPlaces;
     private List<Block> schedule=null;
+    @Index private List<Career> careers = null;
 
     public Group(){
     }
     
-    public Group(Subject subject, int groupNumber, Teacher teacher) {
+    public Group(Subject subject, Teacher teacher, SemesterValue semester, int freePlaces, int groupNumber, int totalPlaces, List<Block> schedule, List<Career> careers) {
         this.subject = subject;
-        this.groupNumber = groupNumber;
         this.teacher = teacher;
+        this.semesterValue = semester;
+        this.freePlaces = freePlaces;
+        this.groupNumber = groupNumber;
+        this.totalPlaces = totalPlaces;
+        this.schedule = schedule;
+        this.careers = careers;
     }
     
     /**
@@ -43,13 +49,33 @@ public class Group implements Serializable {
      * @param group
      * @return
      */
-    public boolean equal(Group group){
+    public boolean equals(Group group){
     	boolean toReturn = false;
-    	if(this.subject == group.getSubject() && this.teacher == group.getTeacher() && 
-    			this.semester == group.getSemester() && this.freePlaces == group.getFreePlaces() &&
-    			this.groupNumber == group.getGroupNumber() && this.totalPlaces == group.getTotalPlaces() &&
-    			this.schedule == group.getSchedule()){
-    		toReturn = true;
+    	boolean blockEquals = false;
+    	if(this.getSubject().equals(group.getSubject()) && this.getTeacher().equals(group.getTeacher()) && 
+    			this.getSemesterValue().equals(group.getSemesterValue()) && this.getFreePlaces() == group.getFreePlaces() &&
+    			this.getGroupNumber() == group.getGroupNumber() && this.getTotalPlaces() == group.getTotalPlaces()
+    			){
+    		
+    		if(this.getSchedule().size() == group.getSchedule().size() && this.getSchedule().size() != 0 && this.getSchedule().size() != -1){
+				for(Block b : this.getSchedule()){
+					blockEquals = false;
+					for(Block b2 : group.getSchedule()){
+						if(b.equals(b2)) {
+							blockEquals = true;
+							break;
+						}      				
+					}
+					if(blockEquals == false){
+						break;
+					}
+				}
+				if(blockEquals == true){
+					toReturn = true;    			
+				} else {
+					toReturn = false;
+				}
+    		}
     	}
     	return toReturn;
     }
@@ -74,12 +100,12 @@ public class Group implements Serializable {
 		this.teacher = teacher;
 	}
 
-	public Semester getSemester() {
-		return semester;
+	public SemesterValue getSemesterValue() {
+		return semesterValue;
 	}
 
-	public void setSemester(Semester semester) {
-		this.semester = semester;
+	public void setSemesterValue(SemesterValue semester) {
+		this.semesterValue = semester;
 	}
 
 	public int getFreePlaces() {
@@ -112,6 +138,14 @@ public class Group implements Serializable {
 
 	public void setSchedule(List<Block> schedule) {
 		this.schedule = schedule;
+	}
+
+	public List<Career> getCareers() {
+		return careers;
+	}
+
+	public void setCareers(List<Career> careers) {
+		this.careers = careers;
 	}
     
     
