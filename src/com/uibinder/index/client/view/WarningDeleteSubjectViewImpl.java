@@ -56,7 +56,7 @@ public class WarningDeleteSubjectViewImpl extends Composite implements WarningDe
 	}
 		
 	private void onDeleteClicked() {
-		presenter.confirmedDeleteSubject(code);
+		//presenter.confirmedDeleteSubject(code);
 	}
 	
 	public void onCancelClicked(){

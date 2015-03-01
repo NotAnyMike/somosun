@@ -20,7 +20,7 @@ public class SemesterDropController extends VerticalPanelDropController {
 	
 	private void notifyPresenter(String code){
 		//TODO fill this thing up
-		planPresenter.updateSemesters(code,semester);
+		//planPresenter.updateSemesters(code,semester);
 	}
 	
 	@Override

@@ -1,5 +1,6 @@
 package com.uibinder.index.client.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -7,6 +8,8 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.uibinder.index.shared.RandomPhrase;
 import com.uibinder.index.shared.SiaResultGroups;
 import com.uibinder.index.shared.SiaResultSubjects;
+import com.uibinder.index.shared.control.Career;
+import com.uibinder.index.shared.control.Plan;
 import com.uibinder.index.shared.control.Subject;
 
 /**
@@ -31,35 +34,14 @@ public interface SUNService extends RemoteService{
 	
 	void saveRandomPhrase(String phrase, String author);
 	
-	/** 
-	 * For more information goto SiaProxy.class
-	 * 
-	 * @param subjectSiaCode
-	 * @param sede
-	 * @return
-	 */
 	public SiaResultGroups getGroupsFromSia(String subjectSiaCode, String sede);
-	
-	/**
-	 * For more information goto SiaProxy.class
-	 * @param subject
-	 * @param sede
-	 * @return
-	 */
 	public SiaResultGroups getGroupsFromSia(Subject subject, String sede);
-	
-	/**
-	 * For more information goto SiaProxy.class
-	 * 
-	 * @param nameOrCode
-	 * @param typology
-	 * @param career
-	 * @param scheduleCP
-	 * @param page
-	 * @param ammount
-	 * @param sede
-	 * @return
-	 */
 	public SiaResultSubjects getSubjectFromSia(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede);
+	
+	public List<Career> getCareers(String sede);
+	
+	public Plan getPlanDefault(String careerCode);
+	
+	public String toTest();
 	
 }

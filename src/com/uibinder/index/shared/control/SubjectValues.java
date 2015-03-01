@@ -15,19 +15,20 @@ public class SubjectValues implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	@Id private Long id = null;
-	@Index Group group;
-    double grade;
-    int timesSeen;
-    String typology;
+	@Index private Group group = null;
+    private double grade = 0;
+    private boolean taken = false;
+    private String typology = null;
+    private boolean obligatoriness = false;
     
     public SubjectValues(){
     }
 
-    public SubjectValues(Group group, double grade,int timesSeen,String type) {
+    public SubjectValues(Group group, double grade,boolean taken,String typology) {
         this.group = group;
         this.grade = grade;
-        this.timesSeen=timesSeen;
-        this.typology=type;
+        this.taken = taken;
+        this.typology=typology;
     }
 
 	public Group getGroup() {
@@ -46,14 +47,6 @@ public class SubjectValues implements Serializable {
 		this.grade = grade;
 	}
 
-	public int getTimesSeen() {
-		return timesSeen;
-	}
-
-	public void setTimesSeen(int timesSeen) {
-		this.timesSeen = timesSeen;
-	}
-
 	public String getTypology() {
 		return typology;
 	}
@@ -68,5 +61,21 @@ public class SubjectValues implements Serializable {
 
 	public Long getId() {
 		return id;
+	}
+
+	public boolean isObligatoriness() {
+		return obligatoriness;
+	}
+
+	public void setObligatoriness(boolean obligatoriness) {
+		this.obligatoriness = obligatoriness;
+	}
+
+	public boolean isTaken() {
+		return taken;
+	}
+
+	public void setTaken(boolean taken) {
+		this.taken = taken;
 	}
 }

@@ -18,17 +18,17 @@
 	        <td width="45%" height="400" align="center" valign="middle" class="lead main-text" style="font-size:20px; text-align:left;">
               	<p><span style="font-size:18px; font-weight:bold">Queremos grupos que nos ayuden a desarrollar los siguientes proyectos:</span></p>
               	<ul>
-              	  <li>Repositorio de Parciales: Sitio en donde los estudiantes anónimamente pueden subir sus parciales para ayudar a los demás estudiantes a estudiar para esas clase </li>
-              	  <li>MyEF app: Una aplicación que permita ranquear a los profesores, clases, que grupos son mejores, ranquear electivas, conocer el promedio de un curso, etc.</li>
+              	  <li>Repositorio de Parciales: Sitio en donde los estudiantes anónimamente pueden subir sus parciales y copias para ayudar a los demás.</li>
+              	  <li>MyEF app: Una aplicación que permita ranquear a los profesores, clases, ver que grupos son mejores, ranquear electivas, conocer el promedio de un curso, etc.</li>
               	  <li>Horario: Aplicación que permita crear el horario antes de inscribir materias teniendo en cuenta las calificaciones de los profesores, los huecos, los grupos fáciles, etc.</li>
-              	  <li>Plan de estudio: GEDAD se encuentra desarrollando esta app actualmente, la cual sirve para crear y administrar los planes de estudio de los estudiantes a través de su estadía en la universidad.</li>
-              	  <li>Te gustaría hacer otra cosa? Cuentanos saber</li>
+              	  <li>Plan de estudio: GEDAD se encuentra desarrollando esta app actualmente, la cual sirve para crear y administrar los planes de estudio de los estudiantes.</li>
+              	  <li>Te gustaría hacer otra cosa? Cuentanos.</li>
        	      </ul>
               	<p>De vez en cuando habrá una que otra reunión para ver el avance y sincronizar todos los proyectos</p>
               	<p>Los proyectos tienen que estar integrados con las demás apps de <a href="#aboutUs">Somos UN</a> (esta página) y tener una interfaz gráfica estandar para luego ser integrados a Somos UN</p>
-           	  <p>Tamaño del grupo: mínimo 2 y evitar que sean más de 6.<br />
+           	  <p>Tamaño del grupo: desde 1 hasta 2147483647.<br />
            	    Si quieres participar y no tienes grupo, no importa.</p>
-              	<p>Si tienes dudas puedes contactar a: <br />
+              	<p>Si quieres hablaros nosotros somos: <br />
               	  <a href="https://www.facebook.com/MikeCrosoft" target="new">Mike W</a> - <a href="https://twitter.com/MWoodcock_" target="new">@MWoodcock_</a><br />
               	  <a href="https://www.facebook.com/neill.giraldo" target="new">Neill P</a> - <a href="https://plus.google.com/+NeillGiraldo" target="new">+NeillGiraldo</a><br />
               	  <a href="https://www.facebook.com/afcruzs" target="new">Felipe C </a> - <a href="https://twitter.com/SoyPecora" target="new">@SoyPecora</a><br />

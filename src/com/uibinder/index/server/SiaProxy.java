@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -81,31 +82,54 @@ public class SiaProxy {
 		sede = confirmSede(sede);
 		String URLToConnect = getSedeRpcUrl(sede);
 		String respString = null;
+		boolean error = false; //it makes reference to the error when we make to much calls to often, not the other normal and standar errors
+		int counter = 0;
 		
-		try {
-            URL url = new URL(URLToConnect);
-            HttpURLConnection request = ( HttpURLConnection ) url.openConnection();
-            
-            request.setDoOutput(true);
-            request.setDoInput(true);
-            
-            OutputStreamWriter post = new OutputStreamWriter(request.getOutputStream());
-            post.write(data);
-            post.flush();
-            
-            BufferedReader reader = new BufferedReader(new InputStreamReader(request.getInputStream()));
-            String line;
-
-            while ((line = reader.readLine()) != null) {
-               respString = line;
-            }
-            reader.close();
-
-        } catch (MalformedURLException e) {
-            respString ="MalformedURLException";
-        } catch (IOException e) {
-            respString ="IOException";
-        }
+		do{
+			try {
+	            URL url = new URL(URLToConnect);
+	            HttpURLConnection request = ( HttpURLConnection ) url.openConnection();
+	            
+	            request.setDoOutput(true);
+	            request.setDoInput(true);
+	            
+	            OutputStreamWriter post = new OutputStreamWriter(request.getOutputStream());
+	            post.write(data);
+	            post.flush();
+	            
+	            BufferedReader reader = new BufferedReader(new InputStreamReader(request.getInputStream()));
+	            String line;
+	
+	            while ((line = reader.readLine()) != null) {
+	            	if(line.contains("</html>") == true ){
+	            		respString = "error";
+	            		error = true;
+	            		break;
+	            	}else{
+	            		error=false;
+	            		respString = line;
+	            	}
+	            }
+	            reader.close();
+	
+	        } catch (MalformedURLException e) {
+	            respString ="MalformedURLException";
+	            error = false;
+	        } catch (IOException e) {
+	            respString ="IOException";
+	            error = false;
+	        }
+			
+			if(error == true){
+				counter ++;
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					//do nothing
+				}
+			}
+		}while(error == true && counter < 5);
+		
 		return respString;
 	}
 	 
@@ -159,10 +183,31 @@ public class SiaProxy {
 		if(respString == "IOException" || respString == "MalformedURLException" || respString == null){
 			siaResult.setError(true);
 		}else{
-			siaResult = parseSubjectJSON(respString, ammount);
+			siaResult = parseSubjectJSON(respString, ammount);		
 		}
+
 		return siaResult;
 	}
+	
+public static String getSubjects2Delete(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede){
+		
+		sede = confirmSede(sede);
+		
+		String respString = null;
+		SiaResultSubjects siaResult = new SiaResultSubjects();
+		String data = "{method:buscador.obtenerAsignaturas,params:['"+nameOrCode+"','"+VALOR_NIVELACADEMICO_TIPOLOGIA_PRE+"','"+typology+"','"+VALOR_NIVELACADEMICO_PLANESTUDIO_PRE+"','"+career+"','"+scheduleCP+"',"+page+","+ammount+"]}";
+		
+		respString = connectToSia(data, sede);
+		
+		if(respString == "IOException" || respString == "MalformedURLException" || respString == null || respString == "error"){
+			siaResult.setError(true);
+		}else{
+			siaResult = parseSubjectJSON(respString, ammount);		
+		}
+
+		return respString;
+	}
+	
 	
 	public static SiaResultGroups getGroupsFromSubject(String subjectSiaCode, String sede){
 		SubjectDao subjectDao = new SubjectDao();
@@ -205,21 +250,32 @@ public class SiaProxy {
 		SiaResultSubjects siaResult = new SiaResultSubjects();
 
 		List<Subject> subjectList = new ArrayList<Subject>();
-		JSONObject json = new JSONObject(jsonString).getJSONObject("result");
-		JSONArray jsonArray = json.getJSONObject("asignaturas").getJSONArray("list");
-		JSONObject jsonObject = null;
-		SubjectDao subjectDao = new SubjectDao(); 
-		
-		int totalPages = json.getInt("numPaginas");
-		int totalSubjects = json.getInt("totalAsignaturas");
-		
-		int ammountOfResults = (ammount > totalSubjects ? totalSubjects : ammount);
-		
-		for(int i=0; i<ammountOfResults; i++){
-			jsonObject = jsonArray.getJSONObject(i);
-			Subject subject = new Subject(jsonObject.getInt("creditos"), jsonObject.getString("id_asignatura"), jsonObject.getString("codigo"),jsonObject.getString("nombre"), "bog");
-			subject = subjectDao.getSubjectbySubject(subject, true);
-			subjectList.add(subject);
+		int totalPages = 0;
+		int totalSubjects = 0;
+				
+		try{			
+			
+			JSONObject json = new JSONObject(jsonString).getJSONObject("result");
+			JSONArray jsonArray = json.getJSONObject("asignaturas").getJSONArray("list");
+			JSONObject jsonObject = null;
+			SubjectDao subjectDao = new SubjectDao(); 
+			
+			totalPages = json.getInt("numPaginas");
+			totalSubjects = json.getInt("totalAsignaturas");
+			
+			if(totalSubjects != 0){
+				int ammountOfResults = (ammount > totalSubjects ? totalSubjects : ammount);
+				
+				for(int i=0; i<ammountOfResults; i++){
+					jsonObject = jsonArray.getJSONObject(i);
+					Subject subject = new Subject(jsonObject.getInt("creditos"), jsonObject.getString("id_asignatura"), jsonObject.getString("codigo"),jsonObject.getString("nombre"), "bog");
+					subject = subjectDao.getSubjectbySubject(subject, true);
+					subjectList.add(subject);
+				}
+			}
+			
+		} catch (JSONException e){
+			siaResult.setError(true);
 		}
 		
 		siaResult.setNumPaginas(totalPages);
@@ -377,7 +433,7 @@ public class SiaProxy {
 			
 			for(Element option : options){
 				if(option.attr("value") != null && option.attr("value") != ""){
-					career = new Career(option.text(), option.attr("value"), sede);
+					career = new Career(option.text(), option.attr("value"), sede); //TODO remove the code from the name
 					careerDao.saveOrUpdate(career);
 				}
 			}

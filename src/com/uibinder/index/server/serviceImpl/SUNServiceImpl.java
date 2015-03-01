@@ -1,5 +1,6 @@
 package com.uibinder.index.server.serviceImpl;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,9 +13,14 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.uibinder.index.client.service.SUNService;
 import com.uibinder.index.client.widget.SubjectWidget;
 import com.uibinder.index.server.SiaProxy;
+import com.uibinder.index.server.dao.CareerDao;
+import com.uibinder.index.server.dao.PlanDao;
+import com.uibinder.index.server.dao.SubjectDao;
 import com.uibinder.index.shared.RandomPhrase;
 import com.uibinder.index.shared.SiaResultGroups;
 import com.uibinder.index.shared.SiaResultSubjects;
+import com.uibinder.index.shared.control.Career;
+import com.uibinder.index.shared.control.Plan;
 import com.uibinder.index.shared.control.Subject;
 
 /**
@@ -130,7 +136,40 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 	@Override
 	public SiaResultSubjects getSubjectFromSia(String nameOrCode, String typology,
 			String career, String scheduleCP, int page, int ammount, String sede) {
-		return SiaProxy.getSubjects(nameOrCode, typology, career, scheduleCP, page, ammount, sede);
+		return null;//SiaProxy.getSubjects(nameOrCode, typology, career, scheduleCP, page, ammount, sede);
+	}
+
+	@Override
+	public List<Career> getCareers(String sede) {
+		CareerDao careerDao = new CareerDao();
+		List<Career> listFromDb = careerDao.getCareersBySede(sede);
+		List<Career> listToReturn = new ArrayList<Career>();
+		for(Career c : listFromDb){
+			listToReturn.add(c);
+		}
+		return listToReturn;
+	}
+
+	@Override
+	public Plan getPlanDefault(String careerCode) {
+		PlanDao planDao = new PlanDao();
+		return (Plan) planDao.createPlanFromDefaultString(careerCode);
+	}
+
+	@Override
+	public String toTest() {
+		String stringToReturn = SiaProxy.getSubjects2Delete("2024838", "", "", "", 1, 3, "bog");
+		stringToReturn = stringToReturn + " holaaaaaaaaaaaaa " + SiaProxy.getSubjects2Delete("2024838", "", "", "", 1, 3, "bog");
+		stringToReturn = stringToReturn + " holaaaaaaaaaaaaa " + SiaProxy.getSubjects2Delete("2024838", "", "", "", 1, 3, "bog");
+		stringToReturn = stringToReturn + " holaaaaaaaaaaaaa " + SiaProxy.getSubjects2Delete("2024838", "", "", "", 1, 3, "bog");
+		stringToReturn = stringToReturn + " holaaaaaaaaaaaaa " + SiaProxy.getSubjects2Delete("2024838", "", "", "", 1, 3, "bog");
+		stringToReturn = stringToReturn + " holaaaaaaaaaaaaa " + SiaProxy.getSubjects2Delete("2024838", "", "", "", 1, 3, "bog");
+		stringToReturn = stringToReturn + " holaaaaaaaaaaaaa " + SiaProxy.getSubjects2Delete("2024838", "", "", "", 1, 3, "bog");
+		stringToReturn = stringToReturn + " holaaaaaaaaaaaaa " + SiaProxy.getSubjects2Delete("2024838", "", "", "", 1, 3, "bog");
+		stringToReturn = stringToReturn + " holaaaaaaaaaaaaa " + SiaProxy.getSubjects2Delete("2024838", "", "", "", 1, 3, "bog");
+		stringToReturn = stringToReturn + " holaaaaaaaaaaaaa " + SiaProxy.getSubjects2Delete("2024838", "", "", "", 1, 3, "bog");
+		
+		return stringToReturn;
 	}
 
 }

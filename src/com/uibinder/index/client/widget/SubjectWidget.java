@@ -7,10 +7,11 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.uibinder.index.shared.control.Subject;
+import com.uibinder.index.shared.control.SubjectValues;
 
 public class SubjectWidget extends FlowPanel {
 	
-	private static final String[] TYPENESS = {"N", "B", "C", "L", "P", "-"};
+	private static final String[] TYPENESS = {"N", "F", "D", "L", "P", "-"};
 	private static final String[] TYPENESS_STYLE = {"nivelacion", "fundamentacion", "disciplinar", "libreEleccion", "otra", "otra"};
 	private static final String[] TYPENESS_NAMES = {"Nivelación", "Fundamentación", "Disciplinar", "Libre Elección", "Otra", "Otra"};
 	
@@ -60,6 +61,21 @@ public class SubjectWidget extends FlowPanel {
 		createWidget();
 	}
 	
+	public SubjectWidget(String name, String code, int credits, double grade, boolean obligatoriness, String type){
+		this.name = name;
+		this.code = code;
+		this.credits = credits;
+		this.grade = grade;
+		this.approved = ((grade >= 3) ? true : false);
+		this.taken = true;
+		this.obligatoriness = obligatoriness;
+		this.type = getTypeFromString(type);
+		
+		setAttributes();
+		
+		createWidget();
+	}
+	
 	/**
 	 * Type = 0 Nivelación, 1 Fundamentación, 2 Disiplinar, 3 libre elección, 4 Añadir para posgrado
 	 * @param name
@@ -87,19 +103,24 @@ public class SubjectWidget extends FlowPanel {
 	 * TODO: fix the obligatoriness
 	 * @param s
 	 */
-	public SubjectWidget(Subject s){
+	public SubjectWidget(Subject s, SubjectValues sV){
 		this.name = s.getName();
 		this.code = s.getCode();
 		this.credits = s.getCredits();
 		this.grade = 0.0;
-		this.approved = false;
-		this.taken = false;
-		this.obligatoriness = true;
-		this.type = 0;
+		this.approved = true;
+		this.taken = sV.isTaken();
+		this.obligatoriness = sV.isObligatoriness();
+		this.type = getTypeFromString(sV.getTypology());
 		
 		setAttributes();
 		
 		createWidget();
+	}
+
+	private int getTypeFromString(String typology) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	/**

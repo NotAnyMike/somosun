@@ -80,6 +80,23 @@ public class CreateViewImpl extends Composite implements CreateView {
 			presenter.onContinueButtonClicked(academicHistory);
 		}
 	}
+	
+	@UiHandler("continueDefaultButton")
+	void onContinueDefaultButton(ClickEvent event){
+		if(presenter!=null){			
+			presenter.onContinueDefaultButtonClick(listBoxCreate.getSelectedValue());
+		}
+	}
+
+	@Override
+	public Button getContinueDefaultButton() {
+		return continueDefaultButton;
+	}
+
+	@Override
+	public String getCurrentDefaultCareerValue() {
+		return listBoxCreate.getSelectedValue();
+	}
 
 
 }

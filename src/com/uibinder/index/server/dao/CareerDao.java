@@ -26,7 +26,7 @@ public class CareerDao {
 		if(careerFromDB == null){
 			save(career);
 		}else{
-			if(careerFromDB.equal(career)==false && false){ //To mantain the info from our db, otherwise any info changed in the code will end up changing our db, BIG SECURITY RISK
+			if(careerFromDB.equals(career)==false && false){ //To mantain the info from our db, otherwise any info changed in the code will end up changing our db, BIG SECURITY RISK
 				careerFromDB.setName(career.getName());
 				careerFromDB.setSede(career.getSede());
 				Key<Career> key = Key.create(Career.class, careerFromDB.getId());
@@ -34,14 +34,6 @@ public class CareerDao {
 				save(careerFromDB);
 			}
 		}
-	}
-	
-	/**
-	 * This will return only the groups available for that career
-	 * @return
-	 */
-	public static List<Group> getGroupsFromSubjectByCareer(){
-		return null; //TODO
 	}
 	
 	public List<Career> getCareersBySede(String sede){

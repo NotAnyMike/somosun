@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyService;
+import com.uibinder.index.server.SiaProxy;
+import com.uibinder.index.shared.SiaResultSubjects;
 import com.uibinder.index.shared.control.Student;
 import com.uibinder.index.shared.control.Subject;
 
@@ -34,12 +36,25 @@ public class SubjectDao {
 		return null;
 	}
 	
+	/**
+	 * Sia Code makes reference to the special code that the sia has for the subject
+	 * @param siaCode
+	 * @return
+	 */
 	public Subject getSubjectBySiaCode(String siaCode) {
 		return (Subject) ofy().load().type(Subject.class).filter("siaCode", siaCode).first().now();
 	}
 	
 	public Subject getSubjectByCode(String code){
-		return (Subject) ofy().load().type(Subject.class).filter("code", code).first().now();
+		Subject subjectToReturn;
+		subjectToReturn = (Subject) ofy().load().type(Subject.class).filter("code", code).first().now();
+		if(subjectToReturn == null){
+			SiaResultSubjects siaResult = SiaProxy.getSubjects(code, "", "", "", 1, 2, "bog");
+			if(siaResult.getSubjectList().isEmpty() == false){
+				subjectToReturn = siaResult.getSubjectList().get(0);
+			}
+		}
+		return subjectToReturn;
 	}
 	
 	/**
@@ -55,7 +70,7 @@ public class SubjectDao {
 			subjectToReturn = getSubjectByCode(subject.getCode());
 			if(subjectToReturn==null){
 				subjectToReturn = subject;
-				addSubject(subject);
+				saveSubject(subject);
 			} else {
 				if(isSiaProxy && subjectToReturn.equals(subject)==false){ //takes care of the update just if the info is coming from the siaProxy class
 					subjectToReturn.setCode(subject.getCode());
@@ -81,12 +96,14 @@ public class SubjectDao {
 	
 	private void updateSubject(Subject s){
 		deleteSubject(s.getId());
-		addSubject(s);		
+		saveSubject(s);		
 	}
 	
-	private void addSubject(Subject subject){
+	private void saveSubject(Subject subject){
 		if(ofy().load().type(Subject.class).filter("code", subject.getCode()).first().now()==null){
-			ofy().save().entity(subject).now();
+			if(subject.getCode() != subject.getName() && subject.getName() != subject.getSiaCode()){
+				ofy().save().entity(subject).now();				
+			}
 		}
 	}
 

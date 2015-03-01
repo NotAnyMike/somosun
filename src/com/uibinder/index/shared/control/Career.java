@@ -9,11 +9,17 @@ import com.googlecode.objectify.annotation.Id;
 @Entity
 public class Career implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+	/**
+	 * 
+	 */
+	private final static long serialVersionUID = 1L;
 	@Id private Long id=null;
-	@Index private String name;
-	@Index private String code;
-    @Index private String sede;
+	@Index private String name = null;
+	@Index private String code = null;
+    @Index private String sede = null;
+    @Index private int foudationCredits = 0;
+    @Index private int freeElectionCredits = 0;
+    @Index private int disciplinaryCredits = 0;
     
     public Career(){
     }
@@ -35,7 +41,7 @@ public class Career implements Serializable {
         this.sede = sede;
     }
     
-    public boolean equal(Career career){
+    public boolean equals(Career career){
     	if(this.getCode() == career.getCode() && this.getSede() == career.getSede() && this.getName() == career.getName()){
     		return true;
     	}else{
@@ -72,6 +78,30 @@ public class Career implements Serializable {
     		sede = "bog";
     	}
 		this.sede = sede;
+	}
+
+	public int getFoudationCredits() {
+		return foudationCredits;
+	}
+
+	public void setFoudationCredits(int foudation) {
+		this.foudationCredits = foudation;
+	}
+
+	public int getFreeElectionCredits() {
+		return freeElectionCredits;
+	}
+
+	public void setFreeElectionCredits(int freeElection) {
+		this.freeElectionCredits = freeElection;
+	}
+
+	public int getDisciplinaryCredits() {
+		return disciplinaryCredits;
+	}
+
+	public void setDisciplinaryCredits(int disciplinaryCredits) {
+		this.disciplinaryCredits = disciplinaryCredits;
 	}
 
 }

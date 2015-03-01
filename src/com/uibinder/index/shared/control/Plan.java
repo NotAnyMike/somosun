@@ -25,12 +25,16 @@ public class Plan implements Serializable {
     private List<Semester> semesters = null;
     private double PAPA = 0;
     @Stringify(com.googlecode.objectify.stringifier.KeyStringifier.class)
-    private Map<Subject, SubjectValues> subMap = null;
+    private Map<SubjectValues, Subject> subjectMap = null;
 
     public Plan() {
     }
     
-    public String getCareer(){
+    public Career getCareer(){
+    	return career;
+    }
+    
+    public String getCareerCode(){
     	return career.getCode();
     }
 
@@ -126,16 +130,16 @@ public class Plan implements Serializable {
 		return PAPA;
 	}
 
-	public void setPAPA(double pAPA) {
-		PAPA = pAPA;
+	public void setPAPA(double papa) {
+		this.PAPA = papa;
 	}
 
-	public Map<Subject, SubjectValues> getSubMap() {
-		return subMap;
+	public Map<SubjectValues, Subject> getSubjectMap() {
+		return subjectMap;
 	}
 
-	public void setSubMap(Map<Subject, SubjectValues> subMap) {
-		this.subMap = subMap;
+	public void setSubjectMap(Map<SubjectValues, Subject> subMap) {
+		this.subjectMap = subMap;
 	}
 
 	public void setCareer(Career career) {

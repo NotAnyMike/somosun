@@ -15,6 +15,8 @@ import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.uibinder.index.client.event.AboutUsEvent;
 import com.uibinder.index.client.event.AboutUsEventHandler;
+import com.uibinder.index.client.event.ContinueDefaultCareerEvent;
+import com.uibinder.index.client.event.ContinueDefaultCareerEventHandler;
 import com.uibinder.index.client.event.GenerateAcademicHistoryFromStringEvent;
 import com.uibinder.index.client.event.GenerateAcademicHistoryFromStringEventHandler;
 import com.uibinder.index.client.presenter.AnnouncementPresenter;
@@ -38,8 +40,8 @@ import com.uibinder.index.client.view.TopBarViewImpl;
 import com.uibinder.index.client.view.CreateViewImpl;
 import com.uibinder.index.shared.LoginInfo;
 import com.uibinder.index.shared.RandomPhrase;
+import com.uibinder.index.shared.control.Plan;
 import com.uibinder.index.shared.control.Student;
-import com.uibinder.index.shared.control.UserSun;
 
 public class AppController implements Presenter, ValueChangeHandler<String> {
 
@@ -84,16 +86,51 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	private void bind(){
 		History.addValueChangeHandler(this);
 		
-		eventBus.addHandler(GenerateAcademicHistoryFromStringEvent.TYPE, 
-				new GenerateAcademicHistoryFromStringEventHandler(){
+		eventBus.addHandler(GenerateAcademicHistoryFromStringEvent.TYPE, new GenerateAcademicHistoryFromStringEventHandler(){
 					@Override
-					public void DoGenerateAcademicHistoryFromString(String academicHisotry){
+					public void doGenerateAcademicHistoryFromString(String academicHisotry){
 						generateAcademicHistoryFromString(academicHisotry);
 					}
 		});
+		
+		eventBus.addHandler(ContinueDefaultCareerEvent.TYPE, new ContinueDefaultCareerEventHandler(){
+			@Override
+			public void onContinueDefaultCareerButtonClicked(String careerCode) {
+				genereteDefaultPlan(careerCode);
+			}
+		});
 	}
 	
-	public void generateAcademicHistoryFromString(String academicHistory){
+	private void genereteDefaultPlan(String careerCode){
+		if(planView == null){
+			planView = new PlanViewImpl();
+			siaSummaryView = new SiaSummaryViewImpl();
+		}
+		if(planPresenter == null){
+			planPresenter = new PlanPresenter(rpcService, eventBus, planView, siaSummaryView);
+		}
+		
+		rpcService.getPlanDefault(careerCode, new AsyncCallback<Plan>(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("sorry we got a problem");
+			}
+
+			@Override
+			public void onSuccess(Plan result) {
+				Plan plan = result;
+				Window.alert(result.toString());
+				planPresenter.setPlan(plan);
+				History.newItem("plan");
+			}
+			
+		});
+		
+		Window.alert("hola nene, estoy solita ;)  ..." + careerCode);
+	}
+	
+	private void generateAcademicHistoryFromString(String academicHistory){
 		Window.alert("This should create an academic history from the string: " + academicHistory);
 		//TODO call the method cesar is working on to get the academic history
 	}
@@ -113,6 +150,18 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 
 	@Override
 	public void onValueChange(ValueChangeEvent<String> event) {
+		
+		/*rpcService.toTest(new AsyncCallback<String>(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("error");
+			}
+
+			@Override
+			public void onSuccess(String result) {
+				Window.alert(result);
+			}});*/
 		
 		token = event.getValue();
 		
