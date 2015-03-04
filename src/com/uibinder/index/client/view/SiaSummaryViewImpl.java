@@ -114,4 +114,51 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 		totalPerCentLabel.setText(x + "%");
 	}
 
+	public void setDefaultFreeElectionCredits(int defaultCredits) {
+		freeElectionCreditsNecessaryLabel.setText("" + defaultCredits);
+	}
+	
+	public void setDefaultLevelingCredits(int defaultCredits) {
+		levelingCreditsNecessaryLabel.setText("" + defaultCredits);
+	}
+	
+	public void setDefaultFoundationCredits(int defaultCredits) {
+		foundationCreditsNecessaryLabel.setText("" + defaultCredits);
+	}
+	
+	public void setDefaultDisciplinaryCredits(int defaultCredits) {
+		disciplinaryCreditsNecessaryLabel.setText("" + defaultCredits);
+	}
+	
+	public void setApprovedFreeElectionCredits(int defaultCredits) {
+		freeElectionCreditsApprovedLabel.setText("" + defaultCredits);
+	}
+	
+	public void setApprovedLevelingCredits(int defaultCredits) {
+		levelingCreditsApprovedLabel.setText("" + defaultCredits);
+	}
+	
+	public void setApprovedFoundationCredits(int defaultCredits) {
+		foundationCreditsApprovedLabel.setText("" + defaultCredits);
+	}
+	
+	public void setApprovedDisciplinaryCredits(int defaultCredits) {
+		disciplinaryCreditsApprovedLabel.setText("" + defaultCredits);
+	}
+	
+	public void setPercentageDisciplinaryCredits(int percentage) {
+		disciplinaryCreditsPerCentLabel.setText(percentage +"%");
+	}
+
+	public void setPercentageFreeElectionCredits(int percentage) {
+		freeElectionCreditsPerCentLabel.setText(percentage +"%");
+	}
+	
+	public void setPercentageFoundationCredits(int percentage) {
+		foundationCreditsPerCentLabel.setText(percentage +"%");
+	}
+	
+	public void setPercentageLevelingCredits(int percentage) {
+		levelingCreditsPerCentLabel.setText(percentage +"%");
+	}
 }

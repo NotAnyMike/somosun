@@ -556,7 +556,7 @@ public class PlanPresenterOld implements Presenter, PlanView.Presenter, SiaSumma
 			List<Semester> semesterListPlan = plan.getSemesters();
 			Career careerPlan = plan.getCareer();
 			Double papa = plan.getPAPA();
-			Map<SubjectValues, Subject> subjectMapPlan = plan.getSubjectMap();
+			Map<SubjectValues, Subject> subjectMapPlan = plan.getSubjectValuesAndSubjectMap();
 			
 			for(Semester semester : semesterListPlan){
 				for(SubjectValues subjectValues : semester.getSubjects()){

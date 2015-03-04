@@ -55,5 +55,11 @@ public class Semester implements Serializable {
 			subjectValuesList.remove(subjectValues);
 		}
 	}
+
+	public void addSubject(SubjectValues subjectValues) {
+		if(subjectValues != null){
+			subjectValuesList.add(subjectValues);
+		}
+	}
     
 }

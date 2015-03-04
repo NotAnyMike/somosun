@@ -70,6 +70,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	private HashMap<Semester, Integer> credits = new HashMap<Semester, Integer>();
 	private HashMap<SemesterWidget, SemesterDropController> controllersBySemester= new HashMap<SemesterWidget, SemesterDropController>();
 	private List<SemesterDropController> semesterDropControllerList = new ArrayList<SemesterDropController>();
+	
+	private int increasingSubjectValuesCounter = 0;
 
 	//Credits variables
 	/**
@@ -77,7 +79,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	 */
 	private int[] totalCredits = {0,0,0,0};
 	/**
-	 * Here variable[0] = total, [1] Approved, [2]Necessary to graduate, the [2] item is a default and it is a final value set a the begging.
+	 * Here variable[0] = total, [1] Approved, [2]Necessary to graduate, the [2] item is a default and it is a final value set a the beginning.
 	 */
 	private int[] foundationCredits = {0,0,0};
 	private int[] disciplinaryCredits = {0,0,0};
@@ -222,13 +224,14 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	 */
 	public void setPlan(Plan plan2) {
 		init();
-		this.plan = new Plan();
+		this.plan = plan2;
+		//this.plan = new Plan();
 		
-		setCareer(plan2.getCareer());
+		setCareer(plan.getCareer());
 		
-		if(plan2.getSemesters() != null) {
+		if(plan.getSemesters() != null) {
 			List<Semester> semesterListPlan = plan2.getSemesters();
-			Map<SubjectValues, Subject> subjectMapPlan = plan2.getSubjectMap();
+			Map<SubjectValues, Subject> subjectMapPlan = plan2.getValuesAndSubjectMap();
 			List<SubjectValues> subjectValuesListPlan = null;
 			
 			//List<Semester> semesterList2 = new ArrayList<Semester>();
@@ -246,7 +249,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	}
 
 	private void setCareer(Career career) {
-		this.plan.setCareer(career);
+		//this.plan.setCareer(career);
 		foundationCredits[2] = career.getFoudationCredits();
 		freeElectionCredits[2] = career.getFreeElectionCredits();
 		disciplinaryCredits[2] = career.getDisciplinaryCredits();
@@ -272,60 +275,66 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		
 	}
 	
-	private void createSubject(Subject subject2, SubjectValues subjectValues2, Semester semester2) {
+	private void createSubject(Subject subject, SubjectValues subjectValues, Semester semester) {
 		
-		subjectValuesList.add(subjectValues2);
-		valuesAndSubjectMap.put(subjectValues2, subject2);
+		//To control where and what subject is dropped
+		increasingSubjectValuesCounter++;
+		subjectValues.setSubjectValuesPublicId(subject.getCode() + increasingSubjectValuesCounter);
 		
-		SubjectWidget subjectWidget = new SubjectWidget(valuesAndSubjectMap.get(subjectValues2).getName(), valuesAndSubjectMap.get(subjectValues2).getCode(), valuesAndSubjectMap.get(subjectValues2).getCredits(), subjectValues2.getGrade(), subjectValues2.isObligatoriness(), subjectValues2.getTypology());
+		if(subjectValuesList.contains(subjectValues)==false) subjectValuesList.add(subjectValues);
+		if(valuesAndSubjectMap.containsKey(subjectValues)==false) valuesAndSubjectMap.put(subjectValues, subject); //although the condition here can be removed because it can will just override it
+		if(semester.getSubjects().contains(subjectValues) == false) semester.addSubject(subjectValues);
+		
+		SubjectWidget subjectWidget = new SubjectWidget(subject.getName(), subject.getCode(), subject.getCredits(), subjectValues.getGrade(), subjectValues.isObligatoriness(), subjectValues.getTypology(), subjectValues.getSubjectValuesPublicId());
 		subjectWidgetList.add(subjectWidget);
 		makeSubjectWidgetDraggable(subjectWidget);
-		semesterAndWidgetBiMap.get(semester2).addSubject(subjectWidget);
-		subjectValuesAndWidgetBiMap.put(subjectValues2, subjectWidget);
-		subjectValuesAndSemesterMap.put(subjectValues2, semester2);
+		semesterAndWidgetBiMap.get(semester).addSubject(subjectWidget);
+		subjectValuesAndWidgetBiMap.put(subjectValues, subjectWidget);
+		subjectValuesAndSemesterMap.put(subjectValues, semester);
 		
-		updateCredits(subjectValues2, semester2, true);
+		updateCredits(subjectValues, semester, true);
+		
 		
 	}
 
 	private void updateCredits(SubjectValues subjectValues2, Semester semester2, boolean toAdd) {
-		int creditsValue = valuesAndSubjectMap.get(subjectValues2).getCredits();
-		if(toAdd == true){
-			credits.put(semester2, credits.get(semester2) + creditsValue);
-			semesterAndWidgetBiMap.get(semester2).setCredits(credits.get(semester2)+creditsValue);
-			totalCredits[0] += creditsValue;
-			if(subjectValues2.isTaken()) totalCredits[2]+= creditsValue;
-			if(subjectValues2.getGrade()>=3) totalCredits[1] += creditsValue;
-		} else {
-			credits.put(semester2, credits.get(semester2) - creditsValue);
-			semesterAndWidgetBiMap.get(semester2).setCredits(credits.get(semester2)-creditsValue);
-			totalCredits[0] -= creditsValue;
-			if(subjectValues2.isTaken()) totalCredits[2] -= creditsValue;
-			if(subjectValues2.getGrade()>=3) totalCredits[1] -= creditsValue;
-		}
-		switch(subjectValues2.getTypology()){
-		case "N":
-		case "n":
-			updateCreditsLeveling(subjectValues2, semester2, toAdd);
-			break;
-		case "L":
-		case "l":
-			updateCreditsFreeElection(subjectValues2, semester2, toAdd);
-			break;
-		case "D":
-		case "d":
-			updateCreditsDisciplinary(subjectValues2, semester2, toAdd);
-			break;
-		case "F":
-		case "f":
-			updateCreditsFoundation(subjectValues2, semester2, toAdd);
-		}
-		updateSiaSummary();
-	}
-
-	private void updateSiaSummary() {
-		// TODO Auto-generated method stub
 		
+		if(valuesAndSubjectMap.containsKey(subjectValues2) == true){ 
+			int creditsValue = valuesAndSubjectMap.get(subjectValues2).getCredits();
+			
+			if(toAdd == true){
+				credits.put(semester2, credits.get(semester2) + creditsValue);
+				semesterAndWidgetBiMap.get(semester2).setCredits(credits.get(semester2));
+				totalCredits[0] += creditsValue;
+				if(subjectValues2.isTaken()) totalCredits[2]+= creditsValue;
+				if(subjectValues2.getGrade()>=3) totalCredits[1] += creditsValue;
+			} else {
+				credits.put(semester2, credits.get(semester2) - creditsValue);
+				semesterAndWidgetBiMap.get(semester2).setCredits(credits.get(semester2));
+				totalCredits[0] -= creditsValue;
+				if(subjectValues2.isTaken()) totalCredits[2] -= creditsValue;
+				if(subjectValues2.getGrade()>=3) totalCredits[1] -= creditsValue;
+			}
+			switch(subjectValues2.getTypology()){
+			case "N":
+			case "n":
+				updateCreditsLeveling(subjectValues2, semester2, toAdd);
+				break;
+			case "L":
+			case "l":
+				updateCreditsFreeElection(subjectValues2, semester2, toAdd);
+				break;
+			case "D":
+			case "d":
+				updateCreditsDisciplinary(subjectValues2, semester2, toAdd);
+				break;
+			case "F":
+			case "f":
+				updateCreditsFoundation(subjectValues2, semester2, toAdd);
+			}
+			updateSiaSummary();
+		
+		}
 	}
 
 	private void updateCreditsFoundation(SubjectValues subjectValues2, Semester semester2, boolean toAdd) {
@@ -390,19 +399,44 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	private void deleteSemester(Integer valueOfSemester) {
 		//deleting all subjects from a semester
 		Semester semester = semesterList.get(valueOfSemester);
-		for(int i=0; i<semester.getSubjects().size(); i++){
-			deleteSubject(semester.getSubjects().get(i));
-			i--;
+		SemesterWidget semesterW = semesterAndWidgetBiMap.get(semester);
+
+		while(semester.getSubjects().size() != 0){
+			deleteSubject(semester.getSubjects().get(0));
 		}
+		
+		if(semesterList.size()!=1){
+			dragController.unregisterDropController(controllersBySemester.get(semesterW));
+			semesterW.removeFromParent();
+			credits.remove(semester);
+			controllersBySemester.remove(semesterW);
+			if(semesterAndWidgetBiMap.containsKey(semester) == true) semesterAndWidgetBiMap.remove(semester);
+			if(semesterList.contains(semester) == true) semesterList.remove(semester);
+			semesterWidgetList.remove(semesterW);
+		}
+		
+		updateSemestersNumber();
 		
 	}
 
-	private void deleteSubject(SubjectValues subjectValues) {
+	/**
+	 * this method will be called to update the number of the semesters and to updated its number in the attribute of the widget
+	 */
+	private void updateSemestersNumber() {
+		for(Semester s : semesterList){
+			semesterAndWidgetBiMap.get(s).setSemester(semesterList.indexOf(s));
+		}
+	}
 
+	private void deleteSubject(SubjectValues subjectValues) {
+		
 		Subject subject = valuesAndSubjectMap.get(subjectValues);
+		SubjectWidget subjectW = subjectValuesAndWidgetBiMap.get(subjectValues);
 		Semester semester = subjectValuesAndSemesterMap.get(subjectValues);
 		
-		semester.deleteSubject(subjectValues);
+		updateCredits(subjectValues, semester, false);
+		
+		if(semester.getSubjects().contains(subjectValues) == true) semester.deleteSubject(subjectValues);
 		//semesterAndWidgetBiMap.get(semester2).addSubject(subjectWidget); the next line replaces this one
 		subjectValuesAndWidgetBiMap.get(subjectValues).removeFromParent();
 		//makeSubjectWidgetDraggable(subjectWidget); sobra
@@ -412,11 +446,104 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		/*if(valuesAndSubjectMap.containsValue(subject) == false){ //means that there is no other subjectValue for a x subject, so subject must be deleted too
 			subjectValuesList.remove(subject);			
 		}*/
+		
+		subjectWidgetList.remove(subjectW);
 		subjectValuesList.remove(subjectValues);
 		subjectValuesAndSemesterMap.remove(subjectValues);
 		subjectValuesAndWidgetBiMap.remove(subjectValues);
 		
-		updateCredits(subjectValues, semester, false);
+	}
+
+	/**
+	 * This mehtod gets triggered when a subject is by the user, dragged, it could be dragged in the same semester, but this method won't be triggered if it dropped it outside
+	 * 
+	 * @param code
+	 * @param semester
+	 */
+	public void subjectMoved(String publicId, SemesterWidget semester) {
+		SubjectValues subjectValues = getSubjectValuesByPublicIdFromList(publicId);
+		int numberSemesterTo = semesterList.indexOf(semesterAndWidgetBiMap.inverse().get(semester));
+		Semester semesterTo = semesterList.get(numberSemesterTo);
+		int numberSemesterFrom = semesterList.indexOf(subjectValuesAndSemesterMap.get(subjectValues));
+		Semester semesterFrom = semesterList.get(numberSemesterFrom);
+
+		if(subjectValues != null){
+			semesterFrom.deleteSubject(subjectValues);
+			semesterTo.addSubject(subjectValues);
+			subjectValuesAndSemesterMap.remove(subjectValues);
+			subjectValuesAndSemesterMap.put(subjectValues, semesterTo);
+			updateCredits(subjectValues, semesterFrom, false);
+			updateCredits(subjectValues, semesterTo, true);
+		}else{
+			Window.alert("sorry we had a problem");
+		}
 		
+	}
+	
+	/**
+	 * When this method is called it is STRICTLY necessary to have and IF statement when this method return null.
+	 * 
+	 * @param idSubjectValue
+	 * @return
+	 */
+	private SubjectValues getSubjectValuesByPublicIdFromList(String publicId){
+		SubjectValues subjectValuesToReturn = null;
+		for(SubjectValues subjectValues : subjectValuesList){
+			if(subjectValues.getSubjectValuesPublicId().equals(publicId)){
+				subjectValuesToReturn = subjectValues;
+			}
+		}
+		return subjectValuesToReturn;
+	}
+
+	private void updateSiaSummary() {
+		updateDefaultCredits();
+		updateApprovedCredits();
+		updatePercentageCredits();
+		updateSmallSummary();
+	}
+
+	private void updatePercentageCredits() {
+		if(disciplinaryCredits[2]!=0) siaSummaryView.setPercentageDisciplinaryCredits(disciplinaryCredits[1]/disciplinaryCredits[2]*100);
+		else siaSummaryView.setPercentageDisciplinaryCredits(0);
+		
+		if(foundationCredits[2]!=0) siaSummaryView.setPercentageFoundationCredits(foundationCredits[1]/foundationCredits[2]*100);
+		else siaSummaryView.setPercentageFoundationCredits(0);
+		
+		if(freeElectionCredits[2]!=0) siaSummaryView.setPercentageFreeElectionCredits(freeElectionCredits[1]/freeElectionCredits[2]*100);
+		else siaSummaryView.setPercentageFreeElectionCredits(0);
+		
+		if(levelingCredits[2]!=0) siaSummaryView.setPercentageLevelingCredits(levelingCredits[1]/levelingCredits[2]*100);
+		else siaSummaryView.setPercentageLevelingCredits(0);
+		
+		if(foundationCredits[2]+freeElectionCredits[2]+disciplinaryCredits[2]+levelingCredits[2]!=0){
+			siaSummaryView.setTotalPerCent((foundationCredits[1]+freeElectionCredits[1]+disciplinaryCredits[1]+levelingCredits[1])/(foundationCredits[2]+freeElectionCredits[2]+disciplinaryCredits[2]+levelingCredits[2])*100);
+			siaSummaryView.setAvance((foundationCredits[1]+freeElectionCredits[1]+disciplinaryCredits[1]+levelingCredits[1])/(foundationCredits[2]+freeElectionCredits[2]+disciplinaryCredits[2]+levelingCredits[2])*100);
+		} else {
+			siaSummaryView.setTotalPerCent(0);
+			siaSummaryView.setAvance(0);
+		}
+	}
+
+	private void updateSmallSummary() {
+		siaSummaryView.setGPA(plan.getPAPA());
+		siaSummaryView.setApprovedCredits(totalCredits[1]);
+		siaSummaryView.setAdditionalyCredits(0); //TODO 
+	}
+
+	private void updateApprovedCredits() {
+		siaSummaryView.setApprovedFoundationCredits(foundationCredits[1]);
+		siaSummaryView.setApprovedFreeElectionCredits(freeElectionCredits[1]);
+		siaSummaryView.setApprovedDisciplinaryCredits(disciplinaryCredits[1]);
+		siaSummaryView.setApprovedLevelingCredits(levelingCredits[1]);
+		siaSummaryView.setTotalApproved(foundationCredits[1]+freeElectionCredits[1]+disciplinaryCredits[1]+levelingCredits[1]);
+	}
+
+	private void updateDefaultCredits() {
+		siaSummaryView.setDefaultFoundationCredits(foundationCredits[2]);
+		siaSummaryView.setDefaultFreeElectionCredits(freeElectionCredits[2]);
+		siaSummaryView.setDefaultDisciplinaryCredits(disciplinaryCredits[2]);
+		siaSummaryView.setDefaultLevelingCredits(levelingCredits[2]);
+		siaSummaryView.setTotalNecessary(foundationCredits[2]+freeElectionCredits[2]+disciplinaryCredits[2]+levelingCredits[2]);
 	}
 }

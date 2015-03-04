@@ -1,6 +1,7 @@
 package com.uibinder.index.shared.control;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +26,7 @@ public class Plan implements Serializable {
     private List<Semester> semesters = null;
     private double PAPA = 0;
     @Stringify(com.googlecode.objectify.stringifier.KeyStringifier.class)
-    private Map<SubjectValues, Subject> subjectMap = null;
+    private HashMap<SubjectValues, Subject> valuesAndSubjectMap = null;
 
     public Plan() {
     }
@@ -134,16 +135,20 @@ public class Plan implements Serializable {
 		this.PAPA = papa;
 	}
 
-	public Map<SubjectValues, Subject> getSubjectMap() {
-		return subjectMap;
+	public HashMap<SubjectValues, Subject> getValuesAndSubjectMap() {
+		return valuesAndSubjectMap;
 	}
 
-	public void setSubjectMap(Map<SubjectValues, Subject> subMap) {
-		this.subjectMap = subMap;
+	public void setValuesAndSubjectMap(HashMap<SubjectValues, Subject> valuesAndSubjectMap) {
+		this.valuesAndSubjectMap = valuesAndSubjectMap;
 	}
 
 	public void setCareer(Career career) {
 		this.career = career;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
     /*public static void main(String[] args) {

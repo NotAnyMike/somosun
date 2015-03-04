@@ -17,6 +17,7 @@ public class SubjectWidget extends FlowPanel {
 	
 	private String name = null;
 	private String code = null;
+	private String publicId = null;
 	private boolean obligatoriness = false;
 	private int credits = 0;
 	private double grade = 0.0;
@@ -46,7 +47,7 @@ public class SubjectWidget extends FlowPanel {
 	 * @param obligatoriness
 	 * @param type
 	 */
-	public SubjectWidget(String name, String code, int credits, double grade, boolean obligatoriness, int type){
+	public SubjectWidget(String name, String code, int credits, double grade, boolean obligatoriness, int type, String publicId){
 		this.name = name;
 		this.code = code;
 		this.credits = credits;
@@ -55,13 +56,14 @@ public class SubjectWidget extends FlowPanel {
 		this.taken = true;
 		this.obligatoriness = obligatoriness;
 		this.type = type;
+		this.publicId = publicId;
 		
 		setAttributes();
 		
 		createWidget();
 	}
 	
-	public SubjectWidget(String name, String code, int credits, double grade, boolean obligatoriness, String type){
+	public SubjectWidget(String name, String code, int credits, double grade, boolean obligatoriness, String type, String publicId){
 		this.name = name;
 		this.code = code;
 		this.credits = credits;
@@ -70,6 +72,7 @@ public class SubjectWidget extends FlowPanel {
 		this.taken = true;
 		this.obligatoriness = obligatoriness;
 		this.type = getTypeFromString(type);
+		this.publicId = publicId;
 		
 		setAttributes();
 		
@@ -84,7 +87,7 @@ public class SubjectWidget extends FlowPanel {
 	 * @param obligatoriness
 	 * @param type
 	 */
-	public SubjectWidget(String name, String code, int credits, boolean obligatoriness, int type){
+	public SubjectWidget(String name, String code, int credits, boolean obligatoriness, int type, String publicId){
 		this.name = name;
 		this.code = code;
 		this.credits = credits;
@@ -93,6 +96,7 @@ public class SubjectWidget extends FlowPanel {
 		this.taken = false;
 		this.obligatoriness = obligatoriness;
 		this.type = type;
+		this.publicId = publicId;
 		
 		setAttributes();
 		
@@ -112,6 +116,7 @@ public class SubjectWidget extends FlowPanel {
 		this.taken = sV.isTaken();
 		this.obligatoriness = sV.isObligatoriness();
 		this.type = getTypeFromString(sV.getTypology());
+		this.publicId = sV.getSubjectValuesPublicId();
 		
 		setAttributes();
 		
@@ -130,6 +135,7 @@ public class SubjectWidget extends FlowPanel {
 		
 		this.getElement().setAttribute("name", name);
 		this.getElement().setAttribute("code", code);
+		this.getElement().setAttribute("publicId", "" + publicId);
 		this.getElement().setAttribute("credits", Integer.toString(credits));
 		this.getElement().setAttribute("grade", Double.toString(grade));
 		this.getElement().setAttribute("obligatoriness", Boolean.toString(obligatoriness));
@@ -293,5 +299,9 @@ public class SubjectWidget extends FlowPanel {
 	 */
 	public int getType(){
 		return type;
+	}
+
+	public String getPublicId() {
+		return publicId;
 	}
 }

@@ -54,7 +54,7 @@
               	<g:TextBox ui:field="textBoxCreate" styleName="{second.textboxCreate}"></g:TextBox>
               </p>
               <p><g:Button ui:field="continueButton" addStyleNames="{third.btn} {third.btn-default}">Continuar</g:Button>  <g:Button ui:field="resetButton" addStyleNames="{third.btn} {third.btn-default}">Reiniciar</g:Button></p>
-              <br/><p class="lead main-text" style="font-size:14px; text-align:left">*O solamente copia desde el título &quot;Mi historia académica/&quot; hasta comenzar las palabras &quot;Resumen académico&quot;</p>
+              <br/><p class="lead main-text" style="font-size:14px; text-align:left">*O solamente copia desde el título &quot;Mi historia académica&quot; hasta comenzar las palabras &quot;Resumen académico&quot;</p>
             </td>
         </tr>
       </table>

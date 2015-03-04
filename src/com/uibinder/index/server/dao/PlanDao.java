@@ -40,7 +40,7 @@ public class PlanDao {
 		List<SubjectValues> subjects = null;
 		Subject subject = null;
 		SubjectValues subjectValues = null;
-		Map<SubjectValues, Subject> subjectMap = new HashMap<SubjectValues, Subject>();;
+		HashMap<SubjectValues, Subject> subjectMap = new HashMap<SubjectValues, Subject>();;
 	
 		JSONObject jsonPlan = new JSONObject(CAREERS_DEFAULTS[getCareerIndex(careerCode)]);
 		JSONArray jsonSemesters = jsonPlan.getJSONArray("semesters");
@@ -77,7 +77,7 @@ public class PlanDao {
 			semester.setSubjects(subjects);
 			semesters.add(semester);
 		}
-		plan.setSubjectMap(subjectMap);
+		plan.setValuesAndSubjectMap(subjectMap);
 		plan.setSemesters(semesters);
 		
 		if(career != null)	plan.setCareer(career);

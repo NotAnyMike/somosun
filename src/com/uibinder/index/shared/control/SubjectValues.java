@@ -3,6 +3,7 @@ package com.uibinder.index.shared.control;
 import java.io.Serializable;
 
 import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Id;
 
@@ -16,6 +17,7 @@ public class SubjectValues implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id private Long id = null;
 	@Index private Group group = null;
+	@Ignore private String subjectValuesPublicId = null;
     private double grade = 0;
     private boolean taken = false;
     private String typology = null;
@@ -77,5 +79,13 @@ public class SubjectValues implements Serializable {
 
 	public void setTaken(boolean taken) {
 		this.taken = taken;
+	}
+
+	public String getSubjectValuesPublicId() {
+		return subjectValuesPublicId;
+	}
+
+	public void setSubjectValuesPublicId(String subjectValuesPublicId) {
+		this.subjectValuesPublicId = subjectValuesPublicId;
 	}
 }

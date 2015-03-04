@@ -21,12 +21,13 @@ public class SemesterDropController extends VerticalPanelDropController {
 	private void notifyPresenter(String code){
 		//TODO fill this thing up
 		//planPresenter.updateSemesters(code,semester);
+		planPresenter.subjectMoved(code, semester);
 	}
 	
 	@Override
 	public void onDrop(DragContext context){
 		super.onDrop(context);
-		notifyPresenter(context.selectedWidgets.get(0).getElement().getAttribute("code"));
+		notifyPresenter(context.selectedWidgets.get(0).getElement().getAttribute("publicId"));
 		//semester.addCredits(Integer.valueOf(context.selectedWidgets.get(0).getElement().getAttribute("credits")));
 	}
 	
