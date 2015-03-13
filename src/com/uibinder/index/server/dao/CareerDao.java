@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyService;
+import com.uibinder.index.server.SiaProxy;
 import com.uibinder.index.shared.control.Career;
 import com.uibinder.index.shared.control.Group;
 
@@ -26,7 +27,7 @@ public class CareerDao {
 		if(careerFromDB == null){
 			save(career);
 		}else{
-			if(careerFromDB.equals(career)==false && false){ //To mantain the info from our db, otherwise any info changed in the code will end up changing our db, BIG SECURITY RISK
+			if(careerFromDB.equals(career)==false && false){ // false: To mantain the info from our db, otherwise any info changed in the code will end up changing our db, BIG SECURITY RISK
 				careerFromDB.setName(career.getName());
 				careerFromDB.setSede(career.getSede());
 				Key<Career> key = Key.create(Career.class, careerFromDB.getId());
@@ -37,7 +38,12 @@ public class CareerDao {
 	}
 	
 	public List<Career> getCareersBySede(String sede){
-		return ofy().load().type(Career.class).filter("sede", sede).list();
+		List<Career> toReturn = ofy().load().type(Career.class).filter("sede", sede).list();
+		if(toReturn == null || toReturn.size()==0){
+			SiaProxy.updateCareersFromSia(sede);
+			toReturn = ofy().load().type(Career.class).filter("sede", sede).list();
+		}
+		return toReturn;
 	}
 	
 	/**

@@ -85,7 +85,7 @@ public class SiaProxy {
 		boolean error = false; //it makes reference to the error when we make to much calls too often, not the other normal and standard errors
 		int counter = 0;
 		
-		/*do{
+		do{
 			try {
 	            URL url = new URL(URLToConnect);
 	            HttpURLConnection request = ( HttpURLConnection ) url.openConnection();
@@ -123,13 +123,13 @@ public class SiaProxy {
 			if(error == true){
 				counter ++;
 				try {
-					Thread.sleep(0); //change to 1000
+					Thread.sleep(1000); //change to 1000
 				} catch (InterruptedException e) {
 					//do nothing
 				}
 			}
-		}while(error == true && counter < 0); //change to 5
-		*/
+		}while(error == true && counter < 5); //change to 5
+		
 		return respString;
 	}
 	 

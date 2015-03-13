@@ -127,7 +127,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 			
 		});
 		
-		Window.alert("hola nene, estoy solita ;)  ..." + careerCode);
+		Window.alert("career: " + careerCode);
 	}
 	
 	private void generateAcademicHistoryFromString(String academicHistory){

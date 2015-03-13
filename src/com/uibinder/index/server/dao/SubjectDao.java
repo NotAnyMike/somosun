@@ -52,6 +52,7 @@ public class SubjectDao {
 			SiaResultSubjects siaResult = SiaProxy.getSubjects(code, "", "", "", 1, 2, "bog");
 			if(siaResult.getSubjectList().isEmpty() == false){
 				subjectToReturn = siaResult.getSubjectList().get(0);
+				saveSubject(subjectToReturn);
 			}
 		}
 		return subjectToReturn;
