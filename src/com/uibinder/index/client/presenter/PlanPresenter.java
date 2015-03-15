@@ -1,7 +1,6 @@
 package com.uibinder.index.client.presenter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +17,7 @@ import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.uibinder.index.client.connection.ConnectionsController;
 import com.uibinder.index.client.dnd.PickUpDragController;
 import com.uibinder.index.client.dnd.SemesterDropController;
 import com.uibinder.index.client.service.SUNServiceAsync;
@@ -28,6 +28,7 @@ import com.uibinder.index.client.view.SiaSummaryView;
 import com.uibinder.index.client.view.SiaSummaryViewImpl;
 import com.uibinder.index.client.view.WarningDeleteSubjectView;
 import com.uibinder.index.client.view.WarningDeleteSubjectViewImpl;
+import com.uibinder.index.client.widget.LineWidget;
 import com.uibinder.index.client.widget.PlanWidget;
 import com.uibinder.index.client.widget.SemesterWidget;
 import com.uibinder.index.client.widget.SubjectWidget;
@@ -93,6 +94,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	private PlanWidget planWidget;
 	//private SiaSummary siaSummary;
 	
+	private ConnectionsController connectionsController;
+
 	private VerticalPanel subContainer = new VerticalPanel();
 	
 	//Dnd Stuff
@@ -120,6 +123,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		searchSubjectView.setPresenter(this);
 		searchSubjectView.fill();
 		this.siaSummaryView = siaSummaryView; 
+		connectionsController = new ConnectionsController();
 		
 	}
 	
@@ -140,6 +144,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		searchSubjectView.setPresenter(this);
 		searchSubjectView.fill();
 		this.siaSummaryView = siaSummaryView;
+		connectionsController = new ConnectionsController();
 		
 		setPlan(plan);		
 	}
@@ -161,6 +166,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		searchSubjectView.setPresenter(this);
 		searchSubjectView.fill();
 		this.siaSummaryView = siaSummaryView;
+		connectionsController = new ConnectionsController();
 		
 		setPlan(plan);
 		
@@ -199,6 +205,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		warningDeleteSubjectView.hideIt();
 		searchSubjectView.hideIt();
 		container.add(subContainer);
+		
+		connectionsController.setContainer(subContainer);
 		
 	}
 	
@@ -293,8 +301,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		subjectValuesAndSemesterMap.put(subjectValues, semester);
 		
 		updateCredits(subjectValues, semester, true);
-		
-		
+	
 	}
 
 	private void updateCredits(SubjectValues subjectValues2, Semester semester2, boolean toAdd) {
