@@ -50,7 +50,7 @@ public class LineWidget extends SimplePanel{
 		update();
 	}
 	
-	public void update() {
+	private void update() {
 		width = Math.pow(Math.pow(x1-x2,2)+Math.pow(y1-y2,2),0.5);
 		angle = Math.atan2(y2-y1, x2-x1);
 		top = (y2-width/2*(Math.sin(angle)));

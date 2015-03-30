@@ -123,7 +123,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		searchSubjectView.setPresenter(this);
 		searchSubjectView.fill();
 		this.siaSummaryView = siaSummaryView; 
-		connectionsController = new ConnectionsController();
+		connectionsController = new ConnectionsController(this);
 		
 	}
 	
@@ -144,7 +144,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		searchSubjectView.setPresenter(this);
 		searchSubjectView.fill();
 		this.siaSummaryView = siaSummaryView;
-		connectionsController = new ConnectionsController();
+		connectionsController = new ConnectionsController(this);
 		
 		setPlan(plan);		
 	}
@@ -166,7 +166,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		searchSubjectView.setPresenter(this);
 		searchSubjectView.fill();
 		this.siaSummaryView = siaSummaryView;
-		connectionsController = new ConnectionsController();
+		connectionsController = new ConnectionsController(this);
 		
 		setPlan(plan);
 		
@@ -424,6 +424,17 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		
 		updateSemestersNumber();
 		
+		connectionsController.addConnection(subjectWidgetList.get(6), subjectWidgetList.get(0), "pre");
+		connectionsController.addConnection(subjectWidgetList.get(0), subjectWidgetList.get(8), "pre");
+		connectionsController.addConnection(subjectWidgetList.get(0), subjectWidgetList.get(7), "pre");
+		connectionsController.addConnection(subjectWidgetList.get(0), subjectWidgetList.get(10), "pre");
+		connectionsController.addConnection(subjectWidgetList.get(11), subjectWidgetList.get(10), "pre");
+		connectionsController.addConnection(subjectWidgetList.get(0), subjectWidgetList.get(1), "co");
+		connectionsController.addConnection(subjectWidgetList.get(0), subjectWidgetList.get(2), "co");
+		connectionsController.addConnection(subjectWidgetList.get(0), subjectWidgetList.get(3), "co");
+		connectionsController.addConnection(subjectWidgetList.get(4), subjectWidgetList.get(2), "co");
+		connectionsController.addConnection(subjectWidgetList.get(4), subjectWidgetList.get(8), "co");
+		
 	}
 
 	/**
@@ -552,5 +563,9 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		siaSummaryView.setDefaultDisciplinaryCredits(disciplinaryCredits[2]);
 		siaSummaryView.setDefaultLevelingCredits(levelingCredits[2]);
 		siaSummaryView.setTotalNecessary(foundationCredits[2]+freeElectionCredits[2]+disciplinaryCredits[2]+levelingCredits[2]);
+	}
+	
+	public void addLine(LineWidget l){
+		subContainer.add(l);
 	}
 }

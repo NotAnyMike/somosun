@@ -8,24 +8,25 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.uibinder.index.client.presenter.PlanPresenter;
 import com.uibinder.index.client.widget.LineWidget;
 import com.uibinder.index.client.widget.SubjectWidget;
 
 public class SuperConnectionsController {
 
+	protected PlanPresenter presenter;
 	protected List<SubjectWidget> subjectWidgetsList;
 	protected List<LineWidget> lines;
 	protected Multimap<SubjectWidget, SubjectWidget> connections;
 	protected Multimap<SubjectWidget, LineWidget> subjectAndLineMultimap;
-	protected VerticalPanel container;
-	protected static int HEIGHT = 0;
+	protected static int HEIGHT = 132;
 	
-	public SuperConnectionsController(VerticalPanel container){
-		this.container = container;
+	public SuperConnectionsController(PlanPresenter presenter){
 		connections = HashMultimap.create();
 		lines =  new ArrayList<LineWidget>();
 		subjectWidgetsList = new ArrayList<SubjectWidget>();
 		subjectAndLineMultimap = HashMultimap.create();
+		this.presenter = presenter;
 	}
 
 	public void update(){
@@ -109,15 +110,18 @@ public class SuperConnectionsController {
 		}
 	}
 	
-	protected void createLine(int x1, int y1, int x2, int y2){
-		LineWidget line = new LineWidget(0,0,500,500);
+	protected void createLine(int x1, int y1, int x2, int y2, SubjectWidget from, SubjectWidget to){
+		LineWidget line = new LineWidget(x1,y1,x2,y2);
 		lines.add(line);
-		container.add(line);
+		subjectAndLineMultimap.put(from, line);
+		subjectAndLineMultimap.put(to, line);
+		presenter.addLine(line);
 	}
 	
 	protected void addConnection(SubjectWidget from, SubjectWidget to){
 		//TODO: see if it is using createConnections from the super class or the inherited class, it must use the inherited class's method
-		subjectWidgetsList.add(from);
-		subjectWidgetsList.add(to);
+		if(subjectWidgetsList.contains(from) == false) subjectWidgetsList.add(from);
+		if(subjectWidgetsList.contains(to) == false) subjectWidgetsList.add(to);
+		connections.put(from, to);
 	}
 }
