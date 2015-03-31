@@ -8,16 +8,15 @@ import com.uibinder.index.client.widget.SubjectWidget;
 public class PosConnectionsController extends SuperConnectionsController{
 	
 	//To save the pos-connections
-	private Multimap<SubjectWidget, SubjectWidget> connectionsPos;
+	
 
 	public PosConnectionsController(PlanPresenter p) {
 		super(p);
-		connectionsPos = HashMultimap.create();
 	}
 	
 	public void createConnections(SubjectWidget from, SubjectWidget to){
 		double h1 = (((connections.get(from).size()-1) & 1) == 1 ? -1 : 1)*(connections.get(from).size()-1+((((connections.get(from).size()-1) & 1)==1) ? 1 : 0));
-		double h2 = (((connectionsPos.get(to).size()-1) & 1) == 1 ? -1 : 1)*(connectionsPos.get(to).size()-1+((((connectionsPos.get(to).size()-1) & 1)==1) ? 1 : 0));
+		double h2 = (((connections2.get(to).size()-1) & 1) == 1 ? -1 : 1)*(connections2.get(to).size()-1+((((connections2.get(to).size()-1) & 1)==1) ? 1 : 0));
 		
 		Double y1 = from.getAbsoluteTop() + (from.getOffsetHeight() + h1*10)/2; 
 		Double y2 = to.getAbsoluteTop() + (to.getOffsetHeight() + h2*10)/2;
@@ -46,7 +45,6 @@ public class PosConnectionsController extends SuperConnectionsController{
 	public void addConnection(SubjectWidget from, SubjectWidget to){
 		if(connections.containsEntry(from, to) == false && connections.containsEntry(to, from)==false){ //TODO check if the two conditions are the same
 			super.addConnection(from, to);
-			connectionsPos.put(to, from);
 			createConnections(from, to);			
 		}
 	}

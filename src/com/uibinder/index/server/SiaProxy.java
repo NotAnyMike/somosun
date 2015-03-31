@@ -2,11 +2,13 @@ package com.uibinder.index.server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +46,9 @@ import com.uibinder.index.shared.control.Teacher;
  */
 public class SiaProxy {
 
+	public final static String SIA_SUBJECT_BOG_HTML = "http://www.sia.unal.edu.co/academia/catalogo-programas/info-asignatura.sdo";
+	public final static String SIA_PLAN_BOG_HTML = "http://www.sia.unal.edu.co/academia/catalogo-programas/semaforo.do";
+	
 	public final static String SIA_URL_AMA_RPC = "http://unsia.unal.edu.co/buscador/JSON-RPC";
 	public final static String SIA_URL_BOG_RPC = "http://www.sia.unal.edu.co/buscador/JSON-RPC";
 	public final static String SIA_URL_CAR_RPC = "http://www.sia.unal.edu.co/buscador/JSON-RPC";
@@ -60,6 +65,7 @@ public class SiaProxy {
 	public final static String SIA_URL_ORI_BUSCADOR = "http://www.sia.unal.edu.co/buscador/service/action.pub";
 	public final static String SIA_URL_PAL_BUSCADOR = "http://www.sia.unal.edu.co/buscador/service/action.pub";
 	public final static String SIA_URL_TUM_BUSCADOR = "http://www.sia.unal.edu.co/buscador/service/action.pub";
+	
 	public final static String VALOR_NIVELACADEMICO_TIPOLOGIA_PRE = "PRE";
 	public final static String VALOR_NIVELACADEMICO_TIPOLOGIA_POS = "POS";
 	public final static String VALOR_NIVELACADEMICO_PLANESTUDIO_PRE = "PRE";
@@ -189,7 +195,7 @@ public class SiaProxy {
 		return siaResult;
 	}
 	
-public static String getSubjects2Delete(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede){
+	public static String getSubjects2Delete(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede){
 		
 		sede = confirmSede(sede);
 		
@@ -207,7 +213,6 @@ public static String getSubjects2Delete(String nameOrCode, String typology, Stri
 
 		return respString;
 	}
-	
 	
 	public static SiaResultGroups getGroupsFromSubject(String subjectSiaCode, String sede){
 		SubjectDao subjectDao = new SubjectDao();
@@ -441,6 +446,97 @@ public static String getSubjects2Delete(String nameOrCode, String typology, Stri
 			//DO nothing
 		}
 	}
+	
+	/**
+	 * This method only works with undergraduate courses, and it is build to find only one course at the time, if you need
+	 * to find more than one subject (all subjects from a career -mandatory ones) use GetPrerequisitesFromSia(String career) 
+	 * but that method would take way to long.
+	 * 
+	 * TODO: make it works with graduated courses
+	 * TODO: create the getPrerequisitesFromSia(String career) method
+	 * 
+	 * @param code
+	 * @param career
+	 */
+	public static String getPrerequisitesFromSia(String code, String career){
+		
+		List<String> prerequisites = new ArrayList<String>();
+
+		String htmlString = "";
+		try {
+			htmlString = getUrlSource(SIA_PLAN_BOG_HTML + "?plan=" + career + "&tipo=PRE&tipoVista=semaforo&nodo=4&parametro=on");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		if(htmlString.contains(code) == true){			
+			Document doc = Jsoup.parse(htmlString);
+			Elements subjects = doc.getElementsContainingOwnText(code);
+			for(Element e : subjects){
+				e = e.parent().parent().parent();
+				if(e.toString().contains("pre-requisitos") == true && e.toString().contains("sin prerequisitos")==false){
+					Elements requisites = e.getElementsByClass("popup-int").first().getElementsByTag("p");
+					for(Element requisite : requisites){
+						int position = requisite.text().indexOf("-");
+						if(position != -1) {
+							prerequisites.add(requisite.text().substring(0, position-1));	
+						}
+					}
+				}
+				subjects.remove(e);
+			}
+			if(prerequisites.isEmpty() == false){
+				//connect to see if it's co or pre-requisite
+				htmlString = "";
+				try {
+					htmlString = getUrlSource(SIA_SUBJECT_BOG_HTML + "?plan=" + career + "&asignatura=" + code);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+				if(htmlString.contains("prerrequisitos")){
+					doc = Jsoup.parse(htmlString);
+					Element completeRequisites = doc.getElementById("prerrequisitos");
+					if(completeRequisites.toString().contains("E | asignatura prerrequisito o de") == true){
+						Elements listRequisites = completeRequisites.getElementsByClass("separa-linea");
+						for(Element requisite : listRequisites){
+							Element requisiteName = requisite.getElementsByClass("zona-dato").first();
+							Element requisiteEsp = requisite.getElementsByClass("zona-dato").get(1);//Esp ecification
+							if(requisiteName.text().contains("[") == true){
+								String codeRequisiteName = requisiteName.text();
+								codeRequisiteName = codeRequisiteName.substring(codeRequisiteName.indexOf("[")+1, codeRequisiteName.indexOf("]"));
+								if(prerequisites.contains(codeRequisiteName)==true){
+									if(requisiteEsp.text().contains("E | asignatura prerrequisito o de") == true){
+										//co requisito
+										prerequisites.add(codeRequisiteName + "E");
+									}//else it is a prerequisite 
+								}
+							}
+						}
+					}else{
+						//all of them are prerequisites
+					}
+				}
+			}
+		}
+		return prerequisites.toString();
+	}
+	
+	private static String getUrlSource(String url) throws IOException {
+        URL urlString = new URL(url);
+        URLConnection yc = urlString.openConnection();
+        BufferedReader in = new BufferedReader(new InputStreamReader(
+                yc.getInputStream(), "UTF-8"));
+        String inputLine;
+        StringBuilder a = new StringBuilder();
+        while ((inputLine = in.readLine()) != null)
+            a.append(inputLine);
+        in.close();
+
+        return a.toString();
+    }
 	
 	private static String confirmSede(String sede){
 		if(sede != "ama" && sede!= "bog" && sede!= "car" && sede!= "man" && sede!= "med" && sede!= "ori" && sede!= "pal" && sede!= "tum"){

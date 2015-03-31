@@ -158,16 +158,8 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 
 	@Override
 	public String toTest() {
-		String stringToReturn = SiaProxy.getSubjects2Delete("2024838", "", "", "", 1, 3, "bog");
-		stringToReturn = stringToReturn + " holaaaaaaaaaaaaa " + SiaProxy.getSubjects2Delete("2024838", "", "", "", 1, 3, "bog");
-		stringToReturn = stringToReturn + " holaaaaaaaaaaaaa " + SiaProxy.getSubjects2Delete("2024838", "", "", "", 1, 3, "bog");
-		stringToReturn = stringToReturn + " holaaaaaaaaaaaaa " + SiaProxy.getSubjects2Delete("2024838", "", "", "", 1, 3, "bog");
-		stringToReturn = stringToReturn + " holaaaaaaaaaaaaa " + SiaProxy.getSubjects2Delete("2024838", "", "", "", 1, 3, "bog");
-		stringToReturn = stringToReturn + " holaaaaaaaaaaaaa " + SiaProxy.getSubjects2Delete("2024838", "", "", "", 1, 3, "bog");
-		stringToReturn = stringToReturn + " holaaaaaaaaaaaaa " + SiaProxy.getSubjects2Delete("2024838", "", "", "", 1, 3, "bog");
-		stringToReturn = stringToReturn + " holaaaaaaaaaaaaa " + SiaProxy.getSubjects2Delete("2024838", "", "", "", 1, 3, "bog");
-		stringToReturn = stringToReturn + " holaaaaaaaaaaaaa " + SiaProxy.getSubjects2Delete("2024838", "", "", "", 1, 3, "bog");
-		stringToReturn = stringToReturn + " holaaaaaaaaaaaaa " + SiaProxy.getSubjects2Delete("2024838", "", "", "", 1, 3, "bog");
+		//String stringToReturn = SiaProxy.getPrerequisitesFromSia("2016016", "2522"); //metodología 2
+		String stringToReturn = SiaProxy.getPrerequisitesFromSia("2016018", "2522"); //micro 2
 		
 		return stringToReturn;
 	}

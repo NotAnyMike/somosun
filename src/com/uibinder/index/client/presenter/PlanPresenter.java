@@ -435,6 +435,22 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		connectionsController.addConnection(subjectWidgetList.get(4), subjectWidgetList.get(2), "co");
 		connectionsController.addConnection(subjectWidgetList.get(4), subjectWidgetList.get(8), "co");
 		
+		rpcService.toTest(new AsyncCallback<String>(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void onSuccess(String result) {
+				// TODO Auto-generated method stub
+				Window.alert(result);
+			}
+			
+		});
+		
 	}
 
 	/**

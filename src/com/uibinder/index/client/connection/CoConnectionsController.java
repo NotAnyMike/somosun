@@ -15,7 +15,6 @@ public class CoConnectionsController extends SuperConnectionsController{
 	public void addConnection(SubjectWidget from, SubjectWidget to){
 		if(connections.containsEntry(from, to) == false && connections.containsEntry(to, from)==false){ //TODO check if the two conditions are the same
 			super.addConnection(from, to);
-			super.addConnection(to, from);
 			createConnections(from, to);			
 		}
 	}

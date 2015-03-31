@@ -18,11 +18,13 @@ public class SuperConnectionsController {
 	protected List<SubjectWidget> subjectWidgetsList;
 	protected List<LineWidget> lines;
 	protected Multimap<SubjectWidget, SubjectWidget> connections;
+	protected Multimap<SubjectWidget, SubjectWidget> connections2;
 	protected Multimap<SubjectWidget, LineWidget> subjectAndLineMultimap;
 	protected static int HEIGHT = 132;
 	
 	public SuperConnectionsController(PlanPresenter presenter){
 		connections = HashMultimap.create();
+		connections2 = HashMultimap.create();
 		lines =  new ArrayList<LineWidget>();
 		subjectWidgetsList = new ArrayList<SubjectWidget>();
 		subjectAndLineMultimap = HashMultimap.create();
@@ -123,5 +125,6 @@ public class SuperConnectionsController {
 		if(subjectWidgetsList.contains(from) == false) subjectWidgetsList.add(from);
 		if(subjectWidgetsList.contains(to) == false) subjectWidgetsList.add(to);
 		connections.put(from, to);
+		connections.put(to, from);
 	}
 }
