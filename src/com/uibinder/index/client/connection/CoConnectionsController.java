@@ -11,43 +11,42 @@ public class CoConnectionsController extends SuperConnectionsController{
 		super(p);
 	}
 	
-	@Override
 	public void addConnection(SubjectWidget from, SubjectWidget to){
-		if(connections.containsEntry(from, to) == false && connections.containsEntry(to, from)==false){ //TODO check if the two conditions are the same
-			super.addConnection(from, to);
-			createConnections(from, to);			
+		Connection c = super.createConnectionObject(from, to);	
+		if(c != null){
+			createConnections(c);						
 		}
 	}
 
-	private void createConnections(SubjectWidget from, SubjectWidget to) {
+	private void createConnections(Connection c) {
 		
-		double h1 = (((connections.get(from).size()-1 & 1) == 1) ? -1 : 1)*(connections.get(from).size()-1+(((connections.get(from).size()-1)==1) ? 1 : 0));
-		double h2 = (((connections.get(to).size()-1 & 1) == 1) ? -1 : 1)*(connections.get(to).size()-1+(((connections.get(to).size()-1)==1) ? 1 : 0));
+		double h1 = (((connections.get(c.getFrom()).size()-1 & 1) == 1) ? -1 : 1)*(connections.get(c.getFrom()).size()-1+(((connections.get(c.getFrom()).size()-1)==1) ? 1 : 0));
+		double h2 = (((connections.get(c.getTo()).size()-1 & 1) == 1) ? -1 : 1)*(connections.get(c.getTo()).size()-1+(((connections.get(c.getTo()).size()-1)==1) ? 1 : 0));
 		
-		Double x1 = from.getAbsoluteLeft() + (from.getOffsetWidth() + 10*h1)/2;
-		Double x2 = to.getAbsoluteLeft() + (to.getOffsetWidth() + 10*h2)/2;
+		Double x1 = c.getFrom().getAbsoluteLeft() + (c.getFrom().getOffsetWidth() + 10*h1)/2;
+		Double x2 = c.getTo().getAbsoluteLeft() + (c.getTo().getOffsetWidth() + 10*h2)/2;
 		
-		if(from.getAbsoluteLeft() == to.getAbsoluteLeft()){
+		if(c.getFrom().getAbsoluteLeft() == c.getTo().getAbsoluteLeft()){
 			//One line
-			if(from.getAbsoluteTop() < to.getAbsoluteTop()){
+			if(c.getFrom().getAbsoluteTop() < c.getTo().getAbsoluteTop()){
 				//goes down
-				createLine(x1.intValue(), from.getAbsoluteTop() + from.getOffsetHeight(), x2.intValue(), to.getAbsoluteTop(), from, to);
+				createLine(x1.intValue(), c.getFrom().getAbsoluteTop() + c.getFrom().getOffsetHeight(), x2.intValue(), c.getTo().getAbsoluteTop(), c);
 			}else{
 				//goes up
-				createLine(x1.intValue(), from.getAbsoluteTop(), x2.intValue(), to.getAbsoluteTop()+to.getOffsetHeight(), from, to);
+				createLine(x1.intValue(), c.getFrom().getAbsoluteTop(), x2.intValue(), c.getTo().getAbsoluteTop()+c.getTo().getOffsetHeight(), c);
 			}
 		}else{
 			//three lines
-			if(from.getAbsoluteTop() < to.getAbsoluteTop()){
+			if(c.getFrom().getAbsoluteTop() < c.getTo().getAbsoluteTop()){
 				//goes down
-				createLine(x1.intValue(), from.getAbsoluteTop()+from.getOffsetHeight(), x1.intValue(), from.getAbsoluteTop()+from.getOffsetHeight()+10,from, to);
-				createLine(x1.intValue(), from.getAbsoluteTop()+from.getOffsetHeight()+10, x2.intValue(), to.getAbsoluteTop()-10,from, to);
-				createLine(x2.intValue(), to.getAbsoluteTop()-10, x2.intValue(), to.getAbsoluteTop(),from, to);
+				createLine(x1.intValue(), c.getFrom().getAbsoluteTop()+c.getFrom().getOffsetHeight(), x1.intValue(), c.getFrom().getAbsoluteTop()+c.getFrom().getOffsetHeight()+10,c);
+				createLine(x1.intValue(), c.getFrom().getAbsoluteTop()+c.getFrom().getOffsetHeight()+10, x2.intValue(), c.getTo().getAbsoluteTop()-10,c);
+				createLine(x2.intValue(), c.getTo().getAbsoluteTop()-10, x2.intValue(), c.getTo().getAbsoluteTop(),c);
 			} else {
 				//goes up
-				createLine(x1.intValue(), from.getAbsoluteTop(), x1.intValue(), from.getAbsoluteTop()-10,from, to);
-				createLine(x1.intValue(), from.getAbsoluteTop()-10, x2.intValue(), to.getAbsoluteTop()+to.getOffsetHeight()+10,from, to);
-				createLine(x2.intValue(), to.getAbsoluteTop()+to.getOffsetHeight()+10, x2.intValue(), to.getAbsoluteTop()+to.getOffsetHeight(),from, to);
+				createLine(x1.intValue(), c.getFrom().getAbsoluteTop(), x1.intValue(), c.getFrom().getAbsoluteTop()-10,c);
+				createLine(x1.intValue(), c.getFrom().getAbsoluteTop()-10, x2.intValue(), c.getTo().getAbsoluteTop()+c.getTo().getOffsetHeight()+10,c);
+				createLine(x2.intValue(), c.getTo().getAbsoluteTop()+c.getTo().getOffsetHeight()+10, x2.intValue(), c.getTo().getAbsoluteTop()+c.getTo().getOffsetHeight(),c);
 			}
 		}
 	}

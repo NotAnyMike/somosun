@@ -3,13 +3,17 @@ package com.uibinder.index.client.widget;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.uibinder.index.shared.control.Subject;
 import com.uibinder.index.shared.control.SubjectValues;
 
-public class SubjectWidget extends FlowPanel {
+public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 	
 	private static final String[] TYPENESS = {"N", "F", "D", "L", "P", "-"};
 	private static final String[] TYPENESS_STYLE = {"nivelacion", "fundamentacion", "disciplinar", "libreEleccion", "otra", "otra"};
@@ -304,4 +308,11 @@ public class SubjectWidget extends FlowPanel {
 	public String getPublicId() {
 		return publicId;
 	}
+
+	@Override
+	public HandlerRegistration addClickHandler(
+	        ClickHandler handler)
+	    {
+	        return addDomHandler(handler, ClickEvent.getType());
+	    }
 }

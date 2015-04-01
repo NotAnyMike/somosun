@@ -14,38 +14,37 @@ public class PosConnectionsController extends SuperConnectionsController{
 		super(p);
 	}
 	
-	public void createConnections(SubjectWidget from, SubjectWidget to){
-		double h1 = (((connections.get(from).size()-1) & 1) == 1 ? -1 : 1)*(connections.get(from).size()-1+((((connections.get(from).size()-1) & 1)==1) ? 1 : 0));
-		double h2 = (((connections2.get(to).size()-1) & 1) == 1 ? -1 : 1)*(connections2.get(to).size()-1+((((connections2.get(to).size()-1) & 1)==1) ? 1 : 0));
-		
-		Double y1 = from.getAbsoluteTop() + (from.getOffsetHeight() + h1*10)/2; 
-		Double y2 = to.getAbsoluteTop() + (to.getOffsetHeight() + h2*10)/2;
-		//If true means that they are at the same level
-		if(from.getAbsoluteTop() == to.getAbsoluteTop()){
-			//if true means that they are in the same or more advanced semester
-			if(from.getAbsoluteLeft()<=to.getAbsoluteLeft()){
-				//create one line
-				createLine(from.getElement().getAbsoluteLeft() + from.getOffsetWidth(), y1.intValue(), to.getAbsoluteLeft(), y2.intValue(),from, to);
-			}else{
-				//create four lines
-				createLine(from.getElement().getAbsoluteLeft() + from.getOffsetWidth(),y1.intValue(),from.getElement().getAbsoluteLeft() + from.getOffsetWidth()+10,y1.intValue(), from, to);
-				createLine(from.getElement().getAbsoluteLeft() + from.getOffsetWidth()+10,y1.intValue(),from.getElement().getAbsoluteLeft() + from.getOffsetWidth()+10,y1.intValue()+from.getElement().getClientHeight()/2+10, from, to);
-				createLine(from.getElement().getAbsoluteLeft() + from.getOffsetWidth()+10,y1.intValue()+from.getElement().getClientHeight()/2+10,to.getAbsoluteLeft()-10, y2.intValue(), from, to);
-				createLine(to.getAbsoluteLeft()-10, y2.intValue(),to.getAbsoluteLeft(), y2.intValue(), from, to);
-			}
-		}else{
-			//create three lines
-			createLine(from.getElement().getAbsoluteLeft() + from.getOffsetWidth(),y1.intValue(),from.getElement().getAbsoluteLeft() + from.getOffsetWidth()+10,y1.intValue(), from, to);
-			createLine(from.getElement().getAbsoluteLeft() + from.getOffsetWidth()+10,y1.intValue(),to.getAbsoluteLeft()-10, y2.intValue(), from, to);
-			createLine(to.getAbsoluteLeft()-10, y2.intValue(),to.getAbsoluteLeft(), y2.intValue(), from, to);
+	public void addConnection(SubjectWidget from, SubjectWidget to){
+		Connection c = super.createConnectionObject(from, to);	
+		if(c != null){
+			createConnections(c);						
 		}
 	}
 	
-	@Override
-	public void addConnection(SubjectWidget from, SubjectWidget to){
-		if(connections.containsEntry(from, to) == false && connections.containsEntry(to, from)==false){ //TODO check if the two conditions are the same
-			super.addConnection(from, to);
-			createConnections(from, to);			
+	public void createConnections(Connection c){
+		double h1 = (((connections.get(c.getFrom()).size()-1) & 1) == 1 ? -1 : 1)*(connections.get(c.getFrom()).size()-1+((((connections.get(c.getFrom()).size()-1) & 1)==1) ? 1 : 0));
+		double h2 = (((connections2.get(c.getTo()).size()-1) & 1) == 1 ? -1 : 1)*(connections2.get(c.getTo()).size()-1+((((connections2.get(c.getTo()).size()-1) & 1)==1) ? 1 : 0));
+		
+		Double y1 = c.getFrom().getAbsoluteTop() + (c.getFrom().getOffsetHeight() + h1*10)/2; 
+		Double y2 = c.getTo().getAbsoluteTop() + (c.getTo().getOffsetHeight() + h2*10)/2;
+		//If true means that they are at the same level
+		if(c.getFrom().getAbsoluteTop() == c.getTo().getAbsoluteTop()){
+			//if true means that they are in the same or more advanced semester
+			if(c.getFrom().getAbsoluteLeft()<=c.getTo().getAbsoluteLeft()){
+				//create one line
+				createLine(c.getFrom().getElement().getAbsoluteLeft() + c.getFrom().getOffsetWidth(), y1.intValue(), c.getTo().getAbsoluteLeft(), y2.intValue(),c);
+			}else{
+				//create four lines
+				createLine(c.getFrom().getElement().getAbsoluteLeft() + c.getFrom().getOffsetWidth(),y1.intValue(),c.getFrom().getElement().getAbsoluteLeft() + c.getFrom().getOffsetWidth()+10,y1.intValue(), c);
+				createLine(c.getFrom().getElement().getAbsoluteLeft() + c.getFrom().getOffsetWidth()+10,y1.intValue(),c.getFrom().getElement().getAbsoluteLeft() + c.getFrom().getOffsetWidth()+10,y1.intValue()+c.getFrom().getElement().getClientHeight()/2+10, c);
+				createLine(c.getFrom().getElement().getAbsoluteLeft() + c.getFrom().getOffsetWidth()+10,y1.intValue()+c.getFrom().getElement().getClientHeight()/2+10,c.getTo().getAbsoluteLeft()-10, y2.intValue(), c);
+				createLine(c.getTo().getAbsoluteLeft()-10, y2.intValue(),c.getTo().getAbsoluteLeft(), y2.intValue(), c);
+			}
+		}else{
+			//create three lines
+			createLine(c.getFrom().getElement().getAbsoluteLeft() + c.getFrom().getOffsetWidth(),y1.intValue(),c.getFrom().getElement().getAbsoluteLeft() + c.getFrom().getOffsetWidth()+10,y1.intValue(), c);
+			createLine(c.getFrom().getElement().getAbsoluteLeft() + c.getFrom().getOffsetWidth()+10,y1.intValue(),c.getTo().getAbsoluteLeft()-10, y2.intValue(), c);
+			createLine(c.getTo().getAbsoluteLeft()-10, y2.intValue(),c.getTo().getAbsoluteLeft(), y2.intValue(), c);
 		}
 	}
 

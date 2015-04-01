@@ -33,6 +33,7 @@ import com.uibinder.index.client.widget.PlanWidget;
 import com.uibinder.index.client.widget.SemesterWidget;
 import com.uibinder.index.client.widget.SubjectWidget;
 import com.uibinder.index.shared.control.Career;
+import com.uibinder.index.shared.control.ComplementaryValues;
 import com.uibinder.index.shared.control.Plan;
 import com.uibinder.index.shared.control.Semester;
 import com.uibinder.index.shared.control.Subject;
@@ -183,6 +184,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		//Create the dnd stuff
 		boundaryPanel = new AbsolutePanel();
 		dragController = new PickUpDragController(boundaryPanel, allowDroppingOnBoundaryPanel, this);
+		dragController.setBehaviorDragStartSensitivity(1);
 		
 		planWidget = new PlanWidget();
 		
@@ -305,7 +307,29 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		subjectValuesAndSemesterMap.put(subjectValues, semester);
 		
 		updateCredits(subjectValues, semester, true);
+		
+		addClickHandlerSubjectWidget(subjectWidget);
+		
+	}
 	
+	private void onSubjectWidgetClicked(String publicId) {
+		SubjectValues sV = getSubjectValuesByPublicIdFromList(publicId);
+		ComplementaryValues cV = sV.getComplementaryValues();
+		List<Subject> subjectRelatedList = new ArrayList<Subject>();
+		//TODO: get complementary values from sia
+		
+		//TODO: Show/Create lines
+		
+		//TODO: Reduce/Increase opacity
+		subjectRelatedList.addAll(cV.getListPrerequisites());
+		subjectRelatedList.addAll(cV.getListCorequisites());
+		subjectRelatedList.addAll(cV.getListPosrequisites());
+		for(SubjectValues sVTemporary : subjectValuesList){
+			if(subjectRelatedList.contains(valuesAndSubjectMap.get(sVTemporary))==false && sVTemporary != sV){
+				subjectValuesAndWidgetBiMap.get(sVTemporary).getElement().setAttribute("style", "opacity:0.1");
+			}
+		}
+		Window.alert(publicId);
 	}
 
 	private void updateCredits(SubjectValues subjectValues2, Semester semester2, boolean toAdd) {
@@ -429,6 +453,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		connectionsController.addConnection(subjectWidgetList.get(0), subjectWidgetList.get(3), "co");
 		connectionsController.addConnection(subjectWidgetList.get(4), subjectWidgetList.get(2), "co");
 		connectionsController.addConnection(subjectWidgetList.get(4), subjectWidgetList.get(8), "co");
+		
+		Window.alert(subjectValuesList.get(7).getComplementaryValues().getListPrerequisites().toString());
 		
 		rpcService.toTest(new AsyncCallback<String>(){
 
@@ -612,6 +638,15 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 			public void onClick(ClickEvent event) {
 				searchSubjectView.showIt();
 			}});
+	}
+	
+	private void addClickHandlerSubjectWidget(SubjectWidget s){
+		s.addClickHandler(new ClickHandler(){
+			@Override
+			public void onClick(ClickEvent event) {
+				onSubjectWidgetClicked(event.getRelativeElement().getAttribute("publicId"));
+			}			
+		});
 	}
 	
 	private void addClickHandlerDeleteSemesterButton(SemesterWidget semester){

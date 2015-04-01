@@ -16,18 +16,17 @@ public class SuperConnectionsController {
 
 	protected PlanPresenter presenter;
 	protected List<SubjectWidget> subjectWidgetsList;
+	protected List<Connection> connectionList;
 	protected List<LineWidget> lines;
-	protected Multimap<SubjectWidget, SubjectWidget> connections;
-	protected Multimap<SubjectWidget, SubjectWidget> connections2;
-	protected Multimap<SubjectWidget, LineWidget> subjectAndLineMultimap;
-	protected static int HEIGHT = 132;
+	protected Multimap<SubjectWidget, Connection> connections;
+	protected Multimap<SubjectWidget, Connection> connections2;
 	
 	public SuperConnectionsController(PlanPresenter presenter){
 		connections = HashMultimap.create();
 		connections2 = HashMultimap.create();
 		lines =  new ArrayList<LineWidget>();
 		subjectWidgetsList = new ArrayList<SubjectWidget>();
-		subjectAndLineMultimap = HashMultimap.create();
+		connectionList = new ArrayList<Connection>();
 		this.presenter = presenter;
 	}
 
@@ -57,11 +56,12 @@ public class SuperConnectionsController {
 	 */
 	public void hide(SubjectWidget s){
 		if(lines.size()!=0){
-			if(subjectAndLineMultimap.containsKey(s) == true){
-				for(LineWidget l : subjectAndLineMultimap.get(s)){
-					l.hide();
-				}
-			}			
+			for(Connection c : connections.get(s)){
+				c.hideLines();
+			}
+			for(Connection c : connections2.get(s)){
+				c.hideLines();
+			}
 		}
 	}
 	
@@ -80,20 +80,18 @@ public class SuperConnectionsController {
 	 */
 	public void show(SubjectWidget s){
 		if(lines.size()!=0){
-			if(subjectAndLineMultimap.containsKey(s) == true){
-				for(LineWidget l : subjectAndLineMultimap.get(s)){
-					l.show();
-				}
+			for(Connection c : connections.get(s)){
+				c.showLines();
+			}
+			for(Connection c : connections2.get(s)){
+				c.showLines();
 			}
 		}
 	}
 	
 	public void delete(){
 		if(lines.size()!=0){
-			for(LineWidget line : lines){
-				lines.remove(line);
-				line.removeFromParent();
-			}			
+			//TODO			
 		}
 	}
 	
@@ -104,27 +102,44 @@ public class SuperConnectionsController {
 	 */
 	public void delete(SubjectWidget s){
 		if(lines.size()!=0){
-			if(subjectAndLineMultimap.containsKey(s) == true){
-				for(LineWidget l : subjectAndLineMultimap.get(s)){
-					l.removeFromParent();
-				}
+			for(Connection c : connections.get(s)){
+				c.deleteLines();
+				connections.remove(s, c);
+			}
+			for(Connection c : connections2.get(s)){
+				c.deleteLines();
+				connections2.remove(s, c);
 			}
 		}
 	}
 	
-	protected void createLine(int x1, int y1, int x2, int y2, SubjectWidget from, SubjectWidget to){
+	protected void createLine(int x1, int y1, int x2, int y2, Connection c){
 		LineWidget line = new LineWidget(x1,y1,x2,y2);
 		lines.add(line);
-		subjectAndLineMultimap.put(from, line);
-		subjectAndLineMultimap.put(to, line);
+		c.addLine(line);
 		presenter.addLine(line);
 	}
 	
-	protected void addConnection(SubjectWidget from, SubjectWidget to){
+	protected Connection createConnectionObject(SubjectWidget from, SubjectWidget to){
 		//TODO: see if it is using createConnections from the super class or the inherited class, it must use the inherited class's method
 		if(subjectWidgetsList.contains(from) == false) subjectWidgetsList.add(from);
 		if(subjectWidgetsList.contains(to) == false) subjectWidgetsList.add(to);
-		connections.put(from, to);
-		connections.put(to, from);
+		boolean isNew = true;
+		Connection connection = null;
+		for(Connection c: connections.get(from)){
+			if(c.contains(from, to)==true || c.contains(to, from)){
+				isNew = false;
+				break;
+			}
+		}
+		if(isNew == true){
+			connection = new Connection(from, to);
+			connectionList.add(connection);
+		}
+		if(connection !=null){
+			connections.put(from, connection);
+			connections2.put(to, connection);
+		}
+		return connection;
 	}
 }
