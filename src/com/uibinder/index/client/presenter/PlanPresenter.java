@@ -622,6 +622,25 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 			}
 			});
 	}
+
+	public void onSubjectDelete(String publicid) {
+		SubjectValues subjectValuesToDelete = getSubjectValuesByPublicIdFromList(publicid);
+		if(subjectValuesToDelete != null){
+			confirmDeleteSubject(subjectValuesToDelete);
+		}
+		
+	}
+
+	private void confirmDeleteSubject(SubjectValues subjectValuesToDelete) {
+		Subject subjectToDelete = valuesAndSubjectMap.get(subjectValuesToDelete);
+		warningDeleteSubjectView.setSubject(subjectValuesToDelete, subjectToDelete);
+		warningDeleteSubjectView.showIt();
+	}
+
+	public void confirmedDeleteSubject(SubjectValues sV) {
+		deleteSubject(sV);
+		warningDeleteSubjectView.hideIt();
+	}
 	
 
 }

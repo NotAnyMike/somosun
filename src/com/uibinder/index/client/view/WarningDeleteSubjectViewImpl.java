@@ -12,6 +12,8 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.uibinder.index.client.presenter.PlanPresenter;
+import com.uibinder.index.shared.control.Subject;
+import com.uibinder.index.shared.control.SubjectValues;
 
 public class WarningDeleteSubjectViewImpl extends Composite implements WarningDeleteSubjectView {
 	
@@ -24,7 +26,7 @@ public class WarningDeleteSubjectViewImpl extends Composite implements WarningDe
 	@UiField Button cancelButton;
 	@UiField Button deleteButton;
 	
-	private String code;
+	private SubjectValues sV;
 	
 	private PlanPresenter presenter;
 
@@ -56,7 +58,7 @@ public class WarningDeleteSubjectViewImpl extends Composite implements WarningDe
 	}
 		
 	private void onDeleteClicked() {
-		//presenter.confirmedDeleteSubject(code);
+		presenter.confirmedDeleteSubject(sV);
 	}
 	
 	public void onCancelClicked(){
@@ -78,24 +80,29 @@ public class WarningDeleteSubjectViewImpl extends Composite implements WarningDe
 	}
 
 	@Override
-	public void setSubject(String code, String name, double grade,
-		int credits, boolean oblg, int type) {
-		subjectName.setText(name);
-		subjectCode.setText(code);
-		subjectGrade.setText(Double.toString(grade));
-		subjectCredits.setText(Integer.toString(credits));
-		subjectOblig.setText((oblg == true ? "Oblig: Si" : "Oblig: No"));
+	public void setSubject(SubjectValues sV, Subject s) {
+		this.sV = sV;
+		subjectName.setText(s.getName());
+		subjectCode.setText(s.getCode());
+		subjectGrade.setText(Double.toString(sV.getGrade()));
+		subjectCredits.setText(Integer.toString(s.getCredits()));
+		subjectOblig.setText((sV.getComplementaryValues().isObligatoriness() == true ? "Oblig: Si" : "Oblig: No"));
 		//Type = 0 Leveling, 1 Foundations, 2 Disciplinary, 3 Free Election, 4 Add to post-grade.
-		if(type==0){
-			subjectType.setText("N");			
-		} else if(type == 1){
-			subjectType.setText("F");
-		} else if(type == 2){
-			subjectType.setText("D");
-		} else if(type == 3){
-			subjectType.setText("L");
+		switch(sV.getComplementaryValues().getTypology()){
+			case "N":
+			case "n":
+				subjectType.setText("N");
+				break;
+			case "D":
+			case "d":
+				subjectType.setText("D");
+				break;
+			case "L":
+			case "l":
+				subjectType.setText("L");
+				break;
 		}
-		this.code = code;
+		//TODO: complete the switch with all the other values
 	}
 
 }

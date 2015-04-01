@@ -1,4 +1,4 @@
 # Module uibinderindex
 # RPC service class, partial path of RPC policy file
-com.uibinder.index.client.service.LoginService, 22505BD6CCD58A24CC4CEA29BA97170D.gwt.rpc
-com.uibinder.index.client.service.SUNService, A51C43A33EB3EF40378811E027CD9108.gwt.rpc
+com.uibinder.index.client.service.SUNService, 238E26F2AA44E6115981AE482B68FA93.gwt.rpc
+com.uibinder.index.client.service.LoginService, 770640402F8E0D5B388E5C4D187D9403.gwt.rpc

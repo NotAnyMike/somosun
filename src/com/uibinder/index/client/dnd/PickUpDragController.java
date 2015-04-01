@@ -111,7 +111,7 @@ public class PickUpDragController extends AbstractDragController {
 	    	if (!getBehaviorDragProxy()) {
 	    		restoreSelectedWidgetsLocation();
 	    	}
-	    	//planPresenter.onSubjectDelete(context.draggable.asWidget().getElement().getAttribute("code"));
+	    	planPresenter.onSubjectDelete(context.draggable.asWidget().getElement().getAttribute("publicid"));
 	    } else {
 	      context.dropController.onDrop(context);
 	      context.dropController.onLeave(context);

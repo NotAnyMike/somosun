@@ -3,6 +3,8 @@ package com.uibinder.index.client.view;
 import com.google.gwt.user.client.ui.Widget;
 import com.uibinder.index.client.presenter.PlanPresenter;
 import com.uibinder.index.client.view.SiaSummaryView.Presenter;
+import com.uibinder.index.shared.control.Subject;
+import com.uibinder.index.shared.control.SubjectValues;
 
 public interface WarningDeleteSubjectView {
 	
@@ -13,6 +15,6 @@ public interface WarningDeleteSubjectView {
 	Widget asWidget();
 	void hideIt();
 	void showIt();
-	void setSubject(String code, String name, double grade, int credits, boolean oblg, int type);
+	void setSubject(SubjectValues sV, Subject s);
 
 }
