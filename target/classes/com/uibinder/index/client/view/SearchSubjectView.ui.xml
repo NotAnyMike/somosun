@@ -14,11 +14,11 @@
 	        <head>
 			    <script src="angular.min.js"></script>
 			    <script src="bootstrap-gh-pages/ui-bootstrap-tpls-0.12.0.js"></script>
-			    <script src="example.js"></script>  
+			    <script src="example.js"></script> 
   			</head>
  			<body>
-		<div style="height:100%; width:100%; top:0px; left:0px; position:fixed; background:#000; opacity:.4; z-index:9999"></div>
-		<div style="position: absolute; top:50px; left:50%; width:1070px; margin-left:-535px; z-index:10000; padding-bottom:50px">
+		<div style="height:100%; width:100%; top:0px; left:0px; position:fixed; background:#000; opacity:.4; z-index:1000"></div>
+		<div style="position: absolute; top:60px; left:50%; width:1070px; margin-left:-535px; z-index:1001; padding-bottom:50px">
 			<table border="0" cellspacing="0" cellpadding="0">
 				<tr>
 					<td width="250" rowspan="2" align="left" valign="top">

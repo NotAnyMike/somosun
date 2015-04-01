@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import com.googlecode.objectify.ObjectifyService;
 import com.uibinder.index.shared.control.Career;
+import com.uibinder.index.shared.control.ComplementaryValues;
 import com.uibinder.index.shared.control.Plan;
 import com.uibinder.index.shared.control.Semester;
 import com.uibinder.index.shared.control.Subject;
@@ -30,6 +31,7 @@ public class PlanDao {
 		
 		CareerDao careerDao = new CareerDao();
 		SubjectDao subjectDao = new SubjectDao();
+		ComplementaryValuesDao complementaryValuesDao = new ComplementaryValuesDao();
 		
 		Plan plan = new Plan();
 		Career career = null;
@@ -39,6 +41,7 @@ public class PlanDao {
 		Semester semester = null;
 		List<SubjectValues> subjects = null;
 		Subject subject = null;
+		ComplementaryValues complementaryValues = null;
 		SubjectValues subjectValues = null;
 		HashMap<SubjectValues, Subject> subjectMap = new HashMap<SubjectValues, Subject>();;
 	
@@ -66,8 +69,17 @@ public class PlanDao {
 					subject = new Subject(jsonSubject.getInt("credits"), jsonSubject.getString("code"), jsonSubject.getString("code"), jsonSubject.getString("code"), sede);
 				}
 				subjectValues = new SubjectValues();
-				subjectValues.setTypology(jsonSubject.getString("type"));
-				subjectValues.setObligatoriness(jsonSubject.getBoolean("oblig"));
+				//getting the complementary values
+				if(subject!=null){
+					complementaryValues = complementaryValuesDao.getComplementaryValues(career, subject);
+					if(complementaryValues != null) {subjectValues.setComplementaryValues(complementaryValues);}
+					else {complementaryValues = new ComplementaryValues(career, subject);}
+				}
+				
+				subjectValues.getComplementaryValues().setObligatoriness(jsonSubject.getBoolean("oblig"));
+				subjectValues.getComplementaryValues().setTypology(jsonSubject.getString("type"));
+
+				if(jsonSubject.getBoolean("normal") == true && subject != null) complementaryValuesDao.saveComplementaryValues(complementaryValues);
 				
 				if(subject != null && subjectValues != null) {
 					subjects.add(subjectValues);

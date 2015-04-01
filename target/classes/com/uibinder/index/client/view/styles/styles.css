@@ -163,3 +163,7 @@ float:right;
 	vertical-align:middle;
 	padding-top:2px;
 }
+
+#header2 {
+	position: absolute; top:60px; left:50%; width:1070px; margin-left:-535px; z-index:1001; padding-bottom:50px
+}

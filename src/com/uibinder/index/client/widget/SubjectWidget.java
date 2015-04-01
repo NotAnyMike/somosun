@@ -114,8 +114,8 @@ public class SubjectWidget extends FlowPanel {
 		this.grade = 0.0;
 		this.approved = true;
 		this.taken = sV.isTaken();
-		this.obligatoriness = sV.isObligatoriness();
-		this.type = getTypeFromString(sV.getTypology());
+		this.obligatoriness = sV.getComplementaryValues().isObligatoriness();
+		this.type = getTypeFromString(sV.getComplementaryValues().getTypology());
 		this.publicId = sV.getSubjectValuesPublicId();
 		
 		setAttributes();

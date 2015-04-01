@@ -159,7 +159,8 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 	@Override
 	public String toTest() {
 		//String stringToReturn = SiaProxy.getPrerequisitesFromSia("2016016", "2522"); //metodología 2
-		String stringToReturn = SiaProxy.getPrerequisitesFromSia("2016018", "2522"); //micro 2
+		//String stringToReturn = SiaProxy.getPrerequisitesFromSia("2016018", "2522"); //micro 2
+		String stringToReturn = SiaProxy.getPrerequisitesFromSia("2016017", "2522"); //micro 1
 		
 		return stringToReturn;
 	}

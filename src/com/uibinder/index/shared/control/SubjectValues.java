@@ -20,17 +20,27 @@ public class SubjectValues implements Serializable {
 	@Ignore private String subjectValuesPublicId = null;
     private double grade = 0;
     private boolean taken = false;
-    private String typology = null;
-    private boolean obligatoriness = false;
+    private ComplementaryValues complementaryValues = null;
     
+    /**
+     * people should try to avoid using this constructor
+     */
     public SubjectValues(){
+    	this.complementaryValues = new ComplementaryValues();
     }
 
-    public SubjectValues(Group group, double grade,boolean taken,String typology) {
+    public SubjectValues(Group group, double grade,boolean taken, ComplementaryValues complementaryValues) {
         this.group = group;
         this.grade = grade;
         this.taken = taken;
-        this.typology=typology;
+        this.complementaryValues = complementaryValues;
+    }
+    
+    public SubjectValues(Group group, double grade,boolean taken) {
+        this.group = group;
+        this.grade = grade;
+        this.taken = taken;
+        this.complementaryValues = new ComplementaryValues();
     }
 
 	public Group getGroup() {
@@ -49,28 +59,12 @@ public class SubjectValues implements Serializable {
 		this.grade = grade;
 	}
 
-	public String getTypology() {
-		return typology;
-	}
-
-	public void setTypology(String typology) {
-		this.typology = typology;
-	}
-
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
 
 	public Long getId() {
 		return id;
-	}
-
-	public boolean isObligatoriness() {
-		return obligatoriness;
-	}
-
-	public void setObligatoriness(boolean obligatoriness) {
-		this.obligatoriness = obligatoriness;
 	}
 
 	public boolean isTaken() {
@@ -87,5 +81,13 @@ public class SubjectValues implements Serializable {
 
 	public void setSubjectValuesPublicId(String subjectValuesPublicId) {
 		this.subjectValuesPublicId = subjectValuesPublicId;
+	}
+
+	public ComplementaryValues getComplementaryValues() {
+		return complementaryValues;
+	}
+
+	public void setComplementaryValues(ComplementaryValues complementaryValues) {
+		this.complementaryValues = complementaryValues;
 	}
 }

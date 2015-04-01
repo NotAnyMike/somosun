@@ -11,8 +11,8 @@ public class SemesterValueDao {
 		ObjectifyService.register(SemesterValue.class);
 	}
 	
-	public void saveSemesterValue(SemesterValue subject){
-		ofy().save().entity(subject).now();
+	public void saveSemesterValue(SemesterValue semesterValue){
+		ofy().save().entity(semesterValue).now();
 	}
 	
 	public void saveSemesterValue(int year, int numberSemester){

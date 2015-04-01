@@ -12,4 +12,9 @@
 		<property name="numberSemester" direction="asc"/>
 	</datastore-index>
 	
+	<datastore-index kind="ComplementaryValues" ancestor="false">
+		<property name="subject" direction="asc"/>
+		<property name="career" direction="asc"/>
+	</datastore-index>
+	
 </datastore-indexes>

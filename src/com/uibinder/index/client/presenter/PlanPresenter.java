@@ -186,6 +186,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		
 		planWidget = new PlanWidget();
 		
+		addClickHandlerAddSemester();
+		
 	}
 	
 	private void addWidgets(HasWidgets container) {
@@ -281,6 +283,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		semesterDropControllerList.add(dropController);
 		controllersBySemester.put(semesterW, dropController);
 		
+		addClickHandlerAddSubject(semesterW);
+		
 	}
 	
 	private void createSubject(Subject subject, SubjectValues subjectValues, Semester semester) {
@@ -293,7 +297,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		if(valuesAndSubjectMap.containsKey(subjectValues)==false) valuesAndSubjectMap.put(subjectValues, subject); //although the condition here can be removed because it can will just override it
 		if(semester.getSubjects().contains(subjectValues) == false) semester.addSubject(subjectValues);
 		
-		SubjectWidget subjectWidget = new SubjectWidget(subject.getName(), subject.getCode(), subject.getCredits(), subjectValues.getGrade(), subjectValues.isObligatoriness(), subjectValues.getTypology(), subjectValues.getSubjectValuesPublicId());
+		SubjectWidget subjectWidget = new SubjectWidget(subject.getName(), subject.getCode(), subject.getCredits(), subjectValues.getGrade(), subjectValues.getComplementaryValues().isObligatoriness(), subjectValues.getComplementaryValues().getTypology(), subjectValues.getSubjectValuesPublicId());
 		subjectWidgetList.add(subjectWidget);
 		makeSubjectWidgetDraggable(subjectWidget);
 		semesterAndWidgetBiMap.get(semester).addSubject(subjectWidget);
@@ -322,7 +326,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 				if(subjectValues2.isTaken()) totalCredits[2] -= creditsValue;
 				if(subjectValues2.getGrade()>=3) totalCredits[1] -= creditsValue;
 			}
-			switch(subjectValues2.getTypology()){
+			switch(subjectValues2.getComplementaryValues().getTypology()){
 			case "N":
 			case "n":
 				updateCreditsLeveling(subjectValues2, semester2, toAdd);
@@ -387,15 +391,6 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 			if(subjectValues2.getGrade()>=3) levelingCredits[1] -= creditsValue;
 		}
 		
-	}
-	
-	private void addClickHandlerDeleteSemesterButton(SemesterWidget semester){
-		semester.getDeleteSemesterButton().addClickHandler(new ClickHandler(){
-			@Override
-			public void onClick(ClickEvent event) {
-				deleteSemesterClicked(event);
-			}
-			});
 	}
 	
 	private void deleteSemesterClicked(ClickEvent event) {
@@ -584,4 +579,49 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	public void addLine(LineWidget l){
 		subContainer.add(l);
 	}
+
+	private void addClickHandlerAddSemester(){
+		planWidget.getLabelAddSemester().addClickHandler(new ClickHandler(){
+
+			@Override
+			public void onClick(ClickEvent event) {
+				onClickAddSemester();
+			}});
+		
+		planWidget.getImageAddSemester().addClickHandler(new ClickHandler(){
+
+			@Override
+			public void onClick(ClickEvent event) {
+				onClickAddSemester();
+			}
+			
+		});
+	}
+
+	private void onClickAddSemester() {
+		// TODO Auto-generated method stub
+		if(semesters <=20){
+			createSemester(new Semester());
+		}
+	}
+	
+	private void addClickHandlerAddSubject(SemesterWidget semesterW){
+		semesterW.getAddButton().addClickHandler(new ClickHandler(){
+
+			@Override
+			public void onClick(ClickEvent event) {
+				searchSubjectView.showIt();
+			}});
+	}
+	
+	private void addClickHandlerDeleteSemesterButton(SemesterWidget semester){
+		semester.getDeleteSemesterButton().addClickHandler(new ClickHandler(){
+			@Override
+			public void onClick(ClickEvent event) {
+				deleteSemesterClicked(event);
+			}
+			});
+	}
+	
+
 }

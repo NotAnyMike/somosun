@@ -19,7 +19,7 @@ import com.uibinder.index.client.widget.SubjectWidget;
 public class SemesterWidget extends VerticalPanel {
 	
 	private static final String[] SEMESTER_ROMAN = {"I", "II", "III", "IV", "V", "VI", 
-		"VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII"};
+		"VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX"};
 	private static final String CREDITS_STRING = "créditos: ";
 	
 	private Button addButton = new Button();
