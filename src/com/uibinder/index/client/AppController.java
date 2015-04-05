@@ -120,14 +120,12 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 			@Override
 			public void onSuccess(Plan result) {
 				Plan plan = result;
-				Window.alert(result.toString());
 				planPresenter.setPlan(plan);
 				History.newItem("plan");
 			}
 			
 		});
-		
-		Window.alert("career: " + careerCode);
+	
 	}
 	
 	private void generateAcademicHistoryFromString(String academicHistory){

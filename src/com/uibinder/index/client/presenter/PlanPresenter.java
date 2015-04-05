@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.Icon;
+
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -73,6 +75,11 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	private HashMap<SemesterWidget, SemesterDropController> controllersBySemester= new HashMap<SemesterWidget, SemesterDropController>();
 	private List<SemesterDropController> semesterDropControllerList = new ArrayList<SemesterDropController>();
 	
+	//in order to control how many times a subject gets its requisites updated
+	private final int LIMIT_TO_REQUISITES_UPDATES = 1;
+	private HashMap<Subject, Integer> subjectTimesUpdated = new HashMap<Subject, Integer>();
+	
+	//In order to control the publicId of the subjectWidgets
 	private int increasingSubjectValuesCounter = 0;
 
 	//Credits variables
@@ -105,6 +112,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	//This one is to allow or not drag items wherever
 	private final boolean allowDroppingOnBoundaryPanel = false;
 	
+	private SubjectValues subjectValuesSelected = null;
 	
 	/**
 	 * This is the constructor to create an empty plan, that means no subjects
@@ -210,8 +218,6 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		searchSubjectView.hideIt();
 		container.add(subContainer);
 		
-		connectionsController.setContainer(subContainer);
-		
 	}
 	
 	private void makeSubjectWidgetDraggable(SubjectWidget subject){
@@ -295,7 +301,10 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		increasingSubjectValuesCounter++;
 		subjectValues.setSubjectValuesPublicId(subject.getCode() + increasingSubjectValuesCounter);
 		
-		if(subjectValuesList.contains(subjectValues)==false) subjectValuesList.add(subjectValues);
+		if(subjectValuesList.contains(subjectValues)==false) {
+			subjectValuesList.add(subjectValues);
+			if(subjectTimesUpdated.containsKey(subject) == false) subjectTimesUpdated.put(subject, 0);
+		}
 		if(valuesAndSubjectMap.containsKey(subjectValues)==false) valuesAndSubjectMap.put(subjectValues, subject); //although the condition here can be removed because it can will just override it
 		if(semester.getSubjects().contains(subjectValues) == false) semester.addSubject(subjectValues);
 		
@@ -313,23 +322,162 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	}
 	
 	private void onSubjectWidgetClicked(String publicId) {
-		SubjectValues sV = getSubjectValuesByPublicIdFromList(publicId);
-		ComplementaryValues cV = sV.getComplementaryValues();
-		List<Subject> subjectRelatedList = new ArrayList<Subject>();
-		//TODO: get complementary values from sia
-		
-		//TODO: Show/Create lines
-		
-		//TODO: Reduce/Increase opacity
-		subjectRelatedList.addAll(cV.getListPrerequisites());
-		subjectRelatedList.addAll(cV.getListCorequisites());
-		subjectRelatedList.addAll(cV.getListPosrequisites());
-		for(SubjectValues sVTemporary : subjectValuesList){
-			if(subjectRelatedList.contains(valuesAndSubjectMap.get(sVTemporary))==false && sVTemporary != sV){
-				subjectValuesAndWidgetBiMap.get(sVTemporary).getElement().setAttribute("style", "opacity:0.1");
+		SubjectValues sV = getSubjectValuesByPublicId(publicId);
+		if(subjectValuesSelected != null) {
+			deleteAllOpacities();
+			hideArrows();
+		}
+		if(sV.equals(subjectValuesSelected)==false){
+			subjectValuesSelected = sV;
+			
+			//get complementary values from sia
+			getComplementaryValues(sV);
+			
+			//TODO: Show/Create lines
+			showConnections(sV);
+			
+			//Reduce/Increase opacity
+			modifyOpacity(sV);
+		}else{
+			setSubjectValuesSelected(null);
+		}
+	}
+	
+	public void moveArrows(String publicId){
+		SubjectValues sV = getSubjectValuesByPublicId(publicId);
+		if(sV != null && (subjectValuesSelected.equals(sV) == true || areRelated(sV, subjectValuesSelected) == true)){
+			showConnections(subjectValuesSelected);
+		}
+	}
+
+	private boolean areRelated(SubjectValues sV, SubjectValues sV2) {
+		boolean toReturn = false;
+		List<Subject> relatedSubjects = new ArrayList<Subject>();
+		relatedSubjects.addAll(sV.getComplementaryValues().getListPrerequisites());
+		relatedSubjects.addAll(sV.getComplementaryValues().getListCorequisites());
+		relatedSubjects.addAll(sV.getComplementaryValues().getListPrerequisitesOf());
+		relatedSubjects.addAll(sV.getComplementaryValues().getListCorequisitesOf());
+		for(Subject s : relatedSubjects){
+			if(s.equals(valuesAndSubjectMap.get(sV2))){
+				toReturn = true;
+				break;
 			}
 		}
-		Window.alert(publicId);
+		return toReturn;
+	}
+
+	private void showConnections(SubjectValues sV) {
+		for(Subject s : sV.getComplementaryValues().getListPrerequisites()){
+			for(SubjectValues sVTempo : getSubjectValuesBySubject(s)){
+				connectionsController.addConnection(subjectValuesAndWidgetBiMap.get(sV), subjectValuesAndWidgetBiMap.get(sVTempo), "pre");
+			}
+		}
+		for(Subject s : sV.getComplementaryValues().getListCorequisites()){
+			for(SubjectValues sVTempo : getSubjectValuesBySubject(s)){
+				connectionsController.addConnection(subjectValuesAndWidgetBiMap.get(sV), subjectValuesAndWidgetBiMap.get(sVTempo), "co");
+			}
+		}
+		for(Subject s : sV.getComplementaryValues().getListPrerequisitesOf()){
+			for(SubjectValues sVTempo : getSubjectValuesBySubject(s)){
+				connectionsController.addConnection(subjectValuesAndWidgetBiMap.get(sVTempo), subjectValuesAndWidgetBiMap.get(sV), "pre");
+			}
+		}
+		for(Subject s : sV.getComplementaryValues().getListCorequisitesOf()){
+			for(SubjectValues sVTempo : getSubjectValuesBySubject(s)){
+				connectionsController.addConnection(subjectValuesAndWidgetBiMap.get(sVTempo), subjectValuesAndWidgetBiMap.get(sV), "co");
+			}
+		}
+	}
+
+	private void hideArrows() {
+		connectionsController.hideArrows();
+	}
+
+	private void modifyOpacity(SubjectValues sV) {
+		boolean isRelated = false;
+		List<Subject> subjectRelatedList = new ArrayList<Subject>();
+		ComplementaryValues cV = sV.getComplementaryValues();
+		
+		subjectRelatedList.addAll(cV.getListPrerequisites());
+		subjectRelatedList.addAll(cV.getListCorequisites());
+		subjectRelatedList.addAll(cV.getListPrerequisitesOf());
+		subjectRelatedList.addAll(cV.getListCorequisitesOf());
+		for(SubjectValues sVTemporary : subjectValuesList){
+			isRelated = false;
+			for(Subject sTemporary : subjectRelatedList){
+				if(sTemporary.equals(valuesAndSubjectMap.get(sVTemporary))==true){
+					isRelated = true;
+					subjectRelatedList.remove(sTemporary);
+				}				
+			}
+			if(isRelated == false && sVTemporary.equals(sV)==false){
+				subjectValuesAndWidgetBiMap.get(sVTemporary).getElement().setAttribute("style", "opacity:0.1");
+			}else{
+				subjectValuesAndWidgetBiMap.get(sVTemporary).getElement().setAttribute("style", "opacity:1");
+			}
+		}
+	}
+
+	private void getComplementaryValues(SubjectValues sV) {
+		int timesUpdated = subjectTimesUpdated.get(valuesAndSubjectMap.get(sV));
+		if(timesUpdated < LIMIT_TO_REQUISITES_UPDATES){
+			subjectTimesUpdated.put(valuesAndSubjectMap.get(sV), timesUpdated+1); 
+			rpcService.getComplementaryValues(plan.getCareerCode(), valuesAndSubjectMap.get(sV).getCode(), new AsyncCallback<ComplementaryValues>(){
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					// TODO delete this msg
+					Window.alert("sorry, we got an error while updating the requisites of a subject");
+				}
+	
+				@Override
+				public void onSuccess(ComplementaryValues result) {
+					boolean isOldNull = false;
+					if(result != null){
+						List<SubjectValues> list = getSubjectValuesBySubject(result.getSubject());
+						for(SubjectValues sV : list){
+							if(sV.getComplementaryValues()== null || sV.getComplementaryValues().getListCorequisites().size() == 0 || sV.getComplementaryValues().getListPrerequisitesOf().size() == 0 || sV.getComplementaryValues().getListCorequisitesOf().size() == 0 || sV.getComplementaryValues().getListPrerequisites().size() == 0) isOldNull = true;//TODO: show arrows and opacity again
+							sV.setComplementaryValues(result);
+							//the main subject is pre requisite of some subject, and it is adding it to them
+							for(Subject s : result.getListPrerequisites()){
+								for(SubjectValues sVTemporary : getSubjectValuesBySubject(s)){
+									sVTemporary.getComplementaryValues().addPrerequisiteOf(result.getSubject());
+								}
+							}
+							//the main subject is co requisite of some subject, and it is adding it to them
+							for(Subject s : result.getListCorequisites()){
+								for(SubjectValues sVTemporary : getSubjectValuesBySubject(s)){
+									sVTemporary.getComplementaryValues().addCorequisiteOf(result.getSubject());
+								}
+							}
+							if(isOldNull == true)  
+								if(sV.equals(subjectValuesSelected) == true) {
+									modifyOpacity(sV);
+									showConnections(sV);
+								}
+						}
+					}
+					
+				}
+				
+			});
+		}
+	}
+	
+	private List<SubjectValues> getSubjectValuesBySubject(Subject s){
+		List<SubjectValues> list = new ArrayList<SubjectValues>();
+		for(SubjectValues sV : subjectValuesList){
+			if(valuesAndSubjectMap.get(sV).equals(s) == true){
+				list.add(sV);
+			}
+		}
+		return list;
+	}
+
+	public void deleteAllOpacities() {
+		for(SubjectWidget sW : subjectWidgetList){
+			sW.getElement().setAttribute("style", "opacity:1");
+		}
 	}
 
 	private void updateCredits(SubjectValues subjectValues2, Semester semester2, boolean toAdd) {
@@ -437,40 +585,16 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 			credits.remove(semester);
 			controllersBySemester.remove(semesterW);
 			if(semesterAndWidgetBiMap.containsKey(semester) == true) semesterAndWidgetBiMap.remove(semester);
-			if(semesterList.contains(semester) == true) semesterList.remove(semester);
+			if(semesterList.contains(semester) == true) {
+				semesterList.remove(semester);
+			}
 			semesterWidgetList.remove(semesterW);
 		}
 		
 		updateSemestersNumber();
 		
-		connectionsController.addConnection(subjectWidgetList.get(6), subjectWidgetList.get(0), "pre");
-		connectionsController.addConnection(subjectWidgetList.get(0), subjectWidgetList.get(8), "pre");
+		connectionsController.addConnection(subjectWidgetList.get(0), subjectWidgetList.get(6), "pre");
 		connectionsController.addConnection(subjectWidgetList.get(0), subjectWidgetList.get(7), "pre");
-		connectionsController.addConnection(subjectWidgetList.get(0), subjectWidgetList.get(10), "pre");
-		connectionsController.addConnection(subjectWidgetList.get(11), subjectWidgetList.get(10), "pre");
-		connectionsController.addConnection(subjectWidgetList.get(0), subjectWidgetList.get(1), "co");
-		connectionsController.addConnection(subjectWidgetList.get(0), subjectWidgetList.get(2), "co");
-		connectionsController.addConnection(subjectWidgetList.get(0), subjectWidgetList.get(3), "co");
-		connectionsController.addConnection(subjectWidgetList.get(4), subjectWidgetList.get(2), "co");
-		connectionsController.addConnection(subjectWidgetList.get(4), subjectWidgetList.get(8), "co");
-		
-		Window.alert(subjectValuesList.get(7).getComplementaryValues().getListPrerequisites().toString());
-		
-		rpcService.toTest(new AsyncCallback<String>(){
-
-			@Override
-			public void onFailure(Throwable caught) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void onSuccess(String result) {
-				// TODO Auto-generated method stub
-				Window.alert(result);
-			}
-			
-		});
 		
 	}
 
@@ -516,7 +640,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	 * @param semester
 	 */
 	public void subjectMoved(String publicId, SemesterWidget semester) {
-		SubjectValues subjectValues = getSubjectValuesByPublicIdFromList(publicId);
+		SubjectValues subjectValues = getSubjectValuesByPublicId(publicId);
 		int numberSemesterTo = semesterList.indexOf(semesterAndWidgetBiMap.inverse().get(semester));
 		Semester semesterTo = semesterList.get(numberSemesterTo);
 		int numberSemesterFrom = semesterList.indexOf(subjectValuesAndSemesterMap.get(subjectValues));
@@ -541,7 +665,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	 * @param idSubjectValue
 	 * @return
 	 */
-	private SubjectValues getSubjectValuesByPublicIdFromList(String publicId){
+	private SubjectValues getSubjectValuesByPublicId(String publicId){
 		SubjectValues subjectValuesToReturn = null;
 		for(SubjectValues subjectValues : subjectValuesList){
 			if(subjectValues.getSubjectValuesPublicId().equals(publicId)){
@@ -659,7 +783,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	}
 
 	public void onSubjectDelete(String publicid) {
-		SubjectValues subjectValuesToDelete = getSubjectValuesByPublicIdFromList(publicid);
+		SubjectValues subjectValuesToDelete = getSubjectValuesByPublicId(publicid);
 		if(subjectValuesToDelete != null){
 			confirmDeleteSubject(subjectValuesToDelete);
 		}
@@ -676,6 +800,18 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		deleteSubject(sV);
 		warningDeleteSubjectView.hideIt();
 	}
-	
+
+	public SubjectValues getSubjectValuesSelected() {
+		return subjectValuesSelected;
+	}
+
+	public void setSubjectValuesSelected(SubjectValues subjectValuesSelected) {
+		this.subjectValuesSelected = subjectValuesSelected;
+	}
+
+	public void addIcon(Icon i) {
+		// TODO Auto-generated method stub
+		subContainer.add(i);
+	}	
 
 }

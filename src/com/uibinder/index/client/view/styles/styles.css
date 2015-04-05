@@ -164,4 +164,11 @@ float:right;
 	padding-top:2px;
 }
 
+div.dline{
+	background-color: #666;
+	height:1px;
+	position:absolute;
+}
+	
+
 

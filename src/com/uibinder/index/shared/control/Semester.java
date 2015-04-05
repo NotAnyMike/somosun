@@ -23,6 +23,7 @@ public class Semester implements Serializable {
 	private String date;
 	
 	public Semester(){
+		subjectValuesList= new ArrayList<>();
 	}
     
     public Semester(String date){

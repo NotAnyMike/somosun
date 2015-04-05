@@ -450,6 +450,9 @@ public class SiaProxy {
 	}
 	
 	/**
+	 * 
+	 * If what you want is the full requisites (co, pos and pre) then use the method getRequisites(career, subject)
+	 * 
 	 * This method only works with undergraduate courses, and it is build to find only one course at the time, if you need
 	 * to find more than one subject (all subjects from a career -mandatory ones) use GetPrerequisitesFromSia(String career) 
 	 * but that method would take way to long.
@@ -460,8 +463,12 @@ public class SiaProxy {
 	 * 
 	 * @param code
 	 * @param career
+	 * 
+	 * @return a complementaryValues with the pos-requisite list empty
 	 */
-	public static String getPrerequisitesFromSia(String code, String career){
+	public static ComplementaryValues getRequisitesFromSia(String code, String career){
+		
+		ComplementaryValues complementaryValues = null;
 		
 		List<String> prerequisites = new ArrayList<String>();
 		List<String> corequisites = new ArrayList<String>();
@@ -478,7 +485,7 @@ public class SiaProxy {
 			mainSubject = subjectDao.getSubjectByCode(code);
 		}
 		
-		if(mainSubject != null && career != ""){
+		if(mainSubject != null && mainCareer != null){
 		
 			String htmlString = "";
 			try {
@@ -501,7 +508,9 @@ public class SiaProxy {
 							for(Element requisite : requisites){
 								int position = requisite.text().indexOf("-");
 								if(position != -1) {
-									prerequisites.add(requisite.text().substring(0, position-1));	
+									if(prerequisites.contains(requisite.text().substring(0, position-1))==false){										
+										prerequisites.add(requisite.text().substring(0, position-1));	
+									}
 								}
 							}
 						}
@@ -561,7 +570,7 @@ public class SiaProxy {
 			}
 			
 			ComplementaryValuesDao complementaryValuesDao = new ComplementaryValuesDao();
-			ComplementaryValues complementaryValues = complementaryValuesDao.getComplementaryValues(mainCareer, mainSubject);
+			complementaryValues = complementaryValuesDao.getComplementaryValues(mainCareer, mainSubject);
 			if(complementaryValues == null){
 				complementaryValues = new ComplementaryValues(mainCareer, mainSubject);
 			}
@@ -571,18 +580,30 @@ public class SiaProxy {
 			if(corequisitesSubjectList.isEmpty() == false){//be careful it could be deleting the old list
 				complementaryValues.setListCorequisites(corequisitesSubjectList);
 			}
-			//to save the pos requisites
+			
+			//to save the pos requisites = pre requisites of
 			ComplementaryValues posRequisiteComplementeryValues = null;
 			for(Subject preRequisiteSubject : prerequisitesSubjectList){
 				posRequisiteComplementeryValues = complementaryValuesDao.getComplementaryValues(mainCareer, preRequisiteSubject);
 				if(posRequisiteComplementeryValues == null) posRequisiteComplementeryValues = new ComplementaryValues(mainCareer, preRequisiteSubject);
-				posRequisiteComplementeryValues.addPosrequisite(mainSubject);
+				posRequisiteComplementeryValues.addPrerequisiteOf(mainSubject);
 				complementaryValuesDao.saveComplementaryValues(posRequisiteComplementeryValues);
 				posRequisiteComplementeryValues = null;
 			}
+			
+			//To save the co requisites of
+			ComplementaryValues coRequisiteOfComplementeryValues = null;
+			for(Subject coRequisiteSubject : corequisitesSubjectList){
+				coRequisiteOfComplementeryValues = complementaryValuesDao.getComplementaryValues(mainCareer, coRequisiteSubject);
+				if(coRequisiteOfComplementeryValues == null) coRequisiteOfComplementeryValues = new ComplementaryValues(mainCareer, coRequisiteSubject);
+				coRequisiteOfComplementeryValues.addCorequisiteOf(mainSubject);
+				complementaryValuesDao.saveComplementaryValues(coRequisiteOfComplementeryValues);
+				coRequisiteOfComplementeryValues = null;
+			}
+			
 			complementaryValuesDao.saveComplementaryValues(complementaryValues);
 		}
-		return prerequisites.toString() + corequisites.toString();
+		return complementaryValues;
 	}
 	
 	private static String getUrlSource(String url) throws IOException {

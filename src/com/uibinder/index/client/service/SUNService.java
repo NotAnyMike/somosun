@@ -9,6 +9,7 @@ import com.uibinder.index.shared.RandomPhrase;
 import com.uibinder.index.shared.SiaResultGroups;
 import com.uibinder.index.shared.SiaResultSubjects;
 import com.uibinder.index.shared.control.Career;
+import com.uibinder.index.shared.control.ComplementaryValues;
 import com.uibinder.index.shared.control.Plan;
 import com.uibinder.index.shared.control.Subject;
 
@@ -43,5 +44,7 @@ public interface SUNService extends RemoteService{
 	public Plan getPlanDefault(String careerCode);
 	
 	public String toTest();
+	
+	public ComplementaryValues getComplementaryValues(String career, String code);
 	
 }

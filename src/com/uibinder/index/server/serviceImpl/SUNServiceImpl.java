@@ -20,6 +20,7 @@ import com.uibinder.index.shared.RandomPhrase;
 import com.uibinder.index.shared.SiaResultGroups;
 import com.uibinder.index.shared.SiaResultSubjects;
 import com.uibinder.index.shared.control.Career;
+import com.uibinder.index.shared.control.ComplementaryValues;
 import com.uibinder.index.shared.control.Plan;
 import com.uibinder.index.shared.control.Subject;
 
@@ -160,9 +161,14 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 	public String toTest() {
 		//String stringToReturn = SiaProxy.getPrerequisitesFromSia("2016016", "2522"); //metodología 2
 		//String stringToReturn = SiaProxy.getPrerequisitesFromSia("2016018", "2522"); //micro 2
-		String stringToReturn = SiaProxy.getPrerequisitesFromSia("2016017", "2522"); //micro 1
+		//String stringToReturn = SiaProxy.getRequisitesFromSia("2016017", "2522"); //micro 1
 		
-		return stringToReturn;
+		return "";
+	}
+
+	@Override
+	public ComplementaryValues getComplementaryValues(String career, String code) {
+		return (ComplementaryValues) SiaProxy.getRequisitesFromSia(code, career);
 	}
 
 }

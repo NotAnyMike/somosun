@@ -23,9 +23,12 @@ public class ComplementaryValues implements Serializable {
 	@Id private Long id = null;
 	@Index private Career career = null;;
 	@Index private Subject subject = null;
+	
 	private List<Subject> listPrerequisites = null;
-	private List<Subject> listPosrequisites = null;
 	private List<Subject> listCorequisites = null;
+	private List<Subject> listPrerequisitesOf = null;
+	private List<Subject> listCorequisitesOf = null;
+	
 	@Index private String typology = null;
     @Index private boolean obligatoriness = false;
     
@@ -34,15 +37,17 @@ public class ComplementaryValues implements Serializable {
      */
     public ComplementaryValues(){
     	this.listPrerequisites = new ArrayList<Subject>();
-		this.listPosrequisites = new ArrayList<Subject>();
 		this.listCorequisites = new ArrayList<Subject>();
+		this.listPrerequisitesOf = new ArrayList<Subject>();
+		this.listCorequisitesOf = new ArrayList<Subject>();
     }
 
-	public ComplementaryValues(Career career, Subject subject,	List<Subject> listPrerequisites, List<Subject> listPosrequisites, List<Subject> listCorequisites, String typology,	boolean obligatoriness) {
+	public ComplementaryValues(Career career, Subject subject,	List<Subject> listPrerequisites, List<Subject> listCorequisites, String typology,	boolean obligatoriness) {
 		this.career = career;
 		this.subject = subject;
 		this.listPrerequisites = listPrerequisites;
-		this.listPosrequisites = listPosrequisites;
+		this.listPrerequisitesOf = new ArrayList<Subject>();
+		this.listCorequisitesOf = new ArrayList<Subject>();
 		this.listCorequisites = listCorequisites;
 		this.typology = typology;
 		this.obligatoriness = obligatoriness;
@@ -51,9 +56,12 @@ public class ComplementaryValues implements Serializable {
 	public ComplementaryValues(Career career, Subject subject, String typology,	boolean obligatoriness) {
 		this.career = career;
 		this.subject = subject;
+		
 		this.listPrerequisites = new ArrayList<Subject>();
-		this.listPosrequisites = new ArrayList<Subject>();
 		this.listCorequisites = new ArrayList<Subject>();
+		this.listPrerequisitesOf = new ArrayList<Subject>();
+		this.listCorequisitesOf = new ArrayList<Subject>();
+		
 		this.typology = typology;
 		this.obligatoriness = obligatoriness;
 	}
@@ -62,8 +70,9 @@ public class ComplementaryValues implements Serializable {
 		this.career = career;
 		this.subject = subject;
 		this.listPrerequisites = new ArrayList<Subject>();
-		this.listPosrequisites = new ArrayList<Subject>();
 		this.listCorequisites = new ArrayList<Subject>();
+		this.listPrerequisitesOf = new ArrayList<Subject>();
+		this.listCorequisitesOf = new ArrayList<Subject>();
 	}
 
 	public Career getCareer() {
@@ -95,16 +104,16 @@ public class ComplementaryValues implements Serializable {
 		}
 	}
 	
-	public void addPosrequisite(Subject subject){
-		if(listPosrequisites == null) listPosrequisites = new ArrayList<Subject>();
-		if(listPosrequisites.contains(subject) == false){
-			listPosrequisites.add(subject);
+	public void addPrerequisiteOf(Subject subject){
+		if(listPrerequisitesOf == null) listPrerequisitesOf = new ArrayList<Subject>();
+		if(listPrerequisitesOf.contains(subject) == false){
+			listPrerequisitesOf.add(subject);
 		}
 	}
 	
-	public void removePosrequisite(Subject subject){
-		if(listPosrequisites.contains(subject) == true){
-			listPosrequisites.remove(subject);
+	public void removePrerequisiteOf(Subject subject){
+		if(listPrerequisitesOf.contains(subject) == true){
+			listPrerequisitesOf.remove(subject);
 		}
 	}
 	
@@ -118,6 +127,19 @@ public class ComplementaryValues implements Serializable {
 	public void removeCorequisite(Subject subject){
 		if(listCorequisites.contains(subject) == true){
 			listCorequisites.remove(subject);
+		}
+	}
+	
+	public void addCorequisiteOf(Subject subject){
+		if(listCorequisitesOf == null) listCorequisitesOf = new ArrayList<Subject>();
+		if(listCorequisitesOf.contains(subject) == false){
+			listCorequisitesOf.add(subject);
+		}
+	}
+	
+	public void removeCorequisiteOf(Subject subject){
+		if(listCorequisitesOf.contains(subject) == true){
+			listCorequisitesOf.remove(subject);
 		}
 	}
 
@@ -144,6 +166,14 @@ public class ComplementaryValues implements Serializable {
 	public void setListCorequisites(List<Subject> listCorequisites) {
 		this.listCorequisites = listCorequisites;
 	}
+	
+	public List<Subject> getListCorequisitesOf() {
+		return listCorequisitesOf;
+	}
+	
+	public void setListCorequisitesOf(List<Subject> listCorequisitesOf) {
+		this.listCorequisitesOf = listCorequisitesOf;
+	}
 
 	public List<Subject> getListPrerequisites() {
 		return listPrerequisites;
@@ -153,12 +183,12 @@ public class ComplementaryValues implements Serializable {
 		this.listPrerequisites = listPrerequisites;
 	}
 
-	public List<Subject> getListPosrequisites() {
-		return listPosrequisites;
+	public List<Subject> getListPrerequisitesOf() {
+		return listPrerequisitesOf;
 	}
 
-	public void setListPosrequisites(List<Subject> listPosrequisites) {
-		this.listPosrequisites = listPosrequisites;
+	public void setListPrerequisitesOf(List<Subject> listPosrequisitesOf) {
+		this.listPrerequisitesOf = listPosrequisitesOf;
 	}
 
 }

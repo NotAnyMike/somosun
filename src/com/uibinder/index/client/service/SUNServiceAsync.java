@@ -8,6 +8,7 @@ import com.uibinder.index.shared.RandomPhrase;
 import com.uibinder.index.shared.SiaResultGroups;
 import com.uibinder.index.shared.SiaResultSubjects;
 import com.uibinder.index.shared.control.Career;
+import com.uibinder.index.shared.control.ComplementaryValues;
 import com.uibinder.index.shared.control.Plan;
 import com.uibinder.index.shared.control.Subject;
 
@@ -51,5 +52,7 @@ public interface SUNServiceAsync {
 	void getPlanDefault(String careerCode, AsyncCallback<Plan> callback);
 
 	void toTest(AsyncCallback<String> callback);
+
+	void getComplementaryValues(String career, String code,	AsyncCallback<ComplementaryValues> callback);
 
 }

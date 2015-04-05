@@ -124,10 +124,15 @@ public class PickUpDragController extends AbstractDragController {
 	    movablePanel.removeFromParent();
 	    movablePanel = null;
 	    super.dragEnd();
+	    
+	    planPresenter.moveArrows(context.draggable.getElement().getAttribute("publicid"));
 	  }
 
 	  @Override
 	  public void dragMove() {
+		
+		planPresenter.moveArrows(context.draggable.getElement().getAttribute("publicid"));
+		  
 	    // may have changed due to scrollIntoView(), developer driven changes
 	    // or manual user scrolling
 	    long timeMillis = System.currentTimeMillis();
@@ -167,6 +172,10 @@ public class PickUpDragController extends AbstractDragController {
 	  @Override
 	  public void dragStart() {
 	    super.dragStart();
+	    
+	    //To deselect every subject when dragin starts
+	    //planPresenter.deleteAllOpacities();
+	    //planPresenter.setSubjectValuesSelected(null);
 
 	    lastResetCacheTimeMillis = System.currentTimeMillis();
 	    WidgetLocation currentDraggableLocation = new WidgetLocation(context.draggable,
