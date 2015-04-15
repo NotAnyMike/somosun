@@ -57,7 +57,7 @@ public class CreatePresenter implements Presenter, CreateView.Presenter {
 
 	@Override
 	public void onListBoxCreateChange(String career) {
-		view.setTextOfContinueDefaultButton("Cargar plan de " + career);
+		//TODO add here to deactivate the button of model Plan
 	}
 
 	@Override

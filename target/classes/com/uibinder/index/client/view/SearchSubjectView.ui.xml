@@ -18,7 +18,7 @@
   			</head>
  			<body>
 		<div style="height:100%; width:100%; top:0px; left:0px; position:fixed; background:#000; opacity:.4; z-index:1000"></div>
-		<div style="position: absolute; top:60px; left:50%; width:1070px; margin-left:-535px; z-index:1001; padding-bottom:50px">
+		<div id="searchSubjectMainDiv" onLoad="arrangeLeft('#searchSubjectMainDiv')">
 			<table border="0" cellspacing="0" cellpadding="0">
 				<tr>
 					<td width="250" rowspan="2" align="left" valign="top">
@@ -142,111 +142,197 @@
 					      <b:PanelBody>
 					        <b.html:Paragraph>
                                 
-                                <table border="0" cellspacing="0" cellpadding="0" class="table table-bordered" style="padding:0px">
-						          <tr>
-						            <td align="center" valign="middle"><small>pre-requisitos</small></td>
-						            <td align="center" valign="middle"><small>co-requisitos</small></td>
-						            <td align="center" valign="middle"><small>pos-requisitos</small></td>
-						          </tr>
-						          <tr>
-						            <td style="padding:0px"><table border="0" cellspacing="0" cellpadding="0" class="table table-hover" style="margin:0px">
-						              <tr>
-						                <td align="center" valign="middle">Calculo I</td>
-						              </tr>
-						              <tr>
-						                <td align="center" valign="middle">Microeconomia I</td>
-						              </tr>
-						            </table></td>
-						            <td style="padding:0px"><table border="0" cellspacing="0" cellpadding="0" class="table table-hover" style="margin:0px">
-						              <tr>
-						                <td align="center" valign="middle">Micreoeconomia II</td>
-						              </tr>
-						            </table></td>
-						            <td style="padding:0px"><table border="0" cellspacing="0" cellpadding="0" class="table table-hover" style="margin:0px">
-						              <tr>
-						                <td align="center" valign="middle">Microeconomia III</td>
-						              </tr>
-						            </table></td>
-						          </tr>
-						        </table>
-						        <br></br>
+                                <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                                	<tr>
+                                		<td valing="top">
+                                			<div class="form-group">
+								                <div class="input-group">
+								                  <div class="input-group-addon">Mostrar requisitos para</div>
+								                  <g:ListBox ui:field="listBoxCareers" addStyleNames="{second.textboxCreate} {third.lead} "></g:ListBox>
+								                  </div>
+								              </div>
+                                		</td>
+                                		<td></td>
+                                		<td width="300" valing="top" aling="center" style="vertical-align: top;">
+                                			<div class="panel panel-default" style="">
+								              <div class="panel-body text-center" style="padding:6px">
+								                <g:Label ui:field="labelSubjectGroup">Agrupacion: Contenido cuantitativo</g:Label>
+								              </div>
+								          </div>
+                                		</td>
+                                	</tr>
+                                	<tr>
+                                		<td></td>
+                                		<td width="10"></td>
+                                		<td></td>
+                                	</tr>
+                                	<tr height="10px">
+                                		<td colspan="3"></td>
+                                	</tr>
+                                	<tr>
+                                		<td colspan="3" width="100%">
+                                			<table border="0" cellspacing="0" cellpadding="0" class="table table-bordered" style="padding:0px">
+									          <tr>
+									            <td align="center" valign="middle"><small>pre-requisitos</small></td>
+									            <td align="center" valign="middle"><small>co-requisitos</small></td>
+									          </tr>
+									          <tr>
+									            <td style="padding:0px; margin-bottom:0px">
+										            <g:VerticalPanel ui:field="preRequisitesPanel"></g:VerticalPanel>
+									            </td>
+									            <td style="padding:0px">
+										            <g:VerticalPanel ui:field="coRequisitesPanel"></g:VerticalPanel>
+									            </td>
+									          </tr>
+									        </table>
+									        
+									        <p></p>
+									        
+									        <div class="panel panel-default text-left" style="">
+								                <div class="panel-body" style="padding:6px">
+								                  <table>
+								                    <tr>
+								                      <td style="min-width: 225px" aling="left" valign="top">
+								                        Modelacion estatica es pre-requisito de: 
+								                      </td>
+								                      <td width="10px"></td>
+								                      <td aling="left" valing="top" style="margin:1px">
+								                      	<g:FlowPanel ui:field="antiPreRequisite"></g:FlowPanel>
+								                      </td>
+								                    </tr>
+								                    <tr>
+								                    	<tr colspan="3" height="10"></tr>
+								                    </tr>
+								                    <tr>
+								                    	<td style="min-width: 230px" aling="left" valign="top">
+								                        	Modelacion estatica es co-requisito de: 
+								                      	</td>
+								                    	<td width="10px"></td>
+									                    <td aling="left" valing="top" style="margin:1px">
+									                    	<g:FlowPanel ui:field="antiCoRequisite"></g:FlowPanel>
+									                    </td>
+								                    </tr>
+								                  </table>
+								                </div>
+								              </div>
+									        
+                                		</td>	
+                                	</tr>
+                                </table>
+                                
 						        
+						        
+						        <br></br>
+						        <g:Grid ui:field="gradesTable">
+						        	<g:row>
+						        		<g:cell styleName="text-center"># gr</g:cell>
+						        		<g:cell styleName="text-left"><strong>Profesor</strong></g:cell>
+						        		<g:cell styleName="text-center"><small>Nota profesor</small></g:cell>
+						        		<g:cell styleName="text-center"><small>Nota grupo</small></g:cell>
+						        		<g:cell styleName="text-center"><small>Nota promedio</small></g:cell>
+						        		<g:customCell styleName="text-center">
+						        			<g:Grid ui:field="spacesTable">
+						        				<g:row>
+						        					<g:cell styleName="text-center"><small>Cupos</small></g:cell>
+						        				</g:row>
+						        				<g:row>
+						        					<g:customCell  styleName="text-center">
+						        					<g:Grid ui:field="titleSpacesTable">
+							        					<g:row>
+							        						<g:cell styleName="text-center"><small>disp</small></g:cell>
+							        						<g:cell styleName="text-center"><small>total</small></g:cell>
+							        					</g:row>
+						        					</g:Grid>
+						        					</g:customCell>
+						        				</g:row>
+						        			</g:Grid>
+						        		</g:customCell>
+						        		<g:cell styleName="text-center"><strong>L</strong></g:cell>
+						        		<g:cell styleName="text-center"><strong>M</strong></g:cell>
+						        		<g:cell styleName="text-center"><strong>C</strong></g:cell>
+						        		<g:cell styleName="text-center"><strong>J</strong></g:cell>
+						        		<g:cell styleName="text-center"><strong>V</strong></g:cell>
+						        		<g:cell styleName="text-center"><strong>S</strong></g:cell>
+						        		<g:cell styleName="text-center"><strong>D</strong></g:cell>
+						        	</g:row>
+						        </g:Grid>
+								
 						        <table border="0" cellspacing="0" cellpadding="0" class="table table-hover">
 						        <thead>
-						  <tr>
-						    <td align="center" valign="bottom"><strong># gr</strong></td>
-						    <td align="left" valign="bottom"><strong>Profesor</strong></td>
-						    <td width="45" align="center" valign="bottom"><strong><small>Nota Profesor</small></strong></td>
-						    <td width="40" align="center" valign="bottom"><strong><small>Nota  grupo</small></strong></td>
-						    <td width="40" align="center" valign="bottom"><strong><small>Nota promedio</small></strong></td>
-						    <td colspan="2" align="center" valign="bottom"><table width="60" border="0" cellspacing="0" cellpadding="0">
-						      <tr>
-						        <td colspan="2" align="center" valign="middle"><strong><small>cupos</small></strong></td>
-						        </tr>
-						      <tr>
-						        <td width="30" align="center" valign="middle"><strong><small>disp</small></strong></td>
-						        <td width="30" align="center" valign="middle"><strong><small>total</small></strong></td>
-						      </tr>
-						    </table></td>
-						    <td align="center" valign="bottom"><strong>L</strong></td>
-						    <td align="center" valign="bottom"><strong>M</strong></td>
-						    <td align="center" valign="bottom"><strong>C</strong></td>
-						    <td align="center" valign="bottom"><strong>J</strong></td>
-						    <td align="center" valign="bottom"><strong>V</strong></td>
-						    <td align="center" valign="bottom"><strong>S</strong></td>
-						    <td align="center" valign="bottom"><strong>D</strong></td>
-						  </tr>
-						  </thead>
-						  <tr>
-						    <td align="center">1</td>
-						    <td align="left">Arsenio Pecha Castiblanco</td>
-						    <td width="45" align="center">4,7</td>
-						    <td width="40" align="center">3,0</td>
-						    <td width="40" align="center">3,2</td>
-						    <td width="30" align="center">5</td>
-						    <td width="30" align="center">30</td>
-						    <td align="center">.-</td>
-						    <td align="center">-</td>
-						    <td align="center">--</td>
-						    <td align="center">--</td>
-						    <td align="center">--</td>
-						    <td align="center">--</td>
-						    <td align="center">-</td>
-						  </tr>
-						  <tr>
-						    <td align="center">2</td>
-						    <td align="left">Mike Woodcock</td>
-						    <td width="45" align="center">4,8</td>
-						    <td width="40" align="center">5,0</td>
-						    <td width="40" align="center">2,3</td>
-						    <td width="30" align="center">15</td>
-						    <td width="30" align="center">50</td>
-						    <td align="center">-</td>
-						    <td align="center">--</td>
-						    <td align="center">-</td>
-						    <td align="center">-</td>
-						    <td align="center">-</td>
-						    <td align="center">-</td>
-						    <td align="center">-</td>
-						  </tr>
-						  <tr>
-						    <td align="center">3</td>
-						    <td align="left">Neill Giraldo SeundoApellido</td>
-						    <td width="45" align="center">4,2</td>
-						    <td width="40" align="center">4,0</td>
-						    <td width="40" align="center">4,1</td>
-						    <td width="30" align="center">4</td>
-						    <td width="30" align="center">40</td>
-						    <td align="center">-</td>
-						    <td align="center">-</td>
-						    <td align="center">-</td>
-						    <td align="center">--</td>
-						    <td align="center">-</td>
-						    <td align="center">-</td>
-						    <td align="center">-</td>
-						  </tr>
-						</table>
-						<div class="alert alert-warning" role="alert">Necesitamos ayuda para poder completar estas funciones, si quieres hacerlo has click aqui</div>
+								  <tr>
+								    <td align="center" valign="bottom"><strong># gr</strong></td>
+								    <td align="left" valign="bottom"><strong>Profesor</strong></td>
+								    <td width="45" align="center" valign="bottom"><strong><small>Nota Profesor</small></strong></td>
+								    <td width="40" align="center" valign="bottom"><strong><small>Nota  grupo</small></strong></td>
+								    <td width="40" align="center" valign="bottom"><strong><small>Nota promedio</small></strong></td>
+								    <td colspan="2" align="center" valign="bottom"><table width="60" border="0" cellspacing="0" cellpadding="0">
+								      <tr>
+								        <td colspan="2" align="center" valign="middle"><strong><small>cupos</small></strong></td>
+								        </tr>
+								      <tr>
+								        <td width="30" align="center" valign="middle"><strong><small>disp</small></strong></td>
+								        <td width="30" align="center" valign="middle"><strong><small>total</small></strong></td>
+								      </tr>
+								    </table></td>
+								    <td align="center" valign="bottom"><strong>L</strong></td>
+								    <td align="center" valign="bottom"><strong>M</strong></td>
+								    <td align="center" valign="bottom"><strong>C</strong></td>
+								    <td align="center" valign="bottom"><strong>J</strong></td>
+								    <td align="center" valign="bottom"><strong>V</strong></td>
+								    <td align="center" valign="bottom"><strong>S</strong></td>
+								    <td align="center" valign="bottom"><strong>D</strong></td>
+								  </tr>
+								  </thead>
+								  <tr>
+								    <td align="center">1</td>
+								    <td align="left">Arsenio Pecha Castiblanco</td>
+								    <td width="45" align="center">4,7</td>
+								    <td width="40" align="center">3,0</td>
+								    <td width="40" align="center">3,2</td>
+								    <td width="30" align="center">5</td>
+								    <td width="30" align="center">30</td>
+								    <td align="center">.-</td>
+								    <td align="center">-</td>
+								    <td align="center">--</td>
+								    <td align="center">--</td>
+								    <td align="center">--</td>
+								    <td align="center">--</td>
+								    <td align="center">-</td>
+								  </tr>
+								  <tr>
+								    <td align="center">2</td>
+								    <td align="left">Mike Woodcock</td>
+								    <td width="45" align="center">4,8</td>
+								    <td width="40" align="center">5,0</td>
+								    <td width="40" align="center">2,3</td>
+								    <td width="30" align="center">15</td>
+								    <td width="30" align="center">50</td>
+								    <td align="center">-</td>
+								    <td align="center">--</td>
+								    <td align="center">-</td>
+								    <td align="center">-</td>
+								    <td align="center">-</td>
+								    <td align="center">-</td>
+								    <td align="center">-</td>
+								  </tr>
+								  <tr>
+								    <td align="center">3</td>
+								    <td align="left">Neill Giraldo SeundoApellido</td>
+								    <td width="45" align="center">4,2</td>
+								    <td width="40" align="center">4,0</td>
+								    <td width="40" align="center">4,1</td>
+								    <td width="30" align="center">4</td>
+								    <td width="30" align="center">40</td>
+								    <td align="center">-</td>
+								    <td align="center">-</td>
+								    <td align="center">-</td>
+								    <td align="center">--</td>
+								    <td align="center">-</td>
+								    <td align="center">-</td>
+								    <td align="center">-</td>
+								  </tr>
+								</table>
+							<div class="alert alert-warning" role="alert">Quieres ayudar a completar esatas funcionalidades, entonces has click aqui</div>
                                    
                             </b.html:Paragraph>
 					      </b:PanelBody>

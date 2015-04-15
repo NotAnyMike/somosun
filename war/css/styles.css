@@ -70,8 +70,7 @@ body {
 	text-align:center;
 	align: center;
 	height:30px;
-    position: fixed;
-    bottom: 0;
+    position: absolute;
     width: 100%;
 }
 .buttonCursor{
@@ -170,5 +169,18 @@ div.dline{
 	position:absolute;
 }
 	
+#siaSummary {
+    position: relative;
+	width: 662px;
+	float: left;
+}
 
-
+#searchSubjectMainDiv{
+	position: absolute; 
+	top:80px; 
+	width:1070px; 
+	z-index:1001; 
+	padding-bottom:50px;
+	margin-left: -535px;
+	left: 50%;
+}

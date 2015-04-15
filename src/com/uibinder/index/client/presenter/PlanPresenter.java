@@ -114,6 +114,17 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	
 	private SubjectValues subjectValuesSelected = null;
 	
+	AsyncCallback<List<Career>> asyncGetCareers = new AsyncCallback<List<Career>>() {
+		
+		@Override
+		public void onFailure(Throwable caught) {
+		}
+		
+		@Override
+		public void onSuccess(List<Career> result) {
+			addCareersToListBox(result);				
+		}};
+	
 	/**
 	 * This is the constructor to create an empty plan, that means no subjects
 	 * at all, to make it 100% customizable for the user
@@ -133,6 +144,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		searchSubjectView.fill();
 		this.siaSummaryView = siaSummaryView; 
 		connectionsController = new ConnectionsController(this);
+		
+		getCareers("bog");
 		
 	}
 	
@@ -155,6 +168,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		this.siaSummaryView = siaSummaryView;
 		connectionsController = new ConnectionsController(this);
 		
+		getCareers("bog");
+		
 		setPlan(plan);		
 	}
 
@@ -176,6 +191,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		searchSubjectView.fill();
 		this.siaSummaryView = siaSummaryView;
 		connectionsController = new ConnectionsController(this);
+		
+		getCareers("bog");
 		
 		setPlan(plan);
 		
@@ -345,7 +362,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	
 	public void moveArrows(String publicId){
 		SubjectValues sV = getSubjectValuesByPublicId(publicId);
-		if(sV != null && (subjectValuesSelected.equals(sV) == true || areRelated(sV, subjectValuesSelected) == true)){
+		if(sV != null && ((subjectValuesSelected.equals(sV) == true || areRelated(sV, subjectValuesSelected) == true))){
 			showConnections(subjectValuesSelected);
 		}
 	}
@@ -474,6 +491,20 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		return list;
 	}
 
+	public void getCareers(String sede) {
+		rpcService.getCareers(sede, asyncGetCareers);
+	}
+	
+	private void addCareersToListBox(List<Career> careers) {
+		if(careers == null){
+			searchSubjectView.addCareerToListBox("No se pudieron cargar las careeras","1");			
+		} else {
+			for(Career career : careers){
+				searchSubjectView.addCareerToListBox(career.getName(), career.getCode());
+			}
+		}
+	}
+	
 	public void deleteAllOpacities() {
 		for(SubjectWidget sW : subjectWidgetList){
 			sW.getElement().setAttribute("style", "opacity:1");

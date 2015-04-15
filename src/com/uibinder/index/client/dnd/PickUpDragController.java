@@ -123,9 +123,9 @@ public class PickUpDragController extends AbstractDragController {
 	    }
 	    movablePanel.removeFromParent();
 	    movablePanel = null;
+	    planPresenter.moveArrows(context.draggable.getElement().getAttribute("publicid"));
 	    super.dragEnd();
 	    
-	    planPresenter.moveArrows(context.draggable.getElement().getAttribute("publicid"));
 	  }
 
 	  @Override
@@ -173,7 +173,8 @@ public class PickUpDragController extends AbstractDragController {
 	  public void dragStart() {
 	    super.dragStart();
 	    
-	    //To deselect every subject when dragin starts
+	    
+	    //To deselect every subject when dragging starts
 	    //planPresenter.deleteAllOpacities();
 	    //planPresenter.setSubjectValuesSelected(null);
 

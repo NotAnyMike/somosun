@@ -111,7 +111,7 @@ public class ConnectionsController {
 			topInit = y1;
 			leftInit = x1 +(from.getOffsetWidth())/2;// + 10*(((connectionsFrom & 1)==1)? -1 : 1)*(connectionsFrom + (((connectionsFrom & 1 )==1) ? 1 : 0)))/2;
 			topFinal = to.getAbsoluteTop() + to.getOffsetHeight();
-			leftFinal = to.getAbsoluteLeft()+(to.getOffsetWidth() + 10*(((connectionsTo & 1)==1)? -1 : 1)*(connectionsTo + (((connectionsTo & 1 )==1) ? 1 : 0)))/2;
+			leftFinal = to.getAbsoluteLeft()+(to.getOffsetWidth() + 10*(((connectionsTo & 1)==1)? -1 : 1)*(connectionsTo + (((connectionsTo & 1 )==1) ? 1 : 2)))/2;
 			c.setOutUp();
 			c.setInDown();
 			if(c.getInDown() != 0 && c.getPosition() == null && connectionsTo != 0){

@@ -41,7 +41,7 @@
 	      <tr>
 	        <td width="45%" align="right" valign="middle">
               	<g:ListBox ui:field="listBoxCreate" addStyleNames="{second.textboxCreate} {third.lead} "></g:ListBox><br></br>
-              	<p><g:Button ui:field="continueDefaultButton" addStyleNames="{third.btn} {third.btn-default}">Cargar plan de Ingeniería de Sistemas</g:Button></p>
+              	<p><g:Button ui:field="newPlanButton" addStyleNames="{third.btn} {third.btn-default}">Nuevo plan</g:Button>   <g:Button ui:field="modelPlanButton" addStyleNames="{third.btn} {third.btn-default}">Cargar plan modelo</g:Button></p>
             </td>
 	        <td width="45%" height="400" align="left" valign="middle" style="font-size:20px; text-align:left" class="lead main-text">
             <ol>
