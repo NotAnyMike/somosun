@@ -362,7 +362,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	
 	public void moveArrows(String publicId){
 		SubjectValues sV = getSubjectValuesByPublicId(publicId);
-		if(sV != null && ((subjectValuesSelected.equals(sV) == true || areRelated(sV, subjectValuesSelected) == true))){
+		if(sV != null){
+			//if((subjectValuesSelected.equals(sV) == true || areRelated(sV, subjectValuesSelected) == true) || true)
 			showConnections(subjectValuesSelected);
 		}
 	}
@@ -384,24 +385,26 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	}
 
 	private void showConnections(SubjectValues sV) {
-		for(Subject s : sV.getComplementaryValues().getListPrerequisites()){
-			for(SubjectValues sVTempo : getSubjectValuesBySubject(s)){
-				connectionsController.addConnection(subjectValuesAndWidgetBiMap.get(sV), subjectValuesAndWidgetBiMap.get(sVTempo), "pre");
+		if(sV !=null){
+			for(Subject s : sV.getComplementaryValues().getListPrerequisites()){
+				for(SubjectValues sVTempo : getSubjectValuesBySubject(s)){
+					connectionsController.addConnection(subjectValuesAndWidgetBiMap.get(sV), subjectValuesAndWidgetBiMap.get(sVTempo), "pre");
+				}
 			}
-		}
-		for(Subject s : sV.getComplementaryValues().getListCorequisites()){
-			for(SubjectValues sVTempo : getSubjectValuesBySubject(s)){
-				connectionsController.addConnection(subjectValuesAndWidgetBiMap.get(sV), subjectValuesAndWidgetBiMap.get(sVTempo), "co");
+			for(Subject s : sV.getComplementaryValues().getListCorequisites()){
+				for(SubjectValues sVTempo : getSubjectValuesBySubject(s)){
+					connectionsController.addConnection(subjectValuesAndWidgetBiMap.get(sV), subjectValuesAndWidgetBiMap.get(sVTempo), "co");
+				}
 			}
-		}
-		for(Subject s : sV.getComplementaryValues().getListPrerequisitesOf()){
-			for(SubjectValues sVTempo : getSubjectValuesBySubject(s)){
-				connectionsController.addConnection(subjectValuesAndWidgetBiMap.get(sVTempo), subjectValuesAndWidgetBiMap.get(sV), "pre");
+			for(Subject s : sV.getComplementaryValues().getListPrerequisitesOf()){
+				for(SubjectValues sVTempo : getSubjectValuesBySubject(s)){
+					connectionsController.addConnection(subjectValuesAndWidgetBiMap.get(sVTempo), subjectValuesAndWidgetBiMap.get(sV), "pre");
+				}
 			}
-		}
-		for(Subject s : sV.getComplementaryValues().getListCorequisitesOf()){
-			for(SubjectValues sVTempo : getSubjectValuesBySubject(s)){
-				connectionsController.addConnection(subjectValuesAndWidgetBiMap.get(sVTempo), subjectValuesAndWidgetBiMap.get(sV), "co");
+			for(Subject s : sV.getComplementaryValues().getListCorequisitesOf()){
+				for(SubjectValues sVTempo : getSubjectValuesBySubject(s)){
+					connectionsController.addConnection(subjectValuesAndWidgetBiMap.get(sVTempo), subjectValuesAndWidgetBiMap.get(sV), "co");
+				}
 			}
 		}
 	}
@@ -698,9 +701,11 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	 */
 	private SubjectValues getSubjectValuesByPublicId(String publicId){
 		SubjectValues subjectValuesToReturn = null;
-		for(SubjectValues subjectValues : subjectValuesList){
-			if(subjectValues.getSubjectValuesPublicId().equals(publicId)){
-				subjectValuesToReturn = subjectValues;
+		if(subjectValuesList.isEmpty() == false){
+			for(SubjectValues subjectValues : subjectValuesList){
+				if(subjectValues.getSubjectValuesPublicId().equals(publicId)){
+					subjectValuesToReturn = subjectValues;
+				}
 			}
 		}
 		return subjectValuesToReturn;

@@ -123,9 +123,9 @@ public class PickUpDragController extends AbstractDragController {
 	    }
 	    movablePanel.removeFromParent();
 	    movablePanel = null;
-	    planPresenter.moveArrows(context.draggable.getElement().getAttribute("publicid"));
 	    super.dragEnd();
 	    
+	    planPresenter.moveArrows(context.draggable.getElement().getAttribute("publicid"));
 	  }
 
 	  @Override
@@ -222,6 +222,7 @@ public class PickUpDragController extends AbstractDragController {
 	    calcBoundaryOffset();
 	    dropTargetClientWidth = DOMUtil.getClientWidth(boundaryPanel.getElement());
 	    dropTargetClientHeight = DOMUtil.getClientHeight(boundaryPanel.getElement());
+	    
 	  }
 
 	  /**
