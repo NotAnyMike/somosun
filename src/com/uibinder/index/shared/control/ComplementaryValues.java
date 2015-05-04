@@ -31,6 +31,7 @@ public class ComplementaryValues implements Serializable {
 	
 	@Index private String typology = null;
     @Index private boolean obligatoriness = false;
+    @Index private SubjectGroup subjectGroup = null;
     
     /**
      * Do NOT use this method
@@ -51,6 +52,18 @@ public class ComplementaryValues implements Serializable {
 		this.listCorequisites = listCorequisites;
 		this.typology = typology;
 		this.obligatoriness = obligatoriness;
+	}
+	
+	public ComplementaryValues(Career career, Subject subject,	List<Subject> listPrerequisites, List<Subject> listCorequisites, String typology,	boolean obligatoriness, SubjectGroup subjectGroup) {
+		this.career = career;
+		this.subject = subject;
+		this.listPrerequisites = listPrerequisites;
+		this.listPrerequisitesOf = new ArrayList<Subject>();
+		this.listCorequisitesOf = new ArrayList<Subject>();
+		this.listCorequisites = listCorequisites;
+		this.typology = typology;
+		this.obligatoriness = obligatoriness;
+		this.subjectGroup = subjectGroup;
 	}
 
 	public ComplementaryValues(Career career, Subject subject, String typology,	boolean obligatoriness) {
@@ -189,6 +202,14 @@ public class ComplementaryValues implements Serializable {
 
 	public void setListPrerequisitesOf(List<Subject> listPosrequisitesOf) {
 		this.listPrerequisitesOf = listPosrequisitesOf;
+	}
+
+	public SubjectGroup getSubjectGroup() {
+		return subjectGroup;
+	}
+
+	public void setSubjectGroup(SubjectGroup subjectGroup) {
+		this.subjectGroup = subjectGroup;
 	}
 
 }

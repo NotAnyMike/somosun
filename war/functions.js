@@ -1,4 +1,8 @@
 $(window).load(function(){
+	//showTooltip();
+});
+
+$(window).load(function(){
 	arrangeLeft("#footer")
 });
 
@@ -17,3 +21,18 @@ function arrangeLeft(id){
 		});
 	});
 };
+
+function showTooltip(){
+	$('[data-toggle="tooltip"]').tooltip();	
+};
+
+$(document).click(function(e) { 
+    // Check for left button
+    if (e.button == 0) {
+    	if($(e.target).attr("id") == "btnAddSpecificSubject" || $(e.target).parent().attr("id") == "btnAddSpecificSubject"){
+			alert("took");
+			e.stopPropagation(); 		
+    	}
+
+    }
+});

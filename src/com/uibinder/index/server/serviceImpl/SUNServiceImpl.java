@@ -64,7 +64,6 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		return null;
 	}
 
-	
 	/*
 	 * 
 	 * It allows the admins to retrieve and store data in & out of the database infrastructure. 
@@ -135,9 +134,8 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 	 * @return
 	 */
 	@Override
-	public SiaResultSubjects getSubjectFromSia(String nameOrCode, String typology,
-			String career, String scheduleCP, int page, int ammount, String sede) {
-		return null;//SiaProxy.getSubjects(nameOrCode, typology, career, scheduleCP, page, ammount, sede);
+	public SiaResultSubjects getSubjectFromSia(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede) {
+		return SiaProxy.getSubjects(nameOrCode, typology, career, scheduleCP, page, ammount, sede);
 	}
 
 	@Override
@@ -159,16 +157,28 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 
 	@Override
 	public String toTest() {
-		//String stringToReturn = SiaProxy.getPrerequisitesFromSia("2016016", "2522"); //metodología 2
-		//String stringToReturn = SiaProxy.getPrerequisitesFromSia("2016018", "2522"); //micro 2
-		//String stringToReturn = SiaProxy.getRequisitesFromSia("2016017", "2522"); //micro 1
-		
+		SiaProxy.getRequisitesForACareer("2508");
 		return "";
 	}
 
 	@Override
 	public ComplementaryValues getComplementaryValues(String career, String code) {
 		return (ComplementaryValues) SiaProxy.getRequisitesFromSia(code, career);
+	}
+
+	
+	/**
+	 * @param nameOrCode the name or the code as a String
+	 * @para typology:
+	 * 	For all = ""
+	 * 	For under-graduate: Nivelación: "P" Fundamentación: "B" Disciplinar: "C" Libre elección: "L"
+	 * 	For graduate: Obligatorio: "O" Elegible: "T"
+	 * @param career: the String of the code of the career
+	 * @param sede: "ama", "bog", "car", "man", "med", "ori", "pal" or  "tum" if nothing it will be taken as bog
+	 */
+	@Override
+	public SiaResultSubjects getSubjectsFromSia(String nameOrCode, String typology, String career, String sede, int page) {
+		return getSubjectFromSia(nameOrCode, typology, career, "", page, 10, sede);
 	}
 
 }

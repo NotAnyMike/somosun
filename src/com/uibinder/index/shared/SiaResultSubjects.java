@@ -12,14 +12,16 @@ public class SiaResultSubjects extends SiaResult implements Serializable{
 	private List<Subject> subjectList = new ArrayList<Subject>();
 	private int totalAsignaturas = 0;
 	private int numPaginas = 0;
+	private int page = 0;
 	
 	public SiaResultSubjects(){
 	}
 	
-	public SiaResultSubjects(List<Subject> subjectList, int totalAsignaturas, int numPaginas) {
+	public SiaResultSubjects(List<Subject> subjectList, int totalAsignaturas, int numPaginas, int page) {
 		this.subjectList = subjectList;
 		this.totalAsignaturas = totalAsignaturas;
 		this.numPaginas = numPaginas;
+		this.page = page;
 	}
 
 	public List<Subject> getSubjectList() {
@@ -44,6 +46,14 @@ public class SiaResultSubjects extends SiaResult implements Serializable{
 
 	public void setNumPaginas(int numPaginas) {
 		this.numPaginas = numPaginas;
+	}
+
+	public int getPage() {
+		return page;
+	}
+
+	public void setPage(int page) {
+		this.page = page;
 	}
 	
 }

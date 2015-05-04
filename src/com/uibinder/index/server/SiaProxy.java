@@ -68,6 +68,9 @@ public class SiaProxy {
 	public final static String SIA_URL_PAL_BUSCADOR = "http://www.sia.unal.edu.co/buscador/service/action.pub";
 	public final static String SIA_URL_TUM_BUSCADOR = "http://www.sia.unal.edu.co/buscador/service/action.pub";
 	
+	public final static String SIA_COMPLEMENTARY_VALUES_AND_PLAN_BOG = "http://www.pregrado.unal.edu.co/index.php?option=com_content&view=article&id=2&Itemid=102&cod=";
+	public final static String SIA_BASIC_URL_TO_COMPLEMENTARY_AND_PLAN = "http://www.legal.unal.edu.co/sisjurun/normas/Norma1.jsp?i=";
+	
 	public final static String VALOR_NIVELACADEMICO_TIPOLOGIA_PRE = "PRE";
 	public final static String VALOR_NIVELACADEMICO_TIPOLOGIA_POS = "POS";
 	public final static String VALOR_NIVELACADEMICO_PLANESTUDIO_PRE = "PRE";
@@ -93,7 +96,7 @@ public class SiaProxy {
 		boolean error = false; //it makes reference to the error when we make to much calls too often, not the other normal and standard errors
 		int counter = 0;
 		
-		/*do{
+		do{
 			try {
 	            URL url = new URL(URLToConnect);
 	            HttpURLConnection request = ( HttpURLConnection ) url.openConnection();
@@ -131,13 +134,13 @@ public class SiaProxy {
 			if(error == true){
 				counter ++;
 				try {
-					Thread.sleep(1000); //change to 1000
+					Thread.sleep(0); //change to 1000
 				} catch (InterruptedException e) {
 					//do nothing
 				}
 			}
-		}while(error == true && counter < 5); //change to 5
-		*/
+		}while(error == true && counter < 1); //change to 5
+		
 		return respString;
 	}
 	 
@@ -173,6 +176,7 @@ public class SiaProxy {
 	 * 		The monday above + the same hours but Wednesday: "L6-10,13-21:M:C6-10,13-21:J:V:S:D"
 	 * @param page: the page of the search, must have a value, if zero then it will return an empty string.
 	 * @param ammount: the number of results per @param page, must have a value, CANNOT be zero or because it will return an error.
+	 * @param sede: sede: "ama", "bog", "car", "man", "med", "ori", "pal" or  "tum"; default "bog"
 	 * 
 	 * @return a list of subjects, if there were some error the first and only subject
 	 * returned will have the name of ERROR, if it is empty there were no errors so the
@@ -191,7 +195,7 @@ public class SiaProxy {
 		if(respString == "IOException" || respString == "MalformedURLException" || respString == null){
 			siaResult.setError(true);
 		}else{
-			siaResult = parseSubjectJSON(respString, ammount);		
+			siaResult = parseSubjectJSON(respString, page, ammount);		
 		}
 
 		return siaResult;
@@ -210,7 +214,7 @@ public class SiaProxy {
 		if(respString == "IOException" || respString == "MalformedURLException" || respString == null || respString == "error"){
 			siaResult.setError(true);
 		}else{
-			siaResult = parseSubjectJSON(respString, ammount);		
+			siaResult = parseSubjectJSON(respString, page, ammount);		
 		}
 
 		return respString;
@@ -253,7 +257,7 @@ public class SiaProxy {
 		
 	}
 	
-	private static SiaResultSubjects parseSubjectJSON(String jsonString, int ammount){		
+	private static SiaResultSubjects parseSubjectJSON(String jsonString, int page, int ammount){		
 		SiaResultSubjects siaResult = new SiaResultSubjects();
 
 		List<Subject> subjectList = new ArrayList<Subject>();
@@ -286,6 +290,7 @@ public class SiaProxy {
 		}
 		
 		siaResult.setNumPaginas(totalPages);
+		siaResult.setPage(page);
 		siaResult.setTotalAsignaturas(totalSubjects);
 		siaResult.setSubjectList(subjectList);
 		
@@ -610,7 +615,7 @@ public class SiaProxy {
         URL urlString = new URL(url);
         URLConnection yc = urlString.openConnection();
         BufferedReader in = new BufferedReader(new InputStreamReader(
-                yc.getInputStream(), "UTF-8"));
+                yc.getInputStream(), "ISO-8859-1"));
         String inputLine;
         StringBuilder a = new StringBuilder();
         while ((inputLine = in.readLine()) != null)
@@ -706,6 +711,309 @@ public class SiaProxy {
 	public Teacher getTeacherFromSiaByUsername(String username){
 		//TODO
 		return null;
+	}
+	
+	/**
+	 * This method will download all available requisites for a career
+	 */
+	public static void getRequisitesForACareer(String careerCode){
+		
+		Document docPlan = null;
+		Document docRequisites = null;
+		
+		List<SubjectGroupDummy> subjectGroups1 = new ArrayList<SubjectGroupDummy>(); //To save the subjectGroups found in plan url
+		List<SubjectGroupDummy> subjectGroups2 = new ArrayList<SubjectGroupDummy>(); //To save the subjectGroups found in requisites url
+		List<ComponentDummy> fundamentals = new ArrayList<ComponentDummy>(); //para guardar los componentes fundamentales
+		List<ComponentDummy> professionals = new ArrayList<ComponentDummy>(); //para guardar los componentes profesionales o disciplinares
+		
+		String htmlPlanURL = null;
+		String planCode = "";
+		String requisitesCode = "";
+		String htmlPlan = null;
+		String htmlRequisites = null;
+		Boolean errorComponent = null;
+		
+		boolean isFundamental = true;
+		
+		try {
+			htmlPlanURL = getUrlSource(SIA_COMPLEMENTARY_VALUES_AND_PLAN_BOG + careerCode);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		if(htmlPlanURL != null){
+			htmlPlanURL = htmlPlanURL.substring(htmlPlanURL.indexOf(SIA_BASIC_URL_TO_COMPLEMENTARY_AND_PLAN) + SIA_BASIC_URL_TO_COMPLEMENTARY_AND_PLAN.length());
+			planCode = htmlPlanURL.substring(0, htmlPlanURL.indexOf('>')-1);
+			htmlPlanURL = htmlPlanURL.substring(htmlPlanURL.indexOf(SIA_BASIC_URL_TO_COMPLEMENTARY_AND_PLAN) + SIA_BASIC_URL_TO_COMPLEMENTARY_AND_PLAN.length());
+			requisitesCode = htmlPlanURL.substring(0, htmlPlanURL.indexOf('>')-1);
+			
+			String planURL = SIA_BASIC_URL_TO_COMPLEMENTARY_AND_PLAN + planCode;
+			String requisiteURL = SIA_BASIC_URL_TO_COMPLEMENTARY_AND_PLAN + requisitesCode;
+			
+			try {
+				htmlPlan = getUrlSource(planURL);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
+				htmlRequisites = getUrlSource(requisiteURL);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			if(htmlRequisites != null && htmlPlan != null){
+				docPlan = Jsoup.parse(htmlPlan);
+				docRequisites = Jsoup.parse(htmlRequisites);
+				
+				Elements tablesFalse = docPlan.getElementsByTag("table");
+				Elements tablesTrue = new Elements();
+				
+				//Deleting unnecessary tables
+				for(Element e : tablesFalse){
+					if(e.toString().toLowerCase().contains("agrupaci")==true && e.toString().toLowerCase().contains("obligatorios") && e.toString().toLowerCase().contains("optativos")==true){
+						tablesTrue.add(e);
+					}
+				}
+				
+				// If there are more than 2 tables then something weird is happening
+				if(tablesTrue.size() > 2) errorComponent = true;
+				
+				//Save the subjectGroups
+				for(Element e : tablesTrue){
+					
+					//Getting if it is fundamental or profesional/disciplinary
+					String partialText = docPlan.toString().replaceAll(" ", "");
+					String partialTable = e.toString().replaceAll(" ", "");
+					int to = partialText.toLowerCase().indexOf(partialTable.toLowerCase());
+					partialText = partialText.toLowerCase().substring(0, to);
+					int fun = partialText.toLowerCase().lastIndexOf("fundamentaci");
+					int pro = partialText.toLowerCase().lastIndexOf("profesional");
+					
+					Elements trs = e.getElementsByTag("tr");
+					
+					ComponentDummy component = new ComponentDummy(true, Integer.valueOf(trs.last().getElementsByTag("td").get(1).text()), Integer.valueOf(trs.last().getElementsByTag("td").get(2).text()), tablesTrue.get(0));
+					if(fun > pro) {
+						fundamentals.add(component);
+						isFundamental = true;
+					}else{
+						professionals.add(component);
+						isFundamental = false;
+					}
+					component.setFundamental(isFundamental);
+					
+					int mandatoryCredits = 0;
+					int optativeCredits = 0;
+					for(int i = 1; i<trs.size()-1 ; i++){
+						//No tomará nunca la primera o última fila
+						Element tr = trs.get(i);
+						Elements tds = tr.getElementsByTag("td");
+						
+						if(tds.size()>4) component.setError(true);
+						
+						mandatoryCredits +=  Integer.valueOf(tds.get(1).text());
+						optativeCredits +=  Integer.valueOf(tds.get(2).text());
+						
+						SubjectGroupDummy sGD = new SubjectGroupDummy(tds.get(0).text(), Integer.valueOf(tds.get(1).text()), Integer.valueOf(tds.get(2).text()), isFundamental, tds);
+						subjectGroups1.add(sGD);
+						
+					}
+					if(component.getObligatoryCredits() != mandatoryCredits || component.getOptativeCredits() != optativeCredits) component.setError(true);
+					
+				}
+				
+				
+				/*
+				 * 
+				 * 
+				 * 1. Mirar todas las clases y organizarlas en agrupaciones
+				 * 1.0 Descargar las pags
+				 * 1.1 Leer las columnas y guardar los 4 valores en un objecto dummy
+				 * 1.2 Identificar el texto para cada componente (Fundamentación y Profesional/Disciplinar y pueden haber varios componentes de Fundamentación o Profesional) y guardarlo en un objecto componentDummy
+				 * 1.3 Dentro de cada componenete identificar las agrupaciones y su texto y guardar ambas en un objeto subjectGroupDummy
+				 * 1.4 Dentro de cada agrupación identificar las clases (filas) [incluyendo los pre-requisitos] y el texto y guardarlas en un objecto subjectDummy
+				 * 
+				 * 2. Mirar si existe alguna clase repetida (sino ir a 7)
+				 * 2.1 Comparar todas las clases por nombre y/o código (si tiene)
+				 * 2.2 Las que esten repetidas mirar que no sean iguales en lo demás
+				 * 2.3 Guardar las que están repetidas y no son iguales en lo demás en una lista de listas
+				 * 
+				 * 4. Mirar el plan de estudios en "MIS PLANES" (COMPROBAR LA EXISTENCIA DE LAS CLASES EN EL BUSCADOR - CONSEGUIR TODOS LOS RESULTADOS DE CLASES) , guardar las clases y organizarlas en agrupaciones
+				 * 4.0 Descargar la pag y también buscar sin nombre y por carrera todos las clases y guardar esa info.
+				 * 4.1 Identificar el texto para cada componente (Fundamentación y Profesional/Disciplinar) y guardarlo en un objeto componentDummy
+				 * 4.2 Identificar las agrupaciones para cada componente (Tener en cuenta que no todas las agrupaciones tienen "cred:req|x|") y guardar datos y texto en una variable dummy subjectGroupDummy
+				 * 4.3 Para cada agrupación identificar las clases y requisitos (NO SE PUEDE SABER OBLIGATORIEDAD) y guardarlas en un objecto subjectDummy 
+				 * 
+				 * 5. Mirar la agrupación más similar en LA NORMA a la agrupación de la clase repetida sacada de "MIS PLANES" (se pueden utilizar puntaje)
+				 * 5.1 Mirar a que agrupación y componente pertenece la clase repetida encontrada en MIS PLANES
+				 * 5.2 Si existe la misma agrupación en el mismo componente en la NORMA y en MIS PLANES entonces:
+				 * SI:
+				 * 5.2.1 Comparar la agrupación en ese componente (A veces hay dos agrupaciones con el mismo nombre en diferentes componentes) de LA NORMA con la agrupación en MIS PLANES
+				 * 5.2.2 Elegir la más similar
+				 * NO: 
+				 * 5.2.1 Comparar la agrupación de MIS PLANES con las agrupaciones DEL MISMO componente de LA NORMA y darles puntaje
+				 * 5.2.2 Elegir la agrupación del mismo componente más similar en LA NORMA
+				 * 5.3 Utilizar esa agrupación para todas las materias repetidas en esa agrupación en LA NORMA ¿? o en la agrupación de MIS PLANES 
+				 * 
+				 * 6. La resultante (i.e. la agrupación en LA NORMA) será tomada como la verdadera agrupación y de donde se sacarán los verdaderos valores de las clases de esa agrupación
+				 * 6.1 Eliminar las clases repetidas que no sean de esta agrupación (No deben haber clases repetidas depués de este numeral)
+				 * 
+				 * 7. Convertir los subjectsDummies y los subjectGroupsDummies a Subjects, ComplementaryValues y SubjectsGroups
+				 * 7.1 Crear cada agrupación y guardarla
+				 * 7.2 Crear cada Subject, Complementary Value y guardarlos
+				 *
+				 * 8. GUARDAR ERRORES 
+				 * 
+				 */
+				
+				//** 1. 
+				
+				tablesFalse = docRequisites.getElementsByTag("table");
+				tablesTrue = new Elements();
+				
+				//Deleting unnecessary tables
+				for(Element e : tablesFalse){
+					if(e.text().toLowerCase().contains("nombre")==true && e.text().toLowerCase().contains("asignatura") && 
+							e.text().toLowerCase().contains("obligatoria")==true){
+						tablesTrue.add(e);
+					}
+				}
+				
+				// If there are more than the subjectsGroups then something weird is happening
+				if(tablesTrue.size() > subjectGroups1.size()) errorComponent = true;
+				
+				//Save the subjectGroups
+				for(Element e : tablesTrue){
+					
+					//Getting if it is fundamental or profesional/disciplinary
+					String partialText = docRequisites.toString().replaceAll(" ", "");
+					String partialTable = e.toString().replaceAll(" ", "");
+					int to = partialText.toLowerCase().indexOf(partialTable.toLowerCase());
+					partialText = partialText.toLowerCase().substring(0, to);
+					int fun = partialText.toLowerCase().lastIndexOf("componentedefundamentaci");
+					int pro = partialText.toLowerCase().lastIndexOf("componentedeformacióndisciplinaroprofesional");
+					if(fun > pro) {
+						isFundamental = true;
+					}else{
+						isFundamental = false;
+					}
+					
+					//getting which subject group it is
+					int x = 0;
+					SubjectGroupDummy fromPlan = null;
+					partialText = partialText.replaceAll("s", "").replaceAll("-","").replaceAll("/", "");
+					//To get the closest subjectGroup for this table (e)
+					for(SubjectGroupDummy sGDTemporary : subjectGroups1){
+						String toSearch = sGDTemporary.getName().toLowerCase().replaceAll(" ", "");
+						//Deleting characters that maybe were removed by a human mistake in the other page
+						toSearch = toSearch.replaceAll("s", "").replaceAll("-", "").replaceAll("/","");
+						int position = partialText.toLowerCase().lastIndexOf(toSearch);
+						if(position > x){
+							x = position;
+							fromPlan = sGDTemporary;
+						}
+					}
+					
+					int mandatoryCredits = 0;
+					int optativeCredits = 0;
+
+					if(fromPlan != null){
+						SubjectGroupDummy sGD = new SubjectGroupDummy(fromPlan.getName(), 0, 0, isFundamental, e);
+						subjectGroups2.add(sGD);						
+					}else{
+						//error, couldn't get the name of the subjectGroup
+					}
+					
+					Element[][] table = createTableOfSubject(e);
+					
+					//TODO: detectar cuando las filas estén vacías, not so importat
+					//Divide the columns in groups of candidates to be any of those "Strings" "int" or "boolean" "requisite" -> contains "prerequisito" o "correquisito" o SOLAMENTE "no"
+					//Get the "NOMBRE" col, "CRÉDITOS" col, "OBLIGATORIA" col, "NOMBRE"  y "REQUISITO"  de la primera o segunda fila
+					// tener cuidado porque en http://www.legal.unal.edu.co/sisjurun/normas/Norma1.jsp?i=73550 si no hay requisitos se llena con "no", puede ocurrir que se llene con "-"
+					int nameClass = -1; //"nombre"
+					int codeClass = -1; //"codigo"
+					int creditsClass = -1; //"credito"
+					int obligatoriness = -1; //"obligatoria"
+					int requisiteClassName = -1; //"nombre" o "asignatura"
+					int requisiteClassCode = -1;
+					int requisiteClassType = -1;
+					
+					
+				}
+				
+				tablesTrue.size();
+			}
+			
+			
+		}
+	}
+	
+	private static Element[][] createTableOfSubject(Element originalTable){
+		
+		int columnNumber = 0;
+		int rowNumber = 0;
+		
+		int rowspan = 0;
+		
+		for(Element col : originalTable.getElementsByTag("tr").get(0).getElementsByTag("td")){
+			columnNumber ++;
+			if(col.attr("colspan") != ""){
+				String s = col.attr("colspan");
+				columnNumber += Integer.valueOf(col.attr("colspan"))-1;
+			}
+		}
+		
+		//This code is just junk
+		/*for(Element row : originalTable.getElementsByTag("tr")){
+			Element e = row.getElementsByTag("td").get(0);
+			rowNumber ++;
+			if(rowspan == 0){
+				if(e.attr("rowspan")!=""){
+					rowspan = Integer.valueOf(e.attr("rowspan")) -1;
+					rowNumber += rowspan;					
+				}
+			}else{
+				rowspan --;
+			}
+		}*/
+		rowNumber = originalTable.getElementsByTag("tr").size();
+		
+		Element[][] table = new Element[rowNumber][columnNumber];
+
+		for(int row = 0; row < rowNumber; row ++){
+			
+			Element rowElement = originalTable.getElementsByTag("tr").get(row);
+			int size = rowElement.getElementsByTag("td").size();
+			for(int col = 0; col < rowElement.getElementsByTag("td").size(); col ++){
+				
+				Element cellElement = rowElement.getElementsByTag("td").get(col);
+				int realCol = -1;
+				
+				for(realCol = col; col < columnNumber; realCol++){
+					if(table[row][realCol] == null){
+						break;
+					}
+				}
+				
+				//Get the colspan, 1 if null
+				int colspan2 = 0;
+				if(cellElement.attr("colspan") == "") colspan2 = 1;
+				else colspan2 = Integer.valueOf(cellElement.attr("colspan"));
+				
+				//get the rowspan, 1 if null
+				int rowspan2 = 0;
+				if(cellElement.attr("rowspan") == "") rowspan2 = 1;
+				else rowspan2 = Integer.valueOf(cellElement.attr("rowspan"));
+				
+				for(int row2 = 0; row2 < rowspan2; row2++){
+					for(int col2 = 0; col2 < colspan2; col2++){
+						table[row + row2][realCol + col2] = cellElement;
+					}
+				}
+			}
+		}
+		
+		return table;
 	}
 	
 }

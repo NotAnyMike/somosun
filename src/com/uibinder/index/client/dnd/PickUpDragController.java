@@ -130,8 +130,6 @@ public class PickUpDragController extends AbstractDragController {
 
 	  @Override
 	  public void dragMove() {
-		
-		planPresenter.moveArrows(context.draggable.getElement().getAttribute("publicid"));
 		  
 	    // may have changed due to scrollIntoView(), developer driven changes
 	    // or manual user scrolling
@@ -167,6 +165,8 @@ public class PickUpDragController extends AbstractDragController {
 	    if (context.dropController != null) {
 	      context.dropController.onMove(context);
 	    }
+	    
+	    planPresenter.moveArrows(context.draggable.getElement().getAttribute("publicid"));
 	  }
 
 	  @Override

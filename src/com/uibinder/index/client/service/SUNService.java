@@ -1,6 +1,5 @@
 package com.uibinder.index.client.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -38,6 +37,7 @@ public interface SUNService extends RemoteService{
 	public SiaResultGroups getGroupsFromSia(String subjectSiaCode, String sede);
 	public SiaResultGroups getGroupsFromSia(Subject subject, String sede);
 	public SiaResultSubjects getSubjectFromSia(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede);
+	public SiaResultSubjects getSubjectsFromSia(String nameOrCode, String typology, String career, String sede, int page);
 	
 	public List<Career> getCareers(String sede);
 	

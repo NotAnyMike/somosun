@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -28,12 +30,15 @@ import com.uibinder.index.client.view.PlanViewImpl;
 import com.uibinder.index.client.view.SearchSubjectViewImpl;
 import com.uibinder.index.client.view.SiaSummaryView;
 import com.uibinder.index.client.view.SiaSummaryViewImpl;
+import com.uibinder.index.client.view.SubjectAccordionView;
+import com.uibinder.index.client.view.SubjectAccordionViewImpl;
 import com.uibinder.index.client.view.WarningDeleteSubjectView;
 import com.uibinder.index.client.view.WarningDeleteSubjectViewImpl;
 import com.uibinder.index.client.widget.LineWidget;
 import com.uibinder.index.client.widget.PlanWidget;
 import com.uibinder.index.client.widget.SemesterWidget;
 import com.uibinder.index.client.widget.SubjectWidget;
+import com.uibinder.index.shared.SiaResultSubjects;
 import com.uibinder.index.shared.control.Career;
 import com.uibinder.index.shared.control.ComplementaryValues;
 import com.uibinder.index.shared.control.Plan;
@@ -49,7 +54,7 @@ import com.uibinder.index.shared.control.SubjectValues;
  * 
  * Be very precise with the subjects' code, because it will work (no errors will be made) when all the codes are different.   
  */
-public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryView.Presenter, WarningDeleteSubjectView.Presenter {
+public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryView.Presenter, WarningDeleteSubjectView.Presenter, SubjectAccordionView.Presenter {
 	
 	private final HandlerManager eventBus;
 	private PlanViewImpl view;
@@ -113,6 +118,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	private final boolean allowDroppingOnBoundaryPanel = false;
 	
 	private SubjectValues subjectValuesSelected = null;
+	private List<Career> careers = new ArrayList<Career>();
 	
 	AsyncCallback<List<Career>> asyncGetCareers = new AsyncCallback<List<Career>>() {
 		
@@ -122,7 +128,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		
 		@Override
 		public void onSuccess(List<Career> result) {
-			addCareersToListBox(result);				
+			careers = result;
+			addCareersToListBox(careers);				
 		}};
 	
 	/**
@@ -235,6 +242,31 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		searchSubjectView.hideIt();
 		container.add(subContainer);
 		
+		//TODO delte form here
+		
+		SubjectAccordionViewImpl v = new SubjectAccordionViewImpl(searchSubjectView.getSubjectsAmmount());
+		v.setPresenter(this);
+		v.setCareerList(careers);
+		v.setHeader("1000004", "Modelación estatica", "L", "4");
+		v.setSubjectGroupName("Asignaturas de relleno");
+		
+		v.addRequisite("pre", "Cálculo I", "0");
+		v.addRequisite("pre", "Microeconomía I", "0");
+		v.addRequisite("co", "Microeconomía II", "0");
+		
+		v.addAntiRequisite("pre", "Modelación dinámica","0");
+		v.addAntiRequisite("pre", "Modelación microdiferencial","0");
+		v.addAntiRequisite("co", "Micro dinámica","0");
+		v.addAntiRequisite("co", "Ecuaciones mamertas","0");
+		v.addAntiRequisite("co", "Mamertos del siglo XXI: su discurso y reproducción","0");
+		v.addAntiRequisite("co", "Logica de los paros: el bloqueo como herramienta fundamental","0");
+		
+		v.addGroup("1", "Arsenio Pecha Castiblanco", "4,7", "3,0", "3,2", "5", "30", "-","-","-","-","-","-","-");
+		v.addGroup("2", "Mike Woodcock Calvache", "4,8", "4,0", "2,2", "20", "30", "-", "-", "-", "-", "-", "-", "-");
+		v.addGroup("3", "Juan Camilo Camacho", "2,0", "2,0", "4,2", "2", "40", "-", "-", "-", "-", "-", "-", "-");
+		
+		searchSubjectView.addSubject(v);
+		// to here
 	}
 	
 	private void makeSubjectWidgetDraggable(SubjectWidget subject){
@@ -388,22 +420,22 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		if(sV !=null){
 			for(Subject s : sV.getComplementaryValues().getListPrerequisites()){
 				for(SubjectValues sVTempo : getSubjectValuesBySubject(s)){
-					connectionsController.addConnection(subjectValuesAndWidgetBiMap.get(sV), subjectValuesAndWidgetBiMap.get(sVTempo), "pre");
+					connectionsController.addConnection(subjectValuesAndWidgetBiMap.get(sVTempo), subjectValuesAndWidgetBiMap.get(sV), "pre");
 				}
 			}
 			for(Subject s : sV.getComplementaryValues().getListCorequisites()){
 				for(SubjectValues sVTempo : getSubjectValuesBySubject(s)){
-					connectionsController.addConnection(subjectValuesAndWidgetBiMap.get(sV), subjectValuesAndWidgetBiMap.get(sVTempo), "co");
+					connectionsController.addConnection(subjectValuesAndWidgetBiMap.get(sVTempo), subjectValuesAndWidgetBiMap.get(sV), "co");
 				}
 			}
 			for(Subject s : sV.getComplementaryValues().getListPrerequisitesOf()){
 				for(SubjectValues sVTempo : getSubjectValuesBySubject(s)){
-					connectionsController.addConnection(subjectValuesAndWidgetBiMap.get(sVTempo), subjectValuesAndWidgetBiMap.get(sV), "pre");
+					connectionsController.addConnection(subjectValuesAndWidgetBiMap.get(sV), subjectValuesAndWidgetBiMap.get(sVTempo), "pre");
 				}
 			}
 			for(Subject s : sV.getComplementaryValues().getListCorequisitesOf()){
 				for(SubjectValues sVTempo : getSubjectValuesBySubject(s)){
-					connectionsController.addConnection(subjectValuesAndWidgetBiMap.get(sVTempo), subjectValuesAndWidgetBiMap.get(sV), "co");
+					connectionsController.addConnection(subjectValuesAndWidgetBiMap.get(sV), subjectValuesAndWidgetBiMap.get(sVTempo), "co");
 				}
 			}
 		}
@@ -502,9 +534,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		if(careers == null){
 			searchSubjectView.addCareerToListBox("No se pudieron cargar las careeras","1");			
 		} else {
-			for(Career career : careers){
-				searchSubjectView.addCareerToListBox(career.getName(), career.getCode());
-			}
+			searchSubjectView.setCareerList(careers);
 		}
 	}
 	
@@ -797,6 +827,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 			@Override
 			public void onClick(ClickEvent event) {
 				searchSubjectView.showIt();
+				showToolTip();
 			}});
 	}
 	
@@ -849,5 +880,107 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		// TODO Auto-generated method stub
 		subContainer.add(i);
 	}	
+	
+	public void onSearchButtonClicked(String s, String careerCode, String type, int page) {
+		
+		rpcService.toTest(new AsyncCallback<String>(){
 
+			@Override
+			public void onFailure(Throwable caught) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void onSuccess(String result) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+		
+		
+		if(type == "all") {
+			type = "";
+		}
+		rpcService.getSubjectsFromSia(s, type, careerCode, "bog", page, new AsyncCallback<SiaResultSubjects>(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("sorry, we couldn't connect to SIA");
+			}
+
+			@Override
+			public void onSuccess(SiaResultSubjects result) {
+				loadSubjectsToSearchView(result);
+			}
+			
+		});
+	}
+
+	protected void loadSubjectsToSearchView(SiaResultSubjects result) {
+		addSubjectsToSearchView(result.getSubjectList());
+		createPagination(result);
+		showToolTip();
+	}
+
+	private void addSubjectsToSearchView(List<Subject> subjectList) {
+		
+		searchSubjectView.clearAccordionContainer();
+		
+		for(Subject s : subjectList){
+			SubjectAccordionViewImpl v = new SubjectAccordionViewImpl(searchSubjectView.getSubjectsAmmount());
+			v.setPresenter(this);
+			v.setCareerList(careers);
+			v.setHeader(s.getCode(), s.getName(), "L", Integer.toString(s.getCredits()));
+			v.setSubjectGroupName("Asignaturas de relleno");
+			searchSubjectView.addSubject(v);
+		}
+		
+	}
+
+	private void createPagination(SiaResultSubjects result) {
+		searchSubjectView.clearPagination();
+		
+		AnchorListItem first = new AnchorListItem();
+		first.setIcon(IconType.ANGLE_DOUBLE_LEFT);
+		
+		if(result.getPage() == 1) first.setEnabled(false);
+		else first.setEnabled(true); 
+		first.setActive(false);
+
+		searchSubjectView.addPage(first);
+		
+		for(int x = 0; x < result.getNumPaginas(); x++){
+			AnchorListItem a = new AnchorListItem(Integer.toString(x+1));
+			
+			if(x+1 == result.getPage()) a.setActive(true);
+			else a.setActive(false); 
+			
+			a.setEnabled(true);
+			searchSubjectView.addPage(a);
+		}
+		
+		AnchorListItem last = new AnchorListItem();
+		last.setIcon(IconType.ANGLE_DOUBLE_RIGHT);
+		
+		if(result.getPage() == result.getNumPaginas()) last.setEnabled(false);
+		else last.setEnabled(true); 
+		last.setActive(false);
+		searchSubjectView.addPage(last);
+	}
+
+	public void onAddSpecificSubjectClick(ClickEvent event) {
+		//TODO
+	}
+
+	/************ JQUERY FUNCTIONS ***************/
+
+	public static native void showToolTip() /*-{
+	  $wnd.showTooltip();
+	}-*/;
+	
+	/********************************************/
+
+	
 }

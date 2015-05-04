@@ -10,7 +10,7 @@
 	<classpathentry including="**/*.java" kind="src" path="xtend-gen"/>
 	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER/App Engine"/>
+	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER/App Engine (1)"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-dnd-3.3.2.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/gwtbootstrap3-0.8.1.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/gwtbootstrap3-extras-0.6.jar"/>

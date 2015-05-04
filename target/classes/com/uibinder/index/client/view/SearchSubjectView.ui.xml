@@ -18,7 +18,7 @@
   			</head>
  			<body>
 		<div style="height:100%; width:100%; top:0px; left:0px; position:fixed; background:#000; opacity:.4; z-index:1000"></div>
-		<div id="searchSubjectMainDiv" onLoad="arrangeLeft('#searchSubjectMainDiv')">
+		<div id="searchSubjectMainDiv" onLoad="arrangeLeft('#searchSubjectMainDiv');">
 			<table border="0" cellspacing="0" cellpadding="0">
 				<tr>
 					<td width="250" rowspan="2" align="left" valign="top">
@@ -27,15 +27,13 @@
 								<h3 class="panel-title">Buscar asignaturas</h3>
 							</div>
 							<div class="panel-body">
-								<div class="input-group">
-									<input type="text" class="form-control">
-										<span class="input-group-btn" placeholder="Materia o profesor">
-											<button class="btn btn-default" type="button">
-												<span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-											</button>
-										</span>
-									</input>
-								</div>
+								<b:InputGroup>
+									<b:TextBox placeholder="nombre de la clase" ui:field="searchField"/>
+									<b:InputGroupButton>
+										<b:Button icon="SEARCH" type="DEFAULT" ui:field="searchButton"/>
+									</b:InputGroupButton>
+								</b:InputGroup>
+								<g:ListBox ui:field="listBoxCareersToSearch" styleName="form-control small"></g:ListBox>
 								<div class="radio disabled">
 									<label>
 										<input type="radio" name="optionsRadios" id="optionsRadios3" value="option1" disabled="true"></input>
@@ -47,41 +45,15 @@
 										<small>Tipologia</small>
 									</div>
 									<div class="panel-body">
-										<div class="radio ">
-											<label>
-												<input type="radio" name="optionsRadios" id="optionsRadios3"
-													value="option1" checked="true"></input>
-													Todas
-											</label>
-										</div>
-										<div class="radio">
-											<label>
-												<input type="radio" name="optionsRadios" id="optionsRadios3"
-													value="option2"></input>
-													Libre eleccion
-											</label>
-										</div>
-										<div class="radio">
-											<label>
-												<input type="radio" name="optionsRadios" id="optionsRadios3"
-													value="option3"></input>
-													Fundamentacion
-											</label>
-										</div>
-										<div class="radio">
-											<label>
-												<input type="radio" name="optionsRadios" id="optionsRadios3"
-													value="option4"></input>
-													Disciplinar
-											</label>
-										</div>
-										<div class="radio">
-											<label>
-												<input type="radio" name="optionsRadios" id="optionsRadios3"
-													value="option5"></input>
-													Nivelacion
-											</label>
-										</div>
+										<b:FormGroup ui:field="checkButtons">
+											<g:VerticalPanel>
+												<b:Radio ui:field="radioButton1" ui:name="typology" formValue="all" text="Todas"/>
+												<b:Radio ui:field="radioButton2" ui:name="typology" formValue="L" text="Libre Elección"/>
+												<b:Radio ui:field="radioButton3" ui:name="typology" formValue="B" text="Fundamentación"/>
+												<b:Radio ui:field="radioButton4" ui:name="typology" formValue="C" text="Disciplinar"/>
+												<b:Radio ui:field="radioButton5" ui:name="typology" formValue="P" text="Nivelación"/>
+											</g:VerticalPanel>
+										</b:FormGroup>
 									</div>
 								</div>
 								<div class="panel panel-default">
@@ -123,336 +95,15 @@
 					<td width="20" rowspan="2" align="center" valign="top"></td>
 					<td valign="top">
 
-                    <b:PanelGroup b:id="accordion">
-  					<b:Panel>
-					    <b:PanelHeader dataToggle="COLLAPSE" dataParent="#accordion2" dataTarget="#collapseOne" ui:field="header">
-					      <b:Heading size="H4">
-						      <g:HorizontalPanel>
-						      	<b:Button type="SUCCESS" icon="PLUS" size="EXTRA_SMALL"/>
-						      	<g:Label ui:field="codeFieldSearchSubject">34896747</g:Label>
-						      	<g:Label ui:field="nameFieldSearchSubject">Modelación estática</g:Label>
-						      	<g:HorizontalPanel ui:field="infoHolderSearchSubject">
-							      	<g:Label ui:field="typeFieldSearchSubject">L</g:Label>
-							      	<g:Label ui:field="creditsFieldSearchSubject">c:3</g:Label>
-						      	</g:HorizontalPanel>
-						      </g:HorizontalPanel>
-					      </b:Heading>
-					    </b:PanelHeader>
-					    <b:PanelCollapse b:id="collapseOne">
-					      <b:PanelBody>
-					        <b.html:Paragraph>
-                                
-                                <table width="100%" border="0" cellpadding="0" cellspacing="0">
-                                	<tr>
-                                		<td valing="top">
-                                			<div class="form-group">
-								                <div class="input-group">
-								                  <div class="input-group-addon">Mostrar requisitos para</div>
-								                  <g:ListBox ui:field="listBoxCareers" addStyleNames="{second.textboxCreate} {third.lead} "></g:ListBox>
-								                  </div>
-								              </div>
-                                		</td>
-                                		<td></td>
-                                		<td width="300" valing="top" aling="center" style="vertical-align: top;">
-                                			<div class="panel panel-default" style="">
-								              <div class="panel-body text-center" style="padding:6px">
-								                <g:Label ui:field="labelSubjectGroup">Agrupacion: Contenido cuantitativo</g:Label>
-								              </div>
-								          </div>
-                                		</td>
-                                	</tr>
-                                	<tr>
-                                		<td></td>
-                                		<td width="10"></td>
-                                		<td></td>
-                                	</tr>
-                                	<tr height="10px">
-                                		<td colspan="3"></td>
-                                	</tr>
-                                	<tr>
-                                		<td colspan="3" width="100%">
-                                			<table border="0" cellspacing="0" cellpadding="0" class="table table-bordered" style="padding:0px">
-									          <tr>
-									            <td align="center" valign="middle"><small>pre-requisitos</small></td>
-									            <td align="center" valign="middle"><small>co-requisitos</small></td>
-									          </tr>
-									          <tr>
-									            <td style="padding:0px; margin-bottom:0px">
-										            <g:VerticalPanel ui:field="preRequisitesPanel"></g:VerticalPanel>
-									            </td>
-									            <td style="padding:0px">
-										            <g:VerticalPanel ui:field="coRequisitesPanel"></g:VerticalPanel>
-									            </td>
-									          </tr>
-									        </table>
-									        
-									        <p></p>
-									        
-									        <div class="panel panel-default text-left" style="">
-								                <div class="panel-body" style="padding:6px">
-								                  <table>
-								                    <tr>
-								                      <td style="min-width: 225px" aling="left" valign="top">
-								                        Modelacion estatica es pre-requisito de: 
-								                      </td>
-								                      <td width="10px"></td>
-								                      <td aling="left" valing="top" style="margin:1px">
-								                      	<g:FlowPanel ui:field="antiPreRequisite"></g:FlowPanel>
-								                      </td>
-								                    </tr>
-								                    <tr>
-								                    	<tr colspan="3" height="10"></tr>
-								                    </tr>
-								                    <tr>
-								                    	<td style="min-width: 230px" aling="left" valign="top">
-								                        	Modelacion estatica es co-requisito de: 
-								                      	</td>
-								                    	<td width="10px"></td>
-									                    <td aling="left" valing="top" style="margin:1px">
-									                    	<g:FlowPanel ui:field="antiCoRequisite"></g:FlowPanel>
-									                    </td>
-								                    </tr>
-								                  </table>
-								                </div>
-								              </div>
-									        
-                                		</td>	
-                                	</tr>
-                                </table>
-                                
-						        
-						        
-						        <br></br>
-						        <g:Grid ui:field="gradesTable">
-						        	<g:row>
-						        		<g:cell styleName="text-center"># gr</g:cell>
-						        		<g:cell styleName="text-left"><strong>Profesor</strong></g:cell>
-						        		<g:cell styleName="text-center"><small>Nota profesor</small></g:cell>
-						        		<g:cell styleName="text-center"><small>Nota grupo</small></g:cell>
-						        		<g:cell styleName="text-center"><small>Nota promedio</small></g:cell>
-						        		<g:customCell styleName="text-center">
-						        			<g:Grid ui:field="spacesTable">
-						        				<g:row>
-						        					<g:cell styleName="text-center"><small>Cupos</small></g:cell>
-						        				</g:row>
-						        				<g:row>
-						        					<g:customCell  styleName="text-center">
-						        					<g:Grid ui:field="titleSpacesTable">
-							        					<g:row>
-							        						<g:cell styleName="text-center"><small>disp</small></g:cell>
-							        						<g:cell styleName="text-center"><small>total</small></g:cell>
-							        					</g:row>
-						        					</g:Grid>
-						        					</g:customCell>
-						        				</g:row>
-						        			</g:Grid>
-						        		</g:customCell>
-						        		<g:cell styleName="text-center"><strong>L</strong></g:cell>
-						        		<g:cell styleName="text-center"><strong>M</strong></g:cell>
-						        		<g:cell styleName="text-center"><strong>C</strong></g:cell>
-						        		<g:cell styleName="text-center"><strong>J</strong></g:cell>
-						        		<g:cell styleName="text-center"><strong>V</strong></g:cell>
-						        		<g:cell styleName="text-center"><strong>S</strong></g:cell>
-						        		<g:cell styleName="text-center"><strong>D</strong></g:cell>
-						        	</g:row>
-						        </g:Grid>
-								
-						        <table border="0" cellspacing="0" cellpadding="0" class="table table-hover">
-						        <thead>
-								  <tr>
-								    <td align="center" valign="bottom"><strong># gr</strong></td>
-								    <td align="left" valign="bottom"><strong>Profesor</strong></td>
-								    <td width="45" align="center" valign="bottom"><strong><small>Nota Profesor</small></strong></td>
-								    <td width="40" align="center" valign="bottom"><strong><small>Nota  grupo</small></strong></td>
-								    <td width="40" align="center" valign="bottom"><strong><small>Nota promedio</small></strong></td>
-								    <td colspan="2" align="center" valign="bottom"><table width="60" border="0" cellspacing="0" cellpadding="0">
-								      <tr>
-								        <td colspan="2" align="center" valign="middle"><strong><small>cupos</small></strong></td>
-								        </tr>
-								      <tr>
-								        <td width="30" align="center" valign="middle"><strong><small>disp</small></strong></td>
-								        <td width="30" align="center" valign="middle"><strong><small>total</small></strong></td>
-								      </tr>
-								    </table></td>
-								    <td align="center" valign="bottom"><strong>L</strong></td>
-								    <td align="center" valign="bottom"><strong>M</strong></td>
-								    <td align="center" valign="bottom"><strong>C</strong></td>
-								    <td align="center" valign="bottom"><strong>J</strong></td>
-								    <td align="center" valign="bottom"><strong>V</strong></td>
-								    <td align="center" valign="bottom"><strong>S</strong></td>
-								    <td align="center" valign="bottom"><strong>D</strong></td>
-								  </tr>
-								  </thead>
-								  <tr>
-								    <td align="center">1</td>
-								    <td align="left">Arsenio Pecha Castiblanco</td>
-								    <td width="45" align="center">4,7</td>
-								    <td width="40" align="center">3,0</td>
-								    <td width="40" align="center">3,2</td>
-								    <td width="30" align="center">5</td>
-								    <td width="30" align="center">30</td>
-								    <td align="center">.-</td>
-								    <td align="center">-</td>
-								    <td align="center">--</td>
-								    <td align="center">--</td>
-								    <td align="center">--</td>
-								    <td align="center">--</td>
-								    <td align="center">-</td>
-								  </tr>
-								  <tr>
-								    <td align="center">2</td>
-								    <td align="left">Mike Woodcock</td>
-								    <td width="45" align="center">4,8</td>
-								    <td width="40" align="center">5,0</td>
-								    <td width="40" align="center">2,3</td>
-								    <td width="30" align="center">15</td>
-								    <td width="30" align="center">50</td>
-								    <td align="center">-</td>
-								    <td align="center">--</td>
-								    <td align="center">-</td>
-								    <td align="center">-</td>
-								    <td align="center">-</td>
-								    <td align="center">-</td>
-								    <td align="center">-</td>
-								  </tr>
-								  <tr>
-								    <td align="center">3</td>
-								    <td align="left">Neill Giraldo SeundoApellido</td>
-								    <td width="45" align="center">4,2</td>
-								    <td width="40" align="center">4,0</td>
-								    <td width="40" align="center">4,1</td>
-								    <td width="30" align="center">4</td>
-								    <td width="30" align="center">40</td>
-								    <td align="center">-</td>
-								    <td align="center">-</td>
-								    <td align="center">-</td>
-								    <td align="center">--</td>
-								    <td align="center">-</td>
-								    <td align="center">-</td>
-								    <td align="center">-</td>
-								  </tr>
-								</table>
-							<div class="alert alert-warning" role="alert">Quieres ayudar a completar esatas funcionalidades, entonces has click aqui</div>
-                                   
-                            </b.html:Paragraph>
-					      </b:PanelBody>
-					    </b:PanelCollapse>
-					  </b:Panel>
-					  
-					  
-					  
-					  <b:Panel>
-					    <b:PanelHeader dataToggle="COLLAPSE" dataParent="#accordion2" dataTarget="#collapseTwo" ui:field="header1">
-					      <b:Heading size="H4">
-						      <g:HorizontalPanel>
-						      	<b:Button type="SUCCESS" icon="PLUS" size="EXTRA_SMALL"/>
-						      	<g:Label ui:field="codeFieldSearchSubject1">34896747</g:Label>
-						      	<g:Label ui:field="nameFieldSearchSubject1">Modelación pre-básica para mamertos </g:Label>
-						      	<g:HorizontalPanel ui:field="infoHolderSearchSubject1">
-							      	<g:Label ui:field="typeFieldSearchSubject1">L</g:Label>
-							      	<g:Label ui:field="creditsFieldSearchSubject1">c:3</g:Label>
-						      	</g:HorizontalPanel>
-						      </g:HorizontalPanel>
-					      </b:Heading>
-					    </b:PanelHeader>
-					    <b:PanelCollapse b:id="collapseTwo">
-					      <b:PanelBody>
-					        <b.html:Paragraph>
-                                
-                                fuck up lazy, ain't nobody need your help
-                                   
-                            </b.html:Paragraph>
-					      </b:PanelBody>
-					    </b:PanelCollapse>
-					  </b:Panel>
-					  <b:Panel>
-					    <b:PanelHeader dataToggle="COLLAPSE" dataParent="#accordion2" dataTarget="#collapseThree" ui:field="header2">
-					      <b:Heading size="H4">
-						      <g:HorizontalPanel>
-						      	<b:Button type="SUCCESS" icon="PLUS" size="EXTRA_SMALL"/>
-						      	<g:Label ui:field="codeFieldSearchSubject2">34896747</g:Label>
-						      	<g:Label ui:field="nameFieldSearchSubject2">Modelación dinámica</g:Label>
-						      	<g:HorizontalPanel ui:field="infoHolderSearchSubject2">
-							      	<g:Label ui:field="typeFieldSearchSubject2">L</g:Label>
-							      	<g:Label ui:field="creditsFieldSearchSubject2">c:3</g:Label>
-						      	</g:HorizontalPanel>
-						      </g:HorizontalPanel>
-					      </b:Heading>
-					    </b:PanelHeader>
-					    <b:PanelCollapse b:id="collapseThree">
-					      <b:PanelBody>
-					        <b.html:Paragraph>
-                                
-                                fuck up lazy, ain't nobody need your help
-                                   
-                            </b.html:Paragraph>
-					      </b:PanelBody>
-					    </b:PanelCollapse>
-					  </b:Panel>
-					  <b:Panel>
-					    <b:PanelHeader dataToggle="COLLAPSE" dataParent="#accordion2" dataTarget="#collapseFour" ui:field="header3">
-					      <b:Heading size="H4">
-						      <g:HorizontalPanel>
-						      	<b:Button type="SUCCESS" icon="PLUS" size="EXTRA_SMALL"/>
-						      	<g:Label ui:field="codeFieldSearchSubject3">34896747</g:Label>
-						      	<g:Label ui:field="nameFieldSearchSubject3">Modelación de cuerpos</g:Label>
-						      	<g:HorizontalPanel ui:field="infoHolderSearchSubject3">
-							      	<g:Label ui:field="typeFieldSearchSubject3">L</g:Label>
-							      	<g:Label ui:field="creditsFieldSearchSubject3">c:3</g:Label>
-						      	</g:HorizontalPanel>
-						      </g:HorizontalPanel>
-					      </b:Heading>
-					    </b:PanelHeader>
-					    <b:PanelCollapse b:id="collapseFour">
-					      <b:PanelBody>
-					        <b.html:Paragraph>
-                                
-                                fuck up lazy, ain't nobody need your help
-                                   
-                            </b.html:Paragraph>
-					      </b:PanelBody>
-					    </b:PanelCollapse>
-					  </b:Panel>
-					  </b:PanelGroup>
+                    <b:PanelGroup b:id="accordionContainer" ui:field="accordionContainer">
+					</b:PanelGroup>
 						
 					</td>
 				</tr>
 				<tr>
 					<td height="50" align="center" valign="top">
-						<nav>
-							<ul class="pagination">
-								<li class="disabled">
-									<a href="#">
-										<span aria-hidden="true">&laquo;</span>
-										<span class="sr-only">Previous</span>
-									</a>
-								</li>
-								<li class="active">
-									<a href="#">
-										1
-										<span class="sr-only">(current)</span>
-									</a>
-								</li>
-								<li>
-									<a href="#">2</a>
-								</li>
-								<li>
-									<a href="#">3</a>
-								</li>
-								<li>
-									<a href="#">4</a>
-								</li>
-								<li>
-									<a href="#">5</a>
-								</li>
-								<li>
-									<a href="#">
-										<span aria-hidden="true">&raquo;</span>
-										<span class="sr-only">Next</span>
-									</a>
-								</li>
-							</ul>
-						</nav>
+						<b:Pagination ui:field="pagination">
+						</b:Pagination>
 					</td>
 				</tr>
 			</table>

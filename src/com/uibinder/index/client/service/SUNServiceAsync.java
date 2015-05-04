@@ -55,4 +55,6 @@ public interface SUNServiceAsync {
 
 	void getComplementaryValues(String career, String code,	AsyncCallback<ComplementaryValues> callback);
 
+	void getSubjectsFromSia(String nameOrCode, String typology, String career, String sede, int page, AsyncCallback<SiaResultSubjects> callback);
+
 }
