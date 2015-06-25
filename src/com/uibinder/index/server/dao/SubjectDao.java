@@ -48,13 +48,17 @@ public class SubjectDao {
 	public Subject getSubjectByCode(String code){
 		Subject subjectToReturn;
 		subjectToReturn = (Subject) ofy().load().type(Subject.class).filter("code", code).first().now();
-		if(subjectToReturn == null){
+		/**this was causing a infinite loop, a class that is not saved is searched, then the method
+		 * getSubjectFromSubject is called, that method calls getSubjectByCode and the last one calls
+		 * the sia, the sia recognizes the subject and calls getSubjectBySubject ... etc. 
+		 */
+		/*if(subjectToReturn == null){
 			SiaResultSubjects siaResult = SiaProxy.getSubjects(code, "", "", "", 1, 2, "bog");
 			if(siaResult.getSubjectList().isEmpty() == false){
 				subjectToReturn = siaResult.getSubjectList().get(0);
 				saveSubject(subjectToReturn);
 			}
-		}
+		}*/
 		return subjectToReturn;
 	}
 	

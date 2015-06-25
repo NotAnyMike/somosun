@@ -242,31 +242,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		searchSubjectView.hideIt();
 		container.add(subContainer);
 		
-		//TODO delte form here
+		addClickSearchField();
 		
-		SubjectAccordionViewImpl v = new SubjectAccordionViewImpl(searchSubjectView.getSubjectsAmmount());
-		v.setPresenter(this);
-		v.setCareerList(careers);
-		v.setHeader("1000004", "Modelación estatica", "L", "4");
-		v.setSubjectGroupName("Asignaturas de relleno");
-		
-		v.addRequisite("pre", "Cálculo I", "0");
-		v.addRequisite("pre", "Microeconomía I", "0");
-		v.addRequisite("co", "Microeconomía II", "0");
-		
-		v.addAntiRequisite("pre", "Modelación dinámica","0");
-		v.addAntiRequisite("pre", "Modelación microdiferencial","0");
-		v.addAntiRequisite("co", "Micro dinámica","0");
-		v.addAntiRequisite("co", "Ecuaciones mamertas","0");
-		v.addAntiRequisite("co", "Mamertos del siglo XXI: su discurso y reproducción","0");
-		v.addAntiRequisite("co", "Logica de los paros: el bloqueo como herramienta fundamental","0");
-		
-		v.addGroup("1", "Arsenio Pecha Castiblanco", "4,7", "3,0", "3,2", "5", "30", "-","-","-","-","-","-","-");
-		v.addGroup("2", "Mike Woodcock Calvache", "4,8", "4,0", "2,2", "20", "30", "-", "-", "-", "-", "-", "-", "-");
-		v.addGroup("3", "Juan Camilo Camacho", "2,0", "2,0", "4,2", "2", "40", "-", "-", "-", "-", "-", "-", "-");
-		
-		searchSubjectView.addSubject(v);
-		// to here
 	}
 	
 	private void makeSubjectWidgetDraggable(SubjectWidget subject){
@@ -357,7 +334,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		if(valuesAndSubjectMap.containsKey(subjectValues)==false) valuesAndSubjectMap.put(subjectValues, subject); //although the condition here can be removed because it can will just override it
 		if(semester.getSubjects().contains(subjectValues) == false) semester.addSubject(subjectValues);
 		
-		SubjectWidget subjectWidget = new SubjectWidget(subject.getName(), subject.getCode(), subject.getCredits(), subjectValues.getGrade(), subjectValues.getComplementaryValues().isObligatoriness(), subjectValues.getComplementaryValues().getTypology(), subjectValues.getSubjectValuesPublicId());
+		SubjectWidget subjectWidget = new SubjectWidget(subject.getName(), subject.getCode(), subject.getCredits(), subjectValues.getGrade(), subjectValues.getComplementaryValues().isMandatory(), subjectValues.getComplementaryValues().getTypology(), subjectValues.getSubjectValuesPublicId());
 		subjectWidgetList.add(subjectWidget);
 		makeSubjectWidgetDraggable(subjectWidget);
 		semesterAndWidgetBiMap.get(semester).addSubject(subjectWidget);
@@ -368,28 +345,6 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		
 		addClickHandlerSubjectWidget(subjectWidget);
 		
-	}
-	
-	private void onSubjectWidgetClicked(String publicId) {
-		SubjectValues sV = getSubjectValuesByPublicId(publicId);
-		if(subjectValuesSelected != null) {
-			deleteAllOpacities();
-			hideArrows();
-		}
-		if(sV.equals(subjectValuesSelected)==false){
-			subjectValuesSelected = sV;
-			
-			//get complementary values from sia
-			getComplementaryValues(sV);
-			
-			//TODO: Show/Create lines
-			showConnections(sV);
-			
-			//Reduce/Increase opacity
-			modifyOpacity(sV);
-		}else{
-			setSubjectValuesSelected(null);
-		}
 	}
 	
 	public void moveArrows(String publicId){
@@ -698,7 +653,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	}
 
 	/**
-	 * This mehtod gets triggered when a subject is by the user, dragged, it could be dragged in the same semester, but this method won't be triggered if it dropped it outside
+	 * This method gets triggered when a subject is by the user, dragged, it could be dragged in the same semester, but this method won't be triggered if it dropped it outside
 	 * 
 	 * @param code
 	 * @param semester
@@ -813,21 +768,13 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 			
 		});
 	}
-
-	private void onClickAddSemester() {
-		// TODO Auto-generated method stub
-		if(semesters <=20){
-			createSemester(new Semester());
-		}
-	}
 	
 	private void addClickHandlerAddSubject(SemesterWidget semesterW){
 		semesterW.getAddButton().addClickHandler(new ClickHandler(){
 
 			@Override
 			public void onClick(ClickEvent event) {
-				searchSubjectView.showIt();
-				showToolTip();
+				onClickAddSubject();
 			}});
 	}
 	
@@ -847,14 +794,6 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 				deleteSemesterClicked(event);
 			}
 			});
-	}
-
-	public void onSubjectDelete(String publicid) {
-		SubjectValues subjectValuesToDelete = getSubjectValuesByPublicId(publicid);
-		if(subjectValuesToDelete != null){
-			confirmDeleteSubject(subjectValuesToDelete);
-		}
-		
 	}
 
 	private void confirmDeleteSubject(SubjectValues subjectValuesToDelete) {
@@ -881,43 +820,6 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		subContainer.add(i);
 	}	
 	
-	public void onSearchButtonClicked(String s, String careerCode, String type, int page) {
-		
-		rpcService.toTest(new AsyncCallback<String>(){
-
-			@Override
-			public void onFailure(Throwable caught) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void onSuccess(String result) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-		});
-		
-		
-		if(type == "all") {
-			type = "";
-		}
-		rpcService.getSubjectsFromSia(s, type, careerCode, "bog", page, new AsyncCallback<SiaResultSubjects>(){
-
-			@Override
-			public void onFailure(Throwable caught) {
-				Window.alert("sorry, we couldn't connect to SIA");
-			}
-
-			@Override
-			public void onSuccess(SiaResultSubjects result) {
-				loadSubjectsToSearchView(result);
-			}
-			
-		});
-	}
-
 	protected void loadSubjectsToSearchView(SiaResultSubjects result) {
 		addSubjectsToSearchView(result.getSubjectList());
 		createPagination(result);
@@ -970,14 +872,113 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		searchSubjectView.addPage(last);
 	}
 
+	/************ behaviors when clicked *******************/
+	
 	public void onAddSpecificSubjectClick(ClickEvent event) {
 		//TODO
 	}
 
+	private void onClickAddSemester() {
+		// TODO Auto-generated method stub
+		if(semesters <=20){
+			createSemester(new Semester());
+		}
+	}
+
+	public void onSearchButtonClicked(String s, String careerCode, String type, int page) {
+		
+		rpcService.toTest(new AsyncCallback<String>(){
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onSuccess(String result) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+		
+		
+		if(type == "all") {
+			type = "";
+		}
+		rpcService.getSubjectsFromSia(s, type, careerCode, "bog", page, new AsyncCallback<SiaResultSubjects>(){
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("sorry, we couldn't connect to SIA");
+			}
+			
+			@Override
+			public void onSuccess(SiaResultSubjects result) {
+				loadSubjectsToSearchView(result);
+			}
+			
+		});
+	}
+
+	public void onSubjectDelete(String publicid) {
+		SubjectValues subjectValuesToDelete = getSubjectValuesByPublicId(publicid);
+		if(subjectValuesToDelete != null){
+			confirmDeleteSubject(subjectValuesToDelete);
+		}
+		
+	}
+	
+	private void onSubjectWidgetClicked(String publicId) {
+		SubjectValues sV = getSubjectValuesByPublicId(publicId);
+		if(subjectValuesSelected != null) {
+			deleteAllOpacities();
+			hideArrows();
+		}
+		if(sV.equals(subjectValuesSelected)==false){
+			subjectValuesSelected = sV;
+			
+			//get complementary values from sia
+			getComplementaryValues(sV);
+			
+			//TODO: Show/Create lines
+			showConnections(sV);
+			
+			//Reduce/Increase opacity
+			modifyOpacity(sV);
+		}else{
+			setSubjectValuesSelected(null);
+		}
+	}
+	
+	private void onClickAddSubject(){
+		searchSubjectView.showIt();
+		showToolTip();
+		arrangeTopOfSearchSubjectView();
+	}
+	
 	/************ JQUERY FUNCTIONS ***************/
 
+	/**
+	 * This method makes that the SearchSubjectView appears right where it was clicked
+	 */
+	public static native void arrangeTopOfSearchSubjectView() /*-{
+		$wnd.arrangeTopOfSearchBox();
+	}-*/;
+	
+	/**
+	 * This method takes care of showing the property "title" in a better way
+	 */
 	public static native void showToolTip() /*-{
 	  $wnd.showTooltip();
+	}-*/;
+	
+	/**
+	 * This method takes care of making the searchBox work with enter
+	 */
+	public static native void addClickSearchField() /*-{
+		$wnd.addClickSearchField();
 	}-*/;
 	
 	/********************************************/

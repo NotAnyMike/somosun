@@ -17,6 +17,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
+import org.jsoup.helper.StringUtil;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -185,6 +186,7 @@ public class SiaProxy {
 	public static SiaResultSubjects getSubjects(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede){
 		
 		sede = confirmSede(sede);
+		nameOrCode = nameOrCode.replaceAll("á", "a").replaceAll("é", "e").replaceAll("í", "i").replaceAll("ó", "o").replaceAll("ú", "u").replaceAll("  ", " ");
 		
 		String respString = null;
 		SiaResultSubjects siaResult = new SiaResultSubjects();
@@ -723,6 +725,7 @@ public class SiaProxy {
 		
 		List<SubjectGroupDummy> subjectGroups1 = new ArrayList<SubjectGroupDummy>(); //To save the subjectGroups found in plan url
 		List<SubjectGroupDummy> subjectGroups2 = new ArrayList<SubjectGroupDummy>(); //To save the subjectGroups found in requisites url
+		List<SubjectDummy> subjects = new ArrayList<SubjectDummy>();
 		List<ComponentDummy> fundamentals = new ArrayList<ComponentDummy>(); //para guardar los componentes fundamentales
 		List<ComponentDummy> professionals = new ArrayList<ComponentDummy>(); //para guardar los componentes profesionales o disciplinares
 		
@@ -752,13 +755,11 @@ public class SiaProxy {
 			try {
 				htmlPlan = getUrlSource(planURL);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			try {
 				htmlRequisites = getUrlSource(requisiteURL);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
@@ -926,28 +927,287 @@ public class SiaProxy {
 					
 					Element[][] table = createTableOfSubject(e);
 					
-					//TODO: detectar cuando las filas estén vacías, not so importat
-					//Divide the columns in groups of candidates to be any of those "Strings" "int" or "boolean" "requisite" -> contains "prerequisito" o "correquisito" o SOLAMENTE "no"
-					//Get the "NOMBRE" col, "CRÉDITOS" col, "OBLIGATORIA" col, "NOMBRE"  y "REQUISITO"  de la primera o segunda fila
-					// tener cuidado porque en http://www.legal.unal.edu.co/sisjurun/normas/Norma1.jsp?i=73550 si no hay requisitos se llena con "no", puede ocurrir que se llene con "-"
-					int nameClass = -1; //"nombre"
-					int codeClass = -1; //"codigo"
-					int creditsClass = -1; //"credito"
-					int obligatoriness = -1; //"obligatoria"
-					int requisiteClassName = -1; //"nombre" o "asignatura"
-					int requisiteClassCode = -1;
-					int requisiteClassType = -1;
+					//TODO: detectar cuando las filas estén vacías, not so important
+					//Get the higher number of rowspan and that number will be the title rows
+					int titleRows = 1;
+					for(Element e2 : table[0]){
+						String rowspan = e2.attr("rowspan");
+						if(rowspan != "")
+							if(Integer.valueOf(rowspan) > titleRows)
+								titleRows = Integer.valueOf(rowspan);
+					}
 					
+					/**
+					 * Divide the columns in groups of candidates to be any of those 
+					 * -"booleans" -> contains "si" or "no" and NOTHING else
+					 * -"requisites" -> contains "prerequisito" or "correquisito" or ONLY "no" (not including "si")
+					 * -"integers" ->  contains just numbers for the credits
+					 * -"strings" -> contains strings or numbers for the subject names, and at least one of those are larger than 4 characters long
+					 */
+					List<Integer> booleansList = new ArrayList<Integer>();
+					List<Integer> requisitesList = new ArrayList<Integer>();
+					List<Integer> integersList = new ArrayList<Integer>();
+					List<Integer> stringsList = new ArrayList<Integer>(); //Guarda también los que no quepan en ningún grupo
+					for(int col3 = 0; col3 < table[0].length; col3++){
+						boolean booleans = true;
+						boolean requisites = true;
+						boolean integers = true;
+						boolean strings = true;
+						boolean empty = true;
+						
+						//Recorrer todas las filas
+						for(int row3 = titleRows; row3 < table.length; row3 ++){
+							String tableColspan = table[row3][col3].attr("colspan");
+							if(tableColspan == "" || tableColspan == "0"){
+								//the colspan is zero
+								String textToTest = standardizeString(table[row3][col3].text());
+								if(textToTest.equals("") == false){
+									empty = false;
+									
+									if(booleans == true)
+										if(textToTest.equals("si") == false && textToTest.equals("no") == false && textToTest.contains("obligatorio") == false) 
+											booleans = false;
+									if(requisites == true)
+										if(textToTest.contains("prerrequisito") == false && textToTest.contains("correquisito") == false
+										&& textToTest.equals("no") == false && textToTest.contains("requisito") == false
+										&& textToTest.equals("") == false)
+											requisites = false;
+									if(integers == true)
+										if(StringUtils.isNumeric(textToTest) == false && textToTest.contains("credito") == false)
+											integers = false;
+									if(integers == false && requisites == false && booleans == false)
+										break;
+								}
+							}
+						}	
+						if((booleans == true || requisites == true || integers == true) || empty == true) 
+							strings = false;
+						
+						if(empty == false){							
+							if(booleans == true)
+								booleansList.add(col3);
+							if(requisites == true)
+								requisitesList.add(col3);
+							if(integers == true)
+								integersList.add(col3);
+							if(strings == true)
+								stringsList.add(col3);								
+						}
+							
+					}
+					//Get the "NOMBRE" col, "CRÉDITOS" col, "OBLIGATORIA" col, "NOMBRE"  y "REQUISITO"  de la primera o segunda fila
+					// tener cuidado porque en http://www.legal.unal.edu.co/sisjurun/normas/Norma1.jsp?i=73550 2si no hay requisitos se llena con "no", puede ocurrir que se llene con "-"
+					int subjectName = -1; //"nombre" done
+					int subjectCode = -1; //"codigo" done
+					int subjectCredits = -1; //"credito" done
+					int obligatoriness = -1; //"obligatoria"
+					int requisiteSubjectName = -1; //"nombre" o "asignatura"
+					int requisiteSubjectCode = -1; //"codigo" done
+					int requisiteSubjectType = -1; //"requisito" done
+					
+					//Distributing the stringList
+					for(int col : stringsList){
+						String textOfColumnTitle = "";
+						for(int row = 0; row < titleRows; row ++){
+							textOfColumnTitle = textOfColumnTitle + table[row][col].text();
+						}
+						textOfColumnTitle = standardizeString(textOfColumnTitle);
+						
+						if(textOfColumnTitle.contains("nombre") == true || textOfColumnTitle.contains("asignatura") == true)
+							if(subjectName == -1){
+								subjectName = col;
+							}
+							else if(requisiteSubjectName == -1)
+								requisiteSubjectName = col;
+							else{
+								//TODO: Something weird is happening, should be checked
+								//throw new RuntimeException("planUrl: " + planURL + "requisiteUrl: " + requisiteURL + " something weird just happened, there is more string columns than two.");
+								//throw new Error("gola in New York because that ugly woman hasn't have lunch yet! BITCH!");
+							}
+					}
+					
+					//Distributting the integer list
+					for(int col : integersList){
+						String textOfColumnTitle = "";
+						for(int row = 0; row < titleRows; row ++){
+							textOfColumnTitle = textOfColumnTitle + table[row][col].text();
+						}
+						textOfColumnTitle = standardizeString(textOfColumnTitle);
+						
+						if(textOfColumnTitle.contains("credito") == true){
+							if(subjectCredits == -1)
+								subjectCredits = col;
+							else{
+								//TODO there must be just one credits column
+							}
+						}else if(textOfColumnTitle.contains("codigo") == true){
+							if(subjectCode == -1)
+								subjectCode = col;
+							else if(requisiteSubjectCode == -1)
+								requisiteSubjectCode = col;
+							else{								
+								//TODO there must be just two at most columns of integers with title "codigo"
+							}
+						}
+						
+					}
+					
+					//Distributing the requisitesList
+					for(int col : requisitesList){
+						String textOfColumnTitle = "";
+						for(int row = 0; row < titleRows; row ++){
+							textOfColumnTitle = textOfColumnTitle + table[row][col].text();
+						}
+						textOfColumnTitle = standardizeString(textOfColumnTitle);
+						
+						if(textOfColumnTitle.contains("requisito"))
+							if(requisiteSubjectType == -1){
+								requisiteSubjectType = col;
+							}
+							else{
+								//TODO: Something weird is happening, should be checked
+							}
+					}
+					
+					//Distributing the booleansList
+					for(int col : booleansList){
+						String textOfColumnTitle = "";
+						for(int row = 0; row < titleRows; row ++){
+							textOfColumnTitle = textOfColumnTitle + table[row][col].text();
+						}
+						textOfColumnTitle = standardizeString(textOfColumnTitle);
+						
+						if(textOfColumnTitle.contains("obligatoria"))
+							if(obligatoriness == -1){
+								obligatoriness = col;
+							}
+							else{
+								//TODO: Something weird is happening, should be checked
+							}
+					}
+					
+					//got the colums for the different values for this table
+					
+					if(subjectName != -1){
+						//Getting the subjects for every subjectGroup
+						//Elements rows = e.getElementsByTag("tr");
+						for(int row = titleRows; row < table.length; row++){
+							//Elements cols = rows.get(row).getElementsByTag("td");
+							Element[] cols = table[row];
+							if(cols[0].attr("colspan") == ""){
+								//does code exists?
+								boolean hasCode = false;
+								if(subjectCode != -1){
+									if(cols[subjectCode].text() != "")
+										hasCode = true;
+								}
+								boolean isTheRowATitleName = false;
+								String name2 = standardizeString(cols[subjectName].text());
+								String nameTitle = standardizeString(table[0][subjectName].text());
+								if(name2.equals(nameTitle)) isTheRowATitleName = true;
+								boolean isTheRowATitleCode = false;
+								if(subjectCode != -1){
+									String code2 = standardizeString(cols[subjectCode].text());
+									String codeTitle = standardizeString(table[0][subjectCode].text());
+									if(code2.equals(codeTitle)) isTheRowATitleCode = true;
+								}
+								if((name2.equals("") == false || hasCode) && (isTheRowATitleCode==false && isTheRowATitleName == false)){
+									String code = "";
+									String name = "";
+									int credits = 0;
+									Boolean mandatory = null;
+									List<SubjectDummy> prerrequisites = new ArrayList<SubjectDummy>();
+									List<SubjectDummy> correquisites = new ArrayList<SubjectDummy>();
+									
+									if(subjectCode != -1) code = cols[subjectCode].text().replaceFirst(" ", "");
+									if(subjectName != -1) name = cols[subjectName].text().toLowerCase();
+									if(subjectCredits != -1 && cols[subjectCredits].text()!=""){
+										String value = cols[subjectCredits].text().replaceAll(" ", "");
+										//if for example there are specialities and the titles get repeated more than once
+										if(StringUtil.isNumeric(value) == true){
+											if(value != "") {
+												credits = Integer.valueOf(value);
+											}											
+										}else{
+											credits = -1;
+										}
+									}
+									if(obligatoriness != -1) mandatory = (cols[obligatoriness].text().toLowerCase().contains("si") == true ? true : false);
+									//fromPlan;
+									//get text
+									//get prerrequisites
+									//get correquisites
+									/**
+									 * 1. get the higher rowspan
+									 * 2. do a loop to recolect them
+									 * 3. add it to the row value of the loop
+									 */
+									//1.
+									int rowspanInt = 1;
+									for(int i = 0; i<3 ;i++){
+										String rowspanString = cols[i].attr("rowspan");
+										if(rowspanString != "")
+											if(StringUtil.isNumeric(rowspanString))
+												if(Integer.valueOf(rowspanString) > rowspanInt)
+													rowspanInt = Integer.valueOf(rowspanString);
+									}
+									for(int row2 = 0; row2 < rowspanInt; row2++){
+										if(requisiteSubjectType != -1){		
+											Element[] cols2 = table[row+row2];
+											String type = standardizeString(cols2[requisiteSubjectType].text());
+											if(requisiteSubjectName != -1){
+												if(type.contains("prerrequisit")){
+													if(requisiteSubjectCode != -1){
+														prerrequisites.add(new SubjectDummy(cols2[requisiteSubjectName].text(), cols2[requisiteSubjectCode].text()));													
+													}else{
+														prerrequisites.add(new SubjectDummy(cols2[requisiteSubjectName].text()));
+													}
+												} else if(type.contains("correquisit")){
+													if(requisiteSubjectCode != -1){
+														correquisites.add(new SubjectDummy(cols2[requisiteSubjectName].text(), cols2[requisiteSubjectCode].text()));													
+													}else{
+														correquisites.add(new SubjectDummy(cols2[requisiteSubjectName].text()));
+													}
+												}											
+											}
+										}
+									}
+									//3.
+									row = row + rowspanInt - 1; 
+									
+									//creating and adding to the list the subjectDummy
+									SubjectDummy subjectDummy = new SubjectDummy(code, name, credits, fromPlan, prerrequisites, correquisites, mandatory, cols);
+									subjects.add(subjectDummy);
+								}
+							}
+							
+						}
+					}else{
+						//TODO Error 
+					}
 					
 				}
 				
-				tablesTrue.size();
+				//to have a breakPoint
+				int xxxx = 0 +1;
+				xxxx = subjects.size()+1;
+				
+				//Since this point I have all the subjects (subjectsDummy) from a plan, what is left is to create them and save everything
+				//TODO: finish it
+				
 			}
 			
 			
 		}
 	}
-	
+
+	/**
+	 * This method returns a table with no holes or row and col
+	 * span if and only if the @param originalTable is logic and has no errors
+	 * 
+	 * @param originalTable
+	 * @return
+	 */
 	private static Element[][] createTableOfSubject(Element originalTable){
 		
 		int columnNumber = 0;
@@ -1016,4 +1276,24 @@ public class SiaProxy {
 		return table;
 	}
 	
+	/**
+	 * This function will delete:
+	 * - "´" accents (e.g "é"->"e"
+	 * - "-" -> ""
+	 * - " " -> ""
+	 * will NOT delete:
+	 * - "ñ"
+	 * - other accents "`", etc.
+	 * 
+	 * @param s
+	 * @return
+	 */
+	private static String standardizeString(String s){
+		String stringToReturn = s;
+		stringToReturn = stringToReturn.toLowerCase().replaceAll(" ", "")
+				.replaceAll("á", "a").replaceAll("é", "e")
+				.replaceAll("í", "i").replaceAll("ó", "o")
+				.replaceAll("ú", "u").replaceAll("-", "");
+		return stringToReturn;
+	}
 }

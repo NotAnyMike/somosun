@@ -76,7 +76,7 @@ public class PlanDao {
 					else {complementaryValues = new ComplementaryValues(career, subject);}
 				}
 				
-				subjectValues.getComplementaryValues().setObligatoriness(jsonSubject.getBoolean("oblig"));
+				subjectValues.getComplementaryValues().setMandatory(jsonSubject.getBoolean("oblig"));
 				subjectValues.getComplementaryValues().setTypology(jsonSubject.getString("type"));
 
 				if(jsonSubject.getBoolean("normal") == true && subject != null) complementaryValuesDao.saveComplementaryValues(complementaryValues);

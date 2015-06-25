@@ -22,6 +22,10 @@ function arrangeLeft(id){
 	});
 };
 
+function arrangeTopOfSearchBox(){
+	$("#searchSubjectMainDiv").css({'top':$(window).scrollTop() + 80});
+}
+
 function showTooltip(){
 	$('[data-toggle="tooltip"]').tooltip();	
 };
@@ -36,3 +40,13 @@ $(document).click(function(e) {
 
     }
 });
+
+function addClickSearchField(){
+	$("#searchField").keyup(function(event){
+	    if(event.keyCode == 13){
+			var click_ev = document.createEvent("MouseEvents");
+			click_ev.initEvent("click", true /* bubble */, true /* cancelable */);
+			document.getElementById("searchButton").dispatchEvent(click_ev);
+	    }
+	});
+}

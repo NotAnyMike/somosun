@@ -28,9 +28,9 @@
 							</div>
 							<div class="panel-body">
 								<b:InputGroup>
-									<b:TextBox placeholder="nombre de la clase" ui:field="searchField"/>
+									<b:TextBox ui:id="searchField" placeholder="nombre de la clase" ui:field="searchField"/>
 									<b:InputGroupButton>
-										<b:Button icon="SEARCH" type="DEFAULT" ui:field="searchButton"/>
+										<b:Button  ui:id="searchButton" icon="SEARCH" type="DEFAULT" ui:field="searchButton"/>
 									</b:InputGroupButton>
 								</b:InputGroup>
 								<g:ListBox ui:field="listBoxCareersToSearch" styleName="form-control small"></g:ListBox>

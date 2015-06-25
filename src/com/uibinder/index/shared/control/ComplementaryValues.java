@@ -30,7 +30,7 @@ public class ComplementaryValues implements Serializable {
 	private List<Subject> listCorequisitesOf = null;
 	
 	@Index private String typology = null;
-    @Index private boolean obligatoriness = false;
+    @Index private boolean mandatory = false;
     @Index private SubjectGroup subjectGroup = null;
     
     /**
@@ -43,7 +43,7 @@ public class ComplementaryValues implements Serializable {
 		this.listCorequisitesOf = new ArrayList<Subject>();
     }
 
-	public ComplementaryValues(Career career, Subject subject,	List<Subject> listPrerequisites, List<Subject> listCorequisites, String typology,	boolean obligatoriness) {
+	public ComplementaryValues(Career career, Subject subject,	List<Subject> listPrerequisites, List<Subject> listCorequisites, String typology,	boolean mandatory) {
 		this.career = career;
 		this.subject = subject;
 		this.listPrerequisites = listPrerequisites;
@@ -51,10 +51,10 @@ public class ComplementaryValues implements Serializable {
 		this.listCorequisitesOf = new ArrayList<Subject>();
 		this.listCorequisites = listCorequisites;
 		this.typology = typology;
-		this.obligatoriness = obligatoriness;
+		this.mandatory = mandatory;
 	}
 	
-	public ComplementaryValues(Career career, Subject subject,	List<Subject> listPrerequisites, List<Subject> listCorequisites, String typology,	boolean obligatoriness, SubjectGroup subjectGroup) {
+	public ComplementaryValues(Career career, Subject subject,	List<Subject> listPrerequisites, List<Subject> listCorequisites, String typology,	boolean mandatory, SubjectGroup subjectGroup) {
 		this.career = career;
 		this.subject = subject;
 		this.listPrerequisites = listPrerequisites;
@@ -62,11 +62,11 @@ public class ComplementaryValues implements Serializable {
 		this.listCorequisitesOf = new ArrayList<Subject>();
 		this.listCorequisites = listCorequisites;
 		this.typology = typology;
-		this.obligatoriness = obligatoriness;
+		this.mandatory = mandatory;
 		this.subjectGroup = subjectGroup;
 	}
 
-	public ComplementaryValues(Career career, Subject subject, String typology,	boolean obligatoriness) {
+	public ComplementaryValues(Career career, Subject subject, String typology,	boolean mandatory) {
 		this.career = career;
 		this.subject = subject;
 		
@@ -76,7 +76,7 @@ public class ComplementaryValues implements Serializable {
 		this.listCorequisitesOf = new ArrayList<Subject>();
 		
 		this.typology = typology;
-		this.obligatoriness = obligatoriness;
+		this.mandatory = mandatory;
 	}
 	
 	public ComplementaryValues(Career career, Subject subject) {
@@ -164,12 +164,12 @@ public class ComplementaryValues implements Serializable {
 		this.typology = typology;
 	}
 
-	public boolean isObligatoriness() {
-		return obligatoriness;
+	public boolean isMandatory() {
+		return mandatory;
 	}
 
-	public void setObligatoriness(boolean obligatoriness) {
-		this.obligatoriness = obligatoriness;
+	public void setMandatory(boolean mandatory) {
+		this.mandatory = mandatory;
 	}
 
 	public List<Subject> getListCorequisites() {
