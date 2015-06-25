@@ -49,25 +49,34 @@ import com.uibinder.index.shared.control.Teacher;
  */
 public class SiaProxy {
 
-	public final static String SIA_SUBJECT_BOG_HTML = "http://www.sia.unal.edu.co/academia/catalogo-programas/info-asignatura.sdo";
-	public final static String SIA_PLAN_BOG_HTML = "http://www.sia.unal.edu.co/academia/catalogo-programas/semaforo.do";
+	//This is the page that shows information about the subject in MIS PLANES, not in the sia buscador
+	// OLD public final static String SIA_SUBJECT_BOG_HTML = "http://www.sia.unal.edu.co/academia/catalogo-programas/info-asignatura.sdo";
+	public final static String SIA_SUBJECT_BOG_HTML ="http://sia.bogota.unal.edu.co/academia/catalogo-programas/info-asignatura.sdo";
 	
+	//This is the page of the MIS PLANES that shows every different plan
+	// Old public final static String SIA_PLAN_BOG_HTML = "http://www.sia.unal.edu.co/academia/catalogo-programas/semaforo.do";
+	public final static String SIA_PLAN_BOG_HTML = "http://sia.bogota.unal.edu.co/academia/catalogo-programas/semaforo.do";
+	
+	//This is the connection page with the JSON RPC call methods in the sia
+	// OLD public final static String SIA_URL_BOG_RPC = "http://www.sia.unal.edu.co/buscador/JSON-RPC";
+	public final static String SIA_URL_BOG_RPC = "http://sia.bogota.unal.edu.co/buscador/JSON-RPC";
 	public final static String SIA_URL_AMA_RPC = "http://unsia.unal.edu.co/buscador/JSON-RPC";
-	public final static String SIA_URL_BOG_RPC = "http://www.sia.unal.edu.co/buscador/JSON-RPC";
-	public final static String SIA_URL_CAR_RPC = "http://www.sia.unal.edu.co/buscador/JSON-RPC";
-	public final static String SIA_URL_MAN_RPC = "http://www.sia.unal.edu.co/buscador/JSON-RPC";
-	public final static String SIA_URL_MED_RPC = "http://www.sia.unal.edu.co/buscador/JSON-RPC";
-	public final static String SIA_URL_ORI_RPC = "http://www.sia.unal.edu.co/buscador/JSON-RPC";
-	public final static String SIA_URL_PAL_RPC = "http://www.sia.unal.edu.co/buscador/JSON-RPC";
-	public final static String SIA_URL_TUM_RPC = "http://www.sia.unal.edu.co/buscador/JSON-RPC";
-	public final static String SIA_URL_AMA_BUSCADOR = "http://www.sia.unal.edu.co/buscador/service/action.pub";
-	public final static String SIA_URL_BOG_BUSCADOR = "http://www.sia.unal.edu.co/buscador/service/action.pub";
-	public final static String SIA_URL_CAR_BUSCADOR = "http://www.sia.unal.edu.co/buscador/service/action.pub";
-	public final static String SIA_URL_MAN_BUSCADOR = "http://www.sia.unal.edu.co/buscador/service/action.pub";
-	public final static String SIA_URL_MED_BUSCADOR = "http://www.sia.unal.edu.co/buscador/service/action.pub";
-	public final static String SIA_URL_ORI_BUSCADOR = "http://www.sia.unal.edu.co/buscador/service/action.pub";
-	public final static String SIA_URL_PAL_BUSCADOR = "http://www.sia.unal.edu.co/buscador/service/action.pub";
-	public final static String SIA_URL_TUM_BUSCADOR = "http://www.sia.unal.edu.co/buscador/service/action.pub";
+	public final static String SIA_URL_CAR_RPC = "http://sia.bogota.unal.edu.co/buscador/JSON-RPC";
+	public final static String SIA_URL_MAN_RPC = "http://sia.bogota.unal.edu.co/buscador/JSON-RPC";
+	public final static String SIA_URL_MED_RPC = "http://sia.bogota.unal.edu.co/buscador/JSON-RPC";
+	public final static String SIA_URL_ORI_RPC = "http://sia.bogota.unal.edu.co/buscador/JSON-RPC";
+	public final static String SIA_URL_PAL_RPC = "http://sia.bogota.unal.edu.co/buscador/JSON-RPC";
+	public final static String SIA_URL_TUM_RPC = "http://sia.bogota.unal.edu.co/buscador/JSON-RPC";
+	//This is the url of the BUSCADOR, the normal one
+	//OLD public final static String SIA_URL_AMA_BUSCADOR = "http://www.sia.unal.edu.co/buscador/service/action.pub";
+	public final static String SIA_URL_AMA_BUSCADOR = "http://sia.bogota.unal.edu.co/buscador/service/action.pub";
+	public final static String SIA_URL_BOG_BUSCADOR = "http://sia.bogota.unal.edu.co/buscador/service/action.pub";
+	public final static String SIA_URL_CAR_BUSCADOR = "http://sia.bogota.unal.edu.co/buscador/service/action.pub";
+	public final static String SIA_URL_MAN_BUSCADOR = "http://sia.bogota.unal.edu.co/buscador/service/action.pub";
+	public final static String SIA_URL_MED_BUSCADOR = "http://sia.bogota.unal.edu.co/buscador/service/action.pub";
+	public final static String SIA_URL_ORI_BUSCADOR = "http://sia.bogota.unal.edu.co/buscador/service/action.pub";
+	public final static String SIA_URL_PAL_BUSCADOR = "http://sia.bogota.unal.edu.co/buscador/service/action.pub";
+	public final static String SIA_URL_TUM_BUSCADOR = "http://sia.bogota.unal.edu.co/buscador/service/action.pub";
 	
 	public final static String SIA_COMPLEMENTARY_VALUES_AND_PLAN_BOG = "http://www.pregrado.unal.edu.co/index.php?option=com_content&view=article&id=2&Itemid=102&cod=";
 	public final static String SIA_BASIC_URL_TO_COMPLEMENTARY_AND_PLAN = "http://www.legal.unal.edu.co/sisjurun/normas/Norma1.jsp?i=";
