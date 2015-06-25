@@ -1,0 +1,62 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:style field="first">
+
+	</ui:style>
+	<ui:style field="second" src="styles/styles.css"/>
+	<ui:style field="third" src="styles/bootstrap.css"/>
+	<ui:style field="forth" src="styles/bootstrap-theme.min.css"/>
+	<g:HTMLPanel>
+		<table width="100%" border="0" cellpadding="0" cellspacing="0">
+	      <tr>
+	        <td align="right" valign="middle">
+	        	<p class="lead main-text" style="font-size:26px; text-align:right">Cargar un plan de estudio</p>
+            </td>
+	        <td width="100" rowspan="2">
+            	<table width="100%" border="0" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td align="center"><table width="2" border="0" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td width="1" height="170" bgcolor="#666666"></td>
+                      </tr>
+                    </table></td>
+                  </tr>
+                  <tr>
+                    <td  align="center" valign="bottom" class="lead main-text" style="font-size:26px; text-align:center">ó</td>
+                  </tr>
+                  <tr>
+                    <td align="center"><table width="2" border="0" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td width="1" height="170" bgcolor="#666666"></td>
+                      </tr>
+                    </table></td>
+                  </tr>
+                </table>            
+            </td>
+	        <td align="left" valign="middle">
+            	<p class="lead main-text" style="font-size:26px; text-align:left">Cargar <strong>MI</strong> plan de estudio</p>
+            </td>
+        </tr>
+	      <tr>
+	        <td width="45%" align="right" valign="middle">
+              	<g:ListBox ui:field="listBoxCreate" addStyleNames="{second.textboxCreate} {third.lead} "></g:ListBox><br></br>
+              	<p><g:Button ui:field="continueDefaultButton" addStyleNames="{third.btn} {third.btn-default}">Cargar plan de Ingeniería de Sistemas</g:Button></p>
+            </td>
+	        <td width="45%" height="400" align="left" valign="middle" style="font-size:20px; text-align:left" class="lead main-text">
+            <ol>
+	          <li>Ve al <strong>SIA</strong> y luego a <strong>Historia Académica</strong></li>
+	          <li><kbd>ctrl + A</kbd> o <kbd>ctrl + E</kbd>*</li>
+	          <li><kbd>ctrl + C</kbd></li>
+	          <li>Pégalo aquí <kbd>ctrl + V</kbd> <img src="/images/favicon.png" width="16" height="16"/></li>
+	          </ol>
+              <p>
+              	<g:TextBox ui:field="textBoxCreate" styleName="{second.textboxCreate}"></g:TextBox>
+              </p>
+              <p><g:Button ui:field="continueButton" addStyleNames="{third.btn} {third.btn-default}">Continuar</g:Button>  <g:Button ui:field="resetButton" addStyleNames="{third.btn} {third.btn-default}">Reiniciar</g:Button></p>
+              <br/><p class="lead main-text" style="font-size:14px; text-align:left">*O solamente copia desde el título &quot;Mi historia académica/&quot; hasta comenzar las palabras &quot;Resumen académico&quot;</p>
+            </td>
+        </tr>
+      </table>
+	</g:HTMLPanel>
+</ui:UiBinder> 
