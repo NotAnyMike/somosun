@@ -1,11 +1,24 @@
 package com.uibinder.index.client.presenter;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.google.gwt.core.shared.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HasWidgets;
+import com.uibinder.index.client.event.ContinueDefaultCareerEvent;
+import com.uibinder.index.client.event.ContinueDefaultCareerEventHandler;
 import com.uibinder.index.client.event.GenerateAcademicHistoryFromStringEvent;
+import com.uibinder.index.client.service.SUNService;
 import com.uibinder.index.client.service.SUNServiceAsync;
 import com.uibinder.index.client.view.CreateView;
 import com.uibinder.index.client.view.CreateViewImpl;
+import com.uibinder.index.shared.LoginInfo;
+import com.uibinder.index.shared.control.Career;
 
 public class CreatePresenter implements Presenter, CreateView.Presenter {
 	
@@ -18,18 +31,23 @@ public class CreatePresenter implements Presenter, CreateView.Presenter {
 		this.eventBus = eventBus;
 		this.view = view;
 		this.view.setPresenter(this);
-		addCareersToListBox();
+		getCareers("bog");
 	}
-	
+
 	@Override
 	public void go(HasWidgets container) {
 		container.clear();
 		container.add(view.asWidget());
 	}
 
-	private void addCareersToListBox() {
-		view.addCareerToListBox("Ingeniería de sistemas y computación","1");
-		view.addCareerToListBox("Administración de empresas","2");
+	private void addCareersToListBox(List<Career> careers) {
+		if(careers == null){
+			view.addCareerToListBox("No se pudieron cargar las careeras","1");			
+		} else {
+			for(Career career : careers){
+				view.addCareerToListBox(career.getName(), career.getCode());
+			}
+		}
 	}
 
 	@Override
@@ -39,7 +57,7 @@ public class CreatePresenter implements Presenter, CreateView.Presenter {
 
 	@Override
 	public void onListBoxCreateChange(String career) {
-		view.setTextOfContinueDefaultButton("Cargar plan de " + career);
+		//TODO add here to deactivate the button of model Plan
 	}
 
 	@Override
@@ -47,4 +65,25 @@ public class CreatePresenter implements Presenter, CreateView.Presenter {
 		eventBus.fireEvent(new GenerateAcademicHistoryFromStringEvent(academicHistory));
 	}
 
+	@Override
+	public void getCareers(String sede) {
+		rpcService.getCareers(sede, asyncGetCareers);
+	}
+
+	AsyncCallback<List<Career>> asyncGetCareers = new AsyncCallback<List<Career>>() {
+		
+		@Override
+		public void onFailure(Throwable caught) {
+		}
+		
+		@Override
+		public void onSuccess(List<Career> result) {
+			addCareersToListBox(result);				
+		}};
+
+	public void onContinueDefaultButtonClick(String careerCode) {
+		eventBus.fireEvent(new ContinueDefaultCareerEvent(careerCode));
+	}
+	
+	
 }

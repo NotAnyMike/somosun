@@ -17,10 +17,10 @@ public class IndexViewImpl extends Composite implements IndexView {
 	private static IndexViewUiBinder uiBinder = GWT
 			.create(IndexViewUiBinder.class);
 	
-	
 	@UiField Anchor createButton;
 	@UiField Anchor commingSoonButton;
 	@UiField Anchor aboutUsButton;
+	@UiField Anchor twitterButton;
 
 	private Presenter presenter;
 	
@@ -37,13 +37,5 @@ public class IndexViewImpl extends Composite implements IndexView {
 	@Override
 	public Widget asWidget(){
 		return this;
-	}
-	
-	//Bullshit to remove because it is not an important event
-	@UiHandler("aboutUsButton")
-	void onAboutUsButtonClicked(ClickEvent event){
-		if(presenter != null){
-			presenter.onAboutUsButtonClicked();			
-		}
 	}
 }

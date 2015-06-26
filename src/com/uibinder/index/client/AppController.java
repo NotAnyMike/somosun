@@ -3,9 +3,11 @@ package com.uibinder.index.client;
 import java.util.List;
 import java.util.Random;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -13,47 +15,66 @@ import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.uibinder.index.client.event.AboutUsEvent;
 import com.uibinder.index.client.event.AboutUsEventHandler;
+import com.uibinder.index.client.event.ContinueDefaultCareerEvent;
+import com.uibinder.index.client.event.ContinueDefaultCareerEventHandler;
 import com.uibinder.index.client.event.GenerateAcademicHistoryFromStringEvent;
 import com.uibinder.index.client.event.GenerateAcademicHistoryFromStringEventHandler;
-import com.uibinder.index.client.presenter.AboutGedadPresenter;
+import com.uibinder.index.client.presenter.AnnouncementPresenter;
+import com.uibinder.index.client.presenter.AboutUsPresenter;
 import com.uibinder.index.client.presenter.CreatePresenter;
 import com.uibinder.index.client.presenter.DndPresenter;
 import com.uibinder.index.client.presenter.IndexPresenter;
 import com.uibinder.index.client.presenter.PlanPresenter;
 import com.uibinder.index.client.presenter.Presenter;
 import com.uibinder.index.client.presenter.TopBarPresenter;
+import com.uibinder.index.client.service.LoginService;
+import com.uibinder.index.client.service.LoginServiceAsync;
 import com.uibinder.index.client.service.SUNServiceAsync;
-import com.uibinder.index.client.view.AboutGedadViewImpl;
+import com.uibinder.index.client.view.AnnouncementViewImpl;
+import com.uibinder.index.client.view.AboutUsViewImpl;
 import com.uibinder.index.client.view.DndViewImpl;
 import com.uibinder.index.client.view.IndexViewImpl;
 import com.uibinder.index.client.view.PlanViewImpl;
+import com.uibinder.index.client.view.SiaSummaryViewImpl;
 import com.uibinder.index.client.view.TopBarViewImpl;
 import com.uibinder.index.client.view.CreateViewImpl;
+import com.uibinder.index.shared.LoginInfo;
 import com.uibinder.index.shared.RandomPhrase;
+import com.uibinder.index.shared.control.Plan;
+import com.uibinder.index.shared.control.Student;
 
 public class AppController implements Presenter, ValueChangeHandler<String> {
 
-	/*
-	* Creating all the views that will exist once for all to save them to let users go back to their view
-	*/
+	// Creating all the views that will exist once for all to save them to let users go back to their view
 	private IndexPresenter indexPresenter = null;
 	private TopBarPresenter topBarPresenter = null;
 	private DndPresenter dndPresenter = null;
 	private CreatePresenter createPresenter = null;
 	private PlanPresenter planPresenter = null;
-	private List<RandomPhrase> phrases = null;
+	private AboutUsPresenter aboutUsPresenter = null;
+	private AnnouncementPresenter announcementPresenter = null;
 	
-	private RandomPhrase phrase;
-	
-	private final HandlerManager eventBus;
-	private final SUNServiceAsync rpcService;
-	
-	private HasWidgets container;
 	private IndexViewImpl indexView;
 	private TopBarViewImpl topBarView;
 	private DndViewImpl dndView;
 	private CreateViewImpl createView;
 	private PlanViewImpl planView;
+	private AboutUsViewImpl aboutUsView;
+	private AnnouncementViewImpl announcementView;
+	private SiaSummaryViewImpl siaSummaryView;
+	
+	//Taking care of the random phrase funtionality variables 
+	private List<RandomPhrase> phrases = null;
+	private RandomPhrase phrase;
+	
+	private final HandlerManager eventBus;
+	private final SUNServiceAsync rpcService;
+	private HasWidgets container;
+	private String token;
+	
+	private LoginInfo loginInfo = new LoginInfo();
+	private Student student;
+	private LoginServiceAsync loginService;
 	
 	public AppController(SUNServiceAsync rpcService, HandlerManager eventBus){
 		this.rpcService = rpcService;
@@ -65,30 +86,51 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	private void bind(){
 		History.addValueChangeHandler(this);
 		
-		eventBus.addHandler(AboutUsEvent.TYPE, 
-				new AboutUsEventHandler(){
+		eventBus.addHandler(GenerateAcademicHistoryFromStringEvent.TYPE, new GenerateAcademicHistoryFromStringEventHandler(){
 					@Override
-					public void onAboutUs(AboutUsEvent event){
-						doOnAboutUs();
-					}
-				}
-				);
-		eventBus.addHandler(GenerateAcademicHistoryFromStringEvent.TYPE, 
-				new GenerateAcademicHistoryFromStringEventHandler(){
-					@Override
-					public void DoGenerateAcademicHistoryFromString(String academicHisotry){
+					public void doGenerateAcademicHistoryFromString(String academicHisotry){
 						generateAcademicHistoryFromString(academicHisotry);
 					}
 		});
+		
+		eventBus.addHandler(ContinueDefaultCareerEvent.TYPE, new ContinueDefaultCareerEventHandler(){
+			@Override
+			public void onContinueDefaultCareerButtonClicked(String careerCode) {
+				genereteDefaultPlan(careerCode);
+			}
+		});
 	}
 	
-	public void generateAcademicHistoryFromString(String academicHistory){
+	private void genereteDefaultPlan(String careerCode){
+		if(planView == null){
+			planView = new PlanViewImpl();
+			siaSummaryView = new SiaSummaryViewImpl();
+		}
+		if(planPresenter == null){
+			planPresenter = new PlanPresenter(rpcService, eventBus, planView, siaSummaryView);
+		}
+		
+		rpcService.getPlanDefault(careerCode, new AsyncCallback<Plan>(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("sorry we got a problem");
+			}
+
+			@Override
+			public void onSuccess(Plan result) {
+				Plan plan = result;
+				planPresenter.setPlan(plan);
+				History.newItem("plan");
+			}
+			
+		});
+	
+	}
+	
+	private void generateAcademicHistoryFromString(String academicHistory){
 		Window.alert("This should create an academic history from the string: " + academicHistory);
 		//TODO call the method cesar is working on to get the academic history
-	}
-	
-	public void doOnAboutUs(){
-		Window.alert("hola");
 	}
 	
 	@Override
@@ -100,12 +142,26 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 		} else {
 			History.fireCurrentHistoryState();
 		}
+		
+		getLoginInfo();
 	}
 
 	@Override
 	public void onValueChange(ValueChangeEvent<String> event) {
 		
-		String token = event.getValue();
+		/*rpcService.toTest(new AsyncCallback<String>(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("error");
+			}
+
+			@Override
+			public void onSuccess(String result) {
+				Window.alert(result);
+			}});*/
+		
+		token = event.getValue();
 		
 		if(token != null){
 			
@@ -119,7 +175,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 			 * This part will take care of the stability of the plan widget when its height changes due
 			 * to the changes on the number of max subjects on one semester
 			 */
-			if(token.equals("plan")){
+			/*if(token.equals("plan")){
 				if(RootPanel.get("centerArea").getElement().getAttribute("valign") != "top")
 				RootPanel.get("centerArea").getElement().setAttribute("valign","top");
 			}else if(RootPanel.get("centerArea").getElement().getAttribute("valign")!="middle"){
@@ -145,15 +201,28 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 			} else if(token.equals("plan")) {
 				if(planView == null){
 					planView = new PlanViewImpl();
+					siaSummaryView = new SiaSummaryViewImpl();
 				}
 				if(planPresenter == null){
-					planPresenter = new PlanPresenter(rpcService, eventBus, planView);
+					planPresenter = new PlanPresenter(rpcService, eventBus, planView, siaSummaryView);
 				}
 				planPresenter.go(RootPanel.get("centerArea"));
-			} else if(token.equals("gedad")) {
-				AboutGedadViewImpl aboutGedadView = new AboutGedadViewImpl();
-				Presenter aboutGedadPresenter = new AboutGedadPresenter(rpcService, eventBus, aboutGedadView);
-				aboutGedadPresenter.go(RootPanel.get("centerArea"));
+			} else if(token.equals("aboutUs")) {*/
+				if(aboutUsView == null){
+					aboutUsView = new AboutUsViewImpl();
+				}
+				if(aboutUsPresenter == null){
+					aboutUsPresenter = new AboutUsPresenter(rpcService, eventBus, aboutUsView);
+				}
+				aboutUsPresenter.go(RootPanel.get("centerArea"));/*
+			} else if(token.equals("announcement")) {
+				if(aboutUsView == null){
+					announcementView = new AnnouncementViewImpl();
+				}
+				if(aboutUsPresenter == null){
+					announcementPresenter = new AnnouncementPresenter(rpcService, eventBus, announcementView);
+				}
+				announcementPresenter.go(RootPanel.get("centerArea"));
 			} else {
 				if(indexView == null){
 					indexView = new IndexViewImpl();
@@ -162,7 +231,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 					indexPresenter = new IndexPresenter(rpcService, eventBus, indexView);					
 				}
 				indexPresenter.go(RootPanel.get("centerArea"));
-			}
+			}*/
 			setLabelsOnTopBar(token);
 		}
 		
@@ -175,13 +244,12 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 			topBarPresenter.setNameOfThePage("Plan de Estudios");
 		} else if(token.equals("plan")){
 			topBarPresenter.setNameOfThePage("Plan de Estudios");
-		} else if(token.equals("gedad")){
+		} else if(token.equals("aboutUs") || token.equals("announcement")){
 			phrase = getAPhrase();
 			topBarPresenter.setNameOfThePage(phrase.getRandomPhrase(), phrase.getAuthor());
 		} else {
 			topBarPresenter.setNameOfThePage("");
 		}
-		topBarPresenter.setUserName("Invitado");
 	}
 	
 	private void getRandomPhrases(){
@@ -219,5 +287,40 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 		}
 		
 	};
+	
+	private void loadLogin(boolean isThereAUrl){
+		if(isThereAUrl == true){
+			if(loginInfo.isLoggedIn()==true){
+				topBarPresenter.setLogOutUrl(loginInfo.getLogoutUrl());
+				topBarPresenter.setUserName(student.getName());
+			} else {
+				topBarPresenter.setLogInUrl(loginInfo.getLoginUrl());
+				topBarPresenter.setUserName("invitado");
+			}
+		} else {
+			topBarPresenter.setUserName("invitado");
+		}
+		topBarPresenter.showAdminLink(student.isAdmin());
+	}
+	
+	public void getLoginInfo(){
+		loginService = GWT.create(LoginService.class);
+		loginService.login(GWT.getHostPageBaseURL() + "#" + token, new AsyncCallback<LoginInfo>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				loginInfo.setLoggedIn(false);
+				loginInfo = null;
+				student = null;
+				loadLogin(false);
+			}
+
+			@Override
+			public void onSuccess(LoginInfo result) {
+				loginInfo = result;
+				student = loginInfo.getStudent();
+				loadLogin(true);
+			}});
+	}
 	
 }

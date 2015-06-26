@@ -25,6 +25,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.InsertPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.uibinder.index.client.presenter.PlanPresenter;
 
 public class PickUpDragController extends AbstractDragController {
 	
@@ -63,28 +64,19 @@ public class PickUpDragController extends AbstractDragController {
 	   * The implicit boundary drop controller.
 	   */
 	  private final BoundaryDropController boundaryDropController;
-
 	  private int boundaryOffsetX;
-
 	  private int boundaryOffsetY;
-
 	  private boolean dragProxyEnabled = false;
-
 	  private final DropControllerCollection dropControllerCollection;
-
 	  private final ArrayList<DropController> dropControllerList = new ArrayList<DropController>();
-
 	  private int dropTargetClientHeight;
-
 	  private int dropTargetClientWidth;
-
 	  private long lastResetCacheTimeMillis;
-
 	  private Widget movablePanel;
-
 	  private HashMap<Widget, SavedWidgetInfo> savedWidgetInfoMap;
-	  
 	  private AbsolutePanel boundaryPanel;
+	  
+	  private final PlanPresenter planPresenter;
 
 	  /**
 	   * Create a new pickup-and-move style drag controller. Allows widgets or a suitable proxy to be
@@ -99,31 +91,28 @@ public class PickUpDragController extends AbstractDragController {
 	   *          the boundary
 	   * @param allowDroppingOnBoundaryPanel whether or not boundary panel should allow dropping
 	   */
-	  public PickUpDragController(AbsolutePanel boundaryPanel, boolean allowDroppingOnBoundaryPanel) {
+	  public PickUpDragController(AbsolutePanel boundaryPanel, boolean allowDroppingOnBoundaryPanel, PlanPresenter planPresenter) {
 	    super(boundaryPanel);
 	    this.boundaryPanel = boundaryPanel;
 	    assert boundaryPanel != null : "Use 'RootPanel.get()' instead of 'null'.";
 	    boundaryDropController = newBoundaryDropController(boundaryPanel, allowDroppingOnBoundaryPanel);
 	    registerDropController(boundaryDropController);
 	    dropControllerCollection = new DropControllerCollection(dropControllerList);
+	    
+	    this.planPresenter = planPresenter;
 	  }
 
 	  @Override
 	  public void dragEnd() {
 	    assert context.finalDropController == null == (context.vetoException != null);
 	    if (context.vetoException != null) {
-	    	//if(true){
-	    		context.draggable.asWidget().setHeight("100px");
-	    		context.draggable.getElement().setInnerHTML("holaa");
-	    		//movablePanel.removeFromParent();
-	    	//}else{
-			      context.dropController.onLeave(context);
-			      context.dropController = null;
-			      if (!getBehaviorDragProxy()) {
-			        restoreSelectedWidgetsLocation();
-		      //}
-	      }
-	    } else {  
+	    	context.dropController.onLeave(context);
+	    	context.dropController = null;
+	    	if (!getBehaviorDragProxy()) {
+	    		restoreSelectedWidgetsLocation();
+	    	}
+	    	planPresenter.onSubjectDelete(context.draggable.asWidget().getElement().getAttribute("publicid"));
+	    } else {
 	      context.dropController.onDrop(context);
 	      context.dropController.onLeave(context);
 	      context.dropController = null;
@@ -135,10 +124,13 @@ public class PickUpDragController extends AbstractDragController {
 	    movablePanel.removeFromParent();
 	    movablePanel = null;
 	    super.dragEnd();
+	    
+	    planPresenter.moveArrows(context.draggable.getElement().getAttribute("publicid"));
 	  }
 
 	  @Override
 	  public void dragMove() {
+		  
 	    // may have changed due to scrollIntoView(), developer driven changes
 	    // or manual user scrolling
 	    long timeMillis = System.currentTimeMillis();
@@ -173,11 +165,18 @@ public class PickUpDragController extends AbstractDragController {
 	    if (context.dropController != null) {
 	      context.dropController.onMove(context);
 	    }
+	    
+	    planPresenter.moveArrows(context.draggable.getElement().getAttribute("publicid"));
 	  }
 
 	  @Override
 	  public void dragStart() {
 	    super.dragStart();
+	    
+	    
+	    //To deselect every subject when dragging starts
+	    //planPresenter.deleteAllOpacities();
+	    //planPresenter.setSubjectValuesSelected(null);
 
 	    lastResetCacheTimeMillis = System.currentTimeMillis();
 	    WidgetLocation currentDraggableLocation = new WidgetLocation(context.draggable,
@@ -223,6 +222,7 @@ public class PickUpDragController extends AbstractDragController {
 	    calcBoundaryOffset();
 	    dropTargetClientWidth = DOMUtil.getClientWidth(boundaryPanel.getElement());
 	    dropTargetClientHeight = DOMUtil.getClientHeight(boundaryPanel.getElement());
+	    
 	  }
 
 	  /**

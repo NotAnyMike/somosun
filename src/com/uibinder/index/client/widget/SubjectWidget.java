@@ -3,21 +3,30 @@ package com.uibinder.index.client.widget;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
+import com.uibinder.index.shared.control.Subject;
+import com.uibinder.index.shared.control.SubjectValues;
 
-public class SubjectWidget extends FlowPanel {
+public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 	
-	private static final String[] TYPENESS = {"N", "B", "C", "L", "P", "-"};
+	private static final String[] TYPENESS = {"N", "F", "D", "L", "P", "-"};
 	private static final String[] TYPENESS_STYLE = {"nivelacion", "fundamentacion", "disciplinar", "libreEleccion", "otra", "otra"};
 	private static final String[] TYPENESS_NAMES = {"Nivelación", "Fundamentación", "Disciplinar", "Libre Elección", "Otra", "Otra"};
 	
 	private String name = null;
 	private String code = null;
+	private String publicId = null;
 	private boolean obligatoriness = false;
 	private int credits = 0;
 	private double grade = 0.0;
+	private boolean approved = false; //it could happen that it took the class and fail it
+	private boolean taken = false; //because to calculate the credits requirement I need to know if it was(not) taken and (not) passed/failed  
 	private int type = 0;
 	private boolean selected = false;
 	
@@ -32,33 +41,95 @@ public class SubjectWidget extends FlowPanel {
 	private List<SubjectWidget> posList = new ArrayList<SubjectWidget>();
 	private List<SubjectWidget> coList = new ArrayList<SubjectWidget>();
 	
-	/*
-	 * Type = 0 Nivelación, 1 Fundamentación, 2 Disiplinar, 3 libre elección, 4 Añadir para posgrado
+	/**
+	 * Type = 0 Leveling, 1 Foundations, 2 Disciplinary, 3 Free Election, 4 Add to post-grade.
+	 * if it comes with grade means that the class was taken (= true)
+	 * @param name
+	 * @param code
+	 * @param credits
+	 * @param grade
+	 * @param obligatoriness
+	 * @param type
 	 */
-	public SubjectWidget(String name, String code, int credits, double grade, boolean obligatoriness, int type){
+	public SubjectWidget(String name, String code, int credits, double grade, boolean obligatoriness, int type, String publicId){
 		this.name = name;
 		this.code = code;
 		this.credits = credits;
 		this.grade = grade;
+		this.approved = ((grade >= 3) ? true : false);
+		this.taken = true;
 		this.obligatoriness = obligatoriness;
 		this.type = type;
+		this.publicId = publicId;
 		
 		setAttributes();
 		
 		createWidget();
 	}
 	
-	public SubjectWidget(String name, String code, int credits, boolean obligatoriness, int type){
+	public SubjectWidget(String name, String code, int credits, double grade, boolean obligatoriness, String type, String publicId){
 		this.name = name;
 		this.code = code;
 		this.credits = credits;
-		this.grade = 0.0;
+		this.grade = grade;
+		this.approved = ((grade >= 3) ? true : false);
+		this.taken = true;
 		this.obligatoriness = obligatoriness;
-		this.type = type;
+		this.type = getTypeFromString(type);
+		this.publicId = publicId;
 		
 		setAttributes();
 		
 		createWidget();
+	}
+	
+	/**
+	 * Type = 0 Nivelación, 1 Fundamentación, 2 Disiplinar, 3 libre elección, 4 Añadir para posgrado
+	 * @param name
+	 * @param code
+	 * @param credits
+	 * @param obligatoriness
+	 * @param type
+	 */
+	public SubjectWidget(String name, String code, int credits, boolean obligatoriness, int type, String publicId){
+		this.name = name;
+		this.code = code;
+		this.credits = credits;
+		this.grade = 0.0;
+		this.approved = false;
+		this.taken = false;
+		this.obligatoriness = obligatoriness;
+		this.type = type;
+		this.publicId = publicId;
+		
+		setAttributes();
+		
+		createWidget();
+	}
+	
+	/**
+	 * TODO: fix the obligatoriness
+	 * @param s
+	 */
+	public SubjectWidget(Subject s, SubjectValues sV){
+		this.name = s.getName();
+		this.code = s.getCode();
+		this.credits = s.getCredits();
+		this.grade = 0.0;
+		this.approved = true;
+		this.taken = sV.isTaken();
+		this.obligatoriness = sV.getComplementaryValues().isMandatory();
+		this.type = getTypeFromString(sV.getComplementaryValues().getTypology());
+		this.publicId = sV.getSubjectValuesPublicId();
+		
+		setAttributes();
+		
+		createWidget();
+	}
+
+	private int getTypeFromString(String typology) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	/**
@@ -68,17 +139,20 @@ public class SubjectWidget extends FlowPanel {
 		
 		this.getElement().setAttribute("name", name);
 		this.getElement().setAttribute("code", code);
-		this.getElement().setAttribute("Credits", Integer.toString(credits));
+		this.getElement().setAttribute("publicId", "" + publicId);
+		this.getElement().setAttribute("credits", Integer.toString(credits));
 		this.getElement().setAttribute("grade", Double.toString(grade));
 		this.getElement().setAttribute("obligatoriness", Boolean.toString(obligatoriness));
 		this.getElement().setAttribute("type", Integer.toString(type));
+		this.getElement().setAttribute("approved", ((approved == true) ? "1" : "0"));
+		this.getElement().setAttribute("taken", ((taken == true) ? "1" : "0"));
 		
 	}
 
 	private void createWidget() {
 		nameLabel = new Label(name);
 		codeLabel = new Label(code);
-		creditsLabel = new Label("cr: " + Integer.toString(credits));
+		creditsLabel = new Label("c: " + Integer.toString(credits));
 		gradeLabel = new Label((grade == 0) ? "-" : Double.toString(grade));
 		obligatorinessLabel = new Label("oblig: " + ((obligatoriness == true) ? "Si" : "No"));
 		
@@ -200,7 +274,45 @@ public class SubjectWidget extends FlowPanel {
 		return posList;
 	}
 	
+	public String getName(){
+		return name;
+	}
+	
 	public String getCode(){
 		return code;
 	}
+	
+	public boolean getTaken(){
+		return taken;
+	}
+	
+	public boolean getApproved(){
+		return approved;
+	}
+	
+	public double getGrade(){
+		return grade;
+	}
+	
+	public boolean isOblig(){
+		return obligatoriness;
+	}
+	
+	/**
+	 * Type = 0 Nivelación, 1 Fundamentación, 2 Disiplinar, 3 libre elección, 4 Añadir para posgrado
+	 */
+	public int getType(){
+		return type;
+	}
+
+	public String getPublicId() {
+		return publicId;
+	}
+
+	@Override
+	public HandlerRegistration addClickHandler(
+	        ClickHandler handler)
+	    {
+	        return addDomHandler(handler, ClickEvent.getType());
+	    }
 }

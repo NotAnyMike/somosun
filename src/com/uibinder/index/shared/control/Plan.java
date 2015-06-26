@@ -1,38 +1,42 @@
 package com.uibinder.index.shared.control;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Index;
+import com.googlecode.objectify.annotation.Stringify;
 
 /**
  *
  * @author Cesar A. Villamizar C.
  */
+@Entity
 public class Plan implements Serializable {
 
-    Career career;
-    List<Semester> semesters;
-    double PAPA;
-    Map<Subject, SubjectValues> subMap;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	@Id Long id=null;
+	@Index private Career career = null;
+    private List<Semester> semesters = null;
+    private double PAPA = 0;
+    @Stringify(com.googlecode.objectify.stringifier.KeyStringifier.class)
+    private HashMap<SubjectValues, Subject> valuesAndSubjectMap = null;
 
     public Plan() {
-        career = new Career("Unknown","Unknown");
-        semesters = new ArrayList<>();
-        PAPA = 0;
-        subMap = new HashMap<>();
-
+    }
+    
+    public Career getCareer(){
+    	return career;
+    }
+    
+    public String getCareerCode(){
+    	return career.getCode();
     }
 
     /*public void parseHistory(String history) {
@@ -110,6 +114,42 @@ public class Plan implements Serializable {
     public void addSubject() {
 
     }
+
+	public Long getId() {
+		return id;
+	}
+
+	public List<Semester> getSemesters() {
+		return semesters;
+	}
+
+	public void setSemesters(List<Semester> semesters) {
+		this.semesters = semesters;
+	}
+
+	public double getPAPA() {
+		return PAPA;
+	}
+
+	public void setPAPA(double papa) {
+		this.PAPA = papa;
+	}
+
+	public HashMap<SubjectValues, Subject> getValuesAndSubjectMap() {
+		return valuesAndSubjectMap;
+	}
+
+	public void setValuesAndSubjectMap(HashMap<SubjectValues, Subject> valuesAndSubjectMap) {
+		this.valuesAndSubjectMap = valuesAndSubjectMap;
+	}
+
+	public void setCareer(Career career) {
+		this.career = career;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
 
     /*public static void main(String[] args) {
 

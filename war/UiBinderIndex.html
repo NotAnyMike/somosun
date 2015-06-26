@@ -17,6 +17,15 @@
 	<!-- <link href="//fonts.googleapis.com/css?family=Open+Sans:300italic,300,400italic,400,600italic,600,700italic,700,800italic,800" rel="stylesheet" type="text/css">  -->
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
 	
+	<!-- Bootstrap GWT support -->
+	<!-- before your module(*.nocache.js) loading  -->
+	<!--[if lt IE 9]>
+	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<!--[if IE 7]>
+ 	<link rel="stylesheet" href="{your module name}/css/font-awesome-ie7.css">
+	<![endif]-->
+	
 	<!-- Bootstrap core CSS --> 
 	<link type="text/css" rel="stylesheet" href="/css/bootstrap.min.css">
 	
@@ -25,6 +34,8 @@
 	
 	<!-- Custom styles for the plan layout -->
 	<link type="text/css" rel="stylesheet" href="/css/malla.css">
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.js"></script>
+	<script type="text/javascript" src="functions.js"></script>
 
     <title>Somos UN</title>
 
@@ -59,7 +70,7 @@
 		</tr>
 		<tr>
 			<td align="center" valign="middle" id="bottomArea" class="bottomArea">
-			<div class="footer" style="margin: 0px">
+			<div id="footer" class="footer" style="margin: 0px">
 				<p style="font-size: 15px;">
 					<a href="#" style="color: #666; margin: 25px">&copy 2012-2014 somosun.com</a> 
 					<a href="#" style="color: #666; margin: 25px">Contáctanos</a> 
@@ -70,6 +81,7 @@
 			</td>
 		</tr>
 	</table>  
+	
   
 	<script
 		src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>

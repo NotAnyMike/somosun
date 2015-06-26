@@ -1,9 +1,15 @@
 package com.uibinder.index.client.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.uibinder.index.shared.RandomPhrase;
+import com.uibinder.index.shared.SiaResultGroups;
+import com.uibinder.index.shared.SiaResultSubjects;
+import com.uibinder.index.shared.control.Career;
+import com.uibinder.index.shared.control.ComplementaryValues;
+import com.uibinder.index.shared.control.Plan;
 import com.uibinder.index.shared.control.Subject;
 
 /**
@@ -30,5 +36,25 @@ public interface SUNServiceAsync {
 
 	void saveRandomPhrase(String phrase, String author,
 			AsyncCallback<Void> callback);
+
+	void getGroupsFromSia(Subject subject, String sede,
+			AsyncCallback<SiaResultGroups> callback);
+	
+	void getGroupsFromSia(String subjectSiaCode, String sede,
+			AsyncCallback<SiaResultGroups> callback);
+
+	void getSubjectFromSia(String nameOrCode, String typology, String career,
+			String scheduleCP, int page, int ammount, String sede,
+			AsyncCallback<SiaResultSubjects> callback);
+
+	void getCareers(String sede, AsyncCallback<List<Career>> asyncGetCareers);
+
+	void getPlanDefault(String careerCode, AsyncCallback<Plan> callback);
+
+	void toTest(AsyncCallback<String> callback);
+
+	void getComplementaryValues(String career, String code,	AsyncCallback<ComplementaryValues> callback);
+
+	void getSubjectsFromSia(String nameOrCode, String typology, String career, String sede, int page, AsyncCallback<SiaResultSubjects> callback);
 
 }

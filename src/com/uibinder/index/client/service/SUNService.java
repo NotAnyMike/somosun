@@ -5,6 +5,11 @@ import java.util.List;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.uibinder.index.shared.RandomPhrase;
+import com.uibinder.index.shared.SiaResultGroups;
+import com.uibinder.index.shared.SiaResultSubjects;
+import com.uibinder.index.shared.control.Career;
+import com.uibinder.index.shared.control.ComplementaryValues;
+import com.uibinder.index.shared.control.Plan;
 import com.uibinder.index.shared.control.Subject;
 
 /**
@@ -28,5 +33,18 @@ public interface SUNService extends RemoteService{
 	List<RandomPhrase> getRandomPhrase();
 	
 	void saveRandomPhrase(String phrase, String author);
+	
+	public SiaResultGroups getGroupsFromSia(String subjectSiaCode, String sede);
+	public SiaResultGroups getGroupsFromSia(Subject subject, String sede);
+	public SiaResultSubjects getSubjectFromSia(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede);
+	public SiaResultSubjects getSubjectsFromSia(String nameOrCode, String typology, String career, String sede, int page);
+	
+	public List<Career> getCareers(String sede);
+	
+	public Plan getPlanDefault(String careerCode);
+	
+	public String toTest();
+	
+	public ComplementaryValues getComplementaryValues(String career, String code);
 	
 }

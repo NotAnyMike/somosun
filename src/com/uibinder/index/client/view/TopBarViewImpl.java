@@ -1,5 +1,8 @@
 package com.uibinder.index.client.view;
 
+import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.constants.IconType;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -13,6 +16,8 @@ public class TopBarViewImpl extends Composite implements TopBarView {
 	
 	@UiField Label pageNameLabel;
 	@UiField Label userNameLabel;
+	@UiField Anchor logAnchor;
+	@UiField Anchor adminPanelAnchor;
 
 	private static TopBarViewUiBinder uiBinder = GWT
 			.create(TopBarViewUiBinder.class);
@@ -48,6 +53,28 @@ public class TopBarViewImpl extends Composite implements TopBarView {
 	@Override
 	public void setMainLabelTitle(String s) {
 		pageNameLabel.setTitle(s);
+	}
+
+	@Override
+	public void setLogOutUrl(String s) {
+		logAnchor.setText("Salir");
+		logAnchor.setHref(s);
+		logAnchor.setIcon(IconType.EXCLAMATION_TRIANGLE);
+	}
+
+	@Override
+	public void setLogInUrl(String s) {
+		logAnchor.setText("Ingresar");
+		logAnchor.setHref(s);
+		logAnchor.setIcon(IconType.CHILD);
+	}
+
+	public void showAdminLink(boolean b) {
+		if(b==true) {
+			adminPanelAnchor.setText("cPanel");
+			adminPanelAnchor.setIcon(IconType.GEAR);
+		}
+		else adminPanelAnchor.removeFromParent();
 	}
 
 }

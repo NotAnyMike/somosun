@@ -18,7 +18,7 @@ public class GenerateAcademicHistoryFromStringEvent extends GwtEvent<GenerateAca
 
 	@Override
 	protected void dispatch(GenerateAcademicHistoryFromStringEventHandler handler) {
-		handler.DoGenerateAcademicHistoryFromString(academicHistory);
+		handler.doGenerateAcademicHistoryFromString(academicHistory);
 	}
 
 }

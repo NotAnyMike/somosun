@@ -52,4 +52,18 @@ public class TopBarPresenter implements Presenter, TopBarView.Presenter {
 		view.setMainLabelTitle(author);
 	}
 
+	@Override
+	public void setLogInUrl(String s) {
+		view.setLogInUrl(s);
+	}
+
+	@Override
+	public void setLogOutUrl(String s) {
+		view.setLogOutUrl(s);
+	}
+
+	public void showAdminLink(boolean admin) {
+		view.showAdminLink(admin);
+	}
+
 }

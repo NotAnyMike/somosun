@@ -18,7 +18,7 @@ public class CreateViewImpl extends Composite implements CreateView {
 	private Presenter presenter;
 	
 	@UiField Button continueButton;
-	@UiField Button continueDefaultButton;
+	@UiField Button modelPlanButton;
 	@UiField Button resetButton;
 	@UiField TextBox textBoxCreate;
 	@UiField ListBox listBoxCreate;
@@ -37,7 +37,6 @@ public class CreateViewImpl extends Composite implements CreateView {
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
-		
 	}
 
 	@Override
@@ -52,10 +51,6 @@ public class CreateViewImpl extends Composite implements CreateView {
 	
 	public void clearTextBoxCreate(){
 		textBoxCreate.setValue("");
-	}
-	
-	public void setTextOfContinueDefaultButton(String text) {
-		continueDefaultButton.setText(text);
 	}
 
 	/********************* Firing Events *********************/
@@ -80,6 +75,23 @@ public class CreateViewImpl extends Composite implements CreateView {
 		if(presenter != null && academicHistory != null && academicHistory != ""){
 			presenter.onContinueButtonClicked(academicHistory);
 		}
+	}
+	
+	@UiHandler("modelPlanButton")
+	void onContinueDefaultButton(ClickEvent event){
+		if(presenter!=null){			
+			presenter.onContinueDefaultButtonClick(listBoxCreate.getSelectedValue());
+		}
+	}
+
+	@Override
+	public Button getContinueDefaultButton() {
+		return modelPlanButton;
+	}
+
+	@Override
+	public String getCurrentDefaultCareerValue() {
+		return listBoxCreate.getSelectedValue();
 	}
 
 

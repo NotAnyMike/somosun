@@ -11,6 +11,7 @@ body {
 	margin:0px;
 	width:100%;
 	height:100%;
+	-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;
 }
 
 .mainContainer {
@@ -69,8 +70,7 @@ body {
 	text-align:center;
 	align: center;
 	height:30px;
-    position: fixed;
-    bottom: 0;
+    position: absolute;
     width: 100%;
 }
 .buttonCursor{
@@ -83,4 +83,104 @@ body {
 }
 .textboxCreate{
 	width: 400px;
+}
+.warning {
+	background-color:#CCC;
+	/*border: 1px solid #999;
+	border-radius:5px;
+	-webkit-border-radius:5px;
+	-moz-border-radius:5px;*/
+	-webkit-box-shadow: 0px 0px 30px 0px rgba(50, 50, 50, 0.25);
+	-moz-box-shadow:    0px 0px 30px 0px rgba(50, 50, 50, 0.25);
+	box-shadow:         0px 0px 30px 0px rgba(50, 50, 50, 0.25);
+	z-index:2;
+	width:360px;
+	min-height:200px;
+}
+.warning_box{
+	z-index:2;
+	position:fixed;
+	left:50%;
+	top:50%;
+	margin-left:-180px;
+	margin-top:-100px;
+}
+.transparent_background{
+	background-color:#000;
+	opacity:0.5;
+	width:100%;
+	height:100%;
+	position:fixed;
+	top:0px;
+	left:0px;
+	z-index:1;
+}
+.codeFieldSearchSubject{
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+	color:#676767; 
+	width:100px; 
+	font-weight:100;
+	cursor:pointer;
+	font-size:18px;
+	text-align: center;
+	vertical-align:middle;
+	padding-top:2px;
+}
+.nameFieldSearchSubject{
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+	color:#676767; 
+	width:580px;
+	font-weight:200;
+	cursor:pointer;
+	vertical-align:middle;
+	font-size:18px;
+	padding-top:2px;
+}
+.infoHolderSearchSubject{
+/* the table that holds the credits and typoligy information */
+float:right;
+}
+.creditsFieldSearchSubject{
+	width:40px;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+	color:#676767; 
+	font-weight:100;
+	cursor:pointer;
+	font-size:18px;
+	text-align: center;
+	vertical-align:middle;
+	padding-top:2px;
+}
+.typeFieldSearchSubject{
+	width:30px;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+	color:#676767; 
+	font-weight:100;
+	cursor:pointer;
+	font-size:18px;
+	text-align: center;
+	vertical-align:middle;
+	padding-top:2px;
+}
+
+div.dline{
+	background-color: #666;
+	height:1px;
+	position:absolute;
+}
+	
+#siaSummary {
+    position: relative;
+	width: 662px;
+	float: left;
+}
+
+#searchSubjectMainDiv{
+	position: absolute; 
+	top:80px; 
+	width:1070px; 
+	z-index:1001; 
+	padding-bottom:50px;
+	margin-left: -535px;
+	left: 50%;
 }
