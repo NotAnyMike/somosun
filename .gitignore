@@ -47,3 +47,10 @@ bin/**
 # Specific Files #
 ##################
 *datastore-indexes-auto.xml
+
+# Others #
+##########
+*.cache.js
+*.gwt.rpc
+*.symbolMap
+*.nocache.js
