@@ -46,4 +46,4 @@ bin/**
 
 # Specific Files #
 ##################
-**/datastore-indexes-auto.xml
+*datastore-indexes-auto.xml
