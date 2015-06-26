@@ -20,7 +20,7 @@ public class IndexViewImpl extends Composite implements IndexView {
 	@UiField Anchor createButton;
 	@UiField Anchor commingSoonButton;
 	@UiField Anchor aboutUsButton;
-	@UiField Anchor announcementButton;
+	@UiField Anchor twitterButton;
 
 	private Presenter presenter;
 	

@@ -8,34 +8,42 @@
 	<ui:style field="third" src="styles/bootstrap.css"/>
 	<ui:style field="forth" src="styles/bootstrap-theme.min.css"/>
 	<g:HTMLPanel>
-		<table width="85%" border="0" cellpadding="0" cellspacing="0">
-	      <tr>
-	        <td align="center" valign="middle">
-	        	<p class="lead main-text" style="font-size:26px; text-align:center"><br></br>Convocatoria</p>
-            </td>
-        </tr>
-	      <tr>
-	        <td width="45%" height="400" align="center" valign="middle" class="lead main-text" style="font-size:20px; text-align:left;">
-              	<p><span style="font-size:18px; font-weight:bold">Queremos grupos que nos ayuden a desarrollar los siguientes proyectos:</span></p>
-              	<ul>
-              	  <li>Repositorio de Parciales: Sitio en donde los estudiantes anónimamente pueden subir sus parciales y copias para ayudar a los demás.</li>
-              	  <li>MyEF app: Una aplicación que permita ranquear a los profesores, clases, ver que grupos son mejores, ranquear electivas, conocer el promedio de un curso, etc.</li>
-              	  <li>Horario: Aplicación que permita crear el horario antes de inscribir materias teniendo en cuenta las calificaciones de los profesores, los huecos, los grupos fáciles, etc.</li>
-              	  <li>Plan de estudio: GEDAD se encuentra desarrollando esta app actualmente, la cual sirve para crear y administrar los planes de estudio de los estudiantes.</li>
-              	  <li>Te gustaría hacer otra cosa? Cuentanos.</li>
-       	      </ul>
-              	<p>De vez en cuando habrá una que otra reunión para ver el avance y sincronizar todos los proyectos</p>
-              	<p>Los proyectos tienen que estar integrados con las demás apps de <a href="#aboutUs">Somos UN</a> (esta página) y tener una interfaz gráfica estandar para luego ser integrados a Somos UN</p>
-           	  <p>Tamaño del grupo: desde 1 hasta 2147483647.<br />
-           	    Si quieres participar y no tienes grupo, no importa.</p>
-              	<p>Si quieres hablaros nosotros somos: <br />
-              	  <a href="https://www.facebook.com/MikeCrosoft" target="new">Mike W</a> - <a href="https://twitter.com/MWoodcock_" target="new">@MWoodcock_</a><br />
-              	  <a href="https://www.facebook.com/neill.giraldo" target="new">Neill P</a> - <a href="https://plus.google.com/+NeillGiraldo" target="new">+NeillGiraldo</a><br />
-              	  <a href="https://www.facebook.com/afcruzs" target="new">Felipe C </a> - <a href="https://twitter.com/SoyPecora" target="new">@SoyPecora</a><br />
-              	  <a href="https://www.facebook.com/blue.drag1" target="new">Cesar V</a></p>
-              	<p>&nbsp;</p>
-              	<p>&nbsp;</p></td>
-        </tr>
-      </table>
+	<table width="60%" border="0" cellpadding="0" cellspacing="0">
+	 <tr>
+		<td valing="middle" aling="center" class="lead main-text">
+		    <br></br><br></br>
+           	<span style="font-size:50px;">#SomosUN</span>   
+            <br></br>  
+            <span style="font-size:15px;">Esta no es la versión final, solo es un Beta</span>    
+            <br></br>
+            <br></br>
+        </td>
+	   </tr>
+	   <tr>
+	    <td align="left" valign="middle" style="font-size:20px; text-align:left; width:80%" class="lead main-text">
+	      El objetivo de esta aplicación es que sirva a los estudiantes para organizar sus semestres y las clases que verán a través de su(s) carrera(s). Que sea un sitio en donde consultar la información sobre el plan de estudios, horarios, notas, comentarios y calificaciones de las clases y grupos sea fácil. El proyecto recién comienza y sin ayuda no llegará lejos.
+	
+	      <br></br><br></br>
+	      Al estar #SomosUN en versión Beta, cualquier error, sugerencia o queja que tengas puede ser de mucha utilidad, puedes usar nuestro email (<a href="mailto:somos.un.project@gmail.com" target="_blank">somos.un.project@gmail.com</a>) o nuestro twitter (<a href="https://twitter.com/SomosUNal" target="_blank">@SomosUNal</a>) para contarnos cualquier cosa.
+	
+	      <br></br><br></br>
+	      El proyecto por el momento solo funciona con el plan de Economía, encuentra los pre y co-requisitos.
+	
+	      <br></br>
+	      <hr style="display: block; height: 1px; border: 0; border-top: 1px solid #666; margin: 1em 0; padding: 0;" />
+	
+	      Muchas personas han tenido ideas interesantes como:
+	
+	      <ul>
+	        <li>Repositorio de Parciales,</li>
+	        <li>Calificación de profesores, grupos, y clases y </li>
+	        <li>Creador de horarios.</li>
+	      </ul>
+	
+	      Sería interesante que todas estas ideas se puedan agrupar e integrar bajo #SomosUN para facilitarle la vida a los proximos estudiantes de la UN. Cualquier cosa se pueden comunicar con <a href="https://twitter.com/SomosUNal" target="_blank">@SomosUNal</a> o con <a href="https://twitter.com/MikeWoodcockC" target="_blank">@MikeWoodcockC</a>. 
+	      <br></br><br></br><br></br>
+	    </td>
+	  </tr>
+	</table>
 	</g:HTMLPanel>
 </ui:UiBinder> 
