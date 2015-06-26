@@ -1,9 +1,3 @@
-/test-classes/
-/test-classes/
-/test-classes/
-/test-classes/
-/test-classes/
-/gwt-unitCache/
 # Compiled source #
 ###################
 *.com
@@ -41,4 +35,11 @@
 .Trashes
 ehthumbs.db
 Thumbs.db
-/bin/
+
+# Folders #
+###########
+/test-classes/
+test-classes/**
+/gwt-unitCache/
+bin/**
+/bin/**
