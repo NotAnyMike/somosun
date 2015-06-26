@@ -175,7 +175,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 			 * This part will take care of the stability of the plan widget when its height changes due
 			 * to the changes on the number of max subjects on one semester
 			 */
-			if(token.equals("plan")){
+			/*if(token.equals("plan")){
 				if(RootPanel.get("centerArea").getElement().getAttribute("valign") != "top")
 				RootPanel.get("centerArea").getElement().setAttribute("valign","top");
 			}else if(RootPanel.get("centerArea").getElement().getAttribute("valign")!="middle"){
@@ -207,14 +207,14 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 					planPresenter = new PlanPresenter(rpcService, eventBus, planView, siaSummaryView);
 				}
 				planPresenter.go(RootPanel.get("centerArea"));
-			} else if(token.equals("aboutUs")) {
+			} else if(token.equals("aboutUs")) {*/
 				if(aboutUsView == null){
 					aboutUsView = new AboutUsViewImpl();
 				}
 				if(aboutUsPresenter == null){
 					aboutUsPresenter = new AboutUsPresenter(rpcService, eventBus, aboutUsView);
 				}
-				aboutUsPresenter.go(RootPanel.get("centerArea"));
+				aboutUsPresenter.go(RootPanel.get("centerArea"));/*
 			} else if(token.equals("announcement")) {
 				if(aboutUsView == null){
 					announcementView = new AnnouncementViewImpl();
@@ -231,7 +231,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 					indexPresenter = new IndexPresenter(rpcService, eventBus, indexView);					
 				}
 				indexPresenter.go(RootPanel.get("centerArea"));
-			}
+			}*/
 			setLabelsOnTopBar(token);
 		}
 		
