@@ -16,17 +16,27 @@ public class SubjectGroupDummy {
 	public SubjectGroupDummy(String name, int obligatoryCredits, int optativeCredits, boolean fundamental, Elements tds) {
 		super();
 		this.setName(name);
-		this.obligatoryCredits = obligatoryCredits;
-		this.optativeCredits = optativeCredits;
-		this.tds = tds;
+		this.setObligatoryCredits(obligatoryCredits);
+		this.setOptativeCredits(optativeCredits);
+		this.setTds(tds);
 		this.fundamental = fundamental;
 	}
 	
 	public SubjectGroupDummy(String name, int obligatoryCredits, int optativeCredits, boolean fundamental, Element table) {
 		super();
 		this.setName(name);
-		this.obligatoryCredits = obligatoryCredits;
-		this.optativeCredits = optativeCredits;
+		this.setObligatoryCredits(obligatoryCredits);
+		this.setOptativeCredits(optativeCredits);
+		this.setTable(table);
+		this.fundamental = fundamental;
+	}
+	
+	public SubjectGroupDummy(String name, int obligatoryCredits, int optativeCredits, boolean fundamental, Elements tds, Element table) {
+		super();
+		this.setName(name);
+		this.setObligatoryCredits(obligatoryCredits);
+		this.setOptativeCredits(optativeCredits);
+		this.setTds(tds);
 		this.setTable(table);
 		this.fundamental = fundamental;
 	}
@@ -61,6 +71,30 @@ public class SubjectGroupDummy {
 
 	public void setTable(Element table) {
 		this.table = table;
+	}
+
+	public int getOptativeCredits() {
+		return optativeCredits;
+	}
+
+	public void setOptativeCredits(int optativeCredits) {
+		this.optativeCredits = optativeCredits;
+	}
+
+	public int getObligatoryCredits() {
+		return obligatoryCredits;
+	}
+
+	public void setObligatoryCredits(int obligatoryCredits) {
+		this.obligatoryCredits = obligatoryCredits;
+	}
+
+	public Elements getTds() {
+		return tds;
+	}
+
+	public void setTds(Elements tds) {
+		this.tds = tds;
 	}
 
 }

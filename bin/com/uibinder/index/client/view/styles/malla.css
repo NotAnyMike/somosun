@@ -59,13 +59,14 @@ h1 {
 	float:none;
 	font-family: 'Open Sans', sans-serif;
 	text-align:center;
-	background-color:#FFF;
+	background-color:#F5F5F5;
 	width:180px;
 	min-height:130px;
-	border:1px solid #666;
+	border:0px solid #666;
 	-webkit-box-shadow: 0px 0px 20px 0px rgba(50, 50, 50, 0.75);
 	-moz-box-shadow:    0px 0px 20px 0px rgba(50, 50, 50, 0.75);
 	box-shadow:         0px 0px 20px 0px rgba(50, 50, 50, 0.75);
+	border-radius: 5px;
 }
 .otra{
 	background-color:#F90;
@@ -122,6 +123,8 @@ h1 {
 	height:21px;
 	color:#999;
 	border-top: 1px #CCC solid;
+	border-bottom-right-radius: 5px;
+	border-bottom-left-radius: 5px;
 }
 .gradeBottomSubjectBox {
 	padding-top:3px;
@@ -192,14 +195,30 @@ h1 {
 }
 .bottomPartSemesterPanel{
 	opacity: 0.6;
-	width:100px;
+	width:110px;
 	margin:10px;
 	padding:15px;
 	background-color:#EEE;
 	border: 1px solid #999;
 }
 .addImageSemesterPanel {
-	padding:5px;
+	margin:5px;
+	display: inline-block;
+	font-weight: 400;
+	text-align: center;
+	vertical-align: middle;
+	cursor: pointer;
+	background-image: none;
+	border: 1px solid transparent;
+	white-space: nowrap;
+	padding: 6px 12px;
+	font-size: 14px;
+	line-height: 1.42857143;
+	border-radius: 4px;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 .pre {
 	-webkit-box-shadow: 0px 0px 21px 0px #C00;
@@ -231,12 +250,12 @@ h1 {
 }
 .mainLabelNamePageTopBar {
 	 position: fixed;
-	 width:700px;
+	 width:550px;
 	 left:50%;
 	 margin-right:0px;
 	 font-size:16px;
 	 alignment-baseline:central;
-	 margin-left:-350px;
+	 margin-left:-275px;
 	 color:#CACACA;
 	 margin-top:14px;
 	 cursor:default;

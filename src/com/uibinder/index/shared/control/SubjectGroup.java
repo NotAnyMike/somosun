@@ -30,6 +30,17 @@ public class SubjectGroup implements Serializable {
 	public SubjectGroup(){
 	}
 	
+	public SubjectGroup(String name, Career career, Boolean fundamental,
+			int obligatoryCredits, int optativeCredits, boolean error) {
+		super();
+		this.name = name;
+		this.career = career;
+		this.fundamental = fundamental;
+		this.obligatoryCredits = obligatoryCredits;
+		this.optativeCredits = optativeCredits;
+		this.error = error;
+	}
+	
 	public boolean equal(SubjectGroup g){
 		if(this.name == g.getName() && this.career.equals(g.getCareer()) && this.fundamental == g.isFundamental() && this.obligatoryCredits == g.getObligatoryCredits() && this.optativeCredits == g.getOptativeCredits()){
 			return true;
@@ -89,5 +100,5 @@ public class SubjectGroup implements Serializable {
 	public void setError(Boolean ok) {
 		this.error = ok;
 	}
-	
+
 }

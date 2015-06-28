@@ -41,7 +41,7 @@
 	      <tr>
 	        <td width="45%" align="right" valign="middle">
               	<g:ListBox ui:field="listBoxCreate" addStyleNames="{second.textboxCreate} {third.lead} "></g:ListBox><br></br>
-              	<p><g:Button ui:field="continueDefaultButton" addStyleNames="{third.btn} {third.btn-default}">Cargar plan de Ingeniería de Sistemas</g:Button></p>
+              	<p><g:Button ui:field="newPlanButton" addStyleNames="{third.btn} {third.btn-default}">Nuevo plan</g:Button>   <g:Button ui:field="modelPlanButton" addStyleNames="{third.btn} {third.btn-default}">Cargar plan modelo</g:Button></p>
             </td>
 	        <td width="45%" height="400" align="left" valign="middle" style="font-size:20px; text-align:left" class="lead main-text">
             <ol>
@@ -54,7 +54,7 @@
               	<g:TextBox ui:field="textBoxCreate" styleName="{second.textboxCreate}"></g:TextBox>
               </p>
               <p><g:Button ui:field="continueButton" addStyleNames="{third.btn} {third.btn-default}">Continuar</g:Button>  <g:Button ui:field="resetButton" addStyleNames="{third.btn} {third.btn-default}">Reiniciar</g:Button></p>
-              <br/><p class="lead main-text" style="font-size:14px; text-align:left">*O solamente copia desde el título &quot;Mi historia académica/&quot; hasta comenzar las palabras &quot;Resumen académico&quot;</p>
+              <br/><p class="lead main-text" style="font-size:14px; text-align:left">*O solamente copia desde el título &quot;Mi historia académica&quot; hasta comenzar las palabras &quot;Resumen académico&quot;</p>
             </td>
         </tr>
       </table>

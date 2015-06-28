@@ -22,12 +22,14 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import com.googlecode.objectify.annotation.Index;
 import com.uibinder.index.server.dao.BlockDao;
 import com.uibinder.index.server.dao.CareerDao;
 import com.uibinder.index.server.dao.ComplementaryValuesDao;
 import com.uibinder.index.server.dao.GroupDao;
 import com.uibinder.index.server.dao.SemesterValueDao;
 import com.uibinder.index.server.dao.SubjectDao;
+import com.uibinder.index.server.dao.SubjectGroupDao;
 import com.uibinder.index.server.dao.TeacherDao;
 import com.uibinder.index.shared.SiaResultGroups;
 import com.uibinder.index.shared.SiaResultSubjects;
@@ -36,6 +38,7 @@ import com.uibinder.index.shared.control.Career;
 import com.uibinder.index.shared.control.ComplementaryValues;
 import com.uibinder.index.shared.control.Group;
 import com.uibinder.index.shared.control.Subject;
+import com.uibinder.index.shared.control.SubjectGroup;
 import com.uibinder.index.shared.control.Teacher;
 
 /**
@@ -734,6 +737,7 @@ public class SiaProxy {
 		
 		List<SubjectGroupDummy> subjectGroups1 = new ArrayList<SubjectGroupDummy>(); //To save the subjectGroups found in plan url
 		List<SubjectGroupDummy> subjectGroups2 = new ArrayList<SubjectGroupDummy>(); //To save the subjectGroups found in requisites url
+		List<SubjectGroupDummy> subjectGroupsFinal = null; //To save the final subjectGroups, the ones with mistakes and the ones with no mistakes. 
 		List<SubjectDummy> subjects = new ArrayList<SubjectDummy>();
 		List<ComponentDummy> fundamentals = new ArrayList<ComponentDummy>(); //para guardar los componentes fundamentales
 		List<ComponentDummy> professionals = new ArrayList<ComponentDummy>(); //para guardar los componentes profesionales o disciplinares
@@ -773,6 +777,14 @@ public class SiaProxy {
 			}
 			
 			if(htmlRequisites != null && htmlPlan != null){
+				
+				Career career = null;
+				
+				if(careerCode != null){
+					CareerDao careerDao = new CareerDao();
+					career = careerDao.getCareerByCode(careerCode);					
+				}
+				
 				docPlan = Jsoup.parse(htmlPlan);
 				docRequisites = Jsoup.parse(htmlRequisites);
 				
@@ -910,7 +922,7 @@ public class SiaProxy {
 					
 					//getting which subject group it is
 					int x = 0;
-					SubjectGroupDummy fromPlan = null;
+					SubjectGroupDummy sGFromPlan = null;
 					partialText = partialText.replaceAll("s", "").replaceAll("-","").replaceAll("/", "");
 					//To get the closest subjectGroup for this table (e)
 					for(SubjectGroupDummy sGDTemporary : subjectGroups1){
@@ -920,15 +932,15 @@ public class SiaProxy {
 						int position = partialText.toLowerCase().lastIndexOf(toSearch);
 						if(position > x){
 							x = position;
-							fromPlan = sGDTemporary;
+							sGFromPlan = sGDTemporary;
 						}
 					}
 					
 					int mandatoryCredits = 0;
 					int optativeCredits = 0;
 
-					if(fromPlan != null){
-						SubjectGroupDummy sGD = new SubjectGroupDummy(fromPlan.getName(), 0, 0, isFundamental, e);
+					if(sGFromPlan != null){
+						SubjectGroupDummy sGD = new SubjectGroupDummy(sGFromPlan.getName(), 0, 0, isFundamental, e);
 						subjectGroups2.add(sGD);						
 					}else{
 						//error, couldn't get the name of the subjectGroup
@@ -1185,7 +1197,7 @@ public class SiaProxy {
 									row = row + rowspanInt - 1; 
 									
 									//creating and adding to the list the subjectDummy
-									SubjectDummy subjectDummy = new SubjectDummy(code, name, credits, fromPlan, prerrequisites, correquisites, mandatory, cols);
+									SubjectDummy subjectDummy = new SubjectDummy(code, name, credits, sGFromPlan, prerrequisites, correquisites, mandatory, cols);
 									subjects.add(subjectDummy);
 								}
 							}
@@ -1197,17 +1209,107 @@ public class SiaProxy {
 					
 				}
 				
-				//to have a breakPoint
-				int xxxx = 0 +1;
-				xxxx = subjects.size()+1;
+				/**
+				 * From this point on I have the subjects, the subjectsGroups (I have two of this), and
+				 * the professional and fundamental list (where the SubjectGroups are saved to know if 
+				 * they are professional or just fundamental).
+				 * What is next to do is:
+				 * 
+				 * 1. ToDo: Compere if the subjectGroup1 (from the plan url) is the same as 
+				 * subjectGroup2 (from the requisites url). If they are not the same then there is something wrong
+				 * 
+				 * 2. ToDo: Save the subjects and the subjectGroup into the DB
+				 */
 				
-				//Since this point I have all the subjects (subjectsDummy) from a plan, what is left is to create them and save everything
-				//TODO: finish it
+				/**
+				 * Checking if the subject groups are OK and getting a final list
+				 */
+				
+				subjectGroupsFinal = getFinalSUbjectGroups(subjectGroups1, subjectGroups2);
+				saveSubjectGroups(subjectGroupsFinal, career);
+				
+				int x = 0;
 				
 			}
-			
-			
 		}
+	}
+
+	private static void saveSubjectGroups(List<SubjectGroupDummy> subjectGroupsFinal, Career career) {
+		
+		SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
+		
+		for(SubjectGroupDummy sGD : subjectGroupsFinal){
+			SubjectGroup sG = new SubjectGroup( sGD.getName(), career, sGD.isFundamental(), sGD.getObligatoryCredits(), sGD.getOptativeCredits(), sGD.getError());
+			subjectGroupDao.saveSubjectGroup(sG);
+		}
+		
+	}
+
+	/**
+	 * Given two list of SG it will return just one with the final SG
+	 * 
+	 * @param subjectGroups1
+	 * @param subjectGroups2
+	 * @return A list with the final subjectGroups
+	 */
+	private static List<SubjectGroupDummy> getFinalSUbjectGroups(
+			List<SubjectGroupDummy> subjectGroups1,
+			List<SubjectGroupDummy> subjectGroups2) {
+		
+		List<SubjectGroupDummy> subjectGroups = new ArrayList<SubjectGroupDummy>();
+		
+		for(SubjectGroupDummy sG1 : subjectGroups1){
+			String name1 = standardizeString(sG1.getName());
+			int obligatoryCredits = 0;
+			int optativeCredits = 0;
+			Boolean fundamental = null;
+			boolean error = false;
+			Elements tds = null;
+			Element table = null;
+			
+			for(SubjectGroupDummy sG2 : subjectGroups2){
+				String name2 = standardizeString(sG2.getName());
+				if(name1.equals(name2) == true){
+					
+					//Look for anymistake
+					//this will use only the values from sG1
+					if(sG1.getObligatoryCredits() != sG2.getObligatoryCredits() && sG2.getObligatoryCredits() != 0) error = true; 
+					if(sG1.getObligatoryCredits() != 0) obligatoryCredits = sG1.getObligatoryCredits();
+					else obligatoryCredits = sG2.getObligatoryCredits();
+					
+					if(sG1.getOptativeCredits() != sG2.getOptativeCredits() && sG2.getOptativeCredits() != 0) error = true;
+					if(sG1.getOptativeCredits() != 0) optativeCredits = sG1.getOptativeCredits();
+					else optativeCredits = sG2.getOptativeCredits();
+					
+					if((sG1.isFundamental() != sG2.isFundamental() && sG2.isFundamental() != null) || (sG1.isFundamental() == null && sG2.isFundamental()== null)) error = true;
+					if(sG1.isFundamental() != null) fundamental = sG1.isFundamental();
+					else fundamental = sG2.isFundamental();
+					
+					if(sG1.getTds() != null) tds = sG1.getTds();
+					else tds = sG2.getTds();
+					
+					if(sG2.getTable() != null) table = sG2.getTable();
+					else table = sG1.getTable();
+					
+					subjectGroups2.remove(sG2);
+					break;
+				}
+			}
+			
+			SubjectGroupDummy sg = new SubjectGroupDummy(name1, obligatoryCredits, optativeCredits, fundamental, tds, table);
+			sg.setError(error);
+			subjectGroups.add(sg);
+		}
+		
+		if(subjectGroups2.size() > 0){
+			for(SubjectGroupDummy sG : subjectGroups2){
+				subjectGroups.add(sG);
+				subjectGroups2.remove(sG);
+			}
+		}
+		
+				
+		return subjectGroups;
 	}
 
 	/**
