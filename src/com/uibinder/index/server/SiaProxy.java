@@ -941,7 +941,20 @@ public class SiaProxy {
 
 					if(sGFromPlan != null){
 						SubjectGroupDummy sGD = new SubjectGroupDummy(sGFromPlan.getName(), 0, 0, isFundamental, e);
-						subjectGroups2.add(sGD);						
+						String name1Temporary  = standardizeString(sGD.getName());
+						boolean isInList = false;
+						
+						//This is to make sure that if a subjectGroup with the same name, not to add it again
+						// see Odontología with Agrupación Indagación e Investigación, at the end there are two tables for the same subjectGroup
+						for(SubjectGroupDummy sGDTemporary : subjectGroups2)
+						{
+							String name2Temporary  = standardizeString(sGDTemporary.getName());
+							if(name1Temporary.equals(name2Temporary)) {
+								isInList = true;
+								break;
+							}
+						}
+						if(isInList == false) subjectGroups2.add(sGD);						
 					}else{
 						//error, couldn't get the name of the subjectGroup
 					}
@@ -1215,10 +1228,10 @@ public class SiaProxy {
 				 * they are professional or just fundamental).
 				 * What is next to do is:
 				 * 
-				 * 1. ToDo: Compere if the subjectGroup1 (from the plan url) is the same as 
+				 * 1. Compere if the subjectGroup1 (from the plan url) is the same as 
 				 * subjectGroup2 (from the requisites url). If they are not the same then there is something wrong
 				 * 
-				 * 2. ToDo: Save the subjects and the subjectGroup into the DB
+				 * 2. TODO: Save the subjects and the subjectGroup into the DB
 				 */
 				
 				/**
@@ -1240,9 +1253,30 @@ public class SiaProxy {
 		
 		SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
 		
+		List<SubjectGroup> sGFromDB = subjectGroupDao.getSubjectGroups(career.getCode()); 
+				
 		for(SubjectGroupDummy sGD : subjectGroupsFinal){
+			boolean isInDb = false;
+			String name = standardizeString(sGD.getName());
 			SubjectGroup sG = new SubjectGroup( sGD.getName(), career, sGD.isFundamental(), sGD.getObligatoryCredits(), sGD.getOptativeCredits(), sGD.getError());
-			subjectGroupDao.saveSubjectGroup(sG);
+			
+			for(SubjectGroup sGDb : sGFromDB){
+				String nameDb = standardizeString(sGDb.getName());
+				if(nameDb.equals(name)){
+					if((sGD.isFundamental() != null && sGD.isFundamental().equals(sGDb.isFundamental()) == false) || 
+							((sGD.getObligatoryCredits() != 0 || sGD.getOptativeCredits() != 0) && sGD.getObligatoryCredits() != sGDb.getObligatoryCredits()) || //The first double parentesis is for the subjectGroup with 0 credits either in optative or obligatory credits  
+							((sGD.getObligatoryCredits() != 0 || sGD.getOptativeCredits() != 0) && sGD.getOptativeCredits() != sGDb.getOptativeCredits()) == true)
+					{
+						//in order to update the subjectGroups
+						subjectGroupDao.deleteSubjectGroup(sGDb.getName(), sGDb.isFundamental(), sGDb.getCareer().getCode());						
+					}else{			
+						isInDb = true;
+						sGFromDB.remove(sGDb);
+						break;
+					}
+				}
+			}
+			if(isInDb == false)	subjectGroupDao.saveSubjectGroup(sG);
 		}
 		
 	}
