@@ -730,14 +730,14 @@ public class SiaProxy {
 	/**
 	 * This method will download all available requisites for a career
 	 */
-	public static void getRequisitesForACareer(String careerCode){
+	public static int getRequisitesForACareer(String careerCode){
 		
 		Document docPlan = null;
 		Document docRequisites = null;
 		
 		List<SubjectGroupDummy> subjectGroups1 = new ArrayList<SubjectGroupDummy>(); //To save the subjectGroups found in plan url
 		List<SubjectGroupDummy> subjectGroups2 = new ArrayList<SubjectGroupDummy>(); //To save the subjectGroups found in requisites url
-		List<SubjectGroupDummy> subjectGroupsFinal = null; //To save the final subjectGroups, the ones with mistakes and the ones with no mistakes. 
+		List<SubjectGroupDummy> subjectGroupsFinal = null; //To save the final subjectGroups, the ones with mistakes and the ones with no mistakes
 		List<SubjectDummy> subjects = new ArrayList<SubjectDummy>();
 		List<ComponentDummy> fundamentals = new ArrayList<ComponentDummy>(); //para guardar los componentes fundamentales
 		List<ComponentDummy> professionals = new ArrayList<ComponentDummy>(); //para guardar los componentes profesionales o disciplinares
@@ -1208,6 +1208,7 @@ public class SiaProxy {
 					}
 					
 				}
+				int x = 0;
 				
 				/**
 				 * From this point on I have the subjects, the subjectsGroups (I have two of this), and
@@ -1225,13 +1226,14 @@ public class SiaProxy {
 				 * Checking if the subject groups are OK and getting a final list
 				 */
 				
-				subjectGroupsFinal = getFinalSUbjectGroups(subjectGroups1, subjectGroups2);
+				subjectGroupsFinal = getFinalSubjectGroups(subjectGroups1, subjectGroups2);
 				saveSubjectGroups(subjectGroupsFinal, career);
 				
-				int x = 0;
 				
 			}
 		}
+		if(subjectGroupsFinal != null) return(subjectGroupsFinal.size());
+		else return 10;
 	}
 
 	private static void saveSubjectGroups(List<SubjectGroupDummy> subjectGroupsFinal, Career career) {
@@ -1252,7 +1254,7 @@ public class SiaProxy {
 	 * @param subjectGroups2
 	 * @return A list with the final subjectGroups
 	 */
-	private static List<SubjectGroupDummy> getFinalSUbjectGroups(
+	private static List<SubjectGroupDummy> getFinalSubjectGroups(
 			List<SubjectGroupDummy> subjectGroups1,
 			List<SubjectGroupDummy> subjectGroups2) {
 		

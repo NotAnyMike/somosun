@@ -887,6 +887,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 
 	public void onSearchButtonClicked(String s, String careerCode, String type, int page) {
 		
+		Window.alert("hol1");
+		
 		rpcService.toTest(new AsyncCallback<String>(){
 			
 			@Override
@@ -898,7 +900,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 			@Override
 			public void onSuccess(String result) {
 				// TODO Auto-generated method stub
-				
+				Window.alert("hol2");
+				Window.alert(result);
 			}
 			
 		});
