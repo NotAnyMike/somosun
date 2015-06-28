@@ -1227,6 +1227,7 @@ public class SiaProxy {
 				 */
 				
 				subjectGroupsFinal = getFinalSubjectGroups(subjectGroups1, subjectGroups2);
+				//saving the subjectGroups, I'm not checking if they are already in the DB
 				saveSubjectGroups(subjectGroupsFinal, career);
 				
 				
