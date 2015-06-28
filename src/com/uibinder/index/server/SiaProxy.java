@@ -730,7 +730,7 @@ public class SiaProxy {
 	/**
 	 * This method will download all available requisites for a career
 	 */
-	public static int getRequisitesForACareer(String careerCode){
+	public static String getRequisitesForACareer(String careerCode){
 		
 		Document docPlan = null;
 		Document docRequisites = null;
@@ -1208,7 +1208,6 @@ public class SiaProxy {
 					}
 					
 				}
-				int x = 0;
 				
 				/**
 				 * From this point on I have the subjects, the subjectsGroups (I have two of this), and
@@ -1230,11 +1229,11 @@ public class SiaProxy {
 				//saving the subjectGroups, I'm not checking if they are already in the DB
 				saveSubjectGroups(subjectGroupsFinal, career);
 				
+				int x = 0;
 				
 			}
 		}
-		if(subjectGroupsFinal != null) return(subjectGroupsFinal.size());
-		else return 10;
+		return "10";
 	}
 
 	private static void saveSubjectGroups(List<SubjectGroupDummy> subjectGroupsFinal, Career career) {
@@ -1270,8 +1269,10 @@ public class SiaProxy {
 			Elements tds = null;
 			Element table = null;
 			
-			for(SubjectGroupDummy sG2 : subjectGroups2){
+			for(int x = 0; x < subjectGroups2.size(); x++){
+				SubjectGroupDummy sG2 = subjectGroups2.get(x);
 				String name2 = standardizeString(sG2.getName());
+				
 				if(name1.equals(name2) == true){
 					
 					//Look for anymistake
@@ -1299,7 +1300,7 @@ public class SiaProxy {
 				}
 			}
 			
-			SubjectGroupDummy sg = new SubjectGroupDummy(name1, obligatoryCredits, optativeCredits, fundamental, tds, table);
+			SubjectGroupDummy sg = new SubjectGroupDummy(sG1.getName(), obligatoryCredits, optativeCredits, fundamental, tds, table);
 			sg.setError(error);
 			subjectGroups.add(sg);
 		}
@@ -1307,7 +1308,6 @@ public class SiaProxy {
 		if(subjectGroups2.size() > 0){
 			for(SubjectGroupDummy sG : subjectGroups2){
 				subjectGroups.add(sG);
-				subjectGroups2.remove(sG);
 			}
 		}
 		

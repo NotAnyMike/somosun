@@ -157,8 +157,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 
 	@Override
 	public String toTest() {
-		SiaProxy.getRequisitesForACareer("2557");
-		return "";
+		return SiaProxy.getRequisitesForACareer("2557");
 	}
 
 	@Override
