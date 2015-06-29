@@ -1314,6 +1314,11 @@ public class SiaProxy {
 		ComplementaryValuesDao complementaryValuesDao = new ComplementaryValuesDao();
 		
 		List<Subject> subjectListFinal = new ArrayList<Subject>();
+
+		String careerString = career.getCode();		
+		String sede = "bog";
+		SiaResultSubjects siaResultFundamental = getSubjects("", "B", careerString, "", 1, 200, sede);
+		SiaResultSubjects siaResultProfessional = getSubjects("", "C", careerString, "", 1, 200, sede);
 				
 		for(SubjectDummy sD : subjects)
 		{
@@ -1327,57 +1332,13 @@ public class SiaProxy {
 			String codeStandardize = (code == null ? "" : standardizeString(code)); //to avoid NullPointerException due to an empty string
 			String siaCode = null;
 			String siaCodeStandardize = (siaCode == null ? "" : standardizeString(siaCode)); //to avoid NullPointerException due to an empty string
-			String location = "bog";
+			String location = sede;
 			
-			String nameOrCode = (codeStandardize != "" ? code : name);
-			String typology = (sD.getSubjectGroupDummy().isFundamental() == true ? "B" : "C");
-			if(sD.getSubjectGroupDummy().isFundamental() == null) typology = "";
-			String careerString = career.getCode();
-			String scheduleCP = "";
-			int page = 1;
-			int ammount = 100;
-			String sede = location;
-			SiaResultSubjects siaResult = getSubjects(nameOrCode, typology, careerString, scheduleCP, page, ammount, sede);
-			//TODO do a search by career and typology because I'm getting nothing after the 26th search due to the sec I have to wait
-			//choose one subject from the list in siaResult
-			if(siaResult.getSubjectList() != null)
-			{
-				if(siaResult.getSubjectList().size() != 0)
-				{
-					int position = 0;
-					int charactersLeft = 10000;
-					
-					if(siaResult.getSubjectList().size() == 1) sFromSia = siaResult.getSubjectList().get(0);
-					else
-					{
-						for(Subject sFromSiaTemporary : siaResult.getSubjectList())
-						{
-							String nameFromSiaStandardized = standardizeString(sFromSiaTemporary.getName());
-							String nameWithOut = nameFromSiaStandardized.replace(nameStandardized, "");
-							
-							if(charactersLeft > nameWithOut.length() == true){
-								position = siaResult.getSubjectList().indexOf(sFromSiaTemporary);
-								charactersLeft = nameWithOut.length();
-							}
-									
-						}
-						int z = 0;
-
-						sFromSia = siaResult.getSubjectList().get(position);
-
-						if(credits == 0) credits = sFromSia.getCredits();						
-						if(codeStandardize == "") code = sFromSia.getCode();
-						if(siaCodeStandardize == "") siaCode = sFromSia.getSiaCode();
-					}
-				}else
-				{
-					//The subject does not exit
-					break;
-				}
-			}else{
-				//the subject does not exist 
-				break;
-			}
+			sFromSia = getSubjectFromList(sD, (sD.getSubjectGroupDummy().isFundamental() == true ? siaResultFundamental : siaResultProfessional));
+			
+			if(credits == 0) credits = sFromSia.getCredits();						
+			if(codeStandardize == "") code = sFromSia.getCode();
+			if(siaCodeStandardize == "") siaCode = sFromSia.getSiaCode();
 			
 			Subject sTemporary = new Subject(credits, code, siaCode, name, location);
 		    Subject sFromDb = subjectDao.getSubjectByName(sD.getName());
@@ -1409,10 +1370,58 @@ public class SiaProxy {
 			
 		}
 		
-      		 @SuppressWarnings("unused")
-			int t = 0 ;
+      	@SuppressWarnings("unused")
+		int t = 0 ;
 				 
 		//TODO manage all the complementary Values part 
+	}
+
+	/**
+	 * This function will return the subject that has a name closes to the @param sD.getName()
+	 * 
+	 * @param sD
+	 * @param siaResult
+	 * @return
+	 */
+	private static Subject getSubjectFromList(SubjectDummy sD,
+			SiaResultSubjects siaResult) {
+		
+		Subject sToReturn = null;
+		String nameStandardized = standardizeString(sD.getName());
+		
+		//choose one subject from the list in siaResult
+		if(siaResult.getSubjectList() != null)
+		{
+			if(siaResult.getSubjectList().size() != 0)
+			{
+				
+				if(siaResult.getSubjectList().size() == 1) sToReturn = siaResult.getSubjectList().get(0);
+				else
+				{
+					int position = 0;
+					int charactersLeft = 10000;
+
+					for(Subject sFromSiaTemporary : siaResult.getSubjectList())
+					{
+						String nameFromSiaStandardized = standardizeString(sFromSiaTemporary.getName());
+						String nameWithOut = nameFromSiaStandardized.replace(nameStandardized, "");
+						
+						if(charactersLeft > nameWithOut.length() == true){
+							position = siaResult.getSubjectList().indexOf(sFromSiaTemporary);
+							charactersLeft = nameWithOut.length();
+						}
+								
+					}
+
+					sToReturn = siaResult.getSubjectList().get(position);
+
+				}
+			}
+		}else{
+			//the subject does not exist 
+		}
+		
+		return sToReturn;
 	}
 
 	private static List<SubjectGroup> saveSubjectGroupsAndReturnThem(List<SubjectGroupDummy> subjectGroupsFinal, Career career) {
