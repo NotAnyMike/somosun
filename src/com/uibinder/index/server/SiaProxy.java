@@ -31,6 +31,7 @@ import com.uibinder.index.server.dao.SemesterValueDao;
 import com.uibinder.index.server.dao.SubjectDao;
 import com.uibinder.index.server.dao.SubjectGroupDao;
 import com.uibinder.index.server.dao.TeacherDao;
+import com.uibinder.index.shared.SiaResult;
 import com.uibinder.index.shared.SiaResultGroups;
 import com.uibinder.index.shared.SiaResultSubjects;
 import com.uibinder.index.shared.control.Block;
@@ -173,7 +174,7 @@ public class SiaProxy {
 	 * 	For under-graduate (for this the VALOR_NIVELACADEMICO_TIPOLOGIA var should be "PRE", but works either way)
 	 * 		Nivelación: "P"
 	 * 		Fundamentación: "B"
-	 * 		Disciplinar: "C"
+	 * 		Disciplinar/Profesional: "C"
 	 * 		Libre elección: "L"</br></br>
 	 * 	For graduate (for this the VALOR_NIVELACADEMICO_TIPOLOGIA var should be "POS", but works either way)
 	 * 		Obligatorio: "O"
@@ -735,6 +736,8 @@ public class SiaProxy {
 		Document docPlan = null;
 		Document docRequisites = null;
 		
+		List<SubjectGroup> subjectGroupFinal = null; //To save the SubjectGroup (no Dummy final, getting them from the DB or updating them)
+		
 		List<SubjectGroupDummy> subjectGroups1 = new ArrayList<SubjectGroupDummy>(); //To save the subjectGroups found in plan url
 		List<SubjectGroupDummy> subjectGroups2 = new ArrayList<SubjectGroupDummy>(); //To save the subjectGroups found in requisites url
 		List<SubjectGroupDummy> subjectGroupsFinal = null; //To save the final subjectGroups, the ones with mistakes and the ones with no mistakes
@@ -983,6 +986,11 @@ public class SiaProxy {
 					List<Integer> integersList = new ArrayList<Integer>();
 					List<Integer> stringsList = new ArrayList<Integer>(); //Guarda también los que no quepan en ningún grupo
 					for(int col3 = 0; col3 < table[0].length; col3++){
+						
+						
+						String minColspan = getMinColspan(table, col3); 
+						
+						
 						boolean booleans = true;
 						boolean requisites = true;
 						boolean integers = true;
@@ -992,14 +1000,13 @@ public class SiaProxy {
 						//Recorrer todas las filas
 						for(int row3 = titleRows; row3 < table.length; row3 ++){
 							String tableColspan = table[row3][col3].attr("colspan");
-							if(tableColspan == "" || tableColspan == "0"){
-								//the colspan is zero
+							if((tableColspan.equals("")== true && minColspan.equals("0")) || (tableColspan.equals(minColspan) == true )){
 								String textToTest = standardizeString(table[row3][col3].text());
 								if(textToTest.equals("") == false){
 									empty = false;
-									
+									 
 									if(booleans == true)
-										if(textToTest.equals("si") == false && textToTest.equals("no") == false && textToTest.contains("obligatorio") == false) 
+										if(textToTest.equals("si") == false && textToTest.equals("no") == false && textToTest.contains("obligatori") == false && textToTest.equals("") == false ) 
 											booleans = false;
 									if(requisites == true)
 										if(textToTest.contains("prerrequisito") == false && textToTest.contains("correquisito") == false
@@ -1009,6 +1016,7 @@ public class SiaProxy {
 									if(integers == true)
 										if(StringUtils.isNumeric(textToTest) == false && textToTest.contains("credito") == false)
 											integers = false;
+									
 									if(integers == false && requisites == false && booleans == false)
 										break;
 								}
@@ -1056,7 +1064,6 @@ public class SiaProxy {
 							else{
 								//TODO: Something weird is happening, should be checked
 								//throw new RuntimeException("planUrl: " + planURL + "requisiteUrl: " + requisiteURL + " something weird just happened, there is more string columns than two.");
-								//throw new Error("gola in New York because that ugly woman hasn't have lunch yet! BITCH!");
 							}
 					}
 					
@@ -1112,12 +1119,19 @@ public class SiaProxy {
 						textOfColumnTitle = standardizeString(textOfColumnTitle);
 						
 						if(textOfColumnTitle.contains("obligatoria"))
+						{	
 							if(obligatoriness == -1){
 								obligatoriness = col;
 							}
-							else{
-								//TODO: Something weird is happening, should be checked
-							}
+						}
+						
+					}
+					
+					//Obligatoriness must be different from -1 -i.e. it has to exist-
+					if(obligatoriness == -1)
+					{
+						//Something weird is happening, should be checked
+						throw new RuntimeException("Theres is no 'mandatory' column in this table");
 					}
 					
 					//got the colums for the different values for this table
@@ -1132,6 +1146,7 @@ public class SiaProxy {
 								//does code exists?
 								boolean hasCode = false;
 								if(subjectCode != -1){
+									//TODO: Standardize the string cols[...].text
 									if(cols[subjectCode].text() != "")
 										hasCode = true;
 								}
@@ -1166,7 +1181,11 @@ public class SiaProxy {
 											credits = -1;
 										}
 									}
-									if(obligatoriness != -1) mandatory = (cols[obligatoriness].text().toLowerCase().contains("si") == true ? true : false);
+									
+									if(obligatoriness != -1) {
+										String cellText = cols[obligatoriness].text().toLowerCase();
+										mandatory = (cellText.contains("si") == true ? true : false);
+									}
 									//fromPlan;
 									//get text
 									//get prerrequisites
@@ -1235,13 +1254,21 @@ public class SiaProxy {
 				 */
 				
 				/**
-				 * Checking if the subject groups are OK and getting a final list
+				 * Checking if the subject groups are OK and getting a final list and saving them
 				 */
 				
 				subjectGroupsFinal = getFinalSubjectGroups(subjectGroups1, subjectGroups2);
 				//saving the subjectGroups, I'm not checking if they are already in the DB
-				saveSubjectGroups(subjectGroupsFinal, career);
+				subjectGroupFinal = saveSubjectGroupsAndReturnThem(subjectGroupsFinal, career);
 				
+				/**
+				 * Saving the subjects and getting back a List of Subjects (to add them to the ComplementaryValues) and a ComplementaryValues 
+				 */
+				saveSubjectsAndComplementaryValues(subjects, career, subjectGroupFinal);
+				
+				//END
+				
+				@SuppressWarnings("unused")
 				int x = 0;
 				
 			}
@@ -1249,11 +1276,151 @@ public class SiaProxy {
 		return "10";
 	}
 
-	private static void saveSubjectGroups(List<SubjectGroupDummy> subjectGroupsFinal, Career career) {
+	/**
+	 * it will return a number in a String between 0 and infinite, even in there is no colspan (in this case will return "0")
+	 * 
+	 * @param table: the table
+	 * @param col3: The column to work with
+	 * @return: int >= 0
+	 * 
+	 */
+	private static String getMinColspan(Element[][] table, int col3) {
+		//row col as in algebra
+		
+		Integer minColspan = 1000;
+		
+		for(int row = 0; row < table.length; row++){
+			String colspanString = table[row][col3].attr("colspan");
+			if(colspanString.equals("0") == true || colspanString.equals("") == true)
+			{
+				minColspan = 0;
+				break;
+			}else
+			{
+				int colspanInt = Integer.valueOf(colspanString);
+				if(colspanInt < minColspan) minColspan = colspanInt;
+			}
+		}
+		
+		
+		return minColspan.toString();
+	}
+
+	private static void saveSubjectsAndComplementaryValues(
+			List<SubjectDummy> subjects, Career career,
+			List<SubjectGroup> subjectGroupFinal) {
+		
+		SubjectDao subjectDao = new SubjectDao();
+		ComplementaryValuesDao complementaryValuesDao = new ComplementaryValuesDao();
+		
+		List<Subject> subjectListFinal = new ArrayList<Subject>();
+				
+		for(SubjectDummy sD : subjects)
+		{
+			
+			Subject sFromSia = null;
+			
+			int credits = sD.getCredits();
+			String name = sD.getName();
+			String nameStandardized = standardizeString(name);
+			String code = sD.getCode();   
+			String codeStandardize = (code == null ? "" : standardizeString(code)); //to avoid NullPointerException due to an empty string
+			String siaCode = null;
+			String siaCodeStandardize = (siaCode == null ? "" : standardizeString(siaCode)); //to avoid NullPointerException due to an empty string
+			String location = "bog";
+			
+			String nameOrCode = (codeStandardize != "" ? code : name);
+			String typology = (sD.getSubjectGroupDummy().isFundamental() == true ? "B" : "C");
+			if(sD.getSubjectGroupDummy().isFundamental() == null) typology = "";
+			String careerString = career.getCode();
+			String scheduleCP = "";
+			int page = 1;
+			int ammount = 100;
+			String sede = location;
+			SiaResultSubjects siaResult = getSubjects(nameOrCode, typology, careerString, scheduleCP, page, ammount, sede);
+			//TODO do a search by career and typology because I'm getting nothing after the 26th search due to the sec I have to wait
+			//choose one subject from the list in siaResult
+			if(siaResult.getSubjectList() != null)
+			{
+				if(siaResult.getSubjectList().size() != 0)
+				{
+					int position = 0;
+					int charactersLeft = 10000;
+					
+					if(siaResult.getSubjectList().size() == 1) sFromSia = siaResult.getSubjectList().get(0);
+					else
+					{
+						for(Subject sFromSiaTemporary : siaResult.getSubjectList())
+						{
+							String nameFromSiaStandardized = standardizeString(sFromSiaTemporary.getName());
+							String nameWithOut = nameFromSiaStandardized.replace(nameStandardized, "");
+							
+							if(charactersLeft > nameWithOut.length() == true){
+								position = siaResult.getSubjectList().indexOf(sFromSiaTemporary);
+								charactersLeft = nameWithOut.length();
+							}
+									
+						}
+						int z = 0;
+
+						sFromSia = siaResult.getSubjectList().get(position);
+
+						if(credits == 0) credits = sFromSia.getCredits();						
+						if(codeStandardize == "") code = sFromSia.getCode();
+						if(siaCodeStandardize == "") siaCode = sFromSia.getSiaCode();
+					}
+				}else
+				{
+					//The subject does not exit
+					break;
+				}
+			}else{
+				//the subject does not exist 
+				break;
+			}
+			
+			Subject sTemporary = new Subject(credits, code, siaCode, name, location);
+		    Subject sFromDb = subjectDao.getSubjectByName(sD.getName());
+
+		    if(sFromDb != null)
+			{
+		    	
+		    	codeStandardize = (code == null ? "" : standardizeString(code));
+		    	siaCodeStandardize = (siaCode == null ? "" : standardizeString(siaCode));
+				//Comparar para ver si hay alguno más reciente y agregar el más reciente a la lista
+		    	if((credits != 0 && credits != sFromDb.getCredits()) ||
+		    			(codeStandardize != "" && codeStandardize.equals(sFromDb.getCode())==false) ||
+		    			(siaCodeStandardize != "" & siaCodeStandardize.equals(sFromDb.getSiaCode())==false) == true)
+		    		{
+		    			//the sTemporary is more updated thant the sFromDb ... allors udpate it
+		    			subjectDao.deleteSubject(sFromDb.getId());
+		    			subjectDao.saveSubject(sTemporary);
+		    			subjectListFinal.add(sTemporary);
+		    		}else{
+		    			//sTemporary is not more uptaded that sFromDb
+		    			subjectListFinal.add(sFromDb);
+		    		}
+			}else
+			{
+				//Save the sTemporary into the DB and add it to the list
+				subjectDao.saveSubject(sTemporary);
+				subjectListFinal.add(sTemporary);
+			}
+			
+		}
+		
+      		 @SuppressWarnings("unused")
+			int t = 0 ;
+				 
+		//TODO manage all the complementary Values part 
+	}
+
+	private static List<SubjectGroup> saveSubjectGroupsAndReturnThem(List<SubjectGroupDummy> subjectGroupsFinal, Career career) {
 		
 		SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
 		
-		List<SubjectGroup> sGFromDB = subjectGroupDao.getSubjectGroups(career.getCode()); 
+		List<SubjectGroup> sGFromDB = subjectGroupDao.getSubjectGroups(career.getCode());
+		List<SubjectGroup> sGFinal = new ArrayList<SubjectGroup>();
 				
 		for(SubjectGroupDummy sGD : subjectGroupsFinal){
 			boolean isInDb = false;
@@ -1269,18 +1436,26 @@ public class SiaProxy {
 					{
 						//in order to update the subjectGroups
 						subjectGroupDao.deleteSubjectGroup(sGDb.getName(), sGDb.isFundamental(), sGDb.getCareer().getCode());						
-					}else{			
+					}else{
 						isInDb = true;
+						sGFinal.add(sGDb);
 						sGFromDB.remove(sGDb);
 						break;
 					}
 				}
 			}
-			if(isInDb == false)	subjectGroupDao.saveSubjectGroup(sG);
+			if(isInDb == false)	
+			{
+				subjectGroupDao.saveSubjectGroup(sG);
+				sGFinal.add(sG);
+			}
 		}
+		
+		return sGFinal;
 		
 	}
 
+	
 	/**
 	 * Given two list of SG it will return just one with the final SG
 	 * 
@@ -1349,6 +1524,7 @@ public class SiaProxy {
 		return subjectGroups;
 	}
 
+	
 	/**
 	 * This method returns a table with no holes or row and col
 	 * span if and only if the @param originalTable is logic and has no errors
@@ -1424,6 +1600,7 @@ public class SiaProxy {
 		return table;
 	}
 	
+	
 	/**
 	 * This function will delete:
 	 * - "´" accents (e.g "é"->"e"
@@ -1437,8 +1614,11 @@ public class SiaProxy {
 	 * @return
 	 */
 	private static String standardizeString(String s){
-		String stringToReturn = s;
-		stringToReturn = stringToReturn.toLowerCase().replaceAll(" ", "")
+		String stringToReturn = s.trim();
+		stringToReturn = stringToReturn.toLowerCase()
+				.replaceAll("&nbsp;", "")
+				.replaceAll(" ", "") //this space is different fromt he below one, this is un html (the above one) DO NOT DELETE!
+				.replaceAll(" ", "")
 				.replaceAll("á", "a").replaceAll("é", "e")
 				.replaceAll("í", "i").replaceAll("ó", "o")
 				.replaceAll("ú", "u").replaceAll("-", "");

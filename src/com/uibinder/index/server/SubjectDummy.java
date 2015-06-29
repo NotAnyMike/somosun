@@ -51,4 +51,72 @@ public class SubjectDummy {
 		this.error = error;
 	}
 
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public int getCredits() {
+		return credits;
+	}
+
+	public void setCredits(int credits) {
+		this.credits = credits;
+	}
+
+	public SubjectGroupDummy getSubjectGroupDummy() {
+		return subjectGroupDummy;
+	}
+
+	public void setSubjectGroupDummy(SubjectGroupDummy subjectGroupDummy) {
+		this.subjectGroupDummy = subjectGroupDummy;
+	}
+
+	public List<SubjectDummy> getPreRequisites() {
+		return preRequisites;
+	}
+
+	public void setPreRequisites(List<SubjectDummy> preRequisites) {
+		this.preRequisites = preRequisites;
+	}
+
+	public List<SubjectDummy> getCoRequisites() {
+		return coRequisites;
+	}
+
+	public void setCoRequisites(List<SubjectDummy> coRequisites) {
+		this.coRequisites = coRequisites;
+	}
+
+	public Boolean getMandatory() {
+		return mandatory;
+	}
+
+	public void setMandatory(Boolean mandatory) {
+		this.mandatory = mandatory;
+	}
+
+	public Element[] getElements() {
+		return elements;
+	}
+
+	public void setElements(Element[] elements) {
+		this.elements = elements;
+	}
+
+	public void setError(boolean error) {
+		this.error = error;
+	}
+
 }

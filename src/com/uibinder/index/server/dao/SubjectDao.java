@@ -17,6 +17,10 @@ public class SubjectDao {
 		ObjectifyService.register(Subject.class);
 	}
 	
+	public Subject getSubjectByName(String name){
+		return (Subject) ofy().load().type(Subject.class).filter("name" , name).first().now();
+	}
+	
 	/**
 	 * It search in the Db compare the results from sia, if the sia is on, it
 	 * updates the subjects if it is needed and then returns them,
@@ -31,10 +35,11 @@ public class SubjectDao {
 		return null;
 	};
 	
+	 /* subject has no career field
 	public List<Subject> getSubjectsByName(String name, String career){
 		//return ofy().load().type(Subject.class).filter("name", name).filter("career", career);
 		return null;
-	}
+	}*/
 	
 	/**
 	 * Sia Code makes reference to the special code that the sia has for the subject
@@ -94,7 +99,7 @@ public class SubjectDao {
 		return null;
 	}
 	
-	private void deleteSubject(Long id){
+	public void deleteSubject(Long id){
 		Key<Subject> key = Key.create(Subject.class, id);
 		ofy().delete().key(key).now();
 	}
@@ -104,7 +109,7 @@ public class SubjectDao {
 		saveSubject(s);		
 	}
 	
-	private void saveSubject(Subject subject){
+	public void saveSubject(Subject subject){
 		if(ofy().load().type(Subject.class).filter("code", subject.getCode()).first().now()==null){
 			if(subject.getCode() != subject.getName() && subject.getName() != subject.getSiaCode()){
 				ofy().save().entity(subject).now();				

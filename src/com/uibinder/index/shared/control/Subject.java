@@ -24,6 +24,8 @@ public class Subject implements Serializable {
     @Index private String code = null;   
     @Index private String siaCode = null;
     private String location = null;
+    @Index private boolean special  = false; //This is for example in the case the prerequisite is 80% of the ... 
+    //in the case the subject is special I can create a dummy subjectValue in order to create show it in the planPresenter view
     
     /**
      * This will not allow the search by location, jut by Id, Name and Code.
@@ -39,6 +41,15 @@ public class Subject implements Serializable {
     	this.siaCode = siaCode;
     	this.name = name;
     	this.location = location;
+    }
+    
+    public Subject(int credits, String code, String siaCode, String name, String location, boolean special) {
+    	this.credits = credits;
+    	this.code = code;
+    	this.siaCode = siaCode;
+    	this.name = name;
+    	this.location = location;
+    	this.special = special;
     }
     
     /**
