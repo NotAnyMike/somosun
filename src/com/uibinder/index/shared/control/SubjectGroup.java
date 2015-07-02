@@ -41,7 +41,7 @@ public class SubjectGroup implements Serializable {
 		this.error = error;
 	}
 	
-	public boolean equal(SubjectGroup g){
+	public boolean equals(SubjectGroup g){
 		if(this.name == g.getName() && this.career.equals(g.getCareer()) && this.fundamental == g.isFundamental() && this.obligatoryCredits == g.getObligatoryCredits() && this.optativeCredits == g.getOptativeCredits()){
 			return true;
 		} else {
@@ -99,6 +99,10 @@ public class SubjectGroup implements Serializable {
 
 	public void setError(Boolean ok) {
 		this.error = ok;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 }

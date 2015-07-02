@@ -10,7 +10,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
@@ -276,6 +278,7 @@ public class SiaProxy {
 		SiaResultSubjects siaResult = new SiaResultSubjects();
 
 		List<Subject> subjectList = new ArrayList<Subject>();
+		Map<Subject, String> typology = new HashMap<Subject, String>();
 		int totalPages = 0;
 		int totalSubjects = 0;
 				
@@ -297,6 +300,7 @@ public class SiaProxy {
 					Subject subject = new Subject(jsonObject.getInt("creditos"), jsonObject.getString("id_asignatura"), jsonObject.getString("codigo"),jsonObject.getString("nombre"), "bog");
 					subject = subjectDao.getSubjectbySubject(subject, true);
 					subjectList.add(subject);
+					typology.put(subject, jsonObject.getString("tipologia"));
 				}
 			}
 			
@@ -308,6 +312,7 @@ public class SiaProxy {
 		siaResult.setPage(page);
 		siaResult.setTotalAsignaturas(totalSubjects);
 		siaResult.setSubjectList(subjectList);
+		siaResult.setTypology(typology);
 		
 		return siaResult;
 	}
@@ -736,7 +741,7 @@ public class SiaProxy {
 		Document docPlan = null;
 		Document docRequisites = null;
 		
-		List<SubjectGroup> subjectGroupFinal = null; //To save the SubjectGroup (no Dummy final, getting them from the DB or updating them)
+		Map<SubjectGroupDummy, SubjectGroup> mapSGDSGFinal = null; //To save the SubjectGroup (no Dummy final, getting them from the DB or updating them)
 		
 		List<SubjectGroupDummy> subjectGroups1 = new ArrayList<SubjectGroupDummy>(); //To save the subjectGroups found in plan url
 		List<SubjectGroupDummy> subjectGroups2 = new ArrayList<SubjectGroupDummy>(); //To save the subjectGroups found in requisites url
@@ -1258,13 +1263,15 @@ public class SiaProxy {
 				 */
 				
 				subjectGroupsFinal = getFinalSubjectGroups(subjectGroups1, subjectGroups2);
+				int ttt = 0;
 				//saving the subjectGroups, I'm not checking if they are already in the DB
-				subjectGroupFinal = saveSubjectGroupsAndReturnThem(subjectGroupsFinal, career);
+				SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
+				mapSGDSGFinal = saveSubjectGroupsAndReturnThem(subjectGroupsFinal, career, subjectGroupDao);
 				
 				/**
 				 * Saving the subjects and getting back a List of Subjects (to add them to the ComplementaryValues) and a ComplementaryValues 
 				 */
-				saveSubjectsAndComplementaryValues(subjects, career, subjectGroupFinal);
+				saveSubjectsAndComplementaryValues(subjects, career, mapSGDSGFinal, subjectGroupDao);
 				
 				//END
 				
@@ -1306,24 +1313,35 @@ public class SiaProxy {
 		return minColspan.toString();
 	}
 
-	private static void saveSubjectsAndComplementaryValues(
-			List<SubjectDummy> subjects, Career career,
-			List<SubjectGroup> subjectGroupFinal) {
+	/**
+	 * BE CAREFUL WITH the @param mapSGDSG, because there is two subjectGroupDummy lists, one
+	 * subjectGroupDummy in any of the subjectDummys could be the subjectGroupDummy from the second list,
+	 * the one that is not used in the creations of @param mapSGDSG (it saves teh sGD from the first list)
+	 * then we I get the sGD from the sD and search for it in the map ( @param mapSGDSG ) I could not find it
+	 * 
+	 * @param subjectsD
+	 * @param career
+	 * @param mapSGDSG
+	 */
+	private static void saveSubjectsAndComplementaryValues(	List<SubjectDummy> subjectsD, Career career, Map<SubjectGroupDummy, SubjectGroup> mapSGDSG, SubjectGroupDao subjectGroupDao) {
 		
 		SubjectDao subjectDao = new SubjectDao();
 		ComplementaryValuesDao complementaryValuesDao = new ComplementaryValuesDao();
 		
 		List<Subject> subjectListFinal = new ArrayList<Subject>();
+		Map<Subject, SubjectDummy> mapSSD = new HashMap<Subject, SubjectDummy>();
+		Map<Subject, ComplementaryValues> mapSCV = new HashMap<Subject, ComplementaryValues>();
 
 		String careerString = career.getCode();		
 		String sede = "bog";
 		SiaResultSubjects siaResultFundamental = getSubjects("", "B", careerString, "", 1, 200, sede);
 		SiaResultSubjects siaResultProfessional = getSubjects("", "C", careerString, "", 1, 200, sede);
 				
-		for(SubjectDummy sD : subjects)
+		for(SubjectDummy sD : subjectsD)
 		{
 			
 			Subject sFromSia = null;
+			Subject sFinal = null;
 			
 			int credits = sD.getCredits();
 			String name = sD.getName();
@@ -1334,11 +1352,14 @@ public class SiaProxy {
 			String siaCodeStandardize = (siaCode == null ? "" : standardizeString(siaCode)); //to avoid NullPointerException due to an empty string
 			String location = sede;
 			
-			sFromSia = getSubjectFromList(sD, (sD.getSubjectGroupDummy().isFundamental() == true ? siaResultFundamental : siaResultProfessional));
+			sFromSia = getSubjectFromList(sD, (sD.getSubjectGroupDummy().isFundamental() == true ? siaResultFundamental.getSubjectList() : siaResultProfessional.getSubjectList()));
 			
-			if(credits == 0) credits = sFromSia.getCredits();						
-			if(codeStandardize == "") code = sFromSia.getCode();
-			if(siaCodeStandardize == "") siaCode = sFromSia.getSiaCode();
+			if(sFromSia != null)
+			{
+				if(credits == 0) credits = sFromSia.getCredits();						
+				if(siaCodeStandardize == "") siaCode = sFromSia.getSiaCode();
+				if(codeStandardize == "") code = sFromSia.getCode();				
+			}
 			
 			Subject sTemporary = new Subject(credits, code, siaCode, name, location);
 		    Subject sFromDb = subjectDao.getSubjectByName(sD.getName());
@@ -1356,66 +1377,283 @@ public class SiaProxy {
 		    			//the sTemporary is more updated thant the sFromDb ... allors udpate it
 		    			subjectDao.deleteSubject(sFromDb.getId());
 		    			subjectDao.saveSubject(sTemporary);
-		    			subjectListFinal.add(sTemporary);
+		    			sFinal = sTemporary;
 		    		}else{
 		    			//sTemporary is not more uptaded that sFromDb
-		    			subjectListFinal.add(sFromDb);
+		    			sFinal = sFromDb;
 		    		}
 			}else
 			{
 				//Save the sTemporary into the DB and add it to the list
 				subjectDao.saveSubject(sTemporary);
-				subjectListFinal.add(sTemporary);
+				sFinal = sTemporary;
 			}
+		    
+		    sFinal = subjectDao.getSubjectByCode(sFinal.getCode());
+		    if(sFinal != null){
+		    	subjectListFinal.add(sFinal);
+		    	mapSSD.put(sFinal, sD);		    	
+		    }
+			 
+			String typology = (sD.getSubjectGroupDummy().isFundamental() == true ? "B" : "C");	
+			boolean mandatory = (sD.getMandatory() == true ? true : false); //because it is a Boolean and not a boolean
 			
+			SubjectGroup subjectGroup = mapSGDSG.get(sD.getSubjectGroupDummy()); 
+			
+			if(subjectGroup == null){
+				throw new RuntimeException("There is not such SubjectGroup for this SubjectGroupDummy in mapSGDSG, see comment in saveSubjectsAndComplementaryValues");
+			}
+			//if there is an error add if(subjectGroup != null)
+			ComplementaryValues cV = new ComplementaryValues(career, sFinal, typology, mandatory, subjectGroup);
+			mapSCV.put(sFinal, cV);
+			
+		}
+		
+		for(Subject s : subjectListFinal){
+			
+			List<SubjectDummy> preSD = mapSSD.get(s).getPreRequisites();
+			List<SubjectDummy> coSD = mapSSD.get(s).getCoRequisites();
+			
+			ComplementaryValues cV = mapSCV.get(s);
+			
+			//for each pre and co
+			addRequisitesToBothLists(cV, s, preSD, subjectListFinal, subjectDao, mapSCV, true, complementaryValuesDao, subjectGroupDao);
+			addRequisitesToBothLists(cV, s, coSD, subjectListFinal, subjectDao, mapSCV, false, complementaryValuesDao, subjectGroupDao);
+			
+			
+			//TODO: delete this
+//			for(SubjectDummy sD : preSD){
+//				/**
+//				 *  1. get the S from the SD
+//				 *  	- be careful with the name or the code, it could be using the code
+//				 *  2. add it to the list of PreRequisites and PreRequisitesOF
+//				 */
+//				
+//				String stringStandardized = (sD.getName() == null ? "" : standardizeString(sD.getName())); //could be the name or the code
+//				Subject subjectFinalT = null;
+//				
+//				boolean isSpecial = false;
+//				int charactersLeft = 3; //to make sure that at least the subject selected by name will be 3 chrts far from the original				
+//				
+//				for(Subject sTemporary : subjectListFinal){
+//					String nameStandardizedT = (sTemporary.getName() == null ? "" : standardizeString(sTemporary.getName()));
+//					String codeStandardizedT = (sTemporary.getCode() == null ? "" : standardizeString(sTemporary.getCode()));
+//					
+//					if(stringStandardized.equals(codeStandardizedT))
+//					{
+//						subjectFinalT = sTemporary;
+//						break;
+//					}
+//					else
+//					{
+//						String withOut = nameStandardizedT.replaceAll(stringStandardized, "");
+//						if(charactersLeft > withOut.length())
+//						{
+//							charactersLeft = withOut.length();
+//							subjectFinalT = sTemporary;
+//							
+//							if(charactersLeft == 0) break;
+//						}
+//							
+//					}
+//				}
+//				
+//				if(subjectFinalT == null)
+//				{
+//					//it means that it is a special subject
+//					isSpecial = true;
+//					subjectFinalT = new Subject(0, "", "", sD.getName(), sede, isSpecial);
+//					subjectDao.saveSubject(subjectFinalT);
+//					subjectFinalT = subjectDao.getSubjectByName(subjectFinalT.getName());
+//				}
+//				
+//				if(isSpecial == true){
+//					//TODO: search for word and get the closest aproximation
+//					error
+//				}
+//				
+//				//Add subjectFinalT to the two lists
+//				cV.addPrerequisite(subjectFinalT);
+//				if(isSpecial == false)
+//				{
+//					ComplementaryValues cVT = mapSCV.get(subjectFinalT);
+//					cVT.addPrerequisiteOf(s);
+//				}
+//			}
+			
+//			for(SubjectDummy sD : coSD){
+//				/**
+//				 *  1. get the S from the SD
+//				 *  	- be careful with the name or the code, it could be using the code
+//				 *  2. add it to the list of CoRequisites and CoRequisitesOF
+//				 */
+//				
+//				String stringStandardized = (sD.getName() == null ? "" : standardizeString(sD.getName())); //could be the name or the code
+//				Subject subjectFinalT = null;
+//				
+//				boolean isSpecial = false;
+//				int charactersLeft = 3; //to make sure that at least the subject selected by name will be 3 chrts far from the original				
+//				
+//				for(Subject sTemporary : subjectListFinal){
+//					String nameStandardizedT = (sTemporary.getName() == null ? "" : standardizeString(sTemporary.getName()));
+//					String codeStandardizedT = (sTemporary.getCode() == null ? "" : standardizeString(sTemporary.getCode()));
+//					
+//					if(stringStandardized.equals(codeStandardizedT))
+//					{
+//						subjectFinalT = sTemporary;
+//						break;
+//					}
+//					else
+//					{
+//						String withOut = nameStandardizedT.replaceAll(stringStandardized, "");
+//						if(charactersLeft > withOut.length())
+//						{
+//							charactersLeft = withOut.length();
+//							subjectFinalT = sTemporary;
+//							
+//							if(charactersLeft == 0) break;
+//						}
+//							
+//					}
+//				}
+//				
+//				if(subjectFinalT == null)
+//				{
+//					//it means that it is a special subject
+//					isSpecial = true;
+//					subjectFinalT = new Subject(0, "", "", sD.getName(), sede, isSpecial);
+//					subjectDao.saveSubject(subjectFinalT);
+//					subjectFinalT = subjectDao.getSubjectByName(subjectFinalT.getName());
+//				}
+//				
+//				//Add subjectFinalT to the two lists
+//				cV.addCorequisite(subjectFinalT);
+//				if(isSpecial == false)
+//				{
+//					ComplementaryValues cVT = mapSCV.get(subjectFinalT);
+//					cVT.addCorequisiteOf(s);
+//				}
+//			}
+		}
+		
+		//Save the CV of all the S but first check if the ones in the DB are as updated as these ones
+		/**
+		 * 1. get the complementary value from the DB
+		 * 2. decide which one is up to date
+		 * 3. save, if necessary, the updated one.
+		 */
+		
+		for(Subject s : subjectListFinal)
+		{
+			ComplementaryValues cV = mapSCV.get(s);
+			ComplementaryValues cVT = complementaryValuesDao.getComplementaryValues(career, s);
+			
+			updateTwoComplementaryValues(cV, cVT, complementaryValuesDao);
 		}
 		
       	@SuppressWarnings("unused")
 		int t = 0 ;
-				 
-		//TODO manage all the complementary Values part 
+
 	}
 
 	/**
-	 * This function will return the subject that has a name closes to the @param sD.getName()
+	 * The second cV (i.e. cVFromDb) must be from the DB
+	 * 
+	 * @param cV
+	 * @param cVFromDb
+	 * @param complementaryValuesDao
+	 */
+	private static void updateTwoComplementaryValues(ComplementaryValues cV, ComplementaryValues cVFromDb, ComplementaryValuesDao complementaryValuesDao) {
+		
+		boolean isUpdated = isLastComplementaryValueUpdated(cV, cVFromDb);
+		if(isUpdated == false){
+			//Update the cV from the db - i.e. delete it and save the new one -
+			if(cVFromDb != null && cV != null) 
+				complementaryValuesDao.deleteComplementaryValues(cVFromDb);
+			if(cV != null) 
+				complementaryValuesDao.saveComplementaryValues(cV);
+		}
+		
+	}
+
+	/**
+	 * 
+	 * This method will not say which one is newer, it will give priority to the first
+	 * one becase it is asumend that the first one was just created from the server (sia or similar),
+	 * this method will comper empty or null fields.
+	 * 
+	 * @param cV
+	 * @param cVT
+	 * @return true if cVT is newer than cV, false if the contrary.
+	 */
+	private static boolean isLastComplementaryValueUpdated(ComplementaryValues cV, ComplementaryValues cVT) {
+		
+		boolean toReturn = false;
+		
+		if(cV != null && cVT != null)
+		{
+			if(
+					(cV.getTypology() != null && cV.getTypology().equals(cVT.getTypology()) == false) || 
+					(cV.getSubjectGroup() != null && cV.getSubjectGroup().equals(cVT.getSubjectGroup()) == false) ||
+					(cV.isMandatory() != cVT.isMandatory()) ||
+					(cV.getCareer() != null && cV.getCareer().equals(cVT.getCareer()) == false) ||
+					(cV.getListCorequisites().size() != 0 && cV.getListCorequisites().equals(cVT.getListCorequisites()) == false) ||
+					(cV.getListCorequisitesOf().size() != 0 && cV.getListCorequisitesOf().equals(cVT.getListCorequisitesOf()) == false) ||
+					(cV.getListPrerequisites().size() != 0 && cV.getListPrerequisites().equals(cVT.getListPrerequisites()) == false) ||
+					(cV.getListPrerequisitesOf().size() != 0 && cV.getListPrerequisitesOf().equals(cVT.getListPrerequisitesOf()) == false) ||
+					(cV.getSubject() != null && cV.getSubject().equals(cVT.getSubject()) == false))
+			{
+				toReturn = false;
+			}
+		}
+		else
+		{
+			if(cV == null) toReturn = true;
+			else toReturn = false;
+		}
+
+		return toReturn;
+		
+	}
+
+	/**
+	 * This function will return the subject that has a name closest to the @param sD.getName()
 	 * 
 	 * @param sD
 	 * @param siaResult
 	 * @return
 	 */
-	private static Subject getSubjectFromList(SubjectDummy sD,
-			SiaResultSubjects siaResult) {
+	private static Subject getSubjectFromList(SubjectDummy sD, List<Subject> list) {
 		
 		Subject sToReturn = null;
-		String nameStandardized = standardizeString(sD.getName());
+		String nameStandardized = (sD.getName() == null ? "" : standardizeString(sD.getName()));
 		
 		//choose one subject from the list in siaResult
-		if(siaResult.getSubjectList() != null)
+		if(list != null)
 		{
-			if(siaResult.getSubjectList().size() != 0)
+			if(list.size() != 0 || list.isEmpty() == false)
 			{
 				
-				if(siaResult.getSubjectList().size() == 1) sToReturn = siaResult.getSubjectList().get(0);
-				else
+				int position = -1;
+				int charactersLeft = 4; //in order to get a subject which is as far as 4 characters more
+
+				for(Subject sFromSiaTemporary : list)
 				{
-					int position = 0;
-					int charactersLeft = 10000;
-
-					for(Subject sFromSiaTemporary : siaResult.getSubjectList())
-					{
-						String nameFromSiaStandardized = standardizeString(sFromSiaTemporary.getName());
-						String nameWithOut = nameFromSiaStandardized.replace(nameStandardized, "");
-						
-						if(charactersLeft > nameWithOut.length() == true){
-							position = siaResult.getSubjectList().indexOf(sFromSiaTemporary);
-							charactersLeft = nameWithOut.length();
-						}
-								
+					String nameFromSiaStandardized = standardizeString(sFromSiaTemporary.getName());
+					String nameWithOut = nameFromSiaStandardized.replace(nameStandardized, "");
+					
+					if(charactersLeft > nameWithOut.length() == true){
+						position = list.indexOf(sFromSiaTemporary);
+						charactersLeft = nameWithOut.length();
 					}
-
-					sToReturn = siaResult.getSubjectList().get(position);
-
+							
 				}
+
+				if(position != -1)
+				{	
+					sToReturn = list.get(position);
+				}
+
 			}
 		}else{
 			//the subject does not exist 
@@ -1424,14 +1662,18 @@ public class SiaProxy {
 		return sToReturn;
 	}
 
-	private static List<SubjectGroup> saveSubjectGroupsAndReturnThem(List<SubjectGroupDummy> subjectGroupsFinal, Career career) {
+	private static Map<SubjectGroupDummy, SubjectGroup> saveSubjectGroupsAndReturnThem(List<SubjectGroupDummy> subjectGroupsFinal, Career career, SubjectGroupDao subjectGroupDao) {
 		
-		SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
+		//SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
 		
 		List<SubjectGroup> sGFromDB = subjectGroupDao.getSubjectGroups(career.getCode());
-		List<SubjectGroup> sGFinal = new ArrayList<SubjectGroup>();
+		//List<SubjectGroup> sGFinal = new ArrayList<SubjectGroup>();
+		Map<SubjectGroupDummy, SubjectGroup> mapSGDSG = new HashMap<SubjectGroupDummy, SubjectGroup>();
 				
 		for(SubjectGroupDummy sGD : subjectGroupsFinal){
+			
+			SubjectGroup sGFinal = null;
+			
 			boolean isInDb = false;
 			String name = standardizeString(sGD.getName());
 			SubjectGroup sG = new SubjectGroup( sGD.getName(), career, sGD.isFundamental(), sGD.getObligatoryCredits(), sGD.getOptativeCredits(), sGD.getError());
@@ -1447,7 +1689,7 @@ public class SiaProxy {
 						subjectGroupDao.deleteSubjectGroup(sGDb.getName(), sGDb.isFundamental(), sGDb.getCareer().getCode());						
 					}else{
 						isInDb = true;
-						sGFinal.add(sGDb);
+						sGFinal = sGDb;
 						sGFromDB.remove(sGDb);
 						break;
 					}
@@ -1456,11 +1698,33 @@ public class SiaProxy {
 			if(isInDb == false)	
 			{
 				subjectGroupDao.saveSubjectGroup(sG);
-				sGFinal.add(sG);
+				sGFinal = sG;
 			}
+			
+			mapSGDSG.put(sGD, sGFinal);
 		}
 		
-		return sGFinal;
+		/**
+		 * TODO: SearchFor the libre elección and the Nivelación subjectGroups. if found, do nothing, otherwise create them
+		 */
+		//for libre eleccion
+		SubjectGroup subjectGroupIndividual = subjectGroupDao.getSubjectGroup("libre eleccion", career.getCode());
+		if(subjectGroupIndividual == null)
+		{
+			subjectGroupIndividual = new SubjectGroup("libre eleccion", career, false, 0, 0, false);
+			subjectGroupDao.saveSubjectGroup(subjectGroupIndividual);
+		}
+		//for nivelación
+			subjectGroupIndividual = subjectGroupDao.getSubjectGroup("nivelacion", career.getCode());
+			if(subjectGroupIndividual == null)
+			{
+				subjectGroupIndividual = new SubjectGroup("nivelacion", career, false, 0, 0, false);
+				subjectGroupDao.saveSubjectGroup(subjectGroupIndividual);
+			}
+		
+		
+		
+		return mapSGDSG;
 		
 	}
 
@@ -1472,9 +1736,7 @@ public class SiaProxy {
 	 * @param subjectGroups2
 	 * @return A list with the final subjectGroups
 	 */
-	private static List<SubjectGroupDummy> getFinalSubjectGroups(
-			List<SubjectGroupDummy> subjectGroups1,
-			List<SubjectGroupDummy> subjectGroups2) {
+	private static List<SubjectGroupDummy> getFinalSubjectGroups(List<SubjectGroupDummy> subjectGroups1, List<SubjectGroupDummy> subjectGroups2) {
 		
 		List<SubjectGroupDummy> subjectGroups = new ArrayList<SubjectGroupDummy>();
 		
@@ -1518,9 +1780,18 @@ public class SiaProxy {
 				}
 			}
 			
-			SubjectGroupDummy sg = new SubjectGroupDummy(sG1.getName(), obligatoryCredits, optativeCredits, fundamental, tds, table);
-			sg.setError(error);
-			subjectGroups.add(sg);
+			//It is better modify one already existing to avoid then not finding the same sG (the reference) not the one with the same fields
+//			SubjectGroupDummy sg = new SubjectGroupDummy(sG1.getName(), obligatoryCredits, optativeCredits, fundamental, tds, table);
+//			sg.setError(error);
+//			subjectGroups.add(sg);
+			sG1.setObligatoryCredits(obligatoryCredits);
+			sG1.setOptativeCredits(optativeCredits);
+			sG1.setFundamental(fundamental);
+			sG1.setTds(tds);
+			sG1.setTable(table);
+			sG1.setError(error);
+			subjectGroups.add(sG1);
+			//TODO update the subjectGroupDummy from the Subjects lists 
 		}
 		
 		if(subjectGroups2.size() > 0){
@@ -1611,13 +1882,14 @@ public class SiaProxy {
 	
 	
 	/**
-	 * This function will delete:
-	 * - "´" accents (e.g "é"->"e"
-	 * - "-" -> ""
-	 * - " " -> ""
-	 * will NOT delete:
-	 * - "ñ"
-	 * - other accents "`", etc.
+	 * This function will delete: <br>
+	 * - "´" accents (e.g "é"->"e") <br>
+	 * - "-" -> ""<br>
+	 * - " " -> ""<br>
+	 * - "s" -> ""<br>
+	 * will NOT delete:<br>
+	 * - "ñ"<br>
+	 * - other accents "`", etc.<br>
 	 * 
 	 * @param s
 	 * @return
@@ -1633,4 +1905,186 @@ public class SiaProxy {
 				.replaceAll("ú", "u").replaceAll("-", "");
 		return stringToReturn;
 	}
+
+	private static void addRequisitesToBothLists(ComplementaryValues cV, Subject s, List<SubjectDummy> listSD, List<Subject> subjectListFinal, SubjectDao subjectDao, Map<Subject, ComplementaryValues> mapSCV, boolean isPre, ComplementaryValuesDao complementaryValuesDao, SubjectGroupDao subjectGroupDao)
+	{
+		String sede = "bog";
+		for(SubjectDummy sD : listSD){
+			/**
+			 *  1. get the S from the SD
+			 *  	- be careful with the name or the code, it could be using the code
+			 *  2. add it to the list of PreRequisites and PreRequisitesOF
+			 */
+			
+			String stringStandardized = (sD.getName() == null ? "" : standardizeString(sD.getName())); //could be the name or the code
+			Subject subjectFinalT = null;
+			
+			boolean isSpecial = false;
+			int charactersLeft = 3; //to make sure that at least the subject selected by name will be 3 chrts far from the original				
+			
+			for(Subject sTemporary : subjectListFinal){
+				String nameStandardizedT = (sTemporary.getName() == null ? "" : standardizeString(sTemporary.getName()));
+				String codeStandardizedT = (sTemporary.getCode() == null ? "" : standardizeString(sTemporary.getCode()));
+				
+				if(stringStandardized.equals(codeStandardizedT))
+				{
+					subjectFinalT = sTemporary;
+					break;
+				}
+				else
+				{
+					String withOut = nameStandardizedT.replaceAll(stringStandardized, "");
+					if(charactersLeft > withOut.length())
+					{
+						charactersLeft = withOut.length();
+						subjectFinalT = sTemporary;
+						
+						if(charactersLeft == 0) break;
+					}
+						
+				}
+			}
+			
+			if(subjectFinalT == null){
+				//search for word and get the closest aproximation, in the case of "matemática básica" in Odontología
+				/**
+				 * 1. Divide it into words
+				 * 2. For each Word run getSubjectFromList
+				 * 3. Add each subject into a FinalList
+				 * 4. Run getSubjectFromList for the Final List
+				 */
+				List<String> words = getWordsInString(sD.getName());
+				List<Subject> finalSubjectList = new ArrayList<Subject>();
+				Map<Subject, String> finalTypologyMap = new HashMap<Subject, String>();
+				
+				Subject veryFinalS = null;
+				
+				for(String word : words){
+					SiaResultSubjects siaResult = getSubjects(word, "", cV.getCareer().getCode(), "", 1, 200, sede);
+					if(siaResult != null)
+					{
+						if(siaResult.getSubjectList() != null)
+						{
+							if(siaResult.getSubjectList().size() != 0)
+							{
+								List<Subject> theSearch = siaResult.getSubjectList();
+								Map<Subject, String> typologyMap = siaResult.getTypology();
+								
+								if(theSearch != null)
+								{			
+									Subject sToAdd = null;
+									sToAdd =  getSubjectFromList(sD, theSearch);
+									if(sToAdd != null)
+									{
+										finalSubjectList.add(sToAdd);
+										String stringToAdd = typologyMap.get(sToAdd);
+										finalTypologyMap.put(sToAdd, stringToAdd);
+									}
+								}
+							}
+						}
+					}
+				}
+				
+				veryFinalS = getSubjectFromList(sD, finalSubjectList);
+				
+				if(veryFinalS != null)
+				{
+					isSpecial = false;
+					subjectFinalT = veryFinalS;
+					String typology = finalTypologyMap.get(subjectFinalT);
+					boolean mandatory = false; //becaus it is not in the law
+					
+					/**
+					 * if typology = P then it is leveling, then it must be added to the Nivelación group, and if typology = L, add it to free Elections
+					 * Otherwise the val is null
+					 */
+					
+					SubjectGroup sG = null;
+					if(typology.equals("P"))
+					{
+						//get the Nivelación subjectGroup
+						sG = subjectGroupDao.getSubjectGroup("nivelacion", cV.getCareer().getCode());
+					}
+					else if(typology.equals("L"))
+					{
+						//get the Libre elección subjectGroup
+						sG = subjectGroupDao.getSubjectGroup("libre eleccion", cV.getCareer().getCode());
+					}
+					
+					//create the complementaryValue and add it to the mapSCV
+					
+					ComplementaryValues cVToCreate = new ComplementaryValues(cV.getCareer(), subjectFinalT, typology, mandatory, sG);
+					ComplementaryValues cVFromDb = complementaryValuesDao.getComplementaryValues(cV.getCareer(), subjectFinalT);
+					
+					updateTwoComplementaryValues(cVToCreate, cVFromDb, complementaryValuesDao);
+					
+					mapSCV.put(subjectFinalT, cVToCreate);
+					
+				}
+			}
+			
+			if(subjectFinalT == null)
+			{
+				//it means that it is a special subject
+				isSpecial = true;
+				subjectFinalT = new Subject(0, "", "", sD.getName(), sede, isSpecial);
+				subjectDao.saveSubject(subjectFinalT);
+				subjectFinalT = subjectDao.getSubjectByName(subjectFinalT.getName());
+			}
+			
+			if(isPre == true)
+			{
+				//Add subjectFinalT to the two lists
+				cV.addPrerequisite(subjectFinalT);
+				if(isSpecial == false)
+				{
+					ComplementaryValues cVT = mapSCV.get(subjectFinalT);
+					if(cVT == null)
+					{
+						throw new RuntimeException("Error, the subject " + subjectFinalT.getName() + " is a subject and has no complementary value");
+					}
+					else
+					{						
+						cVT.addPrerequisiteOf(s);
+					}
+				}				
+			}
+			else
+			{
+				//Add subjectFinalT to the two lists
+				cV.addCorequisite(subjectFinalT);
+				if(isSpecial == false)
+				{
+					ComplementaryValues cVT = mapSCV.get(subjectFinalT);
+					if(cVT == null)
+					{
+						throw new RuntimeException("Error, the subject " + subjectFinalT.getName() + " is a subject and has no complementary value");
+					}
+					else
+					{						
+						cVT.addCorequisiteOf(s);
+					}
+				}	
+			}
+		}
+	}
+
+	private static List<String> getWordsInString(String s)
+	{
+		ArrayList<String>  wordArrayList = null;
+		
+		if(s != null)
+			if(s.contains(" ") == true)
+			{
+				{
+					wordArrayList = new ArrayList<String>();
+					for(String word : s.split(" ")) {
+						wordArrayList.add(word);
+					}
+				}				
+			}
+		return wordArrayList;				
+	}
 }
+

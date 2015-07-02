@@ -58,11 +58,48 @@ public class Subject implements Serializable {
      * @return
      */
     public boolean equals(Subject subject){
-    	if(this.credits == subject.getCredits() && this.name.equals(subject.getName()) && this.code.equals(subject.getCode()) && this.siaCode.equals(subject.getSiaCode()) && this.location.equals(subject.getLocation())){
-    		return true;
-    	} else {
-    		return false;
+    	boolean b = true;
+    	if(subject != null){
+    		if(this.credits != subject.getCredits())
+    			b = false;
+    		
+    		if(this.getCode() == null)
+    		{
+    			if(subject.getCode() != null) b = false;
+    		}
+    		else
+    		{
+    			if(this.getCode().equals(subject.getCode()) == false) b = false;
+    		}
+    		
+    		if(this.getName() == null)
+    		{
+    			if(subject.getName() != null) b = false;
+    		}
+    		else
+    		{
+    			if(this.getName().equals(subject.getName()) == false) b = false;
+    		}
+    		
+    		if(this.getSiaCode() == null)
+    		{
+    			if(subject.getSiaCode() != null) b = false;
+    		}
+    		else
+    		{
+    			if(this.getSiaCode().equals(subject.getSiaCode()) == false) b = false;
+    		}
+    		
+    		if(this.getLocation() == null)
+    		{
+    			if(subject.getLocation() != null) b = false;
+    		}
+    		else
+    		{
+    			if(this.getLocation().equals(subject.getLocation()) == false) b = false;
+    		}		
     	}
+    	return b;
     }
 
 	public int getCredits() {
@@ -107,6 +144,10 @@ public class Subject implements Serializable {
 
 	public void setSiaCode(String siaCode) {
 		this.siaCode = siaCode;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 }
    

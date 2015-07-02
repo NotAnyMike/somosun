@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.googlecode.objectify.Key;
+import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
@@ -37,6 +39,7 @@ public class ComplementaryValues implements Serializable {
      * Do NOT use this method
      */
     public ComplementaryValues(){
+    	
     	this.listPrerequisites = new ArrayList<Subject>();
 		this.listCorequisites = new ArrayList<Subject>();
 		this.listPrerequisitesOf = new ArrayList<Subject>();
@@ -44,6 +47,7 @@ public class ComplementaryValues implements Serializable {
     }
 
 	public ComplementaryValues(Career career, Subject subject,	List<Subject> listPrerequisites, List<Subject> listCorequisites, String typology,	boolean mandatory) {
+		
 		this.career = career;
 		this.subject = subject;
 		this.listPrerequisites = listPrerequisites;
@@ -55,6 +59,7 @@ public class ComplementaryValues implements Serializable {
 	}
 	
 	public ComplementaryValues(Career career, Subject subject,	List<Subject> listPrerequisites, List<Subject> listCorequisites, String typology,	boolean mandatory, SubjectGroup subjectGroup) {
+		
 		this.career = career;
 		this.subject = subject;
 		this.listPrerequisites = listPrerequisites;
@@ -67,6 +72,7 @@ public class ComplementaryValues implements Serializable {
 	}
 
 	public ComplementaryValues(Career career, Subject subject, String typology,	boolean mandatory) {
+		
 		this.career = career;
 		this.subject = subject;
 		
@@ -79,13 +85,47 @@ public class ComplementaryValues implements Serializable {
 		this.mandatory = mandatory;
 	}
 	
-	public ComplementaryValues(Career career, Subject subject) {
+	public ComplementaryValues(Career career, Subject subject,	String typology, boolean mandatory, SubjectGroup subjectGroup) {
+		
 		this.career = career;
 		this.subject = subject;
+		
 		this.listPrerequisites = new ArrayList<Subject>();
 		this.listCorequisites = new ArrayList<Subject>();
 		this.listPrerequisitesOf = new ArrayList<Subject>();
 		this.listCorequisitesOf = new ArrayList<Subject>();
+		
+		this.typology = typology;
+		this.mandatory = mandatory;
+		this.subjectGroup = subjectGroup;
+	}
+	
+	public ComplementaryValues(Career career, Subject subject) {
+		
+		this.career = career;
+		this.subject = subject;
+		
+		this.listPrerequisites = new ArrayList<Subject>();
+		this.listCorequisites = new ArrayList<Subject>();
+		this.listPrerequisitesOf = new ArrayList<Subject>();
+		this.listCorequisitesOf = new ArrayList<Subject>();
+	}
+	
+	/**
+	 * @param cV
+	 * @return true if career, subjectGroup, subject, mandatory, and the four lists are the exact sames 
+	 */
+	public boolean equals(ComplementaryValues cV){
+		
+		boolean toReturn = false;
+		
+		if(this.getCareer().equals(cV.getCareer()) && this.getSubjectGroup().equals(cV.getCareer())
+				&& this.getSubject().equals(cV.getSubject()) && this.isMandatory() == cV.isMandatory()
+				&& this.getListCorequisites().equals(cV.getListCorequisites()) && this.getListCorequisitesOf().equals(cV.getListCorequisitesOf())
+				&& this.getListPrerequisites().equals(cV.getListPrerequisites()) && this.getListPrerequisitesOf().equals(cV.getListPrerequisitesOf()))
+			toReturn = true;
+		
+		return toReturn;
 	}
 
 	public Career getCareer() {
@@ -210,6 +250,14 @@ public class ComplementaryValues implements Serializable {
 
 	public void setSubjectGroup(SubjectGroup subjectGroup) {
 		this.subjectGroup = subjectGroup;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	private void setId(Long id) {
+		this.id = id;
 	}
 
 }

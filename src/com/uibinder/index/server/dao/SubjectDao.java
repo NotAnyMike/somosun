@@ -3,10 +3,8 @@ package com.uibinder.index.server.dao;
 import java.util.List;
 
 import com.googlecode.objectify.Key;
+import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
-import com.uibinder.index.server.SiaProxy;
-import com.uibinder.index.shared.SiaResultSubjects;
-import com.uibinder.index.shared.control.Student;
 import com.uibinder.index.shared.control.Subject;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
@@ -26,13 +24,18 @@ public class SubjectDao {
 	 * updates the subjects if it is needed and then returns them,
 	 * if the sia is off then it return the db information.
 	 * 
+	 * <br></br>
+	 * 
+	 * NOTE: this will only return the subjects which have the same name as @param name,
+	 * it will not return the subjects which contains @param name. 
+	 * 
 	 * if @param name is empty, then it will return null
 	 * 
 	 * @param name
 	 * @return
 	 */
 	public List<Subject> getSubjectsByName(String name){
-		return null;
+		return ofy().load().type(Subject.class).filter("name", name).list();
 	};
 	
 	 /* subject has no career field
@@ -109,12 +112,26 @@ public class SubjectDao {
 		saveSubject(s);		
 	}
 	
+	/**
+	 * This will save the @param subject if in the db there is no other subject with the same code 
+	 * and if the subject name is different from the code and the siaCode
+	 * 
+	 * <br/>
+	 * 
+	 * @param subject
+	 */
 	public void saveSubject(Subject subject){
 		if(ofy().load().type(Subject.class).filter("code", subject.getCode()).first().now()==null){
 			if(subject.getCode() != subject.getName() && subject.getName() != subject.getSiaCode()){
 				ofy().save().entity(subject).now();				
 			}
 		}
+	}
+
+	public Long generateId() {
+		ObjectifyFactory f = new ObjectifyFactory();
+		Key<Subject> key = f.allocateId(Subject.class);
+		return key.getId();
 	}
 
 }

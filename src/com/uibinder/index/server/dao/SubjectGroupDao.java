@@ -2,7 +2,10 @@ package com.uibinder.index.server.dao;
 
 import java.util.List;
 
+import com.googlecode.objectify.Key;
+import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
+import com.uibinder.index.shared.control.ComplementaryValues;
 import com.uibinder.index.shared.control.SubjectGroup;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
@@ -36,6 +39,21 @@ public class SubjectGroupDao {
 		{
 			ofy().delete().entity(toDelete).now();
 		}
+	}
+	
+	/**
+	 * Will create a unique key if the entity X has an embedded entity Y which has an empty id, this will not allow to save the X entity,
+	 * then use this method in order to set the Y's id.
+	 * 
+	 * @return
+	 */
+	public Long generateId() {
+		
+		ObjectifyFactory f = new ObjectifyFactory();
+		Key<SubjectGroup> key = f.allocateId(SubjectGroup.class);
+		
+		return key.getId();
+		
 	}
 	
 }
