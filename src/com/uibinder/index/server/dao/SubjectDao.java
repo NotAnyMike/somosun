@@ -121,11 +121,11 @@ public class SubjectDao {
 	 * @param subject
 	 */
 	public void saveSubject(Subject subject){
-		if(ofy().load().type(Subject.class).filter("code", subject.getCode()).first().now()==null){
+		//if(ofy().load().type(Subject.class).filter("code", subject.getCode()).first().now()==null){
 			if(subject.getCode() != subject.getName() && subject.getName() != subject.getSiaCode()){
 				ofy().save().entity(subject).now();				
 			}
-		}
+		//}
 	}
 
 	public Long generateId() {

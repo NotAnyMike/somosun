@@ -9,7 +9,7 @@ import com.uibinder.index.shared.control.Subject;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
-public class ComplementaryValuesDao {
+public class ComplementaryValuesDao extends Dao {
 
 	static{
 		ObjectifyService.register(ComplementaryValues.class);

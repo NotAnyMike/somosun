@@ -36,20 +36,20 @@ public class Subject implements Serializable {
     }
     
     public Subject(int credits, String code, String siaCode, String name, String location) {
-    	this.credits = credits;
-    	this.code = code;
-    	this.siaCode = siaCode;
-    	this.name = name;
-    	this.location = location;
+    	this.setCredits(credits);
+    	this.setCode(code);
+    	this.setSiaCode(siaCode);
+    	this.setName(name);
+    	this.setLocation(location);
     }
     
     public Subject(int credits, String code, String siaCode, String name, String location, boolean special) {
-    	this.credits = credits;
-    	this.code = code;
-    	this.siaCode = siaCode;
-    	this.name = name;
-    	this.location = location;
-    	this.special = special;
+    	this.setCredits(credits);
+    	this.setCode(code);
+    	this.setSiaCode(siaCode);
+    	this.setName(name);
+    	this.setLocation(location);
+    	this.setSpecial(special);
     }
     
     /**
@@ -148,6 +148,14 @@ public class Subject implements Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public boolean isSpecial() {
+		return special;
+	}
+
+	public void setSpecial(boolean special) {
+		this.special = special;
 	}
 }
    
