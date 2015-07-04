@@ -83,6 +83,8 @@ body {
 }
 .textboxCreate{
 	width: 400px;
+	font-size: 16px;
+	margin: 0px;
 }
 .warning {
 	background-color:#CCC;

@@ -181,4 +181,7 @@ div.dline{
 	width:1070px; 
 	z-index:1001; 
 	padding-bottom:50px;
+	margin-left: -535px;
+	left: 50%;
 }
+

@@ -83,6 +83,8 @@ body {
 }
 .textboxCreate{
 	width: 400px;
+	font-size: 16px;
+	margin: 0px;
 }
 .warning {
 	background-color:#CCC;
@@ -181,6 +183,4 @@ div.dline{
 	width:1070px; 
 	z-index:1001; 
 	padding-bottom:50px;
-	margin-left: -535px;
-	left: 50%;
 }
