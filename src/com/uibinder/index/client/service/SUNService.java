@@ -43,7 +43,7 @@ public interface SUNService extends RemoteService{
 	
 	public Plan getPlanDefault(String careerCode);
 	
-	public String toTest();
+	public void toTest();
 	
 	public ComplementaryValues getComplementaryValues(String career, String code);
 	

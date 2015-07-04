@@ -6,7 +6,7 @@ import com.uibinder.index.shared.control.Teacher;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
-public class TeacherDao {
+public class TeacherDao extends Dao {
 
 	static{
 		ObjectifyService.register(Teacher.class);
@@ -53,6 +53,10 @@ public class TeacherDao {
 	}
 
 	private void saveTeacher(Teacher t){
-		ofy().save().entity(t).now();
+		if(t != null)
+		{
+			t.setName(standardizeString(t.getName()));
+			ofy().save().entity(t).now();
+		}
 	}
 }

@@ -5,9 +5,7 @@ public class Dao {
 	/**
 	 * This function will delete: <br>
 	 * - "´" accents (e.g "é"->"e") <br>
-	 * - "-" -> ""<br>
 	 * - " " -> ""<br>
-	 * - "s" -> ""<br>
 	 * will NOT delete:<br>
 	 * - "ñ"<br>
 	 * - other accents "`", etc.<br>
@@ -15,7 +13,7 @@ public class Dao {
 	 * @param s
 	 * @return
 	 */
-	private static String standardizeString(String s){
+	protected static String standardizeString(String s){
 		String stringToReturn = s.trim();
 		stringToReturn = stringToReturn.toLowerCase()
 				.replaceAll("&nbsp;", " ")

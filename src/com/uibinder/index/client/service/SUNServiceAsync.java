@@ -51,7 +51,7 @@ public interface SUNServiceAsync {
 
 	void getPlanDefault(String careerCode, AsyncCallback<Plan> callback);
 
-	void toTest(AsyncCallback<String> callback);
+	void toTest(AsyncCallback<Void> callback);
 
 	void getComplementaryValues(String career, String code,	AsyncCallback<ComplementaryValues> callback);
 

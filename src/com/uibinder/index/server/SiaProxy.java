@@ -446,7 +446,7 @@ public class SiaProxy {
 	}
 	
 	/**
-	 * This method is working just for bogota. And to make it work, modify the function saveOrUpdate
+	 * This method is working just for bogotá. And to make it work, modify the function saveOrUpdate
 	 * on careerDao, the instructions are in the same class.
 	 * 
 	 * @param sede: "ama", "bog", "car", "man", "med", "ori", "pal", "tum" or "" in that case will be "bog"
@@ -465,7 +465,9 @@ public class SiaProxy {
 			
 			for(Element option : options){
 				if(option.attr("value") != null && option.attr("value") != ""){
-					career = new Career(option.text(), option.attr("value"), sede); //TODO remove the code from the name
+					String code = option.attr("value");
+					String name = careerDao.fixName(option.text(), code);
+					career = new Career(name, code, sede); //TODO remove the code from the name
 					careerDao.saveOrUpdate(career);
 				}
 			}
@@ -931,10 +933,11 @@ public class SiaProxy {
 					//getting which subject group it is
 					int x = 0;
 					SubjectGroupDummy sGFromPlan = null;
-					partialText = partialText.replaceAll("s", "").replaceAll("-","").replaceAll("/", "");
+					//partialText = partialText.replaceAll("s", "").replaceAll("-","").replaceAll("/", "");
+					partialText = standardizeString(partialText, true);
 					//To get the closest subjectGroup for this table (e)
 					for(SubjectGroupDummy sGDTemporary : subjectGroups1){
-						String toSearch = sGDTemporary.getName().toLowerCase().replaceAll(" ", "");
+						String toSearch = standardizeString(sGDTemporary.getName(), true);//.toLowerCase().replaceAll(" ", "");
 						//Deleting characters that maybe were removed by a human mistake in the other page
 						toSearch = toSearch.replaceAll("s", "").replaceAll("-", "").replaceAll("/","");
 						int position = partialText.toLowerCase().lastIndexOf(toSearch);
@@ -944,6 +947,7 @@ public class SiaProxy {
 						}
 					}
 					
+					//TODO implement these
 					int mandatoryCredits = 0;
 					int optativeCredits = 0;
 
@@ -1263,8 +1267,7 @@ public class SiaProxy {
 				 */
 				
 				subjectGroupsFinal = getFinalSubjectGroups(subjectGroups1, subjectGroups2);
-				int ttt = 0;
-				//saving the subjectGroups, I'm not checking if they are already in the DB
+
 				SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
 				mapSGDSGFinal = saveSubjectGroupsAndReturnThem(subjectGroupsFinal, career, subjectGroupDao);
 				
@@ -1275,6 +1278,7 @@ public class SiaProxy {
 				
 				//END
 				
+				//in order to get a breakpoint
 				@SuppressWarnings("unused")
 				int x = 0;
 				
@@ -1748,10 +1752,10 @@ public class SiaProxy {
 		
 		for(SubjectGroupDummy sG1 : subjectGroups1){
 			String name1 = standardizeString(sG1.getName(), false);
-			int obligatoryCredits = 0;
-			int optativeCredits = 0;
-			Boolean fundamental = null;
-			boolean error = false;
+			int obligatoryCredits = sG1.getObligatoryCredits();
+			int optativeCredits = sG1.getOptativeCredits();
+			Boolean fundamental = sG1.isFundamental();
+			boolean error = sG1.getError();
 			Elements tds = null;
 			Element table = null;
 			
@@ -1893,6 +1897,7 @@ public class SiaProxy {
 	 * - "-" -> ""<br>
 	 * - " " -> ""<br>
 	 * - "s" -> ""<br>
+	 * - "/" -> ""<br>
 	 * will NOT delete:<br>
 	 * - "ñ"<br>
 	 * - other accents "`", etc.<br>
@@ -1911,7 +1916,8 @@ public class SiaProxy {
 				.replaceAll("í", "i")
 				.replaceAll("ó", "o")
 				.replaceAll("ú", "u")
-				.replaceAll("-", "");
+				.replaceAll("-", "")
+				.replaceAll("/", "");
 		if(removeS == true) stringToReturn = stringToReturn.replaceAll("s", "");
 		
 		return stringToReturn;

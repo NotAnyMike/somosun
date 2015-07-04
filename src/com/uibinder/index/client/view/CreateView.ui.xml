@@ -18,7 +18,10 @@
 	          <option>Economía </option>
 	          <option>Economía - PAPA 4.5</option>
 	        </select>
-	        <button class="btn btn-default">Seleccionar</button>
+	        <div>
+	          <button class="btn btn-default">Seleccionar</button>
+	          <button class="btn btn-default">Eliminar</button>
+	        </div>
 	      </div>
 	      <hl class="secondContainerCreatePlan-hl"></hl>
 	      <div class="secondContainerCreatePlan-new"> 

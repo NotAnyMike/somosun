@@ -3,6 +3,8 @@ package com.uibinder.index.client.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.text.WordUtils;
+
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -42,10 +44,11 @@ public class CreatePresenter implements Presenter, CreateView.Presenter {
 
 	private void addCareersToListBox(List<Career> careers) {
 		if(careers == null){
-			view.addCareerToListBox("No se pudieron cargar las careeras","1");			
+			view.addCareerToListBox("No se pudieron cargar las careeras","-1");			
 		} else {
 			for(Career career : careers){
-				view.addCareerToListBox(career.getName(), career.getCode());
+				String name = "(" + career.getCode() + ") " + career.getName().toUpperCase().charAt(0) + career.getName().substring(1);
+				view.addCareerToListBox(name, career.getCode());
 			}
 		}
 	}
@@ -74,6 +77,7 @@ public class CreatePresenter implements Presenter, CreateView.Presenter {
 		
 		@Override
 		public void onFailure(Throwable caught) {
+			addCareersToListBox(null);
 		}
 		
 		@Override

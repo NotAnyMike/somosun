@@ -10,14 +10,18 @@ import com.uibinder.index.shared.control.SubjectGroup;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
-public class SubjectGroupDao {
+public class SubjectGroupDao extends Dao {
 
 	static{
 		ObjectifyService.register(SubjectGroup.class);
 	}
 	
 	public void saveSubjectGroup(SubjectGroup sG){
-		if(sG != null)	ofy().save().entity(sG).now();
+		if(sG != null)
+		{
+			sG.setName(standardizeString(sG.getName()));
+			ofy().save().entity(sG).now();
+		}
 	}
 	
 	public SubjectGroup getSubjectGroup(String name, String careerCode){

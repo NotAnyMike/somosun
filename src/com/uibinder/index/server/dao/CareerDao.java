@@ -27,7 +27,7 @@ public class CareerDao {
 		if(careerFromDB == null){
 			save(career);
 		}else{
-			if(careerFromDB.equals(career)==false && false){ // false: To mantain the info from our db, otherwise any info changed in the code will end up changing our db, BIG SECURITY RISK
+			if(careerFromDB.equals(career)==false){ // make it false in order To maintain the info from our db, otherwise any info changed in the code will end up changing our db
 				careerFromDB.setName(career.getName());
 				careerFromDB.setSede(career.getSede());
 				Key<Career> key = Key.create(Career.class, careerFromDB.getId());
@@ -38,12 +38,7 @@ public class CareerDao {
 	}
 	
 	public List<Career> getCareersBySede(String sede){
-		List<Career> toReturn = ofy().load().type(Career.class).filter("sede", sede).list();
-		if(toReturn == null || toReturn.size()==0){
-			SiaProxy.updateCareersFromSia(sede);
-			toReturn = ofy().load().type(Career.class).filter("sede", sede).list();
-		}
-		return toReturn;
+		return ofy().load().type(Career.class).order("name").filter("sede", sede).list();
 	}
 	
 	/**
@@ -53,7 +48,9 @@ public class CareerDao {
 	 * @param career
 	 */
 	private void save(Career career){
-		ofy().save().entity(career).now();
+		if(career != null){
+			ofy().save().entity(career).now();
+		}
 	}
 	
 	public Career getCareerById(String Id){
@@ -63,6 +60,21 @@ public class CareerDao {
 	
 	public Career getCareerByCode(String code){
 		return ofy().load().type(Career.class).filter("code", code).first().now();
+	}
+
+	public String fixName(String name, String code) {
+		String s = name;
+		if(s.contains(code))
+		{
+			s = s.replace(code, "").toLowerCase().replace("(", "").replace(")", "");
+			while(s.indexOf(" ") == 0)
+			{
+				s = s.replaceFirst(" ", "");
+			}
+			
+		}
+		
+		return s;
 	}
 	
 

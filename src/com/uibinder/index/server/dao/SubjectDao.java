@@ -9,7 +9,7 @@ import com.uibinder.index.shared.control.Subject;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
-public class SubjectDao {
+public class SubjectDao extends Dao {
 	
 	static {
 		ObjectifyService.register(Subject.class);
@@ -121,11 +121,10 @@ public class SubjectDao {
 	 * @param subject
 	 */
 	public void saveSubject(Subject subject){
-		//if(ofy().load().type(Subject.class).filter("code", subject.getCode()).first().now()==null){
-			if(subject.getCode() != subject.getName() && subject.getName() != subject.getSiaCode()){
-				ofy().save().entity(subject).now();				
-			}
-		//}
+		if(subject.getCode() != subject.getName() && subject.getName() != subject.getSiaCode()){
+			subject.setName(standardizeString(subject.getName()));
+			ofy().save().entity(subject).now();				
+		}
 	}
 
 	public Long generateId() {
