@@ -1,8 +1,8 @@
-<!-- Indices written at Sun, 5 Jul 2015 13:22:41 COT -->
+<!-- Indices written at Sun, 5 Jul 2015 13:49:09 COT -->
 
 <datastore-indexes>
 
-    <!-- Used 3 times in query history -->
+    <!-- Used 1 time in query history -->
     <datastore-index kind="Career" ancestor="false" source="auto">
         <property name="sede" direction="asc"/>
         <property name="name" direction="asc"/>
