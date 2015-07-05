@@ -133,7 +133,7 @@ public class SearchSubjectViewImpl extends Composite implements SearchSubjectVie
 				if(career.getCode().equals(careerSelected.getCode()))
 				{
 					int index = careers.indexOf(career);
-					listBoxCareersToSearch.setItemSelected(index+1, true);					
+					listBoxCareersToSearch.setItemSelected(index+1, true);
 				}
 				
 			}

@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="xtend-gen"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="spec"/>
 	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
 	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-lang3-3.3.2.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/guava-18.0.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/guava-gwt-18.0.jar"/>
