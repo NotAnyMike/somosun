@@ -22,6 +22,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.uibinder.index.client.presenter.PlanPresenter;
+import com.uibinder.index.shared.SomosUNUtils;
 import com.uibinder.index.shared.control.Career;
 
 public class SearchSubjectViewImpl extends Composite implements SearchSubjectView{
@@ -123,9 +124,19 @@ public class SearchSubjectViewImpl extends Composite implements SearchSubjectVie
 	}
 
 	@Override
-	public void setCareerList(List<Career> careers) {
+	public void setCareerList(List<Career> careers, Career careerSelected) {
+		addCareerToListBox("Todas", "all");
 		for(Career career : careers){
-			addCareerToListBox(career.getName(), career.getCode());
+			addCareerToListBox(SomosUNUtils.addCarrerCodeToString(career), career.getCode());
+			if(careerSelected != null) 
+			{
+				if(career.getCode().equals(careerSelected.getCode()))
+				{
+					int index = careers.indexOf(career);
+					listBoxCareersToSearch.setItemSelected(index+1, true);					
+				}
+				
+			}
 		}
 	}
 

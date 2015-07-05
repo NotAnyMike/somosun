@@ -25,6 +25,6 @@ public interface SearchSubjectView {
 	//void setSubjectGroupName(String s);
 	//void addGroup(String group, String professor, String professorGrade, String groupGrade, String averageGrade, String freeSpaces, String totalSpaces, String L, String M, String C, String J, String V, String S, String D);
 	int getSubjectsAmmount();
-	void setCareerList(List<Career> c);
+	void setCareerList(List<Career> c, Career selectedCareer);
 	
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyService;
+import com.googlecode.objectify.VoidWork;
 import com.uibinder.index.server.SiaProxy;
 import com.uibinder.index.shared.control.Career;
 import com.uibinder.index.shared.control.Group;
@@ -22,21 +23,23 @@ public class CareerDao {
 	 * 
 	 * @param career
 	 */
-	public void saveOrUpdate(Career career){
+	public void updateCareer(Career career){
 		Career careerFromDB = getCareerByCode(career.getCode());
 		if(careerFromDB == null){
-			save(career);
+			saveCareer(career);
 		}else{
-			if(careerFromDB.equals(career)==false){ // make it false in order To maintain the info from our db, otherwise any info changed in the code will end up changing our db
-				careerFromDB.setName(career.getName());
-				careerFromDB.setSede(career.getSede());
-				Key<Career> key = Key.create(Career.class, careerFromDB.getId());
-				ofy().delete().key(key).now();
-				save(careerFromDB);
-			}
+			updateCareerTransaction(careerFromDB, career);
 		}
 	}
 	
+	private void deleteCareer(Career career) {
+		if(career != null)
+		{			
+			Key<Career> key = Key.create(Career.class, career.getId());
+			ofy().delete().key(key).now();
+		}
+	}
+
 	public List<Career> getCareersBySede(String sede){
 		return ofy().load().type(Career.class).order("name").filter("sede", sede).list();
 	}
@@ -47,7 +50,7 @@ public class CareerDao {
 	 * 
 	 * @param career
 	 */
-	private void save(Career career){
+	private void saveCareer(Career career){
 		if(career != null){
 			ofy().save().entity(career).now();
 		}
@@ -76,6 +79,14 @@ public class CareerDao {
 		
 		return s;
 	}
-	
+
+	private void updateCareerTransaction(final Career oldCareer, final Career newCareer) {
+		ofy().transact(new VoidWork() {
+			public void vrun(){
+				deleteCareer(oldCareer);
+				saveCareer(newCareer);
+			}
+		});
+	}
 
 }

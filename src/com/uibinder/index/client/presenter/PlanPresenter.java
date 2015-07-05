@@ -129,7 +129,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		@Override
 		public void onSuccess(List<Career> result) {
 			careers = result;
-			addCareersToListBox(careers);				
+			addCareersToListBox(careers);			
 		}};
 	
 	/**
@@ -152,8 +152,6 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		this.siaSummaryView = siaSummaryView; 
 		connectionsController = new ConnectionsController(this);
 		
-		getCareers("bog");
-		
 	}
 	
 	/**
@@ -174,11 +172,11 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		searchSubjectView.fill();
 		this.siaSummaryView = siaSummaryView;
 		connectionsController = new ConnectionsController(this);
+				
+		setPlan(plan);	
 		
-		getCareers("bog");
-		
-		setPlan(plan);		
 	}
+
 
 	/**
 	 * Constructor to create a Plan based on one career
@@ -198,8 +196,6 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		searchSubjectView.fill();
 		this.siaSummaryView = siaSummaryView;
 		connectionsController = new ConnectionsController(this);
-		
-		getCareers("bog");
 		
 		setPlan(plan);
 		
@@ -288,6 +284,9 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 					createSubject(subjectMapPlan.get(subjectValues2) ,subjectValues2, semester2);
 				}
 			}
+			
+			getCareers("bog");
+			
 		}
 		
 	}
@@ -489,7 +488,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		if(careers == null){
 			searchSubjectView.addCareerToListBox("No se pudieron cargar las careeras","1");			
 		} else {
-			searchSubjectView.setCareerList(careers);
+			Career careerSelected = (this.plan != null ? (this.plan.getCareer() != null ? this.plan.getCareer() : null) : null);
+			searchSubjectView.setCareerList(careers, careerSelected);
 		}
 	}
 	

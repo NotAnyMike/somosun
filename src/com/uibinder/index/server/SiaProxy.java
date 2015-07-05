@@ -36,6 +36,7 @@ import com.uibinder.index.server.dao.TeacherDao;
 import com.uibinder.index.shared.SiaResult;
 import com.uibinder.index.shared.SiaResultGroups;
 import com.uibinder.index.shared.SiaResultSubjects;
+import com.uibinder.index.shared.SomosUNUtils;
 import com.uibinder.index.shared.control.Block;
 import com.uibinder.index.shared.control.Career;
 import com.uibinder.index.shared.control.ComplementaryValues;
@@ -468,7 +469,7 @@ public class SiaProxy {
 					String code = option.attr("value");
 					String name = careerDao.fixName(option.text(), code);
 					career = new Career(name, code, sede); //TODO remove the code from the name
-					careerDao.saveOrUpdate(career);
+					careerDao.updateCareer(career);
 				}
 			}
 		} catch (IOException e) {
@@ -738,7 +739,7 @@ public class SiaProxy {
 	/**
 	 * This method will download all available requisites for a career
 	 */
-	public static String getRequisitesForACareer(String careerCode){
+	public static void getRequisitesForACareer(String careerCode){
 		
 		Document docPlan = null;
 		Document docRequisites = null;
@@ -766,7 +767,8 @@ public class SiaProxy {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		if(htmlPlanURL != null){
+		if(htmlPlanURL != null)
+		{
 			htmlPlanURL = htmlPlanURL.substring(htmlPlanURL.indexOf(SIA_BASIC_URL_TO_COMPLEMENTARY_AND_PLAN) + SIA_BASIC_URL_TO_COMPLEMENTARY_AND_PLAN.length());
 			planCode = htmlPlanURL.substring(0, htmlPlanURL.indexOf('>')-1);
 			htmlPlanURL = htmlPlanURL.substring(htmlPlanURL.indexOf(SIA_BASIC_URL_TO_COMPLEMENTARY_AND_PLAN) + SIA_BASIC_URL_TO_COMPLEMENTARY_AND_PLAN.length());
@@ -789,9 +791,9 @@ public class SiaProxy {
 			if(htmlRequisites != null && htmlPlan != null){
 				
 				Career career = null;
+				CareerDao careerDao = new CareerDao();
 				
 				if(careerCode != null){
-					CareerDao careerDao = new CareerDao();
 					career = careerDao.getCareerByCode(careerCode);					
 				}
 				
@@ -1245,7 +1247,7 @@ public class SiaProxy {
 							
 						}
 					}else{
-						//TODO Error 
+						//Error unable to find the subjectName
 					}
 					
 				}
@@ -1276,15 +1278,45 @@ public class SiaProxy {
 				 */
 				saveSubjectsAndComplementaryValues(subjects, career, mapSGDSGFinal, subjectGroupDao);
 				
-				//END
+				int freeElectionValue = -1;
+				int fundamentalValue = fundamentals.get(0).getObligatoryCredits() + fundamentals.get(0).getOptativeCredits();
+				int professionalValue = professionals.get(0).getObligatoryCredits() + professionals.get(0).getOptativeCredits();
 				
-				//in order to get a breakpoint
-				@SuppressWarnings("unused")
-				int x = 0;
+				//getting the libre elección values
+				freeElectionValue = getFreeElectionValue(htmlPlan);
+				
+				//adding the fundamentals, professionals and free election to the career from the DB
+				career.setFoudationCredits(fundamentalValue);
+				career.setDisciplinaryCredits(professionalValue);
+				career.setFreeElectionCredits(freeElectionValue);
+				
+				career.setHasAnalysis(true);
+				
+				//update the career
+				careerDao.updateCareer(career);
+				
 				
 			}
+			
 		}
-		return "10";
+
+	}
+
+	private static int getFreeElectionValue(String htmlPlan) {
+		int toReturn = -1;
+		String toSearch = SomosUNUtils.removeAccents(htmlPlan);
+		int from = -1;
+		int to = -1;
+		
+		from = toSearch.indexOf("componente de libre eleccion:");
+		if(from != -1) toSearch = toSearch.substring(from);
+
+		to = toSearch.indexOf("exigidos");
+		if(to != -1) toSearch = toSearch.substring(0, to);
+		
+		toReturn = SomosUNUtils.getFirstNumberFromString(toSearch);
+		
+		return toReturn;
 	}
 
 	/**
@@ -1737,7 +1769,6 @@ public class SiaProxy {
 		return mapSGDSG;
 		
 	}
-
 	
 	/**
 	 * Given two list of SG it will return just one with the final SG
@@ -1813,7 +1844,6 @@ public class SiaProxy {
 				
 		return subjectGroups;
 	}
-
 	
 	/**
 	 * This method returns a table with no holes or row and col
@@ -1889,7 +1919,6 @@ public class SiaProxy {
 		
 		return table;
 	}
-	
 	
 	/**
 	 * This function will delete: <br>

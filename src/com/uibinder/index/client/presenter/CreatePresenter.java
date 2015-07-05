@@ -20,6 +20,7 @@ import com.uibinder.index.client.service.SUNServiceAsync;
 import com.uibinder.index.client.view.CreateView;
 import com.uibinder.index.client.view.CreateViewImpl;
 import com.uibinder.index.shared.LoginInfo;
+import com.uibinder.index.shared.SomosUNUtils;
 import com.uibinder.index.shared.control.Career;
 
 public class CreatePresenter implements Presenter, CreateView.Presenter {
@@ -47,7 +48,7 @@ public class CreatePresenter implements Presenter, CreateView.Presenter {
 			view.addCareerToListBox("No se pudieron cargar las careeras","-1");			
 		} else {
 			for(Career career : careers){
-				String name = "(" + career.getCode() + ") " + career.getName().toUpperCase().charAt(0) + career.getName().substring(1);
+				String name = SomosUNUtils.addCarrerCodeToString(career);
 				view.addCareerToListBox(name, career.getCode());
 			}
 		}

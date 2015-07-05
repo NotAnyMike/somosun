@@ -17,9 +17,11 @@ public class Career implements Serializable {
 	@Index private String name = null;
 	@Index private String code = null;
     @Index private String sede = null;
-    @Index private int foudationCredits = 0;
-    @Index private int freeElectionCredits = 0;
-    @Index private int disciplinaryCredits = 0;
+    private int foudationCredits = 0;
+    private int freeElectionCredits = 0;
+    private int disciplinaryCredits = 0;
+    @Index private boolean hasDefault = false;
+    @Index private boolean hasAnalysis = false;
     
     public Career(){
     }
@@ -102,6 +104,22 @@ public class Career implements Serializable {
 
 	public void setDisciplinaryCredits(int disciplinaryCredits) {
 		this.disciplinaryCredits = disciplinaryCredits;
+	}
+
+	public boolean isHasAnalysis() {
+		return hasAnalysis;
+	}
+
+	public void setHasAnalysis(boolean hasAnalysis) {
+		this.hasAnalysis = hasAnalysis;
+	}
+
+	public boolean isHasDefault() {
+		return hasDefault;
+	}
+
+	public void setHasDefault(boolean hasDefault) {
+		this.hasDefault = hasDefault;
 	}
 
 }
