@@ -44,7 +44,10 @@ public interface SUNServiceAsync {
 	void getGroupsFromSia(String subjectSiaCode, String sede,
 			AsyncCallback<SiaResultGroups> callback);
 
-	void getSubjectFromSia(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede, Student student, AsyncCallback<SiaResultSubjects> callback);
+	void getSubjectFromSia(String nameOrCode, String typology, String career,
+			String scheduleCP, int page, int ammount, String sede,
+			Student student, List<String> subjectCodeList,
+			AsyncCallback<SiaResultSubjects> callback);
 
 	void getCareers(String sede, AsyncCallback<List<Career>> asyncGetCareers);
 
@@ -52,14 +55,22 @@ public interface SUNServiceAsync {
 
 	void toTest(AsyncCallback<Void> callback);
 
-	void getComplementaryValues(String career, String code,	AsyncCallback<ComplementaryValues> callback);
+	void getComplementaryValuesFromMisPlanes(String career, String code,	AsyncCallback<ComplementaryValues> callback);
 
 	void getSubjectsFromSia(String nameOrCode, String typology, String career, String sede, int page, Student student, AsyncCallback<SiaResultSubjects> callback);
 
-	void getComplementaryValues(String careerCode,	AsyncCallback<List<ComplementaryValues>> asyncGetComplementaryValuesByCareer);
+	void getComplementaryValuesFromMisPlanes(String careerCode,	AsyncCallback<List<ComplementaryValues>> asyncGetComplementaryValuesByCareer);
 
 	void savePlanAsDefault(Student student, Plan plan,	AsyncCallback<Void> callback);
 
 	void getPlanDefaultFromString(String careerCode, AsyncCallback<Plan> callback);
+
+	void analyzeCareer(String careerCode, AsyncCallback<Void> callback);
+
+	void getComplementaryValues(List<String> selectedSubjectCodeStrings, List<String> selectedSubjectCareerStrings, AsyncCallback<List<ComplementaryValues>> callback);
+
+	void getSubjectFromSia(String nameOrCode, String typology, String career,
+			String scheduleCP, int page, int ammount, String sede,
+			Student student, AsyncCallback<SiaResultSubjects> callback);
 
 }

@@ -54,7 +54,7 @@ public class ComplementaryValues implements Serializable {
 		this.listPrerequisitesOf = new ArrayList<Subject>();
 		this.listCorequisitesOf = new ArrayList<Subject>();
 		this.listCorequisites = listCorequisites;
-		this.typology = typology;
+		this.setTypology(typology);
 		this.mandatory = mandatory;
 	}
 	
@@ -66,7 +66,7 @@ public class ComplementaryValues implements Serializable {
 		this.listPrerequisitesOf = new ArrayList<Subject>();
 		this.listCorequisitesOf = new ArrayList<Subject>();
 		this.listCorequisites = listCorequisites;
-		this.typology = typology;
+		this.setTypology(typology);
 		this.mandatory = mandatory;
 		this.subjectGroup = subjectGroup;
 	}
@@ -81,7 +81,7 @@ public class ComplementaryValues implements Serializable {
 		this.listPrerequisitesOf = new ArrayList<Subject>();
 		this.listCorequisitesOf = new ArrayList<Subject>();
 		
-		this.typology = typology;
+		this.setTypology(typology);
 		this.mandatory = mandatory;
 	}
 	
@@ -95,7 +95,7 @@ public class ComplementaryValues implements Serializable {
 		this.listPrerequisitesOf = new ArrayList<Subject>();
 		this.listCorequisitesOf = new ArrayList<Subject>();
 		
-		this.typology = typology;
+		this.setTypology(typology);
 		this.mandatory = mandatory;
 		this.subjectGroup = subjectGroup;
 	}
@@ -201,6 +201,11 @@ public class ComplementaryValues implements Serializable {
 	}
 
 	public void setTypology(String typology) {
+		switch(typology){
+			case "n":
+				typology = "b"; //nivelacion
+				break;
+		}
 		this.typology = typology;
 	}
 

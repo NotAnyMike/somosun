@@ -5,7 +5,10 @@ import java.util.List;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
+import com.uibinder.index.shared.SomosUNUtils;
+import com.uibinder.index.shared.control.Career;
 import com.uibinder.index.shared.control.ComplementaryValues;
+import com.uibinder.index.shared.control.Subject;
 import com.uibinder.index.shared.control.SubjectGroup;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
@@ -58,6 +61,27 @@ public class SubjectGroupDao extends Dao {
 		
 		return key.getId();
 		
+	}
+
+	public SubjectGroup getSubjectGroupById(String id) {
+		SubjectGroup sG = null;
+		Key<SubjectGroup> key = Key.create(SubjectGroup.class, id);
+		sG = ofy().load().key(key).now();
+		return sG;
+		
+	}
+
+	public SubjectGroup getUnkownSubjectGroup(String careerCode, boolean isFundamental) {
+		SubjectGroup sG = null;
+		sG = this.getSubjectGroup(SomosUNUtils.UKNOWN_SG_NAME, isFundamental, careerCode);
+		if(sG == null){
+			CareerDao cDao = new CareerDao();
+			Career career = cDao.getCareerByCode(careerCode);
+			sG = new SubjectGroup(SomosUNUtils.UKNOWN_SG_NAME, career, isFundamental, 0, 0, true);
+			sG.setId(generateId());
+			saveSubjectGroup(sG);
+		}
+		return sG;
 	}
 	
 }

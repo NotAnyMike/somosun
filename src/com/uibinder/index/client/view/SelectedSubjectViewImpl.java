@@ -70,6 +70,11 @@ public class SelectedSubjectViewImpl extends Composite implements SelectedSubjec
 		this.removeFromParent();
 	}
 	
+	@Override
+	public String getCareer() {
+		return subjectSelectedLabel.getElement().getAttribute("career");
+	}
+
 	/********** EVENT HANDLERS *************/
 	
 	@UiHandler("toRemoveButton")

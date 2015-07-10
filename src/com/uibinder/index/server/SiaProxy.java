@@ -162,7 +162,7 @@ public class SiaProxy {
 		
 		return respString;
 	}
-	 
+	
 	/**
 	 * 
 	 * This will only search for subjects, not its groups nor other things, it 
@@ -184,6 +184,7 @@ public class SiaProxy {
 	 * 	For graduate (for this the VALOR_NIVELACADEMICO_TIPOLOGIA var should be "POS", but works either way)
 	 * 		Obligatorio: "O"
 	 * 		Elegible: "T"
+	 * @param subjectCodeListToFilter 
 	 * @param student 
 	 * 
 	 * @param nameOrCode: the words to search for, the code for the students not the internal code
@@ -203,12 +204,57 @@ public class SiaProxy {
 	 * search returned a empty json string
 	 */
 	public static SiaResultSubjects getSubjects(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede){
+		return getSubjectsWithFilter(nameOrCode,  typology, career, scheduleCP, page, ammount, sede, null);
+	}
+	
+	/**
+	 * 
+	 * This will only search for subjects, not its groups nor other things, it 
+	 * must have at least one non-empty field (page and amount are mandatory), if all parameters are null or
+	 * empty then it will return an empty list.</br></br>
+	 * 
+	 * This method search my code too, in that case, the @param nameOrCode must
+	 * be the code.</br></br>
+	 * 
+	 * If the only non-empty @param is the career code, then it will return the
+	 * full list of the subjects for that career.</br></br>
+	 * 
+	 * Typology works as follows:</br></br>
+	 * 	For under-graduate (for this the VALOR_NIVELACADEMICO_TIPOLOGIA var should be "PRE", but works either way)
+	 * 		Nivelación: "P"
+	 * 		Fundamentación: "B"
+	 * 		Disciplinar/Profesional: "C"
+	 * 		Libre elección: "L"</br></br>
+	 * 	For graduate (for this the VALOR_NIVELACADEMICO_TIPOLOGIA var should be "POS", but works either way)
+	 * 		Obligatorio: "O"
+	 * 		Elegible: "T"
+	 * @param subjectCodeListToFilter 
+	 * @param student 
+	 * 
+	 * @param nameOrCode: the words to search for, the code for the students not the internal code
+	 * @param typology: the typology of the subject, empty = all types.
+	 * @param career: the code of the career, the normal code we know, empty = all careers.
+	 * @param scheduleCP: the schedule to look for, empty = all blocks. here are some examples
+	 * 		Empty: ""
+	 * 		All Monday: "L6-21:M:C:J:V:S:D"
+	 * 		Monday from 6 to 9 and 1 until the end: "L6-10,13-21:M:C:J:V:S:D"
+	 * 		The monday above + the same hours but Wednesday: "L6-10,13-21:M:C6-10,13-21:J:V:S:D"
+	 * @param page: the page of the search, must have a value, if zero then it will return an empty string.
+	 * @param ammount: the number of results per @param page, must have a value, CANNOT be zero or because it will return an error.
+	 * @param sede: sede: "ama", "bog", "car", "man", "med", "ori", "pal" or  "tum"; default "bog"
+	 * 
+	 * @return a list of subjects, if there were some error the first and only subject
+	 * returned will have the name of ERROR, if it is empty there were no errors so the
+	 * search returned a empty json string
+	 */
+	public static SiaResultSubjects getSubjectsWithFilter(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede, List<String> subjectCodeListToFilter){
 		
 		sede = confirmSede(sede);
 		nameOrCode = SomosUNUtils.removeAccents(nameOrCode).replaceAll("  ", " ");
 		
 		String respString = null;
 		SiaResultSubjects siaResult = new SiaResultSubjects();
+		typology = SomosUNUtils.getTypology(typology);
 		String data = "{method:buscador.obtenerAsignaturas,params:['"+nameOrCode+"','"+VALOR_NIVELACADEMICO_TIPOLOGIA_PRE+"','"+typology+"','"+VALOR_NIVELACADEMICO_PLANESTUDIO_PRE+"','"+career+"','"+scheduleCP+"',"+page+","+ammount+"]}";
 		
 		respString = connectToSia(data, sede);
@@ -216,7 +262,7 @@ public class SiaProxy {
 		if(respString == "IOException" || respString == "MalformedURLException" || respString == null){
 			siaResult.setError(true);
 		}else{
-			siaResult = parseSubjectJSON(respString, page, ammount);		
+			siaResult = parseSubjectJSON(respString, page, ammount, subjectCodeListToFilter);		
 		}
 
 		return siaResult;
@@ -244,6 +290,7 @@ public class SiaProxy {
 	 * 		Obligatorio: "O"
 	 * 		Elegible: "T"
 	 * @param student 
+	 * @param subjectCodeList 
 	 * 
 	 * @param nameOrCode: the words to search for, the code for the students not the internal code
 	 * @param typology: the typology of the subject, empty = all types.
@@ -262,8 +309,52 @@ public class SiaProxy {
 	 * search returned a empty json string
 	 */
 	public static SiaResultSubjects getSubjects(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede, Student student){
+		return getSubjects(nameOrCode, typology, career, scheduleCP, page, ammount, sede, student, null);
+	}
+	
+	/**
+	 * 
+	 * This will only search for subjects, not its groups nor other things, it 
+	 * must have at least one non-empty field (page and amount are mandatory), if all parameters are null or
+	 * empty then it will return an empty list.</br></br>
+	 * 
+	 * This method search my code too, in that case, the @param nameOrCode must
+	 * be the code.</br></br>
+	 * 
+	 * If the only non-empty @param is the career code, then it will return the
+	 * full list of the subjects for that career.</br></br>
+	 * 
+	 * Typology works as follows:</br></br>
+	 * 	For under-graduate (for this the VALOR_NIVELACADEMICO_TIPOLOGIA var should be "PRE", but works either way)
+	 * 		Nivelación: "P"
+	 * 		Fundamentación: "B"
+	 * 		Disciplinar/Profesional: "C"
+	 * 		Libre elección: "L"</br></br>
+	 * 	For graduate (for this the VALOR_NIVELACADEMICO_TIPOLOGIA var should be "POS", but works either way)
+	 * 		Obligatorio: "O"
+	 * 		Elegible: "T"
+	 * @param student 
+	 * @param subjectCodeList 
+	 * 
+	 * @param nameOrCode: the words to search for, the code for the students not the internal code
+	 * @param typology: the typology of the subject, empty = all types.
+	 * @param career: the code of the career, the normal code we know, empty = all careers.
+	 * @param scheduleCP: the schedule to look for, empty = all blocks. here are some examples
+	 * 		Empty: ""
+	 * 		All Monday: "L6-21:M:C:J:V:S:D"
+	 * 		Monday from 6 to 9 and 1 until the end: "L6-10,13-21:M:C:J:V:S:D"
+	 * 		The monday above + the same hours but Wednesday: "L6-10,13-21:M:C6-10,13-21:J:V:S:D"
+	 * @param page: the page of the search, must have a value, if zero then it will return an empty string.
+	 * @param ammount: the number of results per @param page, must have a value, CANNOT be zero or because it will return an error.
+	 * @param sede: sede: "ama", "bog", "car", "man", "med", "ori", "pal" or  "tum"; default "bog"
+	 * 
+	 * @return a list of subjects, if there were some error the first and only subject
+	 * returned will have the name of ERROR, if it is empty there were no errors so the
+	 * search returned a empty json string
+	 */
+	public static SiaResultSubjects getSubjects(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede, Student student, List<String> subjectCodeListToFilter){
 		
-		SiaResultSubjects siaResultSubjects = getSubjects(nameOrCode, typology, career, scheduleCP, page, ammount, sede);
+		SiaResultSubjects siaResultSubjects = getSubjectsWithFilter(nameOrCode, typology, career, scheduleCP, page, ammount, sede, subjectCodeListToFilter);
 		
 		if(student != null){
 			StudentDao studentDao = new StudentDao();
@@ -272,14 +363,14 @@ public class SiaProxy {
 			if(student != null){
 				if(student.isAdmin() == true){
 					//Add libre and optativa
-					Subject subject = subjectDao.getDummySubjectByCode("optativa");
+					Subject subject = subjectDao.getDummySubjectByCode(SomosUNUtils.OPTATIVA_CODE);
 					if(subject == null){
 						subject = new Subject();
-						subject.setCode("optativa");
+						subject.setCode(SomosUNUtils.OPTATIVA_CODE);
 						subject.setCredits(0);
 						subject.setLocation(sede);
-						subject.setName("optativa");
-						subject.setSiaCode("optativa");
+						subject.setName(SomosUNUtils.OPTATIVA_NAME);
+						subject.setSiaCode(SomosUNUtils.OPTATIVA_CODE);
 						subject.setSpecial(false);
 						subject.setDummy(true);
 						subject.setId(subjectDao.generateId());
@@ -288,14 +379,14 @@ public class SiaProxy {
 						siaResultSubjects.addSubject(subject);
 					}
 					
-					subject = subjectDao.getDummySubjectByCode("libre");
+					subject = subjectDao.getDummySubjectByCode(SomosUNUtils.LIBRE_CODE);
 					if(subject == null){
 						subject = new Subject();
-						subject.setCode("libre");
+						subject.setCode(SomosUNUtils.LIBRE_CODE);
 						subject.setCredits(0);
 						subject.setLocation(sede);
-						subject.setName("libre");
-						subject.setSiaCode("libre");
+						subject.setName(SomosUNUtils.LIBRE_NAME);
+						subject.setSiaCode(SomosUNUtils.LIBRE_CODE);
 						subject.setSpecial(false);
 						subject.setDummy(true);
 						subject.setId(subjectDao.generateId());
@@ -325,7 +416,7 @@ public class SiaProxy {
 		if(respString == "IOException" || respString == "MalformedURLException" || respString == null || respString == "error"){
 			siaResult.setError(true);
 		}else{
-			siaResult = parseSubjectJSON(respString, page, ammount);		
+			siaResult = parseSubjectJSON(respString, page, ammount, null);		
 		}
 
 		return respString;
@@ -368,7 +459,7 @@ public class SiaProxy {
 		
 	}
 	
-	private static SiaResultSubjects parseSubjectJSON(String jsonString, int page, int ammount){		
+	private static SiaResultSubjects parseSubjectJSON(String jsonString, int page, int ammount, List<String> subjectCodeListToFilter){		
 		SiaResultSubjects siaResult = new SiaResultSubjects();
 
 		List<Subject> subjectList = new ArrayList<Subject>();
@@ -391,10 +482,35 @@ public class SiaProxy {
 				
 				for(int i=0; i<ammountOfResults; i++){
 					jsonObject = jsonArray.getJSONObject(i);
-					Subject subject = new Subject(jsonObject.getInt("creditos"), jsonObject.getString("id_asignatura"), jsonObject.getString("codigo"),jsonObject.getString("nombre"), "bog");
-					subject = subjectDao.getSubjectbySubject(subject, true);
-					subjectList.add(subject);
-					typology.put(subject, jsonObject.getString("tipologia"));
+					String code =  jsonObject.getString("id_asignatura");
+					boolean isNeeded = false;
+					if(subjectCodeListToFilter != null){
+						if(subjectCodeListToFilter.size() > 0){
+							for(String subjectCodeT : subjectCodeListToFilter){
+								if(subjectCodeT.equals(code) == true){
+									isNeeded = true;
+									break;
+								}
+							}							
+						}else{
+							isNeeded = true;
+						}
+					}else{
+						isNeeded = true;
+					}
+					
+					if(isNeeded == true){
+						
+						int creditos = jsonObject.getInt("creditos");
+						code =  jsonObject.getString("id_asignatura");
+						String siaCode = jsonObject.getString("codigo");
+						String name = jsonObject.getString("nombre");
+						
+						Subject subject = new Subject(creditos, code, siaCode, name, "bog");
+						subject = subjectDao.getSubjectbySubject(subject, true);
+						subjectList.add(subject);
+						typology.put(subject, jsonObject.getString("tipologia"));
+					}
 				}
 			}
 			
@@ -1843,17 +1959,17 @@ public class SiaProxy {
 		 * TODO: SearchFor the libre elección and the Nivelación subjectGroups. if found, do nothing, otherwise create them
 		 */
 		//for libre eleccion
-		SubjectGroup subjectGroupIndividual = subjectGroupDao.getSubjectGroup("libre eleccion", career.getCode());
+		SubjectGroup subjectGroupIndividual = subjectGroupDao.getSubjectGroup(SomosUNUtils.LIBRE_AGRUPACION_NAME, career.getCode());
 		if(subjectGroupIndividual == null)
 		{
-			subjectGroupIndividual = new SubjectGroup("libre eleccion", career, false, 0, 0, false);
+			subjectGroupIndividual = new SubjectGroup(SomosUNUtils.LIBRE_AGRUPACION_NAME, career, false, 0, 0, false);
 			subjectGroupDao.saveSubjectGroup(subjectGroupIndividual);
 		}
 		//for nivelación
-			subjectGroupIndividual = subjectGroupDao.getSubjectGroup("nivelacion", career.getCode());
+			subjectGroupIndividual = subjectGroupDao.getSubjectGroup(SomosUNUtils.NIVELACION_NAME, career.getCode());
 			if(subjectGroupIndividual == null)
 			{
-				subjectGroupIndividual = new SubjectGroup("nivelacion", career, false, 0, 0, false);
+				subjectGroupIndividual = new SubjectGroup(SomosUNUtils.NIVELACION_NAME, career, false, 0, 0, false);
 				subjectGroupDao.saveSubjectGroup(subjectGroupIndividual);
 			}
 		
@@ -2143,12 +2259,12 @@ public class SiaProxy {
 					if(typology.equals("P"))
 					{
 						//get the Nivelación subjectGroup
-						sG = subjectGroupDao.getSubjectGroup("nivelacion", cV.getCareer().getCode());
+						sG = subjectGroupDao.getSubjectGroup(SomosUNUtils.NIVELACION_NAME, cV.getCareer().getCode());
 					}
 					else if(typology.equals("L"))
 					{
 						//get the Libre elección subjectGroup
-						sG = subjectGroupDao.getSubjectGroup("libre eleccion", cV.getCareer().getCode());
+						sG = subjectGroupDao.getSubjectGroup(SomosUNUtils.LIBRE_AGRUPACION_NAME, cV.getCareer().getCode());
 					}
 					
 					//create the complementaryValue and add it to the mapSCV

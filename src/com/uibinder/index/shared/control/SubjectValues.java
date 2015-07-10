@@ -36,6 +36,13 @@ public class SubjectValues implements Serializable {
         this.complementaryValues = complementaryValues;
     }
     
+    public SubjectValues(double grade,boolean taken, ComplementaryValues complementaryValues) {
+        this.group = group;
+        this.grade = grade;
+        this.taken = taken;
+        this.complementaryValues = complementaryValues;
+    }
+    
     public SubjectValues(Group group, double grade,boolean taken) {
         this.group = group;
         this.grade = grade;

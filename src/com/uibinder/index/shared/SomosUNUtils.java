@@ -12,6 +12,16 @@ import com.uibinder.index.shared.control.Career;
  */
 public class SomosUNUtils {
 	
+	public static final String NIVELACION_NAME = "nivelacion";
+	public static final String LIBRE_AGRUPACION_NAME = "libre eleccion";
+	public static final String LIBRE_CODE = "libre";
+	public static final String OPTATIVA_CODE ="opativa";
+	public static final String LIBRE_NAME = "libre eleccion";
+	public static final String OPTATIVA_NAME ="opativa";
+	
+	public static final String UKNOWN_SG_CODE = "unknown";
+	public static final String UKNOWN_SG_NAME = "Agrupación desconocida";
+	
 	/**
 	 * This method will recive a career and return a string of the code followed by it name<br></br>
 	 * e.g. @return "(2522) Administración de empresas" <br></br>
@@ -82,6 +92,29 @@ public class SomosUNUtils {
 		toReturn = Integer.valueOf(s);
 		
 		return toReturn;
+	}
+	
+	/**
+	 * 
+	 * Will transform the @param t into a reading typology Type
+	 * 
+	 * @param t
+	 * @return
+	 */
+	public static String getTypology(String t){
+		String tToReturn = t;
+		switch(tToReturn){
+		case "d":
+			tToReturn ="c";
+			break;
+		case "n":
+			tToReturn = "p";
+			break;
+		case "f":
+			tToReturn = "b";
+			break;
+		}
+		return tToReturn;
 	}
 
 }

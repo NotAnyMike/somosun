@@ -58,6 +58,16 @@ public class Subject implements Serializable {
     	this.setSpecial(special);
     }
     
+    public Subject(int credits, String code, String siaCode, String name, String location, boolean special, boolean isDummy) {
+    	this.setCredits(credits);
+    	this.setCode(code);
+    	this.setSiaCode(siaCode);
+    	this.setName(name);
+    	this.setLocation(location);
+    	this.setSpecial(special);
+    	this.setDummy(isDummy);
+    }
+    
     /**
      * true if everything but he id is equal 
      * @param subject

@@ -16,5 +16,6 @@ public interface SelectedSubjectView {
 	void onToRemoveButtonClicked(ClickEvent event);
 	void remove();
 	String getCode();
-
+	String getCareer();
+	
 }

@@ -30,8 +30,7 @@ public class SubjectGroup implements Serializable {
 	public SubjectGroup(){
 	}
 	
-	public SubjectGroup(String name, Career career, Boolean fundamental,
-			int obligatoryCredits, int optativeCredits, boolean error) {
+	public SubjectGroup(String name, Career career, Boolean fundamental, int obligatoryCredits, int optativeCredits, boolean error) {
 		super();
 		this.name = name;
 		this.career = career;

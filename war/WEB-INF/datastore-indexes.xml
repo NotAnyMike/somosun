@@ -27,4 +27,10 @@
 	    <property name="code" direciton="asc"/>
 	</datastore-index>
 	
+	<datastore-index kind="SubjectGroup" ancestor="false">
+	    <property name="name" direction="asc"/>
+	    <property name="career.code" direction="asc"></property>
+	    <property name="fundamental" direciton="asc"/>
+	</datastore-index>
+	
 </datastore-indexes>

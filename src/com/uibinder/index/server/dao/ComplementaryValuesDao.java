@@ -5,9 +5,11 @@ import java.util.List;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
+import com.uibinder.index.shared.SomosUNUtils;
 import com.uibinder.index.shared.control.Career;
 import com.uibinder.index.shared.control.ComplementaryValues;
 import com.uibinder.index.shared.control.Subject;
+import com.uibinder.index.shared.control.SubjectGroup;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
@@ -40,12 +42,7 @@ public class ComplementaryValuesDao extends Dao {
 	}
 	
 	public ComplementaryValues getComplementaryValues(Career career, Subject subject){
-		ComplementaryValues toReturn = null;
-		if(subject != null && career != null)
-		{
-			toReturn = (ComplementaryValues) ofy().load().type(ComplementaryValues.class).filter("career.code", career.getCode()).filter("subject.code", subject.getCode()).first().now();
-		}
-		return toReturn;
+		return getComplementaryValues(career.getCode(), subject.getCode());
 	}
 	
 	public void deleteComplementaryValues(ComplementaryValues cV){
@@ -73,6 +70,56 @@ public class ComplementaryValuesDao extends Dao {
 
 	public List<ComplementaryValues> getComplementaryValues(String code) {
 		return ofy().load().type(ComplementaryValues.class).filter("career.code", code).list();
+	}
+
+	public ComplementaryValues getComplementaryValues(String careerCode, String subjectCode) {
+		
+		ComplementaryValues toReturn = null;
+		if(subjectCode != null && careerCode != null)
+		{
+			toReturn = (ComplementaryValues) ofy().load().type(ComplementaryValues.class).filter("career.code", careerCode).filter("subject.code", subjectCode).first().now();
+		}
+		
+		return toReturn;
+		
+	}
+
+	public void createComplementaryValuesForLibre(String careerCode) {
+		if(getComplementaryValues(careerCode, SomosUNUtils.LIBRE_CODE) == null && careerCode.isEmpty() == false){
+			CareerDao careerDao = new CareerDao();
+			SubjectDao subjectDao = new SubjectDao();
+			SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
+			Career c = careerDao.getCareerByCode(careerCode);
+			Subject s = subjectDao.getDummySubjectByCode(SomosUNUtils.LIBRE_CODE);
+			SubjectGroup sG = subjectGroupDao.getSubjectGroup(SomosUNUtils.LIBRE_CODE, careerCode);
+			
+			if(s != null && c != null && sG != null){				
+				ComplementaryValues cVT = new ComplementaryValues(c, s, "l", false, sG);
+				ComplementaryValuesDao cVDao = new ComplementaryValuesDao();
+				cVDao.saveComplementaryValues(cVT);
+			}
+			
+		}
+		
+	}
+	
+	public void createComplementaryValuesForOptativa(String careerCode, String subjectGroupId) {
+		if(getComplementaryValues(careerCode, SomosUNUtils.OPTATIVA_CODE) == null && careerCode.isEmpty() == false && subjectGroupId.isEmpty() == false){
+			CareerDao careerDao = new CareerDao();
+			SubjectDao subjectDao = new SubjectDao();
+			SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
+			Career c = careerDao.getCareerByCode(careerCode);
+			Subject s = subjectDao.getDummySubjectByCode(SomosUNUtils.OPTATIVA_CODE);
+			SubjectGroup sG = subjectGroupDao.getSubjectGroupById(subjectGroupId);
+			
+			if(s != null && c != null && sG != null){				
+				ComplementaryValues cVT = new ComplementaryValues(c, s, (sG.isFundamental() == true ? "b" : "p"), false, sG);
+				ComplementaryValuesDao cVDao = new ComplementaryValuesDao();
+				cVDao.saveComplementaryValues(cVT);
+			}
+			
+		}
+		
 	}
 
 	

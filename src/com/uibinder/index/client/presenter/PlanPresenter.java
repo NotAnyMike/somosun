@@ -140,6 +140,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		}
 	};
 		
+	
 	AsyncCallback<List<ComplementaryValues>> asyncGetComplementaryValuesByCareer = new AsyncCallback<List<ComplementaryValues>>(){
 		
 		public void onFailure(Throwable caught) {
@@ -150,6 +151,9 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		}
 		
 	};
+	
+	/********************** asyncCallbacks varaibles *******************************/
+	
 	
 	/**
 	 * This is the constructor to create an empty plan, that means no subjects
@@ -298,14 +302,14 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		this.plan = plan2;
 		//this.plan = new Plan();
 		
-		rpcService.getComplementaryValues(plan.getCareerCode(), asyncGetComplementaryValuesByCareer);
+		//rpcService.getComplementaryValuesFromMisPlanes(plan.getCareerCode(), asyncGetComplementaryValuesByCareer);
 		
 		setCareer(plan.getCareer());
 		
 		if(plan.getSemesters() != null) {
 			List<Semester> semesterListPlan = plan2.getSemesters();
 			//Map<SubjectValues, Subject> subjectMapPlan = plan2.getValuesAndSubjectMap();
-			List<SubjectValues> subjectValuesListPlan = null;
+			//List<SubjectValues> subjectValuesListPlan = null;
 			
 			//List<Semester> semesterList2 = new ArrayList<Semester>();
 			//List<SubjectValues> subjectValuesList2 = new ArrayList<SubjectValues>();
@@ -369,7 +373,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 			subjectValuesList.add(subjectValues);
 			if(subjectTimesUpdated.containsKey(subject) == false) subjectTimesUpdated.put(subject, 0);
 		}
-		//if(valuesAndSubjectMap.containsKey(subjectValues)==false) valuesAndSubjectMap.put(subjectValues, subject); //although the condition here can be removed because it can will just override it
+		//if(valuesAndSubjectMap.containsKey(subjectValues)==false) valuesAndSubjectMap.put(subjectValues, subject); OLD, I don't save Maps anymore //although the condition here can be removed because it can will just override it
 		if(semester.getSubjects().contains(subjectValues) == false) semester.addSubject(subjectValues);
 		
 		
@@ -472,7 +476,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		if(timesUpdated < LIMIT_TO_REQUISITES_UPDATES){
 			//OLD subjectTimesUpdated.put(valuesAndSubjectMap.get(sV), timesUpdated+1);
 			subjectTimesUpdated.put(sV.getComplementaryValues().getSubject(), timesUpdated+1);
-			rpcService.getComplementaryValues(plan.getCareerCode(), sV.getComplementaryValues().getSubject().getCode(), new AsyncCallback<ComplementaryValues>(){
+			rpcService.getComplementaryValuesFromMisPlanes(plan.getCareerCode(), sV.getComplementaryValues().getSubject().getCode(), new AsyncCallback<ComplementaryValues>(){
 			//OLD rpcService.getComplementaryValues(plan.getCareerCode(), valuesAndSubjectMap.get(sV).getCode(), new AsyncCallback<ComplementaryValues>(){
 				
 				@Override
@@ -991,6 +995,25 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		return selected;
 	}
 	
+	private void addSubjectsToPlan(List<ComplementaryValues> result, String semesterString) {
+		
+		int semesterNumber = Integer.valueOf(semesterString);
+		Semester semester = semesterList.get(semesterNumber);
+		
+		/**
+		 * for each
+		 * 1. Create a subjectValues obj
+		 * 2. Add the cV to the sV
+		 * 3. call createSUbject(subject, CV, semester) 
+		 */
+		for(ComplementaryValues cVT : result){
+			SubjectValues sV = new SubjectValues(0.0 , false, cVT);
+			createSubject(sV.getComplementaryValues().getSubject(), sV, semester);
+		}
+		
+	}
+	
+	
 	/************ behaviors when clicked *******************/
 	
 	public void onSpecificSubjectSelected(String subjectName, String subjectCode, String careerCode) {
@@ -1092,7 +1115,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		eventBus.fireEvent(new SavePlanAsDefaultEvent(this.getPlan()));
 	}
 	
-	public void onFinalizarButtonClick(String semester) {
+	public void onFinalizarButtonClick(final String semesterString) {
 		
 		searchSubjectView.clear();
 		accordions.clear();
@@ -1101,12 +1124,32 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		/**
 		 * read the slectedSubject List, for each subject, create a subjectValue and add its complementaryValue
 		 */
+		List<String> selectedSubjectCodeStrings = new ArrayList<String>();
+		List<String> selectedSubjectCareerStrings = new ArrayList<String>();
+		for(SelectedSubjectViewImpl selectedSubjectsViewImpl : selectedSubjects){
+			selectedSubjectCodeStrings.add(selectedSubjectsViewImpl.getCode());
+			selectedSubjectCareerStrings.add(selectedSubjectsViewImpl.getCareer());
+		}
 		
 		selectedSubjects.clear();
+
+		if(selectedSubjectCodeStrings.size() > 0){			
+			rpcService.getComplementaryValues(selectedSubjectCodeStrings, selectedSubjectCareerStrings, new AsyncCallback<List<ComplementaryValues>>(){
+				
+				public void onFailure(Throwable caught) {
+					Window.alert("Sorry, we were unable to add the selected subjects, please try again");				
+				}
+				
+				public void onSuccess(List<ComplementaryValues> result) {
+					addSubjectsToPlan(result, semesterString);
+				}
+				
+			});
+		}
 		
 	}
 	
-	/************ JQUERY FUNCTIONS ***************/
+	/******************** JQUERY FUNCTIONS *********************/
 
 	/**
 	 * This method makes that the SearchSubjectView appears right where it was clicked
@@ -1134,7 +1177,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		$wnd.stopPropagationOfClickOnSelectSubject()
 	}-*/;
 	
-	/********************************************/
+	/************************************************************/
 
 	
 }

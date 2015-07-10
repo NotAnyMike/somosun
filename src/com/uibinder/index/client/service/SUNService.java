@@ -27,18 +27,17 @@ public interface SUNService extends RemoteService{
 
 	Subject getSubjectByCode(int code);
 	Subject getSubjectByCode(int code, String career);
-	
 	Subject getSubjectByName(String name);
 	Subject getSubjectByName(String name, String career);
 	
 	List<RandomPhrase> getRandomPhrase();
-	
 	void saveRandomPhrase(String phrase, String author);
 	
 	public SiaResultGroups getGroupsFromSia(String subjectSiaCode, String sede);
 	public SiaResultGroups getGroupsFromSia(Subject subject, String sede);
-	public SiaResultSubjects getSubjectFromSia(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede, Student student);
 	public SiaResultSubjects getSubjectsFromSia(String nameOrCode, String typology, String career, String sede, int page, Student student);
+	public SiaResultSubjects getSubjectFromSia(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede, Student student);
+	public SiaResultSubjects getSubjectFromSia(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede, Student student, List<String> subjectCodeList);
 	
 	public List<Career> getCareers(String sede);
 	
@@ -46,11 +45,13 @@ public interface SUNService extends RemoteService{
 	
 	public void toTest();
 	
-	public ComplementaryValues getComplementaryValues(String career, String code);
+	public ComplementaryValues getComplementaryValuesFromMisPlanes(String career, String code);
+	public List<ComplementaryValues> getComplementaryValuesFromMisPlanes(String careerCode);
 	
-	public List<ComplementaryValues> getComplementaryValues(String careerCode);
+	List<ComplementaryValues> getComplementaryValues(List<String> selectedSubjectCodeStrings, List<String> selectedSubjectCareerStrings);
+	
+	public void analyzeCareer(String careerCode);
 	
 	public void savePlanAsDefault(Student student, Plan plan);
-	
 	public Plan getPlanDefault(String careerCode);
 }

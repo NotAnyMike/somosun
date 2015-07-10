@@ -18,14 +18,17 @@ import com.uibinder.index.server.dao.ComplementaryValuesDao;
 import com.uibinder.index.server.dao.PlanDao;
 import com.uibinder.index.server.dao.StudentDao;
 import com.uibinder.index.server.dao.SubjectDao;
+import com.uibinder.index.server.dao.SubjectGroupDao;
 import com.uibinder.index.shared.RandomPhrase;
 import com.uibinder.index.shared.SiaResultGroups;
 import com.uibinder.index.shared.SiaResultSubjects;
+import com.uibinder.index.shared.SomosUNUtils;
 import com.uibinder.index.shared.control.Career;
 import com.uibinder.index.shared.control.ComplementaryValues;
 import com.uibinder.index.shared.control.Plan;
 import com.uibinder.index.shared.control.Student;
 import com.uibinder.index.shared.control.Subject;
+import com.uibinder.index.shared.control.SubjectGroup;
 
 /**
  * 
@@ -135,11 +138,30 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 	 * @param ammount
 	 * @param sede
 	 * @param student 
+	 * @param subjectCodeListToFilter 
+	 * @return
+	 */
+	@Override
+	public SiaResultSubjects getSubjectFromSia(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede, Student student, List<String> subjectCodeListToFilter) {
+		return SiaProxy.getSubjects(nameOrCode, typology, career, scheduleCP, page, ammount, sede, student, subjectCodeListToFilter);
+	}
+	
+	/**
+	 * For more information goto SiaProxy.class
+	 * @param nameOrCode
+	 * @param typology
+	 * @param career
+	 * @param scheduleCP
+	 * @param page
+	 * @param ammount
+	 * @param sede
+	 * @param student 
+	 * @param subjectCodeList 
 	 * @return
 	 */
 	@Override
 	public SiaResultSubjects getSubjectFromSia(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede, Student student) {
-		return SiaProxy.getSubjects(nameOrCode, typology, career, scheduleCP, page, ammount, sede, student);
+		return getSubjectFromSia(nameOrCode, typology, career, scheduleCP, page, ammount, sede, student, null);
 	}
 
 	@Override
@@ -166,7 +188,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 	}
 
 	@Override
-	public ComplementaryValues getComplementaryValues(String career, String code) {
+	public ComplementaryValues getComplementaryValuesFromMisPlanes(String career, String code) {
 		return (ComplementaryValues) SiaProxy.getRequisitesFromSia(code, career);
 	}
 
@@ -186,7 +208,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 	}
 	
 	@Override
-	public List<ComplementaryValues> getComplementaryValues(String careerCode) {
+	public List<ComplementaryValues> getComplementaryValuesFromMisPlanes(String careerCode) {
 		ComplementaryValuesDao cVDao = new ComplementaryValuesDao();
 		List<ComplementaryValues> cVList = cVDao.getComplementaryValues(careerCode);
 		List<ComplementaryValues> cVListToReturn = new ArrayList<ComplementaryValues>();
@@ -223,6 +245,298 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 			p = pDao.getPlanDefault(careerCode);
 		}
 		return p;
-//		return getPlanDefaultFromString(careerCode);
 	}
+
+	@Override
+	public void analyzeCareer(String careerCode) {
+		SiaProxy.getRequisitesForACareer(careerCode);
+	}
+
+	/**
+	 * Will the return the full list of subjects complementaryValues, if it is necessary it will create the complementaryValue and search for its values
+	 * <br></br>The only case where it will not return a complementaryValue for a subject is when the subject does not exist in the Sia results
+	 */
+	public List<ComplementaryValues> getComplementaryValues(List<String> selectedSubjectCodeStrings, List<String> selectedSubjectCareerStrings) {
+		
+		SubjectDao subjectDao = new SubjectDao();
+		ComplementaryValuesDao complementaryValuesDao = new ComplementaryValuesDao();
+		CareerDao careerDao = new CareerDao();
+		SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
+		
+		List<ComplementaryValues> cVList = new ArrayList<ComplementaryValues>();
+		List<String> codeStringsProblematic = new ArrayList<String>();
+		List<String> careerCodeStringsProblematic = new ArrayList<String>();
+		Career career = careerDao.getCareerByCode(selectedSubjectCareerStrings.get(0));
+		
+		for(String subjectCode : selectedSubjectCodeStrings){
+			
+			String careerCode = selectedSubjectCareerStrings.get(selectedSubjectCodeStrings.indexOf(subjectCode));
+			
+			if((career == null) ? true : career.getCode().equals(careerCode) == false){
+				career = careerDao.getCareerByCode(careerCode);					
+				if(career.hasAnalysis()  == false){
+					analyzeCareer(career.getCode());
+					career = careerDao.getCareerByCode(selectedSubjectCareerStrings.get(0));
+				}
+			}
+			
+			if(career != null){
+				Subject subject = subjectDao.getSubjectByCode(subjectCode);
+				if(subject != null){
+					ComplementaryValues complementaryValues = complementaryValuesDao.getComplementaryValues(career.getCode(), subject.getCode());
+					if(complementaryValues != null){
+						cVList.add(complementaryValues);
+					}
+				}				
+			}
+			
+		}
+		
+		//check if every String in selectedSubjectCodeStrings has a subjectValue, if not then search, create and save the ones that are not there
+		int difference = selectedSubjectCodeStrings.size() - cVList.size();
+		if(difference != 0){
+			while(difference > 0){
+				for(String subjectCodeT : selectedSubjectCodeStrings){
+					boolean hasCV = false;
+					for(ComplementaryValues cVT : cVList){
+						if(cVT.getSubject().getCode().equals(subjectCodeT) == true){
+							hasCV = true;
+							break;
+						}
+					}
+					if(hasCV == false){
+						codeStringsProblematic.add(subjectCodeT);
+						careerCodeStringsProblematic.add(selectedSubjectCareerStrings.get(selectedSubjectCodeStrings.indexOf(subjectCodeT)));
+						difference --;
+					}
+				}
+			}
+			
+			//do something with those subjects
+			career = careerDao.getCareerByCode(careerCodeStringsProblematic.get(0));
+			
+			SiaResultSubjects levelingResult = getSubjectFromSia("", "p", career.getCode(), "", 1, 1000, "bog", null);
+			SiaResultSubjects freeElectionResult = getSubjectFromSia("", "l", career.getCode(), "", 1, 1000, "bog", null, codeStringsProblematic);
+			//freeElectionResult = getSubjectFromSia("", "l", career.getCode(), "", 1, freeElectionResult.getTotalAsignaturas(), "bog", null, codeStringsProblematic);
+			
+			List<Subject> levelingList = levelingResult.getSubjectList();
+			List<Subject> freeElectionList = freeElectionResult.getSubjectList();
+			List<Subject> fundamentalList = null;
+			List<Subject> professionalList = null;
+			
+			String oldCareer = "";
+			
+			for(String subjectCodeT : codeStringsProblematic){
+				
+				Subject subjectT = null;
+				String careerCodeT = careerCodeStringsProblematic.get(codeStringsProblematic.indexOf(subjectCodeT));
+				
+				if(oldCareer.equals(careerCodeT) == false){
+					career = careerDao.getCareerByCode(careerCodeT);					
+					if(career.hasAnalysis()  == false){
+						analyzeCareer(career.getCode());
+						career = careerDao.getCareerByCode(selectedSubjectCareerStrings.get(0));
+					}
+					if(subjectCodeT.equals(SomosUNUtils.LIBRE_CODE) == false || subjectCodeT.equals(SomosUNUtils.OPTATIVA_CODE) == false){						
+						levelingResult = getSubjectFromSia("", "p", career.getCode(), "", 1, 1000, "bog", null);
+						levelingList = levelingResult.getSubjectList();
+						freeElectionResult = getSubjectFromSia("", "l", career.getCode(), "", 1, 1000, "bog", null);
+						freeElectionList = freeElectionResult.getSubjectList();
+					}
+					
+				}
+				
+				if(career != null){
+					if(subjectCodeT.equals(SomosUNUtils.LIBRE_CODE)){
+						//means there is no cV for Libre
+						subjectT = subjectDao.getSubjectByCode(subjectCodeT);
+						
+						if(subjectT == null){
+							subjectDao.createSubjectLibre();
+							subjectT = subjectDao.getSubjectByCode(subjectCodeT);
+						}						
+						
+						complementaryValuesDao.createComplementaryValuesForLibre(career.getCode());
+						ComplementaryValues cVT = complementaryValuesDao.getComplementaryValues(career.getCode(), SomosUNUtils.LIBRE_CODE);
+						
+						if(cVT != null){
+							cVList.add(cVT);
+							oldCareer = careerCodeT;
+						}
+					}else if(subjectCodeT.equals(SomosUNUtils.OPTATIVA_CODE)){
+						//TODO can not uncomment this because I need the subjecGroup id to do it, therefore cannot add this subject
+//						//means there is no cV for Optativa
+//						subjectT = subjectDao.getSubjectByCode(subjectCodeT);
+//						
+//						if(subjectT == null){
+//							subjectDao.createSubjectOptative();;
+//							subjectT = subjectDao.getSubjectByCode(subjectCodeT);
+//						}						
+//						
+//						complementaryValuesDao.createComplementaryValuesForOptativa(career.getCode(), subjectGroupId);(career.getCode());
+//						ComplementaryValues cVT = complementaryValuesDao.getComplementaryValues(career.getCode(), SomosUNUtils.OPTATIVA_CODE);
+//						
+//						if(cVT != null){
+//							cVList.add(cVT);
+//						}
+					}else{
+						//The subject is not the dummy subjects "opativa" nor "libre"
+						/**
+						 * 1. Get the libreEleccion subjects and the Nivelación from SiaBuscador
+						 * 2. Find out if the problematic subjects are part of any of those
+						 * 3. Get/create the subject and create its cV and add to the list
+						 */
+						
+						//for nivelación
+						Subject subject = null;
+						ComplementaryValues cV = null;
+						SubjectGroup subjectGroup = null;
+						for(Subject sT : levelingList){
+							if(subjectCodeT.equals(sT.getCode()) == true){
+								subject = subjectDao.getSubjectByCode(sT.getCode());
+
+								cV = complementaryValuesDao.getComplementaryValues(careerCodeT, subjectCodeT);
+								
+								if(cV == null){
+									//Create the cV
+									subjectGroup = subjectGroupDao.getSubjectGroup(SomosUNUtils.NIVELACION_NAME, careerCodeT);
+									
+									if(subjectGroup != null){										
+										cV = new ComplementaryValues(career, subject, "b", false, subjectGroup);
+										cV.setId(complementaryValuesDao.generateId());
+										complementaryValuesDao.saveComplementaryValues(cV);
+									}else{
+										//Se econtró pero no existe la agrupación así que no se hace nada TODO
+									}
+									
+								}
+								break;
+							}
+						}
+						if(cV != null){
+							cVList.add(cV);
+							oldCareer = careerCodeT;
+							continue;
+						}
+						
+						//for freeElection
+						for(Subject sT : freeElectionList){
+							if(subjectCodeT.equals(sT.getCode()) == true){
+								subject = subjectDao.getSubjectByCode(sT.getCode());
+
+								cV = complementaryValuesDao.getComplementaryValues(careerCodeT, subjectCodeT);
+								
+								if(cV == null){
+									//Create the cV
+									subjectGroup = subjectGroupDao.getSubjectGroup(SomosUNUtils.NIVELACION_NAME, careerCodeT);
+									
+									if(subjectGroup != null){										
+										cV = new ComplementaryValues(career, subject, "l", false, subjectGroup);
+										cV.setId(complementaryValuesDao.generateId());
+										complementaryValuesDao.saveComplementaryValues(cV);
+									}else{
+										//Se econtró pero no existe la agrupación así que no se hace nada TODO
+									}
+									
+								}
+								break;
+							}
+						}
+						
+						if(cV != null){							
+							cVList.add(cV);
+							oldCareer = careerCodeT;
+							continue;
+						}
+						
+						if(cV == null){
+							//Look for the subject in the fundamentación y profesional lists
+							if(fundamentalList == null || careerCodeT.equals(oldCareer) == false){
+								fundamentalList = getSubjectFromSia("", "b", careerCodeT, "", 1, 1000, "bog", null, codeStringsProblematic).getSubjectList();
+							}
+							if(fundamentalList != null){
+								if(fundamentalList.size() > 0){
+									for(Subject sT : fundamentalList){
+										if(subjectCodeT.equals(sT.getCode()) == true){
+											subject = subjectDao.getSubjectByCode(sT.getCode());
+
+											cV = complementaryValuesDao.getComplementaryValues(careerCodeT, subjectCodeT);
+											
+											if(cV == null){
+												//Create the cV
+												
+												//TODO get the subjectGroup from comparing the subjects which have a CV that is fundamental and from the same career
+												//else add it to the unknown isFundamental subjectGroup
+												
+												subjectGroup = subjectGroupDao.getUnkownSubjectGroup(careerCodeT, true);
+												
+												if(subjectGroup != null){										
+													cV = new ComplementaryValues(career, subject, SomosUNUtils.getTypology("f"), false, subjectGroup);
+													cV.setId(complementaryValuesDao.generateId());
+													complementaryValuesDao.saveComplementaryValues(cV);
+												}
+												
+											}
+											break;
+										}
+									}
+									
+									if(cV != null){							
+										cVList.add(cV);
+										oldCareer = careerCodeT;
+										continue;
+									}
+								}
+							}
+							
+							//looking inside the professional subjects
+							if(professionalList == null || careerCodeT.equals(oldCareer) == false){
+								professionalList = getSubjectFromSia("", "d", careerCodeT, "", 1, 1000, "bog", null, codeStringsProblematic).getSubjectList();
+							}
+							if(professionalList != null){
+								if(professionalList.size() > 0){
+									for(Subject sT : professionalList){
+										if(subjectCodeT.equals(sT.getCode()) == true){
+											subject = subjectDao.getSubjectByCode(sT.getCode());
+
+											cV = complementaryValuesDao.getComplementaryValues(careerCodeT, subjectCodeT);
+											
+											if(cV == null){
+												//Create the cV
+												
+												//TODO get the subjectGroup from comparing the subjects which have a CV that is fundamental and from the same career
+												//else add it to the unknown isFundamental subjectGroup
+												
+												subjectGroup = subjectGroupDao.getUnkownSubjectGroup(careerCodeT, false);
+												
+												if(subjectGroup != null){										
+													cV = new ComplementaryValues(career, subject, SomosUNUtils.getTypology("d"), false, subjectGroup);
+													cV.setId(complementaryValuesDao.generateId());
+													complementaryValuesDao.saveComplementaryValues(cV);
+												}
+												
+											}
+											break;
+										}
+									}
+									
+									if(cV != null){							
+										cVList.add(cV);
+										oldCareer = careerCodeT;
+										continue;
+									}
+								}
+							}
+							
+						}
+						
+					}
+					
+				}
+			}
+		}
+		
+		return cVList;
+	}
+	
 }
