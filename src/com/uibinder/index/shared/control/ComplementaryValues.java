@@ -256,7 +256,7 @@ public class ComplementaryValues implements Serializable {
 		return id;
 	}
 
-	private void setId(Long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

@@ -3,7 +3,6 @@ package com.uibinder.index.client.presenter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Icon;
@@ -24,10 +23,13 @@ import com.google.gwt.user.client.ui.Widget;
 import com.uibinder.index.client.connection.ConnectionsController;
 import com.uibinder.index.client.dnd.PickUpDragController;
 import com.uibinder.index.client.dnd.SemesterDropController;
+import com.uibinder.index.client.event.SavePlanAsDefaultEvent;
 import com.uibinder.index.client.service.SUNServiceAsync;
 import com.uibinder.index.client.view.PlanView;
 import com.uibinder.index.client.view.PlanViewImpl;
 import com.uibinder.index.client.view.SearchSubjectViewImpl;
+import com.uibinder.index.client.view.SelectedSubjectView;
+import com.uibinder.index.client.view.SelectedSubjectViewImpl;
 import com.uibinder.index.client.view.SiaSummaryView;
 import com.uibinder.index.client.view.SiaSummaryViewImpl;
 import com.uibinder.index.client.view.SubjectAccordionView;
@@ -43,6 +45,7 @@ import com.uibinder.index.shared.control.Career;
 import com.uibinder.index.shared.control.ComplementaryValues;
 import com.uibinder.index.shared.control.Plan;
 import com.uibinder.index.shared.control.Semester;
+import com.uibinder.index.shared.control.Student;
 import com.uibinder.index.shared.control.Subject;
 import com.uibinder.index.shared.control.SubjectValues;
 
@@ -54,7 +57,7 @@ import com.uibinder.index.shared.control.SubjectValues;
  * 
  * Be very precise with the subjects' code, because it will work (no errors will be made) when all the codes are different.   
  */
-public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryView.Presenter, WarningDeleteSubjectView.Presenter, SubjectAccordionView.Presenter {
+public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryView.Presenter, WarningDeleteSubjectView.Presenter, SubjectAccordionView.Presenter, SelectedSubjectView.Presenter {
 	
 	private final HandlerManager eventBus;
 	private PlanViewImpl view;
@@ -62,12 +65,13 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	private WarningDeleteSubjectViewImpl warningDeleteSubjectView = new WarningDeleteSubjectViewImpl();
 	private SearchSubjectViewImpl searchSubjectView = new SearchSubjectViewImpl();
 	private final SUNServiceAsync rpcService;
+	private Student student = null;
 	
 	private List<SubjectWidget> subjectWidgetList = new ArrayList<SubjectWidget>();
 	private List<SemesterWidget> semesterWidgetList = new ArrayList<SemesterWidget>();
 	
 	private List<SubjectValues> subjectValuesList = new ArrayList<SubjectValues>();
-	private HashMap<SubjectValues, Subject> valuesAndSubjectMap = new HashMap<SubjectValues, Subject>(); 
+	//private HashMap<SubjectValues, Subject> valuesAndSubjectMap = new HashMap<SubjectValues, Subject>(); 
 	private BiMap<SubjectValues, SubjectWidget> subjectValuesAndWidgetBiMap = HashBiMap.create();
 	
 	private List<Semester> semesterList = new ArrayList<Semester>();
@@ -120,17 +124,32 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	private SubjectValues subjectValuesSelected = null;
 	private List<Career> careers = new ArrayList<Career>();
 	
+	private List<SubjectAccordionViewImpl> accordions = new ArrayList<SubjectAccordionViewImpl>();
+	private List<SelectedSubjectViewImpl> selectedSubjects = new ArrayList<SelectedSubjectViewImpl>();
+	
+	/********************** asyncCallbacks varaibles *******************************/
+	
 	AsyncCallback<List<Career>> asyncGetCareers = new AsyncCallback<List<Career>>() {
 		
-		@Override
 		public void onFailure(Throwable caught) {
 		}
 		
-		@Override
 		public void onSuccess(List<Career> result) {
 			careers = result;
 			addCareersToListBox(careers);			
-		}};
+		}
+	};
+		
+	AsyncCallback<List<ComplementaryValues>> asyncGetComplementaryValuesByCareer = new AsyncCallback<List<ComplementaryValues>>(){
+		
+		public void onFailure(Throwable caught) {
+		}
+		
+		public void onSuccess(List<ComplementaryValues> result) {
+			setComplementaryValues(result);
+		}
+		
+	};
 	
 	/**
 	 * This is the constructor to create an empty plan, that means no subjects
@@ -140,16 +159,18 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	 * @param eventBus
 	 * @param view
 	 */
-	public PlanPresenter(SUNServiceAsync rpcService, HandlerManager eventBus, PlanViewImpl view, SiaSummaryViewImpl siaSummaryView){
+	public PlanPresenter(SUNServiceAsync rpcService, HandlerManager eventBus, PlanViewImpl view, SiaSummaryViewImpl siaSummaryView, Student student){
 		
 		this.rpcService = rpcService;
 		this.eventBus = eventBus;
 		this.view = view;
 		this.view.setPresenter(this);
+		this.setStudent(student);
 		warningDeleteSubjectView.setPresenter(this);
 		searchSubjectView.setPresenter(this);
 		searchSubjectView.fill();
-		this.siaSummaryView = siaSummaryView; 
+		this.siaSummaryView = siaSummaryView;
+		siaSummaryView.setPresenter(this);
 		connectionsController = new ConnectionsController(this);
 		
 	}
@@ -161,12 +182,13 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	 * @param view
 	 * @param plan
 	 */
-	public PlanPresenter(SUNServiceAsync rpcService, HandlerManager eventBus, PlanViewImpl view, SiaSummaryViewImpl siaSummaryView, Plan plan){
+	public PlanPresenter(SUNServiceAsync rpcService, HandlerManager eventBus, PlanViewImpl view, SiaSummaryViewImpl siaSummaryView, Plan plan, Student student){
 
 		this.rpcService = rpcService;
 		this.eventBus = eventBus;
 		this.view = view;
 		this.view.setPresenter(this);
+		this.setStudent(student);
 		warningDeleteSubjectView.setPresenter(this);
 		searchSubjectView.setPresenter(this);
 		searchSubjectView.fill();
@@ -185,12 +207,13 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	 * @param view
 	 * @param career
 	 */
-	public PlanPresenter(SUNServiceAsync rpcService, HandlerManager eventBus, PlanViewImpl view, SiaSummaryViewImpl siaSummaryView, String career){
+	public PlanPresenter(SUNServiceAsync rpcService, HandlerManager eventBus, PlanViewImpl view, SiaSummaryViewImpl siaSummaryView, String career, Student student){
 		
 		this.rpcService = rpcService;
 		this.eventBus = eventBus;
 		this.view = view;
 		this.view.setPresenter(this);
+		this.setStudent(student);
 		warningDeleteSubjectView.setPresenter(this);
 		searchSubjectView.setPresenter(this);
 		searchSubjectView.fill();
@@ -253,6 +276,14 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		
 	}
 	
+	public Student getStudent() {
+		return student;
+	}
+
+	public void setStudent(Student student) {
+		this.student = student;
+	}
+
 	public Plan getPlan() {
 		return plan;
 	}
@@ -267,11 +298,13 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		this.plan = plan2;
 		//this.plan = new Plan();
 		
+		rpcService.getComplementaryValues(plan.getCareerCode(), asyncGetComplementaryValuesByCareer);
+		
 		setCareer(plan.getCareer());
 		
 		if(plan.getSemesters() != null) {
 			List<Semester> semesterListPlan = plan2.getSemesters();
-			Map<SubjectValues, Subject> subjectMapPlan = plan2.getValuesAndSubjectMap();
+			//Map<SubjectValues, Subject> subjectMapPlan = plan2.getValuesAndSubjectMap();
 			List<SubjectValues> subjectValuesListPlan = null;
 			
 			//List<Semester> semesterList2 = new ArrayList<Semester>();
@@ -281,7 +314,13 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 			for(Semester semester2 : semesterListPlan){
 				createSemester(semester2);
 				for(SubjectValues subjectValues2 : semester2.getSubjects()){
-					createSubject(subjectMapPlan.get(subjectValues2) ,subjectValues2, semester2);
+					if(subjectValues2 != null){
+						if(subjectValues2.getComplementaryValues() != null){
+							if(subjectValues2.getComplementaryValues().getSubject() != null ){
+								createSubject(subjectValues2.getComplementaryValues().getSubject() ,subjectValues2, semester2);								
+							}
+						}
+					}
 				}
 			}
 			
@@ -324,16 +363,17 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		
 		//To control where and what subject is dropped
 		increasingSubjectValuesCounter++;
-		subjectValues.setSubjectValuesPublicId(subject.getCode() + increasingSubjectValuesCounter);
+		subjectValues.setSubjectValuesPublicId((subject.getCode() == null ? "" : subject.getCode()) + increasingSubjectValuesCounter);
 		
 		if(subjectValuesList.contains(subjectValues)==false) {
 			subjectValuesList.add(subjectValues);
 			if(subjectTimesUpdated.containsKey(subject) == false) subjectTimesUpdated.put(subject, 0);
 		}
-		if(valuesAndSubjectMap.containsKey(subjectValues)==false) valuesAndSubjectMap.put(subjectValues, subject); //although the condition here can be removed because it can will just override it
+		//if(valuesAndSubjectMap.containsKey(subjectValues)==false) valuesAndSubjectMap.put(subjectValues, subject); //although the condition here can be removed because it can will just override it
 		if(semester.getSubjects().contains(subjectValues) == false) semester.addSubject(subjectValues);
 		
-		SubjectWidget subjectWidget = new SubjectWidget(subject.getName(), subject.getCode(), subject.getCredits(), subjectValues.getGrade(), subjectValues.getComplementaryValues().isMandatory(), subjectValues.getComplementaryValues().getTypology(), subjectValues.getSubjectValuesPublicId());
+		
+		SubjectWidget subjectWidget = new SubjectWidget(subject.getName(), subject.getCode(), subject.getCredits(), subjectValues.getGrade(), subjectValues.getComplementaryValues().isMandatory(), subjectValues.getComplementaryValues().getTypology(), subjectValues.getSubjectValuesPublicId(), (subjectValues.getComplementaryValues().getSubjectGroup() != null ? subjectValues.getComplementaryValues().getSubjectGroup().getName() : ""));
 		subjectWidgetList.add(subjectWidget);
 		makeSubjectWidgetDraggable(subjectWidget);
 		semesterAndWidgetBiMap.get(semester).addSubject(subjectWidget);
@@ -362,7 +402,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		relatedSubjects.addAll(sV.getComplementaryValues().getListPrerequisitesOf());
 		relatedSubjects.addAll(sV.getComplementaryValues().getListCorequisitesOf());
 		for(Subject s : relatedSubjects){
-			if(s.equals(valuesAndSubjectMap.get(sV2))){
+			if(s.equals(sV2.getComplementaryValues().getSubject())){
+			//OLD if(s.equals(valuesAndSubjectMap.get(sV2))){
 				toReturn = true;
 				break;
 			}
@@ -411,7 +452,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		for(SubjectValues sVTemporary : subjectValuesList){
 			isRelated = false;
 			for(Subject sTemporary : subjectRelatedList){
-				if(sTemporary.equals(valuesAndSubjectMap.get(sVTemporary))==true){
+				if(sTemporary.equals(sVTemporary.getComplementaryValues().getSubject())==true){
+				//OLD if(sTemporary.equals(valuesAndSubjectMap.get(sVTemporary))==true){
 					isRelated = true;
 					subjectRelatedList.remove(sTemporary);
 				}				
@@ -425,15 +467,17 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	}
 
 	private void getComplementaryValues(SubjectValues sV) {
-		int timesUpdated = subjectTimesUpdated.get(valuesAndSubjectMap.get(sV));
+		//int timesUpdated = subjectTimesUpdated.get(valuesAndSubjectMap.get(sV));
+		int timesUpdated = subjectTimesUpdated.get(sV.getComplementaryValues().getSubject());
 		if(timesUpdated < LIMIT_TO_REQUISITES_UPDATES){
-			subjectTimesUpdated.put(valuesAndSubjectMap.get(sV), timesUpdated+1); 
-			rpcService.getComplementaryValues(plan.getCareerCode(), valuesAndSubjectMap.get(sV).getCode(), new AsyncCallback<ComplementaryValues>(){
+			//OLD subjectTimesUpdated.put(valuesAndSubjectMap.get(sV), timesUpdated+1);
+			subjectTimesUpdated.put(sV.getComplementaryValues().getSubject(), timesUpdated+1);
+			rpcService.getComplementaryValues(plan.getCareerCode(), sV.getComplementaryValues().getSubject().getCode(), new AsyncCallback<ComplementaryValues>(){
+			//OLD rpcService.getComplementaryValues(plan.getCareerCode(), valuesAndSubjectMap.get(sV).getCode(), new AsyncCallback<ComplementaryValues>(){
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					// TODO delete this msg
-					Window.alert("sorry, we got an error while updating the requisites of a subject");
+					//Window.alert("sorry, we got an error while updating the requisites of a subject");
 				}
 	
 				@Override
@@ -473,7 +517,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	private List<SubjectValues> getSubjectValuesBySubject(Subject s){
 		List<SubjectValues> list = new ArrayList<SubjectValues>();
 		for(SubjectValues sV : subjectValuesList){
-			if(valuesAndSubjectMap.get(sV).equals(s) == true){
+			//if(valuesAndSubjectMap.get(sV).equals(s) == true){
+			if(sV.getComplementaryValues().getSubject().equals(s) == true){
 				list.add(sV);
 			}
 		}
@@ -501,46 +546,53 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 
 	private void updateCredits(SubjectValues subjectValues2, Semester semester2, boolean toAdd) {
 		
-		if(valuesAndSubjectMap.containsKey(subjectValues2) == true){ 
-			int creditsValue = valuesAndSubjectMap.get(subjectValues2).getCredits();
-			
-			if(toAdd == true){
-				credits.put(semester2, credits.get(semester2) + creditsValue);
-				semesterAndWidgetBiMap.get(semester2).setCredits(credits.get(semester2));
-				totalCredits[0] += creditsValue;
-				if(subjectValues2.isTaken()) totalCredits[2]+= creditsValue;
-				if(subjectValues2.getGrade()>=3) totalCredits[1] += creditsValue;
-			} else {
-				credits.put(semester2, credits.get(semester2) - creditsValue);
-				semesterAndWidgetBiMap.get(semester2).setCredits(credits.get(semester2));
-				totalCredits[0] -= creditsValue;
-				if(subjectValues2.isTaken()) totalCredits[2] -= creditsValue;
-				if(subjectValues2.getGrade()>=3) totalCredits[1] -= creditsValue;
+		//OLD if(valuesAndSubjectMap.containsKey(subjectValues2) == true){
+		if(subjectValues2.getComplementaryValues() != null){
+			if(subjectValues2.getComplementaryValues().getSubject() != null){
+		//UNTIL HERE IS THE NEW CODE
+				
+				//OLD int creditsValue = valuesAndSubjectMap.get(subjectValues2).getCredits();
+				int creditsValue = subjectValues2.getComplementaryValues().getSubject().getCredits();
+				
+				if(toAdd == true){
+					credits.put(semester2, credits.get(semester2) + creditsValue);
+					semesterAndWidgetBiMap.get(semester2).setCredits(credits.get(semester2));
+					totalCredits[0] += creditsValue;
+					if(subjectValues2.isTaken()) totalCredits[2]+= creditsValue;
+					if(subjectValues2.getGrade()>=3) totalCredits[1] += creditsValue;
+				} else {
+					credits.put(semester2, credits.get(semester2) - creditsValue);
+					semesterAndWidgetBiMap.get(semester2).setCredits(credits.get(semester2));
+					totalCredits[0] -= creditsValue;
+					if(subjectValues2.isTaken()) totalCredits[2] -= creditsValue;
+					if(subjectValues2.getGrade()>=3) totalCredits[1] -= creditsValue;
+				}
+				switch(subjectValues2.getComplementaryValues().getTypology()){
+				case "N":
+				case "n":
+					updateCreditsLeveling(subjectValues2, semester2, toAdd);
+					break;
+				case "L":
+				case "l":
+					updateCreditsFreeElection(subjectValues2, semester2, toAdd);
+					break;
+				case "D":
+				case "d":
+					updateCreditsDisciplinary(subjectValues2, semester2, toAdd);
+					break;
+				case "F":
+				case "f":
+					updateCreditsFoundation(subjectValues2, semester2, toAdd);
+				}
+				updateSiaSummary();
+				
 			}
-			switch(subjectValues2.getComplementaryValues().getTypology()){
-			case "N":
-			case "n":
-				updateCreditsLeveling(subjectValues2, semester2, toAdd);
-				break;
-			case "L":
-			case "l":
-				updateCreditsFreeElection(subjectValues2, semester2, toAdd);
-				break;
-			case "D":
-			case "d":
-				updateCreditsDisciplinary(subjectValues2, semester2, toAdd);
-				break;
-			case "F":
-			case "f":
-				updateCreditsFoundation(subjectValues2, semester2, toAdd);
-			}
-			updateSiaSummary();
-		
 		}
 	}
 
 	private void updateCreditsFoundation(SubjectValues subjectValues2, Semester semester2, boolean toAdd) {
-		int creditsValue = valuesAndSubjectMap.get(subjectValues2).getCredits();
+		//OLD int creditsValue = valuesAndSubjectMap.get(subjectValues2).getCredits();
+		int creditsValue = subjectValues2.getComplementaryValues().getSubject().getCredits();
 		if(toAdd== true){
 			foundationCredits[0]+= creditsValue;
 			if(subjectValues2.getGrade()>=3) foundationCredits[1] += creditsValue;
@@ -551,7 +603,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	}
 
 	private void updateCreditsDisciplinary(SubjectValues subjectValues2,	Semester semester2, boolean toAdd) {
-		int creditsValue = valuesAndSubjectMap.get(subjectValues2).getCredits();
+		//OLD int creditsValue = valuesAndSubjectMap.get(subjectValues2).getCredits();
+		int creditsValue = subjectValues2.getComplementaryValues().getSubject().getCredits();
 		if(toAdd== true){
 			disciplinaryCredits[0]+= creditsValue;
 			if(subjectValues2.getGrade()>=3) disciplinaryCredits[1] += creditsValue;
@@ -562,7 +615,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	}
 
 	private void updateCreditsFreeElection(SubjectValues subjectValues2, Semester semester2, boolean toAdd) {
-		int creditsValue = valuesAndSubjectMap.get(subjectValues2).getCredits();
+		//OLD int creditsValue = valuesAndSubjectMap.get(subjectValues2).getCredits();
+		int creditsValue = subjectValues2.getComplementaryValues().getSubject().getCredits();
 		if(toAdd== true){
 			freeElectionCredits[0]+= creditsValue;
 			if(subjectValues2.getGrade()>=3) freeElectionCredits[1] += creditsValue;
@@ -573,7 +627,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	}
 
 	private void updateCreditsLeveling(SubjectValues subjectValues2, Semester semester2, boolean toAdd) {
-		int creditsValue = valuesAndSubjectMap.get(subjectValues2).getCredits();
+		//OLD int creditsValue = valuesAndSubjectMap.get(subjectValues2).getCredits();
+		int creditsValue = subjectValues2.getComplementaryValues().getSubject().getCredits();
 		if(toAdd== true){
 			levelingCredits[0]+= creditsValue;
 			if(subjectValues2.getGrade()>=3) levelingCredits[1] += creditsValue;
@@ -628,7 +683,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 
 	private void deleteSubject(SubjectValues subjectValues) {
 		
-		Subject subject = valuesAndSubjectMap.get(subjectValues);
+		//OLD Subject subject = valuesAndSubjectMap.get(subjectValues);
+		Subject subject = subjectValues.getComplementaryValues().getSubject();
 		SubjectWidget subjectW = subjectValuesAndWidgetBiMap.get(subjectValues);
 		Semester semester = subjectValuesAndSemesterMap.get(subjectValues);
 		
@@ -640,7 +696,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		//makeSubjectWidgetDraggable(subjectWidget); sobra
 		subjectWidgetList.remove(subjectValuesAndWidgetBiMap.get(subjectValues));
 		
-		valuesAndSubjectMap.remove(subjectValues);
+		//OLD valuesAndSubjectMap.remove(subjectValues);
+		//NEW is empty
 		/*if(valuesAndSubjectMap.containsValue(subject) == false){ //means that there is no other subjectValue for a x subject, so subject must be deleted too
 			subjectValuesList.remove(subject);			
 		}*/
@@ -769,12 +826,12 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		});
 	}
 	
-	private void addClickHandlerAddSubject(SemesterWidget semesterW){
+	private void addClickHandlerAddSubject(final SemesterWidget semesterW){
 		semesterW.getAddButton().addClickHandler(new ClickHandler(){
 
 			@Override
 			public void onClick(ClickEvent event) {
-				onClickAddSubject();
+				onClickAddSubject(semesterW.getAddButton().getElement().getAttribute("semester"));
 			}});
 	}
 	
@@ -797,7 +854,8 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	}
 
 	private void confirmDeleteSubject(SubjectValues subjectValuesToDelete) {
-		Subject subjectToDelete = valuesAndSubjectMap.get(subjectValuesToDelete);
+		//OLD Subject subjectToDelete = valuesAndSubjectMap.get(subjectValuesToDelete);
+		Subject subjectToDelete = subjectValuesToDelete.getComplementaryValues().getSubject();
 		warningDeleteSubjectView.setSubject(subjectValuesToDelete, subjectToDelete);
 		warningDeleteSubjectView.showIt();
 	}
@@ -816,28 +874,39 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	}
 
 	public void addIcon(Icon i) {
-		// TODO Auto-generated method stub
 		subContainer.add(i);
 	}	
 	
-	protected void loadSubjectsToSearchView(SiaResultSubjects result) {
-		addSubjectsToSearchView(result.getSubjectList());
+	protected void loadSubjectsToSearchView(SiaResultSubjects result, String careerCode) {
+		
+		addSubjectsToSearchView(result.getSubjectList(), careerCode);
 		createPagination(result);
 		showToolTip();
+				
 	}
 
-	private void addSubjectsToSearchView(List<Subject> subjectList) {
+	private void addSubjectsToSearchView(List<Subject> subjectList, String careerCode) {
 		
 		searchSubjectView.clearAccordionContainer();
+		accordions.clear();
 		
 		for(Subject s : subjectList){
-			SubjectAccordionViewImpl v = new SubjectAccordionViewImpl(searchSubjectView.getSubjectsAmmount());
-			v.setPresenter(this);
-			v.setCareerList(careers);
-			v.setHeader(s.getCode(), s.getName(), "L", Integer.toString(s.getCredits()));
-			v.setSubjectGroupName("Asignaturas de relleno");
-			searchSubjectView.addSubject(v);
+			SubjectAccordionViewImpl accordion = new SubjectAccordionViewImpl(searchSubjectView.getSubjectsAmmount());
+			accordion.setPresenter(this);
+			accordion.setCareerList(careers);
+			accordion.setHeader(s.getCode(), s.getName(), "L", Integer.toString(s.getCredits()), careerCode);
+			accordion.setSubjectGroupName("Asignaturas de relleno");
+			accordions.add(accordion);
+			
+			SelectedSubjectViewImpl selected = getSelectedSubjectView(s.getCode());
+			if(selected != null){
+				accordion.changeState();
+			}
+			
+			searchSubjectView.addSubject(accordion);
 		}
+		
+		avoidAccordionPropagation();
 		
 	}
 
@@ -872,10 +941,84 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		searchSubjectView.addPage(last);
 	}
 
+	/**
+	 * This method wil get the complementaryValues for the subjects and subjectsValues and add it to them.
+	 * 
+	 * @param listCV
+	 */
+	private void setComplementaryValues(List<ComplementaryValues> listCV) {
+		//TODO get the complementaryValue to that subject
+		ComplementaryValues cV = null;
+	}
+	
+	public void deleteAdminButtons() {
+		siaSummaryView.deleteAdminButtons();
+	}
+	
+	private SubjectAccordionViewImpl getAccordion(String code){
+		
+		SubjectAccordionViewImpl accordion = null;
+		
+		if(accordions != null){
+			if(accordions.size() != 0){
+				for(SubjectAccordionViewImpl aT : accordions){
+					if(aT.getCode().equals(code) == true){
+						accordion = aT;
+						break;
+					}
+				}
+			}
+		}
+		
+		return accordion;
+	}
+
+	private SelectedSubjectViewImpl getSelectedSubjectView(String code) {
+		
+		SelectedSubjectViewImpl selected = null;
+		
+		if(accordions != null){
+			if(accordions.size() != 0){
+				for(SelectedSubjectViewImpl sT : selectedSubjects){
+					if(sT.getCode().equals(code) == true){
+						selected = sT;
+						break;
+					}
+				}
+			}
+		}
+		
+		return selected;
+	}
+	
 	/************ behaviors when clicked *******************/
 	
-	public void onAddSpecificSubjectClick(ClickEvent event) {
-		//TODO
+	public void onSpecificSubjectSelected(String subjectName, String subjectCode, String careerCode) {
+		
+		SelectedSubjectViewImpl sSV = new SelectedSubjectViewImpl();
+		sSV.setPresenter(this);
+		sSV.setTexts(subjectName, subjectCode, careerCode);
+		selectedSubjects.add(sSV);
+		
+		SubjectAccordionViewImpl accordion = getAccordion(subjectCode);
+		accordion.changeState();
+		
+		searchSubjectView.addSelectedSubject(sSV.asWidget());
+		
+	}
+	
+	public void onSpecificSubjectUnselected(String subjectName, String subjectCode, String careerCode) {
+		
+		//remove the subjectSelected from the box in the view
+		SelectedSubjectViewImpl selected = getSelectedSubjectView(subjectCode);
+		selected.remove();
+		selectedSubjects.remove(selected);
+		
+		//changeState of the accordion
+		SubjectAccordionViewImpl accordion = getAccordion(subjectCode);
+		accordion.changeState();
+		//accordions.remove(accordion);
+		
 	}
 
 	private void onClickAddSemester() {
@@ -884,12 +1027,14 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		}
 	}
 
-	public void onSearchButtonClicked(String s, String careerCode, String type, int page) {
+	public void onSearchButtonClicked(String s, final String careerCode, String type, int page) {
+		
+		accordions.clear();
 		
 		if(type == "all") {
 			type = "";
 		}
-		rpcService.getSubjectsFromSia(s, type, careerCode, "bog", page, new AsyncCallback<SiaResultSubjects>(){
+		rpcService.getSubjectsFromSia(s, type, careerCode, "bog", page, getStudent(), new AsyncCallback<SiaResultSubjects>(){
 			
 			@Override
 			public void onFailure(Throwable caught) {
@@ -898,10 +1043,11 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 			
 			@Override
 			public void onSuccess(SiaResultSubjects result) {
-				loadSubjectsToSearchView(result);
+				loadSubjectsToSearchView(result, careerCode);
 			}
 			
 		});
+		
 	}
 
 	public void onSubjectDelete(String publicid) {
@@ -924,7 +1070,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 			//get complementary values from sia
 			getComplementaryValues(sV);
 			
-			//TODO: Show/Create lines
+			//Show/Create lines
 			showConnections(sV);
 			
 			//Reduce/Increase opacity
@@ -934,10 +1080,30 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		}
 	}
 	
-	private void onClickAddSubject(){
+	private void onClickAddSubject(String semester){
+		searchSubjectView.setSemester(semester);
 		searchSubjectView.showIt();
 		showToolTip();
 		arrangeTopOfSearchSubjectView();
+	}
+	
+	@Override
+	public void onSavePlanAsDefaultClicked() {
+		eventBus.fireEvent(new SavePlanAsDefaultEvent(this.getPlan()));
+	}
+	
+	public void onFinalizarButtonClick(String semester) {
+		
+		searchSubjectView.clear();
+		accordions.clear();
+		
+		//TODO
+		/**
+		 * read the slectedSubject List, for each subject, create a subjectValue and add its complementaryValue
+		 */
+		
+		selectedSubjects.clear();
+		
 	}
 	
 	/************ JQUERY FUNCTIONS ***************/
@@ -961,6 +1127,11 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	 */
 	public static native void addClickSearchField() /*-{
 		$wnd.addClickSearchField();
+	}-*/;
+
+	
+	public static native void avoidAccordionPropagation() /*-{
+		$wnd.stopPropagationOfClickOnSelectSubject()
 	}-*/;
 	
 	/********************************************/

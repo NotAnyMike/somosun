@@ -1,5 +1,7 @@
 package com.uibinder.index.server.dao;
 
+import com.googlecode.objectify.Key;
+import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 import com.uibinder.index.shared.control.Group;
 import com.uibinder.index.shared.control.SubjectValues;
@@ -24,5 +26,11 @@ public class SubjectValuesDao {
 	 */
 	public SubjectValues getSubjectValuesByGroup(Group g){
 		return (SubjectValues) ofy().load().type(SubjectValues.class).filter("group", g).first().now();
+	}
+
+	public Long generateId() {
+		ObjectifyFactory f = new ObjectifyFactory();
+		Key<SubjectValues> key = f.allocateId(SubjectValues.class);
+		return key.getId();
 	}
 }

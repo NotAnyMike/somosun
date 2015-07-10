@@ -59,4 +59,9 @@ public class SemesterValue implements Serializable {
 		if(this.getNumberSemester() == s.getNumberSemester() && this.getYear() == s.getYear()) return true;
 		else return false;
 	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
 }

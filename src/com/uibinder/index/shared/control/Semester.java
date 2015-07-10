@@ -18,7 +18,7 @@ public class Semester implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	@Id private Long id=null;
+	@Id private Long id = null;
 	private List<SubjectValues> subjectValuesList;
 	private String date;
 	
@@ -61,6 +61,10 @@ public class Semester implements Serializable {
 		if(subjectValues != null){
 			subjectValuesList.add(subjectValues);
 		}
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
     
 }

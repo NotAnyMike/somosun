@@ -20,7 +20,7 @@ public class Group implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id private Long id=null;
     @Index private Subject subject = null;
-    @Index private Teacher teacher=null;
+    @Index private Teacher teacher = null;
     @Index private SemesterValue semesterValue=null;
     @Index private int groupNumber;
     @Index private int freePlaces;
@@ -146,6 +146,10 @@ public class Group implements Serializable {
 
 	public void setCareers(List<Career> careers) {
 		this.careers = careers;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
     
     

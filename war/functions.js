@@ -30,17 +30,6 @@ function showTooltip(){
 	$('[data-toggle="tooltip"]').tooltip();	
 };
 
-$(document).click(function(e) { 
-    // Check for left button
-    if (e.button == 0) {
-    	if($(e.target).attr("id") == "btnAddSpecificSubject" || $(e.target).parent().attr("id") == "btnAddSpecificSubject"){
-			alert("took");
-			e.stopPropagation(); 		
-    	}
-
-    }
-});
-
 function addClickSearchField(){
 	$("#searchField").keyup(function(event){
 	    if(event.keyCode == 13){
@@ -49,4 +38,11 @@ function addClickSearchField(){
 			document.getElementById("searchButton").dispatchEvent(click_ev);
 	    }
 	});
+}
+
+function stopPropagationOfClickOnSelectSubject(){
+	var els = document.getElementById("accordionContainer").getElementsByTagName("button");
+		Array.prototype.forEach.call(els, function(el) {
+    		el.addEventListener('click', function(event){event.stopPropagation();});
+		});
 }

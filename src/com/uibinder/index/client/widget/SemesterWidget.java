@@ -1,21 +1,15 @@
 package com.uibinder.index.client.widget;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.uibinder.index.client.presenter.PlanPresenter;
-import com.uibinder.index.client.widget.SubjectWidget;
 
 public class SemesterWidget extends VerticalPanel {
 	
@@ -51,6 +45,7 @@ public class SemesterWidget extends VerticalPanel {
 		addButton.setType(ButtonType.SUCCESS);
 		addButton.setIconSize(IconSize.LARGE);
 		addButton.setTitle("Agregar Clase");
+		addButton.asWidget().getElement().setAttribute("semester", Integer.toString(semester));
 		
 		//This part is the little box of "credits: x"
 		bottomPart.addStyleName("bottomPartSemesterPanel");
@@ -86,6 +81,7 @@ public class SemesterWidget extends VerticalPanel {
 	public void setSemester(int semester) {
 		semesterLabel.setText(SEMESTER_ROMAN[semester]);
 		deleteSemesterButton.asWidget().getElement().setAttribute("semester", Integer.toString(semester));
+		addButton.asWidget().getElement().setAttribute("semester", Integer.toString(semester));
 	}
 	
 	public void setCredits(int credits) {

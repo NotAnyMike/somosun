@@ -67,5 +67,15 @@ public class SiaResultSubjects extends SiaResult implements Serializable{
 	public void setTypology(Map<Subject, String> typology) {
 		this.typology = typology;
 	}
+
+	/**
+	 * This method will add an empty string to the Map subject type(String) 
+	 * <br></br>
+	 * @param subject
+	 */
+	public void addSubject(Subject subject) {
+		this.subjectList.add(subject);
+		this.typology.put(subject, "");
+	}
 	
 }

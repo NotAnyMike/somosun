@@ -14,7 +14,9 @@ import com.uibinder.index.client.service.SUNService;
 import com.uibinder.index.client.widget.SubjectWidget;
 import com.uibinder.index.server.SiaProxy;
 import com.uibinder.index.server.dao.CareerDao;
+import com.uibinder.index.server.dao.ComplementaryValuesDao;
 import com.uibinder.index.server.dao.PlanDao;
+import com.uibinder.index.server.dao.StudentDao;
 import com.uibinder.index.server.dao.SubjectDao;
 import com.uibinder.index.shared.RandomPhrase;
 import com.uibinder.index.shared.SiaResultGroups;
@@ -22,6 +24,7 @@ import com.uibinder.index.shared.SiaResultSubjects;
 import com.uibinder.index.shared.control.Career;
 import com.uibinder.index.shared.control.ComplementaryValues;
 import com.uibinder.index.shared.control.Plan;
+import com.uibinder.index.shared.control.Student;
 import com.uibinder.index.shared.control.Subject;
 
 /**
@@ -131,11 +134,12 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 	 * @param page
 	 * @param ammount
 	 * @param sede
+	 * @param student 
 	 * @return
 	 */
 	@Override
-	public SiaResultSubjects getSubjectFromSia(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede) {
-		return SiaProxy.getSubjects(nameOrCode, typology, career, scheduleCP, page, ammount, sede);
+	public SiaResultSubjects getSubjectFromSia(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede, Student student) {
+		return SiaProxy.getSubjects(nameOrCode, typology, career, scheduleCP, page, ammount, sede, student);
 	}
 
 	@Override
@@ -150,7 +154,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 	}
 
 	@Override
-	public Plan getPlanDefault(String careerCode) {
+	public Plan getPlanDefaultFromString(String careerCode) {
 		PlanDao planDao = new PlanDao();
 		return (Plan) planDao.createPlanFromDefaultString(careerCode);
 	}
@@ -177,8 +181,48 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 	 * @param sede: "ama", "bog", "car", "man", "med", "ori", "pal" or  "tum" if nothing it will be taken as bog
 	 */
 	@Override
-	public SiaResultSubjects getSubjectsFromSia(String nameOrCode, String typology, String career, String sede, int page) {
-		return getSubjectFromSia(nameOrCode, typology, career, "", page, 10, sede);
+	public SiaResultSubjects getSubjectsFromSia(String nameOrCode, String typology, String career, String sede, int page, Student student) {
+		return getSubjectFromSia(nameOrCode, typology, career, "", page, 10, sede, student);
+	}
+	
+	@Override
+	public List<ComplementaryValues> getComplementaryValues(String careerCode) {
+		ComplementaryValuesDao cVDao = new ComplementaryValuesDao();
+		List<ComplementaryValues> cVList = cVDao.getComplementaryValues(careerCode);
+		List<ComplementaryValues> cVListToReturn = new ArrayList<ComplementaryValues>();
+		for(ComplementaryValues cV : cVList){
+			cVListToReturn.add(cV);
+		}
+		return cVListToReturn;
 	}
 
+	@Override
+	public void savePlanAsDefault(Student student, Plan plan) {
+		PlanDao pDao = new PlanDao();
+		StudentDao sDao = new StudentDao();
+		//Student s = sDao.getStudentByIdSun(student.getIdSun());
+		Student s = sDao.getStudentByIdG(student.getIdG());
+		Career c = null;
+		CareerDao cDao = new CareerDao();
+		if(s != null){
+			if(s.isAdmin() == true){
+				plan.setUser(null);
+				plan.setDefault(true);
+				c = cDao.getCareerByCode(plan.getCareerCode());
+				c.setHasDefault(true);
+				cDao.updateCareer(c);
+				pDao.savePlan(plan);
+			}
+		}
+	}
+
+	public Plan getPlanDefault(String careerCode){
+		Plan p = null;
+		if(careerCode.equals("") == false){
+			PlanDao pDao = new PlanDao();
+			p = pDao.getPlanDefault(careerCode);
+		}
+		return p;
+//		return getPlanDefaultFromString(careerCode);
+	}
 }

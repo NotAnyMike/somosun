@@ -16,8 +16,10 @@ public interface CreateView {
 	
 	void setPresenter(Presenter presenter);
 	Widget asWidget();
-	public abstract void addCareerToListBox(String career, String value);
-	public abstract void clearListBox();
+	public void addCareerToListBox(String career, String value);
+	public void clearListBox();
 	public Button getContinueDefaultButton();
 	public String getCurrentDefaultCareerValue();
+	public void setNewAnalyzedPlanButtonEnable(boolean b);
+	public void setModelAnalyzedPlanButtonEnable(boolean b);
 }

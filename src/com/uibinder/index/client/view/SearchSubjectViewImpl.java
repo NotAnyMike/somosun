@@ -17,9 +17,12 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.uibinder.index.client.presenter.PlanPresenter;
 import com.uibinder.index.shared.SomosUNUtils;
@@ -39,6 +42,8 @@ public class SearchSubjectViewImpl extends Composite implements SearchSubjectVie
 	@UiField Radio radioButton3;
 	@UiField Radio radioButton4;
 	@UiField Radio radioButton5;
+	
+	@UiField VerticalPanel subjectsSelectedVerticalPanel;
 	
 	@UiField FormGroup checkButtons;
 	@UiField Pagination pagination;
@@ -65,30 +70,16 @@ public class SearchSubjectViewImpl extends Composite implements SearchSubjectVie
 	
 	public void fill(){
 		
-		finalizarButton.addClickHandler(new ClickHandler(){
-
-			@Override
-			public void onClick(ClickEvent event) {
-				hideIt();
-			}});
-		
-		searchButton.addClickHandler(new ClickHandler(){
-
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onSearchButtonClicked(searchField.getText(), listBoxCareersToSearch.getSelectedValue(), getCheckBoxesValue(), 1);
-			}
-
-			
-			
-		});
-		
 		radioButton1.getElement().setAttribute("style", "margin-bottom:0px; margin-top:0px");
 		radioButton1.setActive(true);
 		radioButton2.getElement().setAttribute("style", "margin-bottom:0px");
 		radioButton3.getElement().setAttribute("style", "margin-bottom:0px");
 		radioButton4.getElement().setAttribute("style", "margin-bottom:0px");
 		radioButton5.getElement().setAttribute("style", "margin-bottom:0px");
+		subjectsSelectedVerticalPanel.setStyleName("table");
+		subjectsSelectedVerticalPanel.addStyleName("table-hover table-condensed");
+		subjectsSelectedVerticalPanel.getElement().setAttribute("style", "margin:0px");
+		
 	}
 	
 	private String getCheckBoxesValue() {
@@ -125,7 +116,7 @@ public class SearchSubjectViewImpl extends Composite implements SearchSubjectVie
 
 	@Override
 	public void setCareerList(List<Career> careers, Career careerSelected) {
-		addCareerToListBox("Todas", "all");
+		addCareerToListBox("Todas", "");
 		for(Career career : careers){
 			addCareerToListBox(SomosUNUtils.addCarrerCodeToString(career), career.getCode());
 			if(careerSelected != null) 
@@ -150,6 +141,39 @@ public class SearchSubjectViewImpl extends Composite implements SearchSubjectVie
 
 	public void clearAccordionContainer() {
 		accordionContainer.clear();
+	}
+
+	@Override
+	public void addSelectedSubject(Widget w) {
+		subjectsSelectedVerticalPanel.add(w);
+	}
+	
+	@Override
+	public void clear() {
+		
+		subjectsSelectedVerticalPanel.clear();
+		accordionContainer.clear();
+		searchField.clear();
+		pagination.clear();
+		
+	}
+	
+	@Override
+	public void setSemester(String semester) {
+		finalizarButton.getElement().setAttribute("semester", semester);
+	}
+	
+	/********************* EVENTS *********************/
+	
+	@UiHandler("finalizarButton")
+	public void onFinalizarButtonClick(ClickEvent event){
+		hideIt();
+		presenter.onFinalizarButtonClick(finalizarButton.getElement().getAttribute("semester"));
+	}
+	
+	@UiHandler("searchButton")
+	public void onSearchButtonClick(ClickEvent event){
+		presenter.onSearchButtonClicked(searchField.getText(), listBoxCareersToSearch.getSelectedValue(), getCheckBoxesValue(), 1);
 	}
 
 }

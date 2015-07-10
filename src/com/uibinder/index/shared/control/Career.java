@@ -106,7 +106,7 @@ public class Career implements Serializable {
 		this.disciplinaryCredits = disciplinaryCredits;
 	}
 
-	public boolean isHasAnalysis() {
+	public boolean hasAnalysis() {
 		return hasAnalysis;
 	}
 
@@ -114,7 +114,7 @@ public class Career implements Serializable {
 		this.hasAnalysis = hasAnalysis;
 	}
 
-	public boolean isHasDefault() {
+	public boolean hasDefault() {
 		return hasDefault;
 	}
 

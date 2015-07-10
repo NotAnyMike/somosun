@@ -10,6 +10,7 @@ import com.uibinder.index.shared.SiaResultSubjects;
 import com.uibinder.index.shared.control.Career;
 import com.uibinder.index.shared.control.ComplementaryValues;
 import com.uibinder.index.shared.control.Plan;
+import com.uibinder.index.shared.control.Student;
 import com.uibinder.index.shared.control.Subject;
 
 /**
@@ -36,15 +37,20 @@ public interface SUNService extends RemoteService{
 	
 	public SiaResultGroups getGroupsFromSia(String subjectSiaCode, String sede);
 	public SiaResultGroups getGroupsFromSia(Subject subject, String sede);
-	public SiaResultSubjects getSubjectFromSia(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede);
-	public SiaResultSubjects getSubjectsFromSia(String nameOrCode, String typology, String career, String sede, int page);
+	public SiaResultSubjects getSubjectFromSia(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede, Student student);
+	public SiaResultSubjects getSubjectsFromSia(String nameOrCode, String typology, String career, String sede, int page, Student student);
 	
 	public List<Career> getCareers(String sede);
 	
-	public Plan getPlanDefault(String careerCode);
+	public Plan getPlanDefaultFromString(String careerCode);
 	
 	public void toTest();
 	
 	public ComplementaryValues getComplementaryValues(String career, String code);
 	
+	public List<ComplementaryValues> getComplementaryValues(String careerCode);
+	
+	public void savePlanAsDefault(Student student, Plan plan);
+	
+	public Plan getPlanDefault(String careerCode);
 }

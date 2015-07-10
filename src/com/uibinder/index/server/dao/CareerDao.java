@@ -5,9 +5,7 @@ import java.util.List;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.VoidWork;
-import com.uibinder.index.server.SiaProxy;
 import com.uibinder.index.shared.control.Career;
-import com.uibinder.index.shared.control.Group;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 

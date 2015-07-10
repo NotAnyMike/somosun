@@ -26,7 +26,7 @@
 	      <hl class="secondContainerCreatePlan-hl"></hl>
 	      <div class="secondContainerCreatePlan-new"> 
 	        <p style="font-size:30px; margin-right: inherit; text-align: end;" class="lead main-text">Crear un plan nuevo</p><g:ListBox ui:field="listBoxCreate" addStyleNames="{third.lead} {second.textboxCreate}"></g:ListBox>
-	        <div><g:Button ui:field="newPlanButton" addStyleNames="{third.btn} {third.btn-default}">Nuevo plan vacio</g:Button>   <g:Button ui:field="modelPlanButton" addStyleNames="{third.btn} {third.btn-default}">Cargar plan modelo</g:Button></div>
+	        <div><g:Button ui:field="newAnalyzedPlanButton" addStyleNames="{third.btn} {third.btn-default}">Nuevo plan vacio</g:Button>   <g:Button ui:field="modelAnalyzedPlanButton" addStyleNames="{third.btn} {third.btn-default}">Cargar plan modelo</g:Button></div>
 	      </div>
 	    </div>
 	    <div class="middleContainerCreatePlan">

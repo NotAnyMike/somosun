@@ -1,9 +1,13 @@
 package com.uibinder.index.client.view;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -31,6 +35,8 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 	@UiField Label totalApprovedLabel;
 	@UiField Label totalNecessaryLabel;
 	@UiField Label totalPerCentLabel;
+	
+	@UiField Button savePlanAsDefaultButton;
 
 	@UiTemplate("SiaSummaryView.ui.xml")
 	interface SiaSummaryViewUiBinder extends UiBinder<Widget, SiaSummaryViewImpl> {}
@@ -160,5 +166,16 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 	
 	public void setPercentageLevelingCredits(int percentage) {
 		levelingCreditsPerCentLabel.setText(percentage +"%");
+	}
+
+	@Override
+	public void deleteAdminButtons() {
+		savePlanAsDefaultButton.removeFromParent();
+	}
+	
+	/***************** Handlers *********************/
+	@UiHandler("savePlanAsDefaultButton")
+	public void onSavePlanAsDefaultClicked(ClickEvent event){
+		presenter.onSavePlanAsDefaultClicked();
 	}
 }

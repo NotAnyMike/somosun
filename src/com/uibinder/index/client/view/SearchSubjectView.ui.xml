@@ -61,31 +61,7 @@
 										<small>Seleccionadas</small>
 									</div>
 									<div class="panel-body" style="padding:0px;">
-										<table border="0" cellspacing="0" cellpadding="0"
-											class="table table-hover table-condensed" style="margin:0px;">
-											<tbody>
-												<tr>
-													<td>
-														<button type="button" class="btn btn-danger btn-xs"
-															style="padding:1px;margin:1px; height:20px">
-															<span class="glyphicon glyphicon-remove"
-																aria-hidden="true"></span>
-														</button>
-														Calculo vectorial avanzado
-													</td>
-												</tr>
-												<tr>
-													<td>
-														<button type="button" class="btn btn-danger btn-xs"
-															style="padding:1px;margin:1px; height:20px">
-															<span class="glyphicon glyphicon-remove"
-																aria-hidden="true"></span>
-														</button>
-														Musica y arte
-													</td>
-												</tr>
-											</tbody>
-										</table>
+									    <g:VerticalPanel ui:field="subjectsSelectedVerticalPanel"></g:VerticalPanel>
 									</div>
 								</div>
 								<b:Button type="SUCCESS" ui:field="finalizarButton">Finalizar</b:Button>

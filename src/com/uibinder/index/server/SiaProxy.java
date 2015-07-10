@@ -30,6 +30,7 @@ import com.uibinder.index.server.dao.CareerDao;
 import com.uibinder.index.server.dao.ComplementaryValuesDao;
 import com.uibinder.index.server.dao.GroupDao;
 import com.uibinder.index.server.dao.SemesterValueDao;
+import com.uibinder.index.server.dao.StudentDao;
 import com.uibinder.index.server.dao.SubjectDao;
 import com.uibinder.index.server.dao.SubjectGroupDao;
 import com.uibinder.index.server.dao.TeacherDao;
@@ -41,6 +42,7 @@ import com.uibinder.index.shared.control.Block;
 import com.uibinder.index.shared.control.Career;
 import com.uibinder.index.shared.control.ComplementaryValues;
 import com.uibinder.index.shared.control.Group;
+import com.uibinder.index.shared.control.Student;
 import com.uibinder.index.shared.control.Subject;
 import com.uibinder.index.shared.control.SubjectGroup;
 import com.uibinder.index.shared.control.Teacher;
@@ -182,6 +184,7 @@ public class SiaProxy {
 	 * 	For graduate (for this the VALOR_NIVELACADEMICO_TIPOLOGIA var should be "POS", but works either way)
 	 * 		Obligatorio: "O"
 	 * 		Elegible: "T"
+	 * @param student 
 	 * 
 	 * @param nameOrCode: the words to search for, the code for the students not the internal code
 	 * @param typology: the typology of the subject, empty = all types.
@@ -202,7 +205,7 @@ public class SiaProxy {
 	public static SiaResultSubjects getSubjects(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede){
 		
 		sede = confirmSede(sede);
-		nameOrCode = nameOrCode.replaceAll("á", "a").replaceAll("é", "e").replaceAll("í", "i").replaceAll("ó", "o").replaceAll("ú", "u").replaceAll("  ", " ");
+		nameOrCode = SomosUNUtils.removeAccents(nameOrCode).replaceAll("  ", " ");
 		
 		String respString = null;
 		SiaResultSubjects siaResult = new SiaResultSubjects();
@@ -218,6 +221,96 @@ public class SiaProxy {
 
 		return siaResult;
 	}
+	
+	/**
+	 * 
+	 * This will only search for subjects, not its groups nor other things, it 
+	 * must have at least one non-empty field (page and amount are mandatory), if all parameters are null or
+	 * empty then it will return an empty list.</br></br>
+	 * 
+	 * This method search my code too, in that case, the @param nameOrCode must
+	 * be the code.</br></br>
+	 * 
+	 * If the only non-empty @param is the career code, then it will return the
+	 * full list of the subjects for that career.</br></br>
+	 * 
+	 * Typology works as follows:</br></br>
+	 * 	For under-graduate (for this the VALOR_NIVELACADEMICO_TIPOLOGIA var should be "PRE", but works either way)
+	 * 		Nivelación: "P"
+	 * 		Fundamentación: "B"
+	 * 		Disciplinar/Profesional: "C"
+	 * 		Libre elección: "L"</br></br>
+	 * 	For graduate (for this the VALOR_NIVELACADEMICO_TIPOLOGIA var should be "POS", but works either way)
+	 * 		Obligatorio: "O"
+	 * 		Elegible: "T"
+	 * @param student 
+	 * 
+	 * @param nameOrCode: the words to search for, the code for the students not the internal code
+	 * @param typology: the typology of the subject, empty = all types.
+	 * @param career: the code of the career, the normal code we know, empty = all careers.
+	 * @param scheduleCP: the schedule to look for, empty = all blocks. here are some examples
+	 * 		Empty: ""
+	 * 		All Monday: "L6-21:M:C:J:V:S:D"
+	 * 		Monday from 6 to 9 and 1 until the end: "L6-10,13-21:M:C:J:V:S:D"
+	 * 		The monday above + the same hours but Wednesday: "L6-10,13-21:M:C6-10,13-21:J:V:S:D"
+	 * @param page: the page of the search, must have a value, if zero then it will return an empty string.
+	 * @param ammount: the number of results per @param page, must have a value, CANNOT be zero or because it will return an error.
+	 * @param sede: sede: "ama", "bog", "car", "man", "med", "ori", "pal" or  "tum"; default "bog"
+	 * 
+	 * @return a list of subjects, if there were some error the first and only subject
+	 * returned will have the name of ERROR, if it is empty there were no errors so the
+	 * search returned a empty json string
+	 */
+	public static SiaResultSubjects getSubjects(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede, Student student){
+		
+		SiaResultSubjects siaResultSubjects = getSubjects(nameOrCode, typology, career, scheduleCP, page, ammount, sede);
+		
+		if(student != null){
+			StudentDao studentDao = new StudentDao();
+			SubjectDao subjectDao = new SubjectDao();
+			student = studentDao.getStudentByIdSun(student.getIdSun());
+			if(student != null){
+				if(student.isAdmin() == true){
+					//Add libre and optativa
+					Subject subject = subjectDao.getDummySubjectByCode("optativa");
+					if(subject == null){
+						subject = new Subject();
+						subject.setCode("optativa");
+						subject.setCredits(0);
+						subject.setLocation(sede);
+						subject.setName("optativa");
+						subject.setSiaCode("optativa");
+						subject.setSpecial(false);
+						subject.setDummy(true);
+						subject.setId(subjectDao.generateId());
+						subjectDao.saveSubject(subject);
+					}else{
+						siaResultSubjects.addSubject(subject);
+					}
+					
+					subject = subjectDao.getDummySubjectByCode("libre");
+					if(subject == null){
+						subject = new Subject();
+						subject.setCode("libre");
+						subject.setCredits(0);
+						subject.setLocation(sede);
+						subject.setName("libre");
+						subject.setSiaCode("libre");
+						subject.setSpecial(false);
+						subject.setDummy(true);
+						subject.setId(subjectDao.generateId());
+						subjectDao.saveSubject(subject);
+					}else{
+						siaResultSubjects.addSubject(subject);
+					}
+				}
+			}
+		}
+		
+		return siaResultSubjects;
+		
+	}
+	
 	
 	public static String getSubjects2Delete(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede){
 		

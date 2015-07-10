@@ -5,6 +5,8 @@ import com.google.gwt.user.client.ui.Widget;
 public interface SiaSummaryView {
 	
 	interface Presenter{
+		void deleteAdminButtons();
+		void onSavePlanAsDefaultClicked();
 	}
 	
 	void setPresenter(Presenter presenter);
@@ -20,5 +22,6 @@ public interface SiaSummaryView {
 	void setTotalApproved(int x);
 	void setTotalNecessary(int x);
 	void setTotalPerCent(int x);
+	void deleteAdminButtons();
 
 }

@@ -1,6 +1,7 @@
 package com.uibinder.index.server.dao;
 
 import com.googlecode.objectify.Key;
+import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 import com.uibinder.index.shared.control.Teacher;
 
@@ -52,11 +53,17 @@ public class TeacherDao extends Dao {
 		}
 	}
 
-	private void saveTeacher(Teacher t){
+	void saveTeacher(Teacher t){
 		if(t != null)
 		{
 			t.setName(standardizeString(t.getName()));
 			ofy().save().entity(t).now();
 		}
+	}
+
+	public Long generateId() {
+		ObjectifyFactory f = new ObjectifyFactory();
+		Key<Teacher> key = f.allocateId(Teacher.class);
+		return key.getId();
 	}
 }

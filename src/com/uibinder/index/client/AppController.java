@@ -7,23 +7,23 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerManager;
-import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.uibinder.index.client.event.AboutUsEvent;
-import com.uibinder.index.client.event.AboutUsEventHandler;
 import com.uibinder.index.client.event.ContinueDefaultCareerEvent;
 import com.uibinder.index.client.event.ContinueDefaultCareerEventHandler;
 import com.uibinder.index.client.event.GenerateAcademicHistoryFromStringEvent;
 import com.uibinder.index.client.event.GenerateAcademicHistoryFromStringEventHandler;
+import com.uibinder.index.client.event.SavePlanAsDefaultEvent;
+import com.uibinder.index.client.event.SavePlanAsDefaultHandler;
 import com.uibinder.index.client.presenter.AnnouncementPresenter;
 import com.uibinder.index.client.presenter.AboutUsPresenter;
 import com.uibinder.index.client.presenter.CreatePresenter;
 import com.uibinder.index.client.presenter.DndPresenter;
 import com.uibinder.index.client.presenter.IndexPresenter;
+import com.uibinder.index.client.presenter.LoadingPresenter;
 import com.uibinder.index.client.presenter.PlanPresenter;
 import com.uibinder.index.client.presenter.Presenter;
 import com.uibinder.index.client.presenter.TopBarPresenter;
@@ -34,6 +34,7 @@ import com.uibinder.index.client.view.AnnouncementViewImpl;
 import com.uibinder.index.client.view.AboutUsViewImpl;
 import com.uibinder.index.client.view.DndViewImpl;
 import com.uibinder.index.client.view.IndexViewImpl;
+import com.uibinder.index.client.view.LoadingViewImpl;
 import com.uibinder.index.client.view.PlanViewImpl;
 import com.uibinder.index.client.view.SiaSummaryViewImpl;
 import com.uibinder.index.client.view.TopBarViewImpl;
@@ -46,13 +47,14 @@ import com.uibinder.index.shared.control.Student;
 public class AppController implements Presenter, ValueChangeHandler<String> {
 
 	// Creating all the views that will exist once for all to save them to let users go back to their view
-	private IndexPresenter indexPresenter = null;
-	private TopBarPresenter topBarPresenter = null;
-	private DndPresenter dndPresenter = null;
-	private CreatePresenter createPresenter = null;
-	private PlanPresenter planPresenter = null;
-	private AboutUsPresenter aboutUsPresenter = null;
-	private AnnouncementPresenter announcementPresenter = null;
+	private IndexPresenter indexPresenter;
+	private TopBarPresenter topBarPresenter;
+	private DndPresenter dndPresenter;
+	private CreatePresenter createPresenter;
+	private PlanPresenter planPresenter;
+	private AboutUsPresenter aboutUsPresenter;
+	private AnnouncementPresenter announcementPresenter;
+	private LoadingPresenter loadingPresenter;
 	
 	private IndexViewImpl indexView;
 	private TopBarViewImpl topBarView;
@@ -62,9 +64,10 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	private AboutUsViewImpl aboutUsView;
 	private AnnouncementViewImpl announcementView;
 	private SiaSummaryViewImpl siaSummaryView;
+	private LoadingViewImpl loadingView;
 	
 	//Taking care of the random phrase funtionality variables 
-	private List<RandomPhrase> phrases = null;
+	private List<RandomPhrase> phrases;
 	private RandomPhrase phrase;
 	
 	private final HandlerManager eventBus;
@@ -75,6 +78,24 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	private LoginInfo loginInfo = new LoginInfo();
 	private Student student;
 	private LoginServiceAsync loginService;
+	
+	/************** AsyncCallback variables *****************/
+	
+	private AsyncCallback savedPlanAsDefault = new AsyncCallback(){
+
+		@Override
+		public void onFailure(Throwable caught) {
+			Window.alert("Sorry, we could not save the Plan as Default");
+		}
+
+		@Override
+		public void onSuccess(Object result) {
+			Window.alert("Plan saved as default");
+		}
+		
+	};
+	
+	/************** AsyncCallback variables *****************/
 	
 	public AppController(SUNServiceAsync rpcService, HandlerManager eventBus){
 		this.rpcService = rpcService;
@@ -99,15 +120,29 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 				genereteDefaultPlan(careerCode);
 			}
 		});
+		
+		eventBus.addHandler(SavePlanAsDefaultEvent.TYPE, new SavePlanAsDefaultHandler(){
+			@Override
+			public void onSavePlanAsDefault(Plan plan) {
+				savePlanAsDefault(plan);
+			}
+			
+		});
 	}
 	
 	private void genereteDefaultPlan(String careerCode){
+		showLoadingPage();
+		
 		if(planView == null){
 			planView = new PlanViewImpl();
 			siaSummaryView = new SiaSummaryViewImpl();
+			
 		}
 		if(planPresenter == null){
-			planPresenter = new PlanPresenter(rpcService, eventBus, planView, siaSummaryView);
+			planPresenter = new PlanPresenter(rpcService, eventBus, planView, siaSummaryView, student);
+		}
+		if(student.isAdmin()==false){
+			planPresenter.deleteAdminButtons();
 		}
 		
 		rpcService.getPlanDefault(careerCode, new AsyncCallback<Plan>(){
@@ -130,7 +165,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	
 	private void generateAcademicHistoryFromString(String academicHistory){
 		Window.alert("This should create an academic history from the string: " + academicHistory);
-		//TODO call the method cesar is working on to get the academic history
+		//TODO 
 	}
 	
 	@Override
@@ -147,19 +182,8 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	}
 
 	@Override
-	public void onValueChange(ValueChangeEvent<String> event) {
-		
-		/*rpcService.toTest(new AsyncCallback<String>(){
-
-			@Override
-			public void onFailure(Throwable caught) {
-				Window.alert("error");
-			}
-
-			@Override
-			public void onSuccess(String result) {
-				Window.alert(result);
-			}});*/
+	public void onValueChange(ValueChangeEvent<String> event) 
+	{
 		
 		token = event.getValue();
 		
@@ -199,14 +223,18 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 				}
 				createPresenter.go(RootPanel.get("centerArea"));
 			} else if(token.equals("plan")) {
-				if(planView == null){
-					planView = new PlanViewImpl();
-					siaSummaryView = new SiaSummaryViewImpl();
+//				if(planView == null){
+//					planView = new PlanViewImpl();
+//					siaSummaryView = new SiaSummaryViewImpl();
+//				}
+//				if(planPresenter == null){
+//					planPresenter = new PlanPresenter(rpcService, eventBus, planView, siaSummaryView, student);
+//				}
+				if(planView != null && planPresenter != null){
+					planPresenter.go(RootPanel.get("centerArea"));					
+				}else{
+					History.newItem("create");
 				}
-				if(planPresenter == null){
-					planPresenter = new PlanPresenter(rpcService, eventBus, planView, siaSummaryView);
-				}
-				planPresenter.go(RootPanel.get("centerArea"));
 			} else if(token.equals("aboutUs")) {
 				if(aboutUsView == null){
 					aboutUsView = new AboutUsViewImpl();
@@ -321,6 +349,22 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 				student = loginInfo.getStudent();
 				loadLogin(true);
 			}});
+	}
+	
+	private void showLoadingPage()
+	{
+		if(loadingView == null){
+			loadingView = new LoadingViewImpl();
+		}
+		if(loadingPresenter == null){
+			loadingPresenter = new LoadingPresenter(rpcService, eventBus, loadingView);
+			loadingPresenter.setLabel("hola no sé que estoy escribiendo, bla bla bla, espero pasar de linea cuando esto sea muy largo");
+		}
+		loadingPresenter.go(RootPanel.get("centerArea"));
+	}
+	
+	private void savePlanAsDefault(Plan plan) {
+		rpcService.savePlanAsDefault(student, plan, savedPlanAsDefault);
 	}
 	
 }

@@ -18,7 +18,8 @@ public class CreateViewImpl extends Composite implements CreateView {
 	private Presenter presenter;
 	
 	@UiField Button continueButton;
-	@UiField Button modelPlanButton;
+	@UiField Button modelAnalyzedPlanButton;
+	@UiField Button newAnalyzedPlanButton;
 	@UiField Button resetButton;
 	@UiField TextBox textBoxCreate;
 	@UiField ListBox listBoxCreate;
@@ -53,6 +54,26 @@ public class CreateViewImpl extends Composite implements CreateView {
 		textBoxCreate.setValue("");
 	}
 
+	@Override
+	public Button getContinueDefaultButton() {
+		return modelAnalyzedPlanButton;
+	}
+	
+	@Override
+	public String getCurrentDefaultCareerValue() {
+		return listBoxCreate.getSelectedValue();
+	}
+	
+	@Override
+	public void setNewAnalyzedPlanButtonEnable(boolean b) {
+		newAnalyzedPlanButton.setEnabled(b);
+	}
+	
+	@Override
+	public void setModelAnalyzedPlanButtonEnable(boolean b) {
+		modelAnalyzedPlanButton.setEnabled(b);
+	}
+	
 	/********************* Firing Events *********************/
 	
 	@UiHandler("resetButton")
@@ -64,8 +85,10 @@ public class CreateViewImpl extends Composite implements CreateView {
 	
 	@UiHandler("listBoxCreate")
 	void onListBoxCreateChange(ChangeEvent event){
+		setNewAnalyzedPlanButtonEnable(true);
+		setModelAnalyzedPlanButtonEnable(true);
 		if(presenter != null){			
-			presenter.onListBoxCreateChange(listBoxCreate.getItemText(listBoxCreate.getSelectedIndex()));
+			presenter.onListBoxCreateChange(listBoxCreate.getSelectedValue());
 		}
 	}
 	
@@ -77,22 +100,15 @@ public class CreateViewImpl extends Composite implements CreateView {
 		}
 	}
 	
-	@UiHandler("modelPlanButton")
+	@UiHandler("modelAnalyzedPlanButton")
 	void onContinueDefaultButton(ClickEvent event){
+		setNewAnalyzedPlanButtonEnable(true);
+		setModelAnalyzedPlanButtonEnable(true);
 		if(presenter!=null){			
 			presenter.onContinueDefaultButtonClick(listBoxCreate.getSelectedValue());
 		}
 	}
 
-	@Override
-	public Button getContinueDefaultButton() {
-		return modelPlanButton;
-	}
-
-	@Override
-	public String getCurrentDefaultCareerValue() {
-		return listBoxCreate.getSelectedValue();
-	}
 
 
 }

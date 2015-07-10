@@ -6,12 +6,15 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.PanelCollapse;
 import org.gwtbootstrap3.client.ui.PanelHeader;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
@@ -110,6 +113,7 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 		groupTableTitles.getCellFormatter().setVerticalAlignment(0, 10, HasVerticalAlignment.ALIGN_BOTTOM);
 		groupTableTitles.getCellFormatter().setVerticalAlignment(0, 11, HasVerticalAlignment.ALIGN_BOTTOM);
 		
+		addSpecificSubject.getElement().setAttribute("onClick", "function(event){event.stopPropagation();}");
 		
 	}
 
@@ -120,7 +124,7 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 	}
 
 	@Override
-	public void setHeader(String code, String name, String type, String credits) {
+	public void setHeader(String code, String name, String type, String credits, String careerCode) {
 		codeFieldSearchSubject.setText(code);
 		nameFieldSearchSubject.setText(name);
 		typeFieldSearchSubject.setText(type);
@@ -131,6 +135,10 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 		creditsFieldSearchSubject.setTitle("Créditos: " + credits);
 		creditsFieldSearchSubject.getElement().setAttribute("data-toggle", "tooltip");
 		creditsFieldSearchSubject.getElement().setAttribute("data-placement", "top");
+		addSpecificSubject.getElement().setAttribute("code", code);
+		addSpecificSubject.getElement().setAttribute("career", careerCode);
+		addSpecificSubject.getElement().setAttribute("name", name);
+		addSpecificSubject.getElement().setAttribute("state", "add");
 	}
 
 	@Override
@@ -238,18 +246,45 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 		groupTableContainer.add(groupTable);
 		
 	}
+	
+	public void changeState() {
+		String state = addSpecificSubject.getElement().getAttribute("state");
+		if(state.equals("add")){
+			addSpecificSubject.setType(ButtonType.DANGER);
+			addSpecificSubject.setIcon(IconType.MINUS);
+			addSpecificSubject.getElement().setAttribute("state", "remove");
+		}else{
+			addSpecificSubject.setType(ButtonType.SUCCESS);
+			addSpecificSubject.setIcon(IconType.PLUS);
+			addSpecificSubject.getElement().setAttribute("state", "add");
+		}
+	}
 
 	@Override
 	public void init() {
-		addSpecificSubject.addClickHandler(new ClickHandler(){
+		
+	}
+	
+	@Override
+	public String getCode() {
+		return addSpecificSubject.getElement().getAttribute("code");
+	}
 
-			@Override
-			public void onClick(ClickEvent event) {
-				// TODO Auto-generated method stub
-				presenter.onAddSpecificSubjectClick(event);
-			}
-			
-		});
+	/*************************** EVENTS ***************************/
+	@UiHandler("addSpecificSubject")
+	public void onAddSpecificSubjectClick(ClickEvent event){
+		
+		String name  = addSpecificSubject.getElement().getAttribute("name");
+		String code = addSpecificSubject.getElement().getAttribute("code");
+		String career = addSpecificSubject.getElement().getAttribute("career");
+		String state = addSpecificSubject.getElement().getAttribute("state");
+		
+		if(state.equals("add")){					
+			presenter.onSpecificSubjectSelected(name, code, career);
+		}else{
+			presenter.onSpecificSubjectUnselected(name, code, career);
+		}
+
 	}
 
 }

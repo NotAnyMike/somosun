@@ -16,7 +16,6 @@ public class Student extends UserSun implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	Plan plan = null;
 	
 	public Student(){
 	}
@@ -25,12 +24,4 @@ public class Student extends UserSun implements Serializable{
         super(name, username, email, id);
     }
 
-	public Plan getPlan() {
-		return plan;
-	}
-
-	public void setPlan(Plan plan) {
-		this.plan = plan;
-	}
-    
 }

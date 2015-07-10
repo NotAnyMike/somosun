@@ -1,5 +1,7 @@
 package com.uibinder.index.server.dao;
 
+import com.googlecode.objectify.Key;
+import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 import com.uibinder.index.shared.control.SemesterValue;
 
@@ -31,6 +33,12 @@ public class SemesterValueDao {
 			saveSemesterValue(semesterValueToReturn);
 		}
 		return semesterValueToReturn;
+	}
+
+	public Long generateId() {
+		ObjectifyFactory f = new ObjectifyFactory();
+		Key<SemesterValue> key = f.allocateId(SemesterValue.class);
+		return key.getId();
 	}
 	
 }

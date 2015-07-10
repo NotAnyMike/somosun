@@ -97,5 +97,9 @@ public class Block implements Serializable {
 	public void setClassRoom(String classRoom) {
 		this.classRoom = classRoom;
 	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
     
 }

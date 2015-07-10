@@ -3,6 +3,7 @@ package com.uibinder.index.server.dao;
 import java.util.List;
 
 import com.googlecode.objectify.Key;
+import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 import com.uibinder.index.shared.control.Group;
 import com.uibinder.index.shared.control.SemesterValue;
@@ -17,7 +18,7 @@ public class GroupDao {
 	}
 	
 	public void saveGroup(Group g){
-		ofy().save().entity(g).now();
+		if(g != null) ofy().save().entity(g).now();
 	}
 
 	public List<Group> getGroups(Subject subject) {
@@ -69,6 +70,12 @@ public class GroupDao {
 			ofy().delete().key(key).now();
 		}
 		
+	}
+
+	public Long generateId() {
+		ObjectifyFactory f = new ObjectifyFactory();
+		Key<Group> key = f.allocateId(Group.class);
+		return key.getId();
 	}
 	
 	

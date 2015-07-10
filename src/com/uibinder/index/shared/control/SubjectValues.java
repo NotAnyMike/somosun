@@ -9,7 +9,7 @@ import com.googlecode.objectify.annotation.Id;
 
 /**
  *
- * @author Cesar A. Villamizar C.
+ * @author Mike, of stuff is from Cesar A. Villamizar
  */
 @Entity
 public class SubjectValues implements Serializable {
@@ -89,5 +89,9 @@ public class SubjectValues implements Serializable {
 
 	public void setComplementaryValues(ComplementaryValues complementaryValues) {
 		this.complementaryValues = complementaryValues;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 }

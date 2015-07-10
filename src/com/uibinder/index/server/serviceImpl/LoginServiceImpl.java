@@ -1,13 +1,10 @@
 package com.uibinder.index.server.serviceImpl;
 
-import java.io.IOException;
-
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.uibinder.index.client.service.LoginService;
-import com.uibinder.index.server.SiaProxy;
 import com.uibinder.index.server.dao.StudentDao;
 import com.uibinder.index.shared.LoginInfo;
 import com.uibinder.index.shared.control.Student;

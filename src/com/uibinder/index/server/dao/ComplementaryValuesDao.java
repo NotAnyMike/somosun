@@ -1,5 +1,7 @@
 package com.uibinder.index.server.dao;
 
+import java.util.List;
+
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
@@ -18,7 +20,7 @@ public class ComplementaryValuesDao extends Dao {
 	public void saveComplementaryValues(ComplementaryValues cV){
 		if(cV != null)
 		{
-			if(cV.getSubjectGroup() != null && cV.getSubject() != null)
+			if(cV.getSubjectGroup() != null && cV.getSubject() != null && cV.getCareer() != null)
 			{
 				if(cV.getSubjectGroup().getId() == null){
 					SubjectGroupDao sGDao = new SubjectGroupDao();
@@ -31,17 +33,19 @@ public class ComplementaryValuesDao extends Dao {
 					cV.getSubject().setId(id);
 				}
 				if(cV.getSubject().getId() != null && cV.getSubjectGroup().getId() != null)
+					cV.setTypology(standardizeString(cV.getTypology()));
 					ofy().save().entity(cV).now();
 			}			
 		}
 	}
 	
 	public ComplementaryValues getComplementaryValues(Career career, Subject subject){
-		if(subject == null || career == null){
-			return null;
-		}else{			
-			return (ComplementaryValues) ofy().load().type(ComplementaryValues.class).filter("subject.code", subject.getCode()).filter("career.code", career.getCode()).first().now();
+		ComplementaryValues toReturn = null;
+		if(subject != null && career != null)
+		{
+			toReturn = (ComplementaryValues) ofy().load().type(ComplementaryValues.class).filter("career.code", career.getCode()).filter("subject.code", subject.getCode()).first().now();
 		}
+		return toReturn;
 	}
 	
 	public void deleteComplementaryValues(ComplementaryValues cV){
@@ -65,6 +69,10 @@ public class ComplementaryValuesDao extends Dao {
 		
 		return key.getId();
 		
+	}
+
+	public List<ComplementaryValues> getComplementaryValues(String code) {
+		return ofy().load().type(ComplementaryValues.class).filter("career.code", code).list();
 	}
 
 	

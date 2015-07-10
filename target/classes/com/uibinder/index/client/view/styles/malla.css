@@ -74,22 +74,22 @@ h1 {
 	alignment-adjust:central;
 }
 .nivelacion{
-	background-color:#636;
+	background-color:#FFC773;
 	vertical-align:central;
 	alignment-adjust:central;
 }
 .fundamentacion{
-	background-color:#F90;
+	background-color:#73CFFF;
 	vertical-align:central;
 	alignment-adjust:central
 }
 .disciplinar {
-	background-color:#093;
+	background-color:#629F40;
 	vertical-align:central;
 	alignment-adjust:central;
 }
 .libreEleccion {
-	background-color:#06F;
+	background-color:#C1A768;
 	vertical-align:central;
 	alignment-adjust:central;
 }
@@ -306,68 +306,4 @@ h1 {
 .smallCaptionPlanSummary{
 	font-size:12px;
 	padding:2px;
-}
-
-
-
-.mainContainerCreatePlan {
-	display: flex;
-	flex-direction: row;
-	width: 850px;
-	margin: 5px;
-	align-items: center;
-	justify-content: center;
-}
-.mainContainerCreatePlan-upload {
-	width: 49%;
-	margin: 10px;
-	display: flex;
-	height: 100%;
-	justify-content: space-around;
-	flex-direction: column;
-	align-items: flex-start;
-}
-.mainContainerCreatePlan-upload--title {
-	font-size: 26px;
-}
-.mainContainerCreatePlan-upload--small {
-	font-size: 13px;
-}
-.secondContainerCreatePlan {
-	width: 49%;
-	display: flex;
-	flex-direction: column;
-	text-align: right;
-	align-items: flex-end;
-	margin: 10px;
-	justify-content: space-around;
-}
-.secondContainerCreatePlan-saved {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: flex-end;
-}
-.secondContainerCreatePlan-new {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: flex-end;
-}
-.secondContainerCreatePlan-hl {
-	height: 1px;
-	width: 90%;
-	color: #666;
-	background-color: #000;
-	margin: 5px;
-}
-.middleContainerCreatePlan {
-	justify-content: center;
-	align-items: center;
-}
-.verticalLineCreatePlan {
-	height: 360px;
-	width: 1px;
-	background-color: #666;
-	margin: 5px;
 }

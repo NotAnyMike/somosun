@@ -24,8 +24,14 @@ public class Subject implements Serializable {
     @Index private String code = null;   
     @Index private String siaCode = null;
     private String location = null;
-    @Index private boolean special  = false; //This is for example in the case the prerequisite is 80% of the ... 
-    //in the case the subject is special I can create a dummy subjectValue in order to create show it in the planPresenter view
+    /**
+     * A special subject is a kind of subject that will NOT be shown as a subject in the planPresenter, but still need to be a subject. e.g. "80% de los créditos de..."
+     */
+    @Index private boolean special  = false;
+    /**
+     * A dummy subject is a kind of subject that will be shown as a subject in the planPresenter, but still need to be a subject. e.g. "optativa [SubjectGroup.getName()]"
+     */
+    @Index private boolean isDummy = false;
     
     /**
      * This will not allow the search by location, jut by Id, Name and Code.
@@ -150,12 +156,26 @@ public class Subject implements Serializable {
 		this.id = id;
 	}
 
+	/**
+     * A special subject is a kind of subject that will never be show as a subject in the planPresenter, but still need to be a subject. e.g. "80% de los créditos de..."
+     */
 	public boolean isSpecial() {
 		return special;
 	}
 
 	public void setSpecial(boolean special) {
 		this.special = special;
+	}
+
+    /**
+     * A dummy subject is a kind of subject that will be shown as a subject in the planPresenter, but still need to be a subject. e.g. "optativa [SubjectGroup.getName()]"
+     */
+	public boolean isDummy() {
+		return isDummy;
+	}
+
+	public void setDummy(boolean isDummy) {
+		this.isDummy = isDummy;
 	}
 }
    

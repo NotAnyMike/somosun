@@ -113,15 +113,17 @@ public class SubjectDao extends Dao {
 	}
 	
 	/**
-	 * This will save the @param subject if in the db there is no other subject with the same code 
-	 * and if the subject name is different from the code and the siaCode
+	 * This will save the @param subject in the db, if it has no code, then subject.setSpecial(true)
 	 * 
 	 * <br/>
 	 * 
 	 * @param subject
 	 */
 	public void saveSubject(Subject subject){
-		if(subject.getCode() != subject.getName() && subject.getName() != subject.getSiaCode()){
+		if(subject != null){
+			if(subject.getCode().isEmpty()){
+				subject.setSpecial(true);
+			}
 			subject.setName(standardizeString(subject.getName()));
 			ofy().save().entity(subject).now();				
 		}
@@ -131,6 +133,10 @@ public class SubjectDao extends Dao {
 		ObjectifyFactory f = new ObjectifyFactory();
 		Key<Subject> key = f.allocateId(Subject.class);
 		return key.getId();
+	}
+
+	public Subject getDummySubjectByCode(String code) {
+		return ofy().load().type(Subject.class).filter("isDummy", true).filter("code", code).first().now();
 	}
 
 }

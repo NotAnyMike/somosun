@@ -28,6 +28,7 @@ public class CreatePresenter implements Presenter, CreateView.Presenter {
 	private final SUNServiceAsync rpcService;
 	private final HandlerManager eventBus;
 	private CreateViewImpl view;
+	private List<Career> careers = null;
 	
 	public CreatePresenter(SUNServiceAsync rpcService, HandlerManager eventBus, CreateViewImpl view){
 		this.rpcService = rpcService;
@@ -44,6 +45,7 @@ public class CreatePresenter implements Presenter, CreateView.Presenter {
 	}
 
 	private void addCareersToListBox(List<Career> careers) {
+		this.careers = careers;
 		if(careers == null){
 			view.addCareerToListBox("No se pudieron cargar las careeras","-1");			
 		} else {
@@ -51,6 +53,7 @@ public class CreatePresenter implements Presenter, CreateView.Presenter {
 				String name = SomosUNUtils.addCarrerCodeToString(career);
 				view.addCareerToListBox(name, career.getCode());
 			}
+			onListBoxCreateChange(view.getCurrentDefaultCareerValue());
 		}
 	}
 
@@ -60,8 +63,24 @@ public class CreatePresenter implements Presenter, CreateView.Presenter {
 	}
 
 	@Override
-	public void onListBoxCreateChange(String career) {
-		//TODO add here to deactivate the button of model Plan
+	public void onListBoxCreateChange(String code) {
+		Career c = getCareer(code);
+		if(c != null){
+			if(c.hasDefault() == false){
+				view.setModelAnalyzedPlanButtonEnable(false);
+			}
+		}
+	}
+
+	private Career getCareer(String code) {
+		Career career = null;
+		for(Career cT : careers){
+			if(cT.getCode().equals(code) == true){
+				career = cT;
+				break;
+			}
+		}
+		return career;
 	}
 
 	@Override

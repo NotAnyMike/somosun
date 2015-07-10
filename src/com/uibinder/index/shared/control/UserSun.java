@@ -26,7 +26,7 @@ public class UserSun implements Serializable {
 	@Index private String email = null;
 	private String name = null;
 	private boolean blocked = false;
-	private boolean admin = false;
+	private boolean admin = true;
 	
 	public UserSun(){
 	}

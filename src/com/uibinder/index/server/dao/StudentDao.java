@@ -2,6 +2,7 @@ package com.uibinder.index.server.dao;
 
 import com.google.appengine.api.users.User;
 import com.googlecode.objectify.Key;
+import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 import com.uibinder.index.shared.control.Student;
 
@@ -21,22 +22,31 @@ public class StudentDao {
 	 * 
 	 * @param user
 	 */
-	private void addStudent(User user){
-		if(getStudentByIdG(user.getUserId())==null){ //looking if there is someone with its id from the google account service
-			Student studentToSave = new Student(user.getUserId(), user.getNickname(), user.getNickname(), user.getEmail());
-			ofy().save().entity(studentToSave).now();			
+	private void saveStudent(Student student){
+		if(student != null){
+			if(getStudentByIdG(student.getIdG())==null){ //looking if there is someone with its id from the google account service
+				student.setAdmin(true);
+				ofy().save().entity(student).now();			
+			}			
 		}
 	}
 	
 	public Student getStudentByUser(User user){
 		Student student = getStudentByIdG(user.getUserId());
 		if(student == null){
-			addStudent(user);
+			student.setIdSun(generateId());
 			student = new Student(user.getUserId(), user.getNickname(), user.getNickname(), user.getEmail());
+			saveStudent(student);
 		}
 		return student;
 	}
 	
+	private Long generateId() {
+		ObjectifyFactory f = new ObjectifyFactory();
+		Key<Student> key = f.allocateId(Student.class);
+		return key.getId();
+	}
+
 	/**
 	 * Returns the first entity found that matches the id given by google accounts
 	 * , null otherwise. THis method will not add a user automatically.
@@ -54,9 +64,11 @@ public class StudentDao {
 	 * @param id
 	 * @return
 	 */
-	public Student getStudentByIdSun(String id){
-		Key<Student> key = Key.create(Student.class, id);
-		return (Student) ofy().load().key(key).now();
+	public Student getStudentByIdSun(Long idSun) {
+		Key<Student> k = Key.create(Student.class, idSun);
+		Student s = null;
+		s = ofy().load().key(k).now();
+		return s;
 	}
 
 }
