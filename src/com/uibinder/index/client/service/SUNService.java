@@ -12,6 +12,7 @@ import com.uibinder.index.shared.control.ComplementaryValues;
 import com.uibinder.index.shared.control.Plan;
 import com.uibinder.index.shared.control.Student;
 import com.uibinder.index.shared.control.Subject;
+import com.uibinder.index.shared.control.SubjectGroup;
 
 /**
  * 
@@ -47,6 +48,7 @@ public interface SUNService extends RemoteService{
 	
 	public ComplementaryValues getComplementaryValuesFromMisPlanes(String career, String code);
 	public List<ComplementaryValues> getComplementaryValuesFromMisPlanes(String careerCode);
+	public ComplementaryValues createDefaultSubject(String subjectGroupName, String credits, String careerCode, Student student);
 	
 	List<ComplementaryValues> getComplementaryValues(List<String> selectedSubjectCodeStrings, List<String> selectedSubjectCareerStrings);
 	
@@ -54,4 +56,7 @@ public interface SUNService extends RemoteService{
 	
 	public void savePlanAsDefault(Student student, Plan plan);
 	public Plan getPlanDefault(String careerCode);
+	
+	public List<SubjectGroup> getSubjectGroups(String careerCode);
+	
 }

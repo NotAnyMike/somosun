@@ -2283,7 +2283,8 @@ public class SiaProxy {
 			{
 				//it means that it is a special subject
 				isSpecial = true;
-				subjectFinalT = new Subject(0, "", "", sD.getName(), sede, isSpecial);
+				subjectFinalT = new Subject(0, "", "", sD.getName(), sede);
+				subjectFinalT.setSpecial(isSpecial);
 				subjectDao.saveSubject(subjectFinalT);
 				subjectFinalT = subjectDao.getSubjectByName(subjectFinalT.getName());
 			}

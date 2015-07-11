@@ -29,9 +29,15 @@ public class Subject implements Serializable {
      */
     @Index private boolean special  = false;
     /**
-     * A dummy subject is a kind of subject that will be shown as a subject in the planPresenter, but still need to be a subject. e.g. "optativa [SubjectGroup.getName()]"
+     * A dummy subject is a kind of subject that will be shown as a subject in the planPresenter, but still need to be a subject, and can appears in 
+     * searchs only if searching Old Uncontinued subjects. e.g. Old subjects
      */
     @Index private boolean isDummy = false;
+    /**
+     * A default subject is a kind of subject that will be shown as a subject in the planPresenter, but still need to be a subject, and will never ever
+     * appear in a search (not even as a sia backup). e.g. "optativa [SubjectGroup.getName()]" 
+     */
+    @Index private boolean isDefault = false;
     
     /**
      * This will not allow the search by location, jut by Id, Name and Code.
@@ -49,24 +55,24 @@ public class Subject implements Serializable {
     	this.setLocation(location);
     }
     
-    public Subject(int credits, String code, String siaCode, String name, String location, boolean special) {
-    	this.setCredits(credits);
-    	this.setCode(code);
-    	this.setSiaCode(siaCode);
-    	this.setName(name);
-    	this.setLocation(location);
-    	this.setSpecial(special);
-    }
-    
-    public Subject(int credits, String code, String siaCode, String name, String location, boolean special, boolean isDummy) {
-    	this.setCredits(credits);
-    	this.setCode(code);
-    	this.setSiaCode(siaCode);
-    	this.setName(name);
-    	this.setLocation(location);
-    	this.setSpecial(special);
-    	this.setDummy(isDummy);
-    }
+//    public Subject(int credits, String code, String siaCode, String name, String location) {
+//    	this.setCredits(credits);
+//    	this.setCode(code);
+//    	this.setSiaCode(siaCode);
+//    	this.setName(name);
+//    	this.setLocation(location);
+//    	this.setSpecial(special);
+//    }
+//    
+//    public Subject(int credits, String code, String siaCode, String name, String location) {
+//    	this.setCredits(credits);
+//    	this.setCode(code);
+//    	this.setSiaCode(siaCode);
+//    	this.setName(name);
+//    	this.setLocation(location);
+//    	this.setSpecial(special);
+//    	this.setDummy(isDummy);
+//    }
     
     /**
      * true if everything but he id is equal 
@@ -175,6 +181,8 @@ public class Subject implements Serializable {
 
 	public void setSpecial(boolean special) {
 		this.special = special;
+		this.isDefault = false;
+		this.isDummy = false;
 	}
 
     /**
@@ -186,6 +194,18 @@ public class Subject implements Serializable {
 
 	public void setDummy(boolean isDummy) {
 		this.isDummy = isDummy;
+		this.isDefault = false;
+		this.special = false;
+	}
+
+	public boolean isDefault() {
+		return isDefault;
+	}
+
+	public void setDefault(boolean isDefault) {
+		this.isDefault = isDefault;
+		this.special = false;
+		this.isDummy = false;
 	}
 }
    

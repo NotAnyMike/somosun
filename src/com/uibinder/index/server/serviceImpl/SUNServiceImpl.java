@@ -349,22 +349,22 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 				if(career != null){
 					if(subjectCodeT.equals(SomosUNUtils.LIBRE_CODE)){
 						//means there is no cV for Libre
-						subjectT = subjectDao.getSubjectByCode(subjectCodeT);
-						
-						if(subjectT == null){
-							subjectDao.createSubjectLibre();
-							subjectT = subjectDao.getSubjectByCode(subjectCodeT);
-						}						
-						
-						complementaryValuesDao.createComplementaryValuesForLibre(career.getCode());
-						ComplementaryValues cVT = complementaryValuesDao.getComplementaryValues(career.getCode(), SomosUNUtils.LIBRE_CODE);
-						
-						if(cVT != null){
-							cVList.add(cVT);
-							oldCareer = careerCodeT;
-						}
+//						subjectT = subjectDao.getSubjectByCode(subjectCodeT);
+//						
+//						if(subjectT == null){
+//							subjectDao.createSubjectLibre();
+//							subjectT = subjectDao.getSubjectByCode(subjectCodeT);
+//						}						
+//						
+//						complementaryValuesDao.createComplementaryValuesForLibre(career.getCode());
+//						ComplementaryValues cVT = complementaryValuesDao.getComplementaryValues(career.getCode(), SomosUNUtils.LIBRE_CODE);
+//						
+//						if(cVT != null){
+//							cVList.add(cVT);
+//							oldCareer = careerCodeT;
+//						}
 					}else if(subjectCodeT.equals(SomosUNUtils.OPTATIVA_CODE)){
-						//TODO can not uncomment this because I need the subjecGroup id to do it, therefore cannot add this subject
+						//can not uncomment this because I need the subjecGroup id to do it, therefore cannot add this subject
 //						//means there is no cV for Optativa
 //						subjectT = subjectDao.getSubjectByCode(subjectCodeT);
 //						
@@ -537,6 +537,81 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		}
 		
 		return cVList;
+	}
+
+	@Override
+	public ComplementaryValues createDefaultSubject(String subjectGroupName, String credits, String careerCode, Student student) {
+		
+		ComplementaryValues complementaryValues = null;
+		
+		if(subjectGroupName.isEmpty() == false && credits.isEmpty() == false && careerCode.isEmpty() == false && student != null){
+			StudentDao studentDao = new StudentDao();
+			student = studentDao.getStudentByIdSun(student.getIdSun());
+			if(student != null){
+				if(student.isAdmin() == true){
+					
+					CareerDao careerDao = new CareerDao();
+					SubjectDao subjectDao = new SubjectDao();
+					ComplementaryValuesDao complementaryValuesDao = new ComplementaryValuesDao();
+					SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
+					
+					Career career = careerDao.getCareerByCode(careerCode);
+
+					if(career!= null){
+						
+						Subject subjectDefault = null;
+						SubjectGroup subjectGroup = null;
+						
+						if(subjectGroupName.equals(SomosUNUtils.LIBRE_CODE) == true){
+							subjectDefault = new Subject(Integer.valueOf(credits), SomosUNUtils.LIBRE_CODE, SomosUNUtils.LIBRE_CODE, SomosUNUtils.LIBRE_NAME, "bog");
+							subjectGroup = subjectGroupDao.getSubjectGroup(SomosUNUtils.LIBRE_AGRUPACION_NAME, careerCode);
+						}else{						
+							subjectDefault = new Subject(Integer.valueOf(credits), SomosUNUtils.OPTATIVA_CODE, SomosUNUtils.OPTATIVA_CODE, SomosUNUtils.OPTATIVA_NAME, "bog");
+							subjectGroup = subjectGroupDao.getSubjectGroup(subjectGroupName, careerCode);
+						}
+						
+						if(subjectGroup != null){
+							
+							subjectDefault.setDefault(true);
+							subjectDefault.setId(subjectDao.generateId());
+							subjectDao.saveSubject(subjectDefault);
+							
+							String t = null;
+							if(subjectGroupName.equals(SomosUNUtils.LIBRE_CODE) == true) t = SomosUNUtils.getTypology("l");
+							else t = (subjectGroup.isFundamental()== true ? SomosUNUtils.getTypology("f") : SomosUNUtils.getTypology("c"));
+							
+							complementaryValues = new ComplementaryValues(career, subjectDefault, t, false, subjectGroup);
+							complementaryValues.setId(complementaryValuesDao.generateId());
+							complementaryValuesDao.saveComplementaryValues(complementaryValues);
+							
+						}
+						
+						
+						
+						
+						
+					}
+					
+				}
+			}
+		}
+		
+		return complementaryValues;
+	}
+
+	public List<SubjectGroup> getSubjectGroups(String careerCode) {
+		
+		List<SubjectGroup> subjectGroupsListToReturn = new ArrayList<SubjectGroup>();
+		
+		if(careerCode != null){
+			SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
+			List<SubjectGroup> subjectGroupsList = subjectGroupDao.getSubjectGroups(careerCode);
+			for(SubjectGroup sG : subjectGroupsList){				
+				subjectGroupsListToReturn.add(sG);
+			}
+		}
+		
+		return subjectGroupsListToReturn;
 	}
 	
 }

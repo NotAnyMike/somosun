@@ -25,6 +25,8 @@ import com.uibinder.index.client.dnd.PickUpDragController;
 import com.uibinder.index.client.dnd.SemesterDropController;
 import com.uibinder.index.client.event.SavePlanAsDefaultEvent;
 import com.uibinder.index.client.service.SUNServiceAsync;
+import com.uibinder.index.client.view.DefaultSubjectCreationView;
+import com.uibinder.index.client.view.DefaultSubjectCreationViewImpl;
 import com.uibinder.index.client.view.PlanView;
 import com.uibinder.index.client.view.PlanViewImpl;
 import com.uibinder.index.client.view.SearchSubjectViewImpl;
@@ -41,12 +43,14 @@ import com.uibinder.index.client.widget.PlanWidget;
 import com.uibinder.index.client.widget.SemesterWidget;
 import com.uibinder.index.client.widget.SubjectWidget;
 import com.uibinder.index.shared.SiaResultSubjects;
+import com.uibinder.index.shared.SomosUNUtils;
 import com.uibinder.index.shared.control.Career;
 import com.uibinder.index.shared.control.ComplementaryValues;
 import com.uibinder.index.shared.control.Plan;
 import com.uibinder.index.shared.control.Semester;
 import com.uibinder.index.shared.control.Student;
 import com.uibinder.index.shared.control.Subject;
+import com.uibinder.index.shared.control.SubjectGroup;
 import com.uibinder.index.shared.control.SubjectValues;
 
 /**
@@ -57,13 +61,20 @@ import com.uibinder.index.shared.control.SubjectValues;
  * 
  * Be very precise with the subjects' code, because it will work (no errors will be made) when all the codes are different.   
  */
-public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryView.Presenter, WarningDeleteSubjectView.Presenter, SubjectAccordionView.Presenter, SelectedSubjectView.Presenter {
+public class PlanPresenter implements Presenter,
+PlanView.Presenter, 
+SiaSummaryView.Presenter, 
+WarningDeleteSubjectView.Presenter, 
+SubjectAccordionView.Presenter, 
+SelectedSubjectView.Presenter,
+DefaultSubjectCreationView.Presenter{
 	
 	private final HandlerManager eventBus;
 	private PlanViewImpl view;
 	private SiaSummaryViewImpl siaSummaryView;
 	private WarningDeleteSubjectViewImpl warningDeleteSubjectView = new WarningDeleteSubjectViewImpl();
 	private SearchSubjectViewImpl searchSubjectView = new SearchSubjectViewImpl();
+	private DefaultSubjectCreationViewImpl defaultSubjectCreationView = new DefaultSubjectCreationViewImpl(); 
 	private final SUNServiceAsync rpcService;
 	private Student student = null;
 	
@@ -173,6 +184,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		warningDeleteSubjectView.setPresenter(this);
 		searchSubjectView.setPresenter(this);
 		searchSubjectView.fill();
+		defaultSubjectCreationView.setPresenter(this);
 		this.siaSummaryView = siaSummaryView;
 		siaSummaryView.setPresenter(this);
 		connectionsController = new ConnectionsController(this);
@@ -195,6 +207,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		this.setStudent(student);
 		warningDeleteSubjectView.setPresenter(this);
 		searchSubjectView.setPresenter(this);
+		defaultSubjectCreationView.setPresenter(this);
 		searchSubjectView.fill();
 		this.siaSummaryView = siaSummaryView;
 		connectionsController = new ConnectionsController(this);
@@ -220,6 +233,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		this.setStudent(student);
 		warningDeleteSubjectView.setPresenter(this);
 		searchSubjectView.setPresenter(this);
+		defaultSubjectCreationView.setPresenter(this);
 		searchSubjectView.fill();
 		this.siaSummaryView = siaSummaryView;
 		connectionsController = new ConnectionsController(this);
@@ -261,6 +275,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		
 		container.add(warningDeleteSubjectView);
 		container.add(searchSubjectView);
+		container.add(defaultSubjectCreationView);
 		warningDeleteSubjectView.hideIt();
 		searchSubjectView.hideIt();
 		container.add(subContainer);
@@ -375,6 +390,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		}
 		//if(valuesAndSubjectMap.containsKey(subjectValues)==false) valuesAndSubjectMap.put(subjectValues, subject); OLD, I don't save Maps anymore //although the condition here can be removed because it can will just override it
 		if(semester.getSubjects().contains(subjectValues) == false) semester.addSubject(subjectValues);
+		//TODO avoid the same subject twice in the same semester
 		
 		
 		SubjectWidget subjectWidget = new SubjectWidget(subject.getName(), subject.getCode(), subject.getCredits(), subjectValues.getGrade(), subjectValues.getComplementaryValues().isMandatory(), subjectValues.getComplementaryValues().getTypology(), subjectValues.getSubjectValuesPublicId(), (subjectValues.getComplementaryValues().getSubjectGroup() != null ? subjectValues.getComplementaryValues().getSubjectGroup().getName() : ""));
@@ -1013,6 +1029,26 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		
 	}
 	
+	private void showDefaultSubectCreationView(String s){
+		//TODO
+		defaultSubjectCreationView.clear();
+		defaultSubjectCreationView.showIt();
+		defaultSubjectCreationView.setSemester(s);
+		
+		rpcService.getSubjectGroups(plan.getCareerCode(), new AsyncCallback<List<SubjectGroup>>(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("sorry, an error ocurred, take a picture of you with this error and send it to @MikeWoodcockC");
+			}
+
+			@Override
+			public void onSuccess(List<SubjectGroup> result) {
+				defaultSubjectCreationView.addEntriesToList(result);
+			}
+			
+		});
+	}
 	
 	/************ behaviors when clicked *******************/
 	
@@ -1126,9 +1162,16 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 		 */
 		List<String> selectedSubjectCodeStrings = new ArrayList<String>();
 		List<String> selectedSubjectCareerStrings = new ArrayList<String>();
+		List<String> selectedDefaultSubjectCodeStrings = new ArrayList<String>();
+		List<String> selectedDefaultSubjectCareerStrings = new ArrayList<String>();
 		for(SelectedSubjectViewImpl selectedSubjectsViewImpl : selectedSubjects){
-			selectedSubjectCodeStrings.add(selectedSubjectsViewImpl.getCode());
-			selectedSubjectCareerStrings.add(selectedSubjectsViewImpl.getCareer());
+			if(selectedSubjectsViewImpl.getCode().equals(SomosUNUtils.LIBRE_CODE) || selectedSubjectsViewImpl.getCode().equals(SomosUNUtils.OPTATIVA_CODE)){
+				selectedDefaultSubjectCodeStrings.add(selectedSubjectsViewImpl.getCode());
+				selectedDefaultSubjectCareerStrings.add(selectedSubjectsViewImpl.getCareer());
+			}else{				
+				selectedSubjectCodeStrings.add(selectedSubjectsViewImpl.getCode());
+				selectedSubjectCareerStrings.add(selectedSubjectsViewImpl.getCareer());
+			}
 		}
 		
 		selectedSubjects.clear();
@@ -1146,6 +1189,34 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 				
 			});
 		}
+		
+		//TODO do something with selectedDefaultSubjectCodeStrings and the other list
+		if(selectedDefaultSubjectCodeStrings.size() > 0){			
+			showDefaultSubectCreationView(semesterString);
+		}
+		
+	}
+	
+	public void onCreateDefaultSubjectButtonClick(String subjectGroupName, String credits, final String semester) {
+		//TODO create 
+		
+		defaultSubjectCreationView.hideIt();
+		rpcService.createDefaultSubject(subjectGroupName, credits, plan.getCareerCode(), student, new AsyncCallback<ComplementaryValues>(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Subject not saved");
+			}
+
+			@Override
+			public void onSuccess(ComplementaryValues result) {
+				Window.alert("Done");
+				List<ComplementaryValues> cVList = new ArrayList<ComplementaryValues>();
+				cVList.add(result);
+				addSubjectsToPlan(cVList, semester);
+			}
+			
+		});
 		
 	}
 	
@@ -1176,6 +1247,7 @@ public class PlanPresenter implements Presenter, PlanView.Presenter, SiaSummaryV
 	public static native void avoidAccordionPropagation() /*-{
 		$wnd.stopPropagationOfClickOnSelectSubject()
 	}-*/;
+
 	
 	/************************************************************/
 

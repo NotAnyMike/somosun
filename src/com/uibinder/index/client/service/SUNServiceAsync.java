@@ -12,6 +12,7 @@ import com.uibinder.index.shared.control.ComplementaryValues;
 import com.uibinder.index.shared.control.Plan;
 import com.uibinder.index.shared.control.Student;
 import com.uibinder.index.shared.control.Subject;
+import com.uibinder.index.shared.control.SubjectGroup;
 
 /**
  * 
@@ -72,5 +73,11 @@ public interface SUNServiceAsync {
 	void getSubjectFromSia(String nameOrCode, String typology, String career,
 			String scheduleCP, int page, int ammount, String sede,
 			Student student, AsyncCallback<SiaResultSubjects> callback);
+
+	void createDefaultSubject(String subjectGroupName, String credits,
+			String careerCode, Student student,
+			AsyncCallback<ComplementaryValues> callback);
+
+	void getSubjectGroups(String careerCode, AsyncCallback<List<SubjectGroup>> callback);
 
 }

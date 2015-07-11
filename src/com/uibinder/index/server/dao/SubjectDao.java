@@ -140,20 +140,4 @@ public class SubjectDao extends Dao {
 		return ofy().load().type(Subject.class).filter("isDummy", true).filter("code", code).first().now();
 	}
 
-	public void createSubjectLibre() {
-		if(getDummySubjectByCode(SomosUNUtils.LIBRE_CODE) == null){			
-			Subject subject = new Subject(0, SomosUNUtils.LIBRE_CODE, SomosUNUtils.LIBRE_CODE, SomosUNUtils.LIBRE_NAME, "bog", false, true);
-			subject.setId(generateId());
-			saveSubject(subject);
-		}
-	}
-	
-	public void createSubjectOptative() {
-		if(getDummySubjectByCode(SomosUNUtils.OPTATIVA_CODE) == null){			
-			Subject subject = new Subject(0, SomosUNUtils.OPTATIVA_CODE, SomosUNUtils.OPTATIVA_CODE, SomosUNUtils.OPTATIVA_NAME, "bog", false, true);
-			subject.setId(generateId());
-			saveSubject(subject);
-		}
-	}
-
 }

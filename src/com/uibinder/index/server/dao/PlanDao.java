@@ -125,20 +125,22 @@ public class PlanDao {
 				SemesterValueDao  semesterValueDao = new SemesterValueDao();
 
 				List<Semester> semesters = plan.getSemesters();
+				List<SubjectValues> sVToRemoveList = new ArrayList<SubjectValues>();
 				
 				for(Semester s : semesters){
-					//TODO be careful because I can be saving more than once the same semester
+					//be careful because I can be saving more than once the same semester
+					sVToRemoveList.clear();
 
 					List<SubjectValues> subjectValuesList = s.getSubjects();
-					if(s.getId() == null){
+					if(s.getId() == null || true){
 						if(subjectValuesList != null){
 							if(subjectValuesList.size() != 0){
 								for(SubjectValues sV : subjectValuesList){
-									if(sV.getId() == null){
+									if(sV.getId() == null || true){
 										
 										ComplementaryValues cV = sV.getComplementaryValues();
 										if(cV != null){
-											if(cV.getId() == null){
+											if(cV.getId() == null || true){
 												if(cV.getCareer() != null && cV.getSubject() != null){
 													//TODO
 													Subject s2 = cV.getSubject();
@@ -181,9 +183,11 @@ public class PlanDao {
 													sV.setComplementaryValues(null);
 												}
 											}
+											sV.setId(subjectValuesDao.generateId()); 
+											subjectValuesDao.saveSubjectValue(sV);
+										}else{
+											sVToRemoveList.add(sV);
 										}
-										sV.setId(subjectValuesDao.generateId()); 
-										subjectValuesDao.saveSubjectValue(sV);
 									}
 								}
 							}
@@ -191,7 +195,13 @@ public class PlanDao {
 						s.setId(semesterDao.generateId(s));
 						semesterDao.saveSemester(s);
 					}
+					
+					for(SubjectValues sVT : sVToRemoveList){						
+						s.getSubjects().remove(sVT);
+					}
+					
 				}
+				
 				plan.setId(generateId());
 				ofy().save().entity(plan).now();
 			}
