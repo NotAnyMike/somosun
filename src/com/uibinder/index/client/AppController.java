@@ -108,10 +108,10 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 		History.addValueChangeHandler(this);
 		
 		eventBus.addHandler(GenerateAcademicHistoryFromStringEvent.TYPE, new GenerateAcademicHistoryFromStringEventHandler(){
-					@Override
-					public void doGenerateAcademicHistoryFromString(String academicHisotry){
-						generateAcademicHistoryFromString(academicHisotry);
-					}
+			@Override
+			public void doGenerateAcademicHistoryFromString(String academicHisotry){
+				generateAcademicHistoryFromString(academicHisotry);
+			}
 		});
 		
 		eventBus.addHandler(ContinueDefaultCareerEvent.TYPE, new ContinueDefaultCareerEventHandler(){
@@ -141,7 +141,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 		if(planPresenter == null){
 			planPresenter = new PlanPresenter(rpcService, eventBus, planView, siaSummaryView, student);
 		}
-		if(student.isAdmin()==false){
+		if(student == null || student.isAdmin()==false){
 			planPresenter.deleteAdminButtons();
 		}
 		
@@ -220,6 +220,11 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 				}
 				if(createPresenter == null){
 					createPresenter = new CreatePresenter(rpcService, eventBus, createView);					
+				}
+				if(student == null){					
+					createPresenter.showWarning();
+				}else{
+					createPresenter.hideWarning();
 				}
 				createPresenter.go(RootPanel.get("centerArea"));
 			} else if(token.equals("plan")) {
@@ -328,7 +333,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 		} else {
 			topBarPresenter.setUserName("invitado");
 		}
-		topBarPresenter.showAdminLink(student.isAdmin());
+		topBarPresenter.showAdminLink((student == null ? false : student.isAdmin()));
 	}
 	
 	public void getLoginInfo(){
@@ -341,6 +346,9 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 				loginInfo = null;
 				student = null;
 				loadLogin(false);
+				if(createPresenter != null)	{
+					createPresenter.showWarning();
+				}
 			}
 
 			@Override
@@ -348,6 +356,11 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 				loginInfo = result;
 				student = loginInfo.getStudent();
 				loadLogin(true);
+				if(createPresenter != null && loginInfo.isLoggedIn())	{
+					createPresenter.hideWarning();
+				}else{
+					createPresenter.showWarning();
+				}
 			}});
 	}
 	

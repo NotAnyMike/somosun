@@ -25,18 +25,25 @@ public class StudentDao {
 	private void saveStudent(Student student){
 		if(student != null){
 			if(getStudentByIdG(student.getIdG())==null){ //looking if there is someone with its id from the google account service
-				student.setAdmin(true);
+				//student.setAdmin(true);
 				ofy().save().entity(student).now();			
 			}			
 		}
 	}
 	
 	public Student getStudentByUser(User user){
-		Student student = getStudentByIdG(user.getUserId());
-		if(student == null){
-			student.setIdSun(generateId());
-			student = new Student(user.getUserId(), user.getNickname(), user.getNickname(), user.getEmail());
-			saveStudent(student);
+		
+		Student student = null;
+		
+		if(user != null){	
+			if(user.getUserId().equals("0") == false){				
+				student = getStudentByIdG(user.getUserId());
+				if(student == null){
+					student = new Student(user.getUserId(), user.getNickname(), user.getNickname(), user.getEmail());
+					student.setIdSun(generateId());
+					saveStudent(student);
+				}
+			}
 		}
 		return student;
 	}

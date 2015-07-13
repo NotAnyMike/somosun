@@ -12,6 +12,8 @@ public interface CreateView {
 		void onContinueButtonClicked(String academicHistory);
 		void getCareers(String sede);
 		void onContinueDefaultButtonClick(String careerCode);
+		void showWarning();
+		void hideWarning();
 	}
 	
 	void setPresenter(Presenter presenter);
@@ -22,4 +24,7 @@ public interface CreateView {
 	public String getCurrentDefaultCareerValue();
 	public void setNewAnalyzedPlanButtonEnable(boolean b);
 	public void setModelAnalyzedPlanButtonEnable(boolean b);
+	void showWarning();
+	void hideWarning();
+	
 }

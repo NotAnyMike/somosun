@@ -22,6 +22,9 @@ public class SomosUNUtils {
 	public static final String UKNOWN_SG_CODE = "unknown";
 	public static final String UKNOWN_SG_NAME = "Agrupación desconocida";
 	
+	public static final String COLOR_CO = "666";
+	public static final String COLOR_PRE = "000";
+	
 	/**
 	 * This method will recive a career and return a string of the code followed by it name<br></br>
 	 * e.g. @return "(2522) Administración de empresas" <br></br>

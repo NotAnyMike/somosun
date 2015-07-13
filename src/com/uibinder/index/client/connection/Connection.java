@@ -1,12 +1,10 @@
 package com.uibinder.index.client.connection;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.gwtbootstrap3.client.ui.Icon;
 
 import com.uibinder.index.client.widget.LineWidget;
 import com.uibinder.index.client.widget.SubjectWidget;
+import com.uibinder.index.shared.SomosUNUtils;
 
 public class Connection {
 
@@ -26,8 +24,8 @@ public class Connection {
 	private int inLeft = 0;
 	private int inRight = 0;
 	
-	private final String CO = "666";
-	private final String PRE = "000";
+	private final String CO = SomosUNUtils.COLOR_CO;
+	private final String PRE = SomosUNUtils.COLOR_PRE;
 	
 	public Connection(SubjectWidget from, SubjectWidget to, String type){
 		this.from = from;

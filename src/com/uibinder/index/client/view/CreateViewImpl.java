@@ -9,8 +9,11 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class CreateViewImpl extends Composite implements CreateView {
@@ -23,6 +26,7 @@ public class CreateViewImpl extends Composite implements CreateView {
 	@UiField Button resetButton;
 	@UiField TextBox textBoxCreate;
 	@UiField ListBox listBoxCreate;
+	@UiField HTMLPanel htmlPanelWarning;
 
 	private static CreateViewUiBinder uiBinder = GWT
 			.create(CreateViewUiBinder.class);
@@ -73,6 +77,18 @@ public class CreateViewImpl extends Composite implements CreateView {
 	public void setModelAnalyzedPlanButtonEnable(boolean b) {
 		modelAnalyzedPlanButton.setEnabled(b);
 	}
+
+	@Override
+	public void showWarning() {
+		htmlPanelWarning.setVisible(true);
+		htmlPanelWarning.getElement().setAttribute("style", "display: visible");
+	}
+	
+	@Override
+	public void hideWarning() {
+		htmlPanelWarning.setVisible(false);
+		htmlPanelWarning.getElement().setAttribute("style", "display: none");
+	}
 	
 	/********************* Firing Events *********************/
 	
@@ -108,7 +124,5 @@ public class CreateViewImpl extends Composite implements CreateView {
 			presenter.onContinueDefaultButtonClick(listBoxCreate.getSelectedValue());
 		}
 	}
-
-
 
 }
