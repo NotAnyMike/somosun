@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <datastore-indexes autoGenerate="true">
     
-	<datastore-index kind="Group" ancestor="false">
-		<property name="groupNumber" direction="asc"/>
-		<property name="subject" direction="asc"/>
-		<property name="semesterValue" direction="asc"/>
-	</datastore-index>
-	
 	<datastore-index kind="SemesterValue" ancestor="false">
 		<property name="year" direction="asc"/>
 		<property name="numberSemester" direction="asc"/>
@@ -29,7 +23,7 @@
 	
 	<datastore-index kind="SubjectGroup" ancestor="false">
 	    <property name="name" direction="asc"/>
-	    <property name="career.code" direction="asc"></property>
+	    <property name="career.code" direction="asc"/>
 	    <property name="fundamental" direciton="asc"/>
 	</datastore-index>
 	

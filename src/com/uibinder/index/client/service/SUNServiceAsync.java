@@ -80,4 +80,6 @@ public interface SUNServiceAsync {
 
 	void getSubjectGroups(String careerCode, AsyncCallback<List<SubjectGroup>> callback);
 
+	void getCareer(String careerCode, AsyncCallback<Career> callback);
+
 }

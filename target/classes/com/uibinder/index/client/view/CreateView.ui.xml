@@ -48,7 +48,7 @@
 	    </div>
 	  </section>
 	  <g:HTMLPanel ui:field="htmlPanelWarning">
-	  	<div class="alert alert-danger" role="alert" style="width:700px">Si no ingresas con tu usuario, los cambios que hagas se perderan para siempre en el espacio-tiempo.</div>
+	  	<div class="alert alert-danger" role="alert" style="width:700px">Si no ingresas con tu usuario, los cambios que hagas se perderán para siempre en el espacio-tiempo.</div>
 	  </g:HTMLPanel>
 	</g:HTMLPanel>
 </ui:UiBinder> 

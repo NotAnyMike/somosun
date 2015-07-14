@@ -15,6 +15,7 @@ import com.google.gwt.user.client.ui.HasWidgets;
 import com.uibinder.index.client.event.ContinueDefaultCareerEvent;
 import com.uibinder.index.client.event.ContinueDefaultCareerEventHandler;
 import com.uibinder.index.client.event.GenerateAcademicHistoryFromStringEvent;
+import com.uibinder.index.client.event.NewEmptyPlanEvent;
 import com.uibinder.index.client.service.SUNService;
 import com.uibinder.index.client.service.SUNServiceAsync;
 import com.uibinder.index.client.view.CreateView;
@@ -117,6 +118,11 @@ public class CreatePresenter implements Presenter, CreateView.Presenter {
 	@Override
 	public void hideWarning() {
 		view.hideWarning();
+	}
+
+	@Override
+	public void onNewAnalyzedPlanButtonClicked(String careerCode) {
+		eventBus.fireEvent(new NewEmptyPlanEvent(careerCode));
 	}
 	
 	

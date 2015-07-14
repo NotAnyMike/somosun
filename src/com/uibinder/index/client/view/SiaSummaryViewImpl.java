@@ -1,17 +1,19 @@
 package com.uibinder.index.client.view;
 
+import org.gwtbootstrap3.client.ui.AnchorButton;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.VerticalButtonGroup;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
-import com.uibinder.index.client.view.IndexViewImpl.IndexViewUiBinder;
 
 public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 	
@@ -36,7 +38,14 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 	@UiField Label totalNecessaryLabel;
 	@UiField Label totalPerCentLabel;
 	
-	@UiField Button savePlanAsDefaultButton;
+	@UiField HTMLPanel htmlPanelWarning;
+	
+	@UiField VerticalButtonGroup verticalButtonGroupMenu;
+	
+	@UiField AnchorButton savePlanAsDefaultButton;
+	@UiField AnchorButton changePlanNameButton;
+	@UiField AnchorButton newPlanButton;
+	@UiField AnchorButton deletePlanButton;
 
 	@UiTemplate("SiaSummaryView.ui.xml")
 	interface SiaSummaryViewUiBinder extends UiBinder<Widget, SiaSummaryViewImpl> {}
@@ -50,6 +59,8 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 	
 	public SiaSummaryViewImpl(){
 		initWidget(uiBinder.createAndBindUi(this));
+		
+		newPlanButton.getElement().setAttribute("style", "color:#000;");
 	}
 	
 	@Override
@@ -173,9 +184,23 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 		savePlanAsDefaultButton.removeFromParent();
 	}
 	
+	@Override
+	public void showWarning() {
+		htmlPanelWarning.asWidget().setVisible(true);
+		verticalButtonGroupMenu.asWidget().setVisible(false);
+	}
+
+	@Override
+	public void hideWarning() {
+		htmlPanelWarning.asWidget().setVisible(false);
+		verticalButtonGroupMenu.asWidget().setVisible(true);
+	}
+	
 	/***************** Handlers *********************/
+	
 	@UiHandler("savePlanAsDefaultButton")
 	public void onSavePlanAsDefaultClicked(ClickEvent event){
 		presenter.onSavePlanAsDefaultClicked();
 	}
+
 }

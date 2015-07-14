@@ -1,5 +1,6 @@
 package com.uibinder.index.client.view;
 
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface SiaSummaryView {
@@ -23,5 +24,7 @@ public interface SiaSummaryView {
 	void setTotalNecessary(int x);
 	void setTotalPerCent(int x);
 	void deleteAdminButtons();
+	void showWarning();
+	void hideWarning();
 
 }

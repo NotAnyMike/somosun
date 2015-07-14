@@ -16,6 +16,8 @@ import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment.HorizontalAlignmentConstant;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -270,6 +272,8 @@ DefaultSubjectCreationView.Presenter{
 		subContainer.add(boundaryPanel);
 		
 		subContainer.add(siaSummaryView.asWidget());
+		subContainer.setCellHorizontalAlignment(siaSummaryView.asWidget(), HasHorizontalAlignment.ALIGN_LEFT);
+		
 		
 		subContainer.setHorizontalAlignment(HorizontalPanel.ALIGN_CENTER);
 		
@@ -1050,7 +1054,7 @@ DefaultSubjectCreationView.Presenter{
 		});
 	}
 	
-	/************ behaviors when clicked *******************/
+	/************ Behaviors when clicked *******************/
 	
 	public void onSpecificSubjectSelected(String subjectName, String subjectCode, String careerCode) {
 		
@@ -1127,7 +1131,7 @@ DefaultSubjectCreationView.Presenter{
 			subjectValuesSelected = sV;
 			
 			//get complementary values from sia
-			getComplementaryValues(sV);
+			//getComplementaryValues(sV); //TODO uncomment or delete
 			
 			//Show/Create lines
 			showConnections(sV);
@@ -1248,7 +1252,6 @@ DefaultSubjectCreationView.Presenter{
 		$wnd.stopPropagationOfClickOnSelectSubject()
 	}-*/;
 
-	
 	/************************************************************/
 
 	

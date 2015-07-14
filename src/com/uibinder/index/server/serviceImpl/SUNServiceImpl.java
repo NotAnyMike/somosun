@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import java.util.logging.Logger;
+
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
@@ -11,7 +13,6 @@ import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Transaction;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.uibinder.index.client.service.SUNService;
-import com.uibinder.index.client.widget.SubjectWidget;
 import com.uibinder.index.server.SiaProxy;
 import com.uibinder.index.server.dao.CareerDao;
 import com.uibinder.index.server.dao.ComplementaryValuesDao;
@@ -45,6 +46,8 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	private static final Logger log = Logger.getLogger("testing-sunServiceImpl");
+
 
 	@Override
 	public Subject getSubjectByCode(int code) {
@@ -612,6 +615,20 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		}
 		
 		return subjectGroupsListToReturn;
+	}
+
+	@Override
+	public Career getCareer(String careerCode) {
+		
+		Career c = null;
+		
+		if(careerCode != null){
+			CareerDao careerDao = new CareerDao();
+			c = careerDao.getCareerByCode(careerCode);
+			log.info("hola");
+		}
+		
+		return c; 
 	}
 	
 }

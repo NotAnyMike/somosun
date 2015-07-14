@@ -41,6 +41,7 @@ public interface SUNService extends RemoteService{
 	public SiaResultSubjects getSubjectFromSia(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede, Student student, List<String> subjectCodeList);
 	
 	public List<Career> getCareers(String sede);
+	public Career getCareer(String careerCode);
 	
 	public Plan getPlanDefaultFromString(String careerCode);
 	

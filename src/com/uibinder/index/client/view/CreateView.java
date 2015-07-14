@@ -1,6 +1,7 @@
 package com.uibinder.index.client.view;
 
 
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -14,6 +15,7 @@ public interface CreateView {
 		void onContinueDefaultButtonClick(String careerCode);
 		void showWarning();
 		void hideWarning();
+		void onNewAnalyzedPlanButtonClicked(String careerCode);
 	}
 	
 	void setPresenter(Presenter presenter);
@@ -26,5 +28,6 @@ public interface CreateView {
 	public void setModelAnalyzedPlanButtonEnable(boolean b);
 	void showWarning();
 	void hideWarning();
+	void onNewAnalyzedPlanButtonClicked(ClickEvent e);
 	
 }

@@ -16,10 +16,12 @@ import com.uibinder.index.client.event.ContinueDefaultCareerEvent;
 import com.uibinder.index.client.event.ContinueDefaultCareerEventHandler;
 import com.uibinder.index.client.event.GenerateAcademicHistoryFromStringEvent;
 import com.uibinder.index.client.event.GenerateAcademicHistoryFromStringEventHandler;
+import com.uibinder.index.client.event.NewEmptyPlanEvent;
+import com.uibinder.index.client.event.NewEmptyPlanEventHandler;
 import com.uibinder.index.client.event.SavePlanAsDefaultEvent;
 import com.uibinder.index.client.event.SavePlanAsDefaultHandler;
-import com.uibinder.index.client.presenter.AnnouncementPresenter;
 import com.uibinder.index.client.presenter.AboutUsPresenter;
+import com.uibinder.index.client.presenter.AnnouncementPresenter;
 import com.uibinder.index.client.presenter.CreatePresenter;
 import com.uibinder.index.client.presenter.DndPresenter;
 import com.uibinder.index.client.presenter.IndexPresenter;
@@ -30,17 +32,18 @@ import com.uibinder.index.client.presenter.TopBarPresenter;
 import com.uibinder.index.client.service.LoginService;
 import com.uibinder.index.client.service.LoginServiceAsync;
 import com.uibinder.index.client.service.SUNServiceAsync;
-import com.uibinder.index.client.view.AnnouncementViewImpl;
 import com.uibinder.index.client.view.AboutUsViewImpl;
+import com.uibinder.index.client.view.AnnouncementViewImpl;
+import com.uibinder.index.client.view.CreateViewImpl;
 import com.uibinder.index.client.view.DndViewImpl;
 import com.uibinder.index.client.view.IndexViewImpl;
 import com.uibinder.index.client.view.LoadingViewImpl;
 import com.uibinder.index.client.view.PlanViewImpl;
 import com.uibinder.index.client.view.SiaSummaryViewImpl;
 import com.uibinder.index.client.view.TopBarViewImpl;
-import com.uibinder.index.client.view.CreateViewImpl;
 import com.uibinder.index.shared.LoginInfo;
 import com.uibinder.index.shared.RandomPhrase;
+import com.uibinder.index.shared.control.Career;
 import com.uibinder.index.shared.control.Plan;
 import com.uibinder.index.shared.control.Student;
 
@@ -128,21 +131,33 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 			}
 			
 		});
+		
+		eventBus.addHandler(NewEmptyPlanEvent.TYPE, new NewEmptyPlanEventHandler(){
+
+			@Override
+			public void onNewEmptyPlanButtonClicked(String careerCode) {
+				generateEmptyPlan(careerCode);
+			}
+			
+		});
 	}
 	
 	private void genereteDefaultPlan(String careerCode){
 		showLoadingPage();
 		
-		if(planView == null){
-			planView = new PlanViewImpl();
-			siaSummaryView = new SiaSummaryViewImpl();
+		planView = new PlanViewImpl();
+		siaSummaryView = new SiaSummaryViewImpl();
 			
-		}
-		if(planPresenter == null){
-			planPresenter = new PlanPresenter(rpcService, eventBus, planView, siaSummaryView, student);
-		}
+		planPresenter = new PlanPresenter(rpcService, eventBus, planView, siaSummaryView, student);
+		
 		if(student == null || student.isAdmin()==false){
 			planPresenter.deleteAdminButtons();
+		}
+		
+		if(student == null){
+			siaSummaryView.showWarning();
+		}else{
+			siaSummaryView.hideWarning();
 		}
 		
 		rpcService.getPlanDefault(careerCode, new AsyncCallback<Plan>(){
@@ -161,6 +176,28 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 			
 		});
 	
+	}
+	
+	private void generateEmptyPlan(String careerCode) {
+		showLoadingPage();
+		Window.alert("got it");
+		/**
+		 * use the rpcService.createEmptyPlan(careerCode);
+		 */
+		rpcService.getCareer(careerCode, new AsyncCallback<Career>(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("sorry we got an error");
+				History.newItem("create");
+			}
+
+			@Override
+			public void onSuccess(Career result) {
+			}
+			
+		});
+		
 	}
 	
 	private void generateAcademicHistoryFromString(String academicHistory){
@@ -236,7 +273,12 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 //					planPresenter = new PlanPresenter(rpcService, eventBus, planView, siaSummaryView, student);
 //				}
 				if(planView != null && planPresenter != null){
-					planPresenter.go(RootPanel.get("centerArea"));					
+					planPresenter.go(RootPanel.get("centerArea"));
+					if(student == null){
+						siaSummaryView.showWarning();
+					}else{
+						siaSummaryView.hideWarning();						
+					}
 				}else{
 					History.newItem("create");
 				}
@@ -349,6 +391,9 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 				if(createPresenter != null)	{
 					createPresenter.showWarning();
 				}
+				if(siaSummaryView != null){
+					siaSummaryView.showWarning();
+				}
 			}
 
 			@Override
@@ -356,10 +401,20 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 				loginInfo = result;
 				student = loginInfo.getStudent();
 				loadLogin(true);
-				if(createPresenter != null && loginInfo.isLoggedIn())	{
-					createPresenter.hideWarning();
-				}else{
-					createPresenter.showWarning();
+				if(createPresenter != null){
+					if(loginInfo.isLoggedIn())	{
+						createPresenter.hideWarning();
+					}else{
+						createPresenter.showWarning();
+					}					
+				}
+				if(siaSummaryView != null){
+					if(loginInfo.isLoggedIn()){
+						siaSummaryView.hideWarning();
+					}else{
+						siaSummaryView.showWarning();
+					}
+					
 				}
 			}});
 	}

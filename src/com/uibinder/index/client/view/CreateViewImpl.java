@@ -124,5 +124,10 @@ public class CreateViewImpl extends Composite implements CreateView {
 			presenter.onContinueDefaultButtonClick(listBoxCreate.getSelectedValue());
 		}
 	}
+	
+	@UiHandler("newAnalyzedPlanButton")
+	public void onNewAnalyzedPlanButtonClicked(ClickEvent event){
+		presenter.onNewAnalyzedPlanButtonClicked(listBoxCreate.getSelectedValue());
+	}
 
 }
