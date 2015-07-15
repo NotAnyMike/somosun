@@ -282,6 +282,8 @@ DefaultSubjectCreationView.Presenter{
 		searchSubjectView.hideIt();
 		container.add(subContainer);
 		
+		addEventListenerOnChangeToSiaSummary();
+		
 		addClickSearchField();
 		
 	}
@@ -1099,11 +1101,14 @@ DefaultSubjectCreationView.Presenter{
 		$wnd.addClickSearchField();
 	}-*/;
 
-	
 	public static native void avoidAccordionPropagation() /*-{
 		$wnd.stopPropagationOfClickOnSelectSubject()
 	}-*/;
 
+	public static native void addEventListenerOnChangeToSiaSummary() /*-{
+		$wnd.addEventListenerOnScroll()
+	}-*/;
+	
 	/************************************************************/
 
 	/************ Behaviors when clicked *******************/

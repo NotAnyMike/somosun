@@ -1,8 +1,4 @@
 $(window).load(function(){
-	//showTooltip();
-});
-
-$(window).load(function(){
 	arrangeLeft("#footer")
 });
 
@@ -15,16 +11,18 @@ $(window).load(function(){
 });
 
 function arrangeLeft(id){
-	$(window).scroll(function(){
-		$(id).css({
-			var left = $(this).scrollLeft() + ($(window).width()-$(id).width())/2
-			if($(window).width() < $(id).width){
-				left = 0
-			}
-			'left': left, 'margin-left': 0
-		});
-	});
+	$(window).scroll(correctMaringLeft(id));
 };
+
+function correctMaringLeft(id){
+	var leftVar = $(this).scrollLeft() + ($(window).width()- $(id).width())/2
+	if($(window).width() < $(id).width()){
+		leftVar = 0
+	}
+	$(id).css({
+		'left': leftVar, 'margin-left': 0
+	});
+}
 
 function arrangeTopOfSearchBox(){
 	$("#searchSubjectMainDiv").css({'top':$(window).scrollTop() + 80});
@@ -42,6 +40,13 @@ function addClickSearchField(){
 			document.getElementById("searchButton").dispatchEvent(click_ev);
 	    }
 	});
+}
+
+function addEventListenerOnScroll(){
+	correctMaringLeft("#siaSummary")
+	arrangeLeft("#siaSummary")
+	correctMaringLeft("#searchSubjectMainDiv")
+	arrangeLeft("#searchSubjectMainDiv")
 }
 
 function stopPropagationOfClickOnSelectSubject(){
