@@ -272,11 +272,8 @@ DefaultSubjectCreationView.Presenter{
 		subContainer.add(boundaryPanel);
 		
 		subContainer.add(siaSummaryView.asWidget());
-		//subContainer.setCellHorizontalAlignment(siaSummaryView.asWidget(), HasHorizontalAlignment.ALIGN_LEFT);
+
 		subContainer.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_LEFT);
-		
-		
-		subContainer.setHorizontalAlignment(HorizontalPanel.ALIGN_CENTER);
 		
 		container.add(warningDeleteSubjectView);
 		container.add(searchSubjectView);
