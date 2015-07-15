@@ -122,5 +122,14 @@ public class ComplementaryValuesDao extends Dao {
 		
 	}
 
+	public List<ComplementaryValues> getMandatoryComplementaryValues(String careerCode) {
+		
+		List<ComplementaryValues> list = null;
+		
+		list = ofy().load().type(ComplementaryValues.class).filter("career.code", careerCode).filter("mandatory", true).list();
+				
+		return list;
+	}
+
 	
 }

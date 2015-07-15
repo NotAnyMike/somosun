@@ -41,7 +41,7 @@ public interface SUNService extends RemoteService{
 	public SiaResultSubjects getSubjectFromSia(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede, Student student, List<String> subjectCodeList);
 	
 	public List<Career> getCareers(String sede);
-	public Career getCareer(String careerCode);
+	public Career getCareerToUse(String careerCode);
 	
 	public Plan getPlanDefaultFromString(String careerCode);
 	
@@ -49,6 +49,7 @@ public interface SUNService extends RemoteService{
 	
 	public ComplementaryValues getComplementaryValuesFromMisPlanes(String career, String code);
 	public List<ComplementaryValues> getComplementaryValuesFromMisPlanes(String careerCode);
+	public List<ComplementaryValues> getMandatoryComplementaryValues(String careerCode);
 	public ComplementaryValues createDefaultSubject(String subjectGroupName, String credits, String careerCode, Student student);
 	
 	List<ComplementaryValues> getComplementaryValues(List<String> selectedSubjectCodeStrings, List<String> selectedSubjectCareerStrings);

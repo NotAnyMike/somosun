@@ -3,7 +3,6 @@ package com.uibinder.index.server.serviceImpl;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
 import java.util.logging.Logger;
 
 import com.google.appengine.api.datastore.DatastoreService;
@@ -11,6 +10,7 @@ import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Transaction;
+import com.google.appengine.api.log.AppLogLine;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.uibinder.index.client.service.SUNService;
 import com.uibinder.index.server.SiaProxy;
@@ -617,18 +617,51 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		return subjectGroupsListToReturn;
 	}
 
+	/**
+	 * if the career has no analysis, this method will run it before returning the career
+	 */
 	@Override
-	public Career getCareer(String careerCode) {
+	public Career getCareerToUse(String careerCode) {
+
+		log.info("hola");
+		AppLogLine log = new AppLogLine();
+		log.setLogMessage("olaaasas");
 		
 		Career c = null;
+		CareerDao careerDao = new CareerDao();
 		
 		if(careerCode != null){
-			CareerDao careerDao = new CareerDao();
 			c = careerDao.getCareerByCode(careerCode);
-			log.info("hola");
+		}
+		
+		if(c != null && c.hasAnalysis() == false){
+			analyzeCareer(c.getCode());
+			
+			c = careerDao.getCareerByCode(careerCode);
+			
 		}
 		
 		return c; 
+	}
+
+	@Override
+	public List<ComplementaryValues> getMandatoryComplementaryValues(String careerCode) {
+		
+		List<ComplementaryValues> listToReturn = null;
+		
+		if(careerCode != null){
+			ComplementaryValuesDao cVDao = new ComplementaryValuesDao();
+			List<ComplementaryValues> cVListT = cVDao.getMandatoryComplementaryValues(careerCode);
+			
+			if(cVListT != null && cVListT.size() > 0){
+				listToReturn = new ArrayList<ComplementaryValues>();
+				for(ComplementaryValues cVT : cVListT){
+					listToReturn.add(cVT);
+				}
+			}
+		}
+		
+		return listToReturn;
 	}
 	
 }

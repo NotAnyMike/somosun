@@ -19,7 +19,13 @@
 	  	<div class="alert alert-danger" role="alert" style="width:150px">No ingresaste con tu cuenta, tus cambios no serán guardados</div>
 	  </g:HTMLPanel>
       <b:VerticalButtonGroup ui:field="verticalButtonGroupMenu">
-      	<b:AnchorButton ui:field="savePlanAsDefaultButton">Save as Default</b:AnchorButton>
+		<b:ButtonGroup ui:field="adminButtonsButtonGroup">
+			<b:Button dataToggle="DROPDOWN">Admin Options</b:Button>
+			<b:DropDownMenu>
+				<b:AnchorListItem ui:field="addMandatorySubjectsButton">Add mandatory Subjects</b:AnchorListItem>
+				<b:AnchorListItem ui:field="savePlanAsDefaultButton">Save as default</b:AnchorListItem>
+			</b:DropDownMenu>
+		</b:ButtonGroup>
         <b:AnchorButton ui:field="changePlanNameButton">Cambiar nombre</b:AnchorButton>
         <b:AnchorButton ui:field="newPlanButton" href="#create">Nuevo plan</b:AnchorButton>
         <b:AnchorButton type="WARNING" ui:field="deletePlanButton">Eliminar plan</b:AnchorButton>
@@ -109,13 +115,13 @@
 		</table>
         <div class="siaSummaryInfoContainer">
           <div class="siaSummaryRow">
-            <div style="background-color:#4CAF50" class="siaSummaryLine"></div><span aria-hidden="true" style="color:#4CAF50" class="glyphicon glyphicon-chevron-right"></span>
-            <div style="background-color:#4CAF50" class="siaSummaryColorContainer"></div>
+            <div style="background-color:#E91E63" class="siaSummaryLine"></div><span aria-hidden="true" style="color:#E91E63" class="glyphicon glyphicon-chevron-right"></span>
+            <div style="background-color:#E91E63" class="siaSummaryColorContainer"></div>
             <div class="siaSummaryCabelContainer">Prerequisito</div>
           </div>
           <div class="siaSummaryRow">
-            <div style="background-color:#00B0FF" class="siaSummaryLine"></div><span aria-hidden="true" style="color:#00B0FF" class="glyphicon glyphicon-chevron-right"></span>
-            <div style="background-color:#00B0FF" class="siaSummaryColorContainer"></div>
+            <div style="background-color:#9C27B0" class="siaSummaryLine"></div><span aria-hidden="true" style="color:#9C27B0" class="glyphicon glyphicon-chevron-right"></span>
+            <div style="background-color:#9C27B0" class="siaSummaryColorContainer"></div>
             <div class="siaSummaryCabelContainer">Correquisito</div>
           </div><a>Reportar un error</a>
         </div>

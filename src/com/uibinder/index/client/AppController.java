@@ -1,8 +1,11 @@
 package com.uibinder.index.client;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import com.google.appengine.api.log.AppLogLine;
+import com.google.appengine.api.log.LogServiceFactory;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -45,6 +48,7 @@ import com.uibinder.index.shared.LoginInfo;
 import com.uibinder.index.shared.RandomPhrase;
 import com.uibinder.index.shared.control.Career;
 import com.uibinder.index.shared.control.Plan;
+import com.uibinder.index.shared.control.Semester;
 import com.uibinder.index.shared.control.Student;
 
 public class AppController implements Presenter, ValueChangeHandler<String> {
@@ -145,20 +149,6 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	private void genereteDefaultPlan(String careerCode){
 		showLoadingPage();
 		
-		planView = new PlanViewImpl();
-		siaSummaryView = new SiaSummaryViewImpl();
-			
-		planPresenter = new PlanPresenter(rpcService, eventBus, planView, siaSummaryView, student);
-		
-		if(student == null || student.isAdmin()==false){
-			planPresenter.deleteAdminButtons();
-		}
-		
-		if(student == null){
-			siaSummaryView.showWarning();
-		}else{
-			siaSummaryView.hideWarning();
-		}
 		
 		rpcService.getPlanDefault(careerCode, new AsyncCallback<Plan>(){
 
@@ -170,7 +160,8 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 			@Override
 			public void onSuccess(Plan result) {
 				Plan plan = result;
-				planPresenter.setPlan(plan);
+				setPlanPresenter(plan);
+				//planPresenter.setPlan(plan);
 				History.newItem("plan");
 			}
 			
@@ -180,11 +171,11 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	
 	private void generateEmptyPlan(String careerCode) {
 		showLoadingPage();
-		Window.alert("got it");
 		/**
 		 * use the rpcService.createEmptyPlan(careerCode);
 		 */
-		rpcService.getCareer(careerCode, new AsyncCallback<Career>(){
+
+		rpcService.getCareerToUse(careerCode, new AsyncCallback<Career>(){
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -194,8 +185,9 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 
 			@Override
 			public void onSuccess(Career result) {
+				createEmptyPlan(result);
 			}
-			
+
 		});
 		
 	}
@@ -433,6 +425,42 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	
 	private void savePlanAsDefault(Plan plan) {
 		rpcService.savePlanAsDefault(student, plan, savedPlanAsDefault);
+	}
+	
+	private void createEmptyPlan(Career result) {
+		Plan plan = new Plan();
+		plan.setCareer(result);
+		List<Semester> semesters = new ArrayList<Semester>();
+		for(int x = 0; x < 10; x++){
+			Semester s = new Semester(Integer.toString(x));
+			semesters.add(s);
+		}
+		plan.setSemesters(semesters);
+		
+		setPlanPresenter(plan);
+		
+	}
+	
+	private void setPlanPresenter(Plan plan){
+		
+		planView = new PlanViewImpl();
+		siaSummaryView = new SiaSummaryViewImpl();
+			
+		planPresenter = new PlanPresenter(rpcService, eventBus, planView, siaSummaryView, student);
+		
+		if(student == null || student.isAdmin()==false){
+			planPresenter.deleteAdminButtons();
+		}
+		
+		if(student == null){
+			siaSummaryView.showWarning();
+		}else{
+			siaSummaryView.hideWarning();
+		}
+		
+		planPresenter.setPlan(plan);
+		
+		History.newItem("plan");
 	}
 	
 }

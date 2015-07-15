@@ -272,7 +272,8 @@ DefaultSubjectCreationView.Presenter{
 		subContainer.add(boundaryPanel);
 		
 		subContainer.add(siaSummaryView.asWidget());
-		subContainer.setCellHorizontalAlignment(siaSummaryView.asWidget(), HasHorizontalAlignment.ALIGN_LEFT);
+		//subContainer.setCellHorizontalAlignment(siaSummaryView.asWidget(), HasHorizontalAlignment.ALIGN_LEFT);
+		subContainer.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_LEFT);
 		
 		
 		subContainer.setHorizontalAlignment(HorizontalPanel.ALIGN_CENTER);
@@ -1054,6 +1055,60 @@ DefaultSubjectCreationView.Presenter{
 		});
 	}
 	
+	private void loadMandatoryValues(List<ComplementaryValues> list){
+		
+		if(plan != null && list != null){
+			for(int x = 0; x < 9; x++){
+				if(list.isEmpty() == false){					
+					List<ComplementaryValues> cVToAdd = new ArrayList<ComplementaryValues>(); 
+					for(int y = 0; y < 5; y++){
+						if(list.isEmpty() == false){						
+							cVToAdd.add(list.get(0));
+							list.remove(0);
+							System.out.println("Plan Presenter");
+						}else{
+							break;
+						}
+					}
+					if(cVToAdd.isEmpty() == false) addSubjectsToPlan(cVToAdd, Integer.toString(x));
+				}else{
+					break;
+				}
+			}
+		}
+		
+	}
+	
+	/******************** JQUERY FUNCTIONS *********************/
+
+	/**
+	 * This method makes that the SearchSubjectView appears right where it was clicked
+	 */
+	public static native void arrangeTopOfSearchSubjectView() /*-{
+		$wnd.arrangeTopOfSearchBox();
+	}-*/;
+	
+	/**
+	 * This method takes care of showing the property "title" in a better way
+	 */
+	public static native void showToolTip() /*-{
+	  $wnd.showTooltip();
+	}-*/;
+	
+	/**
+	 * This method takes care of making the searchBox work with enter
+	 */
+	public static native void addClickSearchField() /*-{
+		$wnd.addClickSearchField();
+	}-*/;
+
+	
+	public static native void avoidAccordionPropagation() /*-{
+		$wnd.stopPropagationOfClickOnSelectSubject()
+	}-*/;
+
+	/************************************************************/
+
 	/************ Behaviors when clicked *******************/
 	
 	public void onSpecificSubjectSelected(String subjectName, String subjectCode, String careerCode) {
@@ -1224,35 +1279,21 @@ DefaultSubjectCreationView.Presenter{
 		
 	}
 	
-	/******************** JQUERY FUNCTIONS *********************/
+	public void onAddMandatorySubjectsButton() {
+		rpcService.getMandatoryComplementaryValues(plan.getCareerCode(), new AsyncCallback<List<ComplementaryValues>>(){
 
-	/**
-	 * This method makes that the SearchSubjectView appears right where it was clicked
-	 */
-	public static native void arrangeTopOfSearchSubjectView() /*-{
-		$wnd.arrangeTopOfSearchBox();
-	}-*/;
-	
-	/**
-	 * This method takes care of showing the property "title" in a better way
-	 */
-	public static native void showToolTip() /*-{
-	  $wnd.showTooltip();
-	}-*/;
-	
-	/**
-	 * This method takes care of making the searchBox work with enter
-	 */
-	public static native void addClickSearchField() /*-{
-		$wnd.addClickSearchField();
-	}-*/;
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Error - mandatory subjects cannot be loaded.");
+			}
 
-	
-	public static native void avoidAccordionPropagation() /*-{
-		$wnd.stopPropagationOfClickOnSelectSubject()
-	}-*/;
-
-	/************************************************************/
+			@Override
+			public void onSuccess(List<ComplementaryValues> result) {
+				loadMandatoryValues(result);				
+			}
+			
+		});
+	}
 
 	
 }

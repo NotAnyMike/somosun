@@ -11,6 +11,11 @@
 		<property name="subject.code" direction="asc"/>
 	</datastore-index>
 	
+	<datastore-index kind="ComplementaryValues" ancestor="false">
+		<property name="career.code" direction="asc"/>
+		<property name="mandatory" direction="asc"/>
+	</datastore-index>
+	
 	<datastore-index kind="Plan" ancestor="false">
 	    <property name="isDefault" direction="asc"/>
 	    <property name="career.code" direciton="asc"/>

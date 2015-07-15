@@ -17,7 +17,11 @@ $(window).load(function(){
 function arrangeLeft(id){
 	$(window).scroll(function(){
 		$(id).css({
-			'left': $(this).scrollLeft() + ($(window).width()-$(id).width())/2, 'margin-left': 0
+			var left = $(this).scrollLeft() + ($(window).width()-$(id).width())/2
+			if($(window).width() < $(id).width){
+				left = 0
+			}
+			'left': left, 'margin-left': 0
 		});
 	});
 };

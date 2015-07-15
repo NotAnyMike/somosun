@@ -1,7 +1,9 @@
 package com.uibinder.index.client.view;
 
 import org.gwtbootstrap3.client.ui.AnchorButton;
+import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.gwtbootstrap3.client.ui.VerticalButtonGroup;
 
 import com.google.gwt.core.client.GWT;
@@ -41,8 +43,11 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 	@UiField HTMLPanel htmlPanelWarning;
 	
 	@UiField VerticalButtonGroup verticalButtonGroupMenu;
+	@UiField ButtonGroup adminButtonsButtonGroup;
 	
-	@UiField AnchorButton savePlanAsDefaultButton;
+	@UiField AnchorListItem savePlanAsDefaultButton;
+	@UiField AnchorListItem addMandatorySubjectsButton;
+	
 	@UiField AnchorButton changePlanNameButton;
 	@UiField AnchorButton newPlanButton;
 	@UiField AnchorButton deletePlanButton;
@@ -181,7 +186,7 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 
 	@Override
 	public void deleteAdminButtons() {
-		savePlanAsDefaultButton.removeFromParent();
+		adminButtonsButtonGroup.removeFromParent();
 	}
 	
 	@Override
@@ -201,6 +206,11 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 	@UiHandler("savePlanAsDefaultButton")
 	public void onSavePlanAsDefaultClicked(ClickEvent event){
 		presenter.onSavePlanAsDefaultClicked();
+	}
+	
+	@UiHandler("addMandatorySubjectsButton")
+	public void onAddMandatorySubjectsButton(ClickEvent event){
+		presenter.onAddMandatorySubjectsButton();
 	}
 
 }

@@ -70,16 +70,14 @@ public interface SUNServiceAsync {
 
 	void getComplementaryValues(List<String> selectedSubjectCodeStrings, List<String> selectedSubjectCareerStrings, AsyncCallback<List<ComplementaryValues>> callback);
 
-	void getSubjectFromSia(String nameOrCode, String typology, String career,
-			String scheduleCP, int page, int ammount, String sede,
-			Student student, AsyncCallback<SiaResultSubjects> callback);
+	void getSubjectFromSia(String nameOrCode, String typology, String career,String scheduleCP, int page, int ammount, String sede,	Student student, AsyncCallback<SiaResultSubjects> callback);
 
-	void createDefaultSubject(String subjectGroupName, String credits,
-			String careerCode, Student student,
-			AsyncCallback<ComplementaryValues> callback);
+	void createDefaultSubject(String subjectGroupName, String credits,String careerCode, Student student,AsyncCallback<ComplementaryValues> callback);
 
 	void getSubjectGroups(String careerCode, AsyncCallback<List<SubjectGroup>> callback);
 
-	void getCareer(String careerCode, AsyncCallback<Career> callback);
+	void getCareerToUse(String careerCode, AsyncCallback<Career> callback);
+
+	void getMandatoryComplementaryValues(String careerCode,	AsyncCallback<List<ComplementaryValues>> callback);
 
 }
