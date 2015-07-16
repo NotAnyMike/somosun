@@ -18,7 +18,13 @@
 				<b:Button ui:field="changeNameButton" type="SUCCESS">Cambiar</b:Button>
 				<b:Button ui:field="cancelChangeNameButton" type="WARNING">Cancelar</b:Button>
 			</div>
+	    </g:HTMLPanel>	
+	    <g:HTMLPanel ui:field="generalConfirmationHTMLPanel">
+			<div class="mainContainerChangeName" style="height:auto">
+				<h3><b:Label ui:field="generalLabel"></b:Label></h3>
+				<b:Button ui:field="deleteGeneralButton" type="DANGER">Borrar</b:Button>
+				<b:Button ui:field="cancelGeneralButton" type="SUCCESS">Cancelar</b:Button>
+			</div>
 	    </g:HTMLPanel>
-
 	</g:HTMLPanel>
 </ui:UiBinder> 

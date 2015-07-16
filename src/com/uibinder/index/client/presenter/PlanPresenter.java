@@ -666,11 +666,6 @@ DefaultSubjectCreationView.Presenter{
 		
 	}
 	
-	private void deleteSemesterClicked(ClickEvent event) {
-		Widget w = (Widget) event.getSource();
-		deleteSemester(Integer.valueOf(w.getElement().getAttribute("semester")));
-	}
-
 	private void deleteSemester(Integer valueOfSemester) {
 		//deleting all subjects from a semester
 		Semester semester = semesterList.get(valueOfSemester);
@@ -896,7 +891,9 @@ DefaultSubjectCreationView.Presenter{
 		semester.getDeleteSemesterButton().addClickHandler(new ClickHandler(){
 			@Override
 			public void onClick(ClickEvent event) {
-				deleteSemesterClicked(event);
+				Widget w = (Widget) event.getSource();
+				int semester = Integer.valueOf(w.getElement().getAttribute("semester"));
+				onDeleteSemesterClicked(semester);
 			}
 			});
 	}
@@ -1100,6 +1097,34 @@ DefaultSubjectCreationView.Presenter{
 			}
 		}
 		
+	}
+	
+	public void deletePlanConfirmed(){
+		view.hidePopups();
+		if(plan.getId() != null && plan.getId().equals("") == false){
+			String planId = plan.getId().toString();
+			
+			rpcService.deletePlanFromUser(planId, new AsyncCallback(){
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					Window.alert("error deleting");
+				}
+				
+				@Override
+				public void onSuccess(Object result) {
+					Window.alert("deleted");
+					Window.Location.reload();
+				}
+			});
+		}else{
+			Window.Location.reload();
+		}
+	}
+
+	public void deleteSemesterConfirmed(int semester){
+		view.hidePopups();
+		deleteSemester(semester-1);
 	}
 	
 	/******************** JQUERY FUNCTIONS *********************/
@@ -1339,25 +1364,21 @@ DefaultSubjectCreationView.Presenter{
 	
 	public void onDeletePlanButtonClicked() {
 		
-		if(plan.getId() != null && plan.getId().equals("") == false){
-			String planId = plan.getId().toString();
-			
-			rpcService.deletePlanFromUser(planId, new AsyncCallback(){
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					Window.alert("error deleting");
-				}
-				
-				@Override
-				public void onSuccess(Object result) {
-					Window.alert("deleted");
-					Window.Location.reload();
-				}
-			});
+		String s = "";
+		if(plan.getName() != null && plan.getName().isEmpty() == false){
+			s = plan.getName();
 		}else{
-			Window.Location.reload();
+			s = plan.getCareer().getName();
 		}
+		
+		view.setPlan(s);
+		view.showGeneralPopup();
+		
+	}
+	
+	private void onDeleteSemesterClicked(int semester) {
+		view.setSemester(Integer.toString(semester+1));
+		view.showGeneralPopup();
 	}
 
 	

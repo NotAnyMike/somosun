@@ -10,6 +10,8 @@ public interface PlanView {
 
 	public interface Presenter {
 		void planNameChanged(String s);
+		void deletePlanConfirmed();
+		void deleteSemesterConfirmed(int semester);
 	}
 	
 	void setPresenter(Presenter presenter);
@@ -21,4 +23,6 @@ public interface PlanView {
 	void setSugestionText(String s);
 	void cancelChangeNameButtonClicked(ClickEvent e);
 	void changeNameButton(ClickEvent e);
+	void cancelGeneralButton(ClickEvent e);
+	void onDeleteGeneralButtonClick(ClickEvent e);
 }
