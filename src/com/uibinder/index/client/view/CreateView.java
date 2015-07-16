@@ -3,8 +3,9 @@ package com.uibinder.index.client.view;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Button;
+
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Widget;
 import com.uibinder.index.shared.PlanValuesResult;
 
@@ -19,6 +20,9 @@ public interface CreateView {
 		void showWarning();
 		void hideWarning();
 		void onNewAnalyzedPlanButtonClicked(String careerCode);
+		void onDeletePlanButtonClicked(String planId);
+		void onSelectPlanButtonClicked(String planId);
+		
 	}
 	
 	void setPresenter(Presenter presenter);
@@ -33,5 +37,7 @@ public interface CreateView {
 	void hideWarning();
 	void onNewAnalyzedPlanButtonClicked(ClickEvent e);
 	void addPlans(List<PlanValuesResult> planValue);
+	void onSelectPlanButtonClicked(ClickEvent e);
+	void onDeletePlanButtonClicked(ClickEvent e);
 	
 }

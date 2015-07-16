@@ -239,10 +239,16 @@ public class PlanDao {
 		}
 	}
 	
-	public void deletePlan(Long id) {
-		Key<Plan> key = Key.create(Plan.class, id);
-		ofy().delete().key(key).now();
-		
+	/**
+	 * This method will only delete the plan entity, will not delete the semesters nor the subjectValues in it.
+	 * 
+	 * @param id
+	 */
+	private void deletePlan(Long id) {
+		if(id != null){			
+			Key<Plan> key = Key.create(Plan.class, id);
+			ofy().delete().key(key).now();
+		}
 	}
 
 	private void updatePlanTransaction(final Plan plan) {
@@ -263,6 +269,40 @@ public class PlanDao {
 			plans = ofy().load().type(Plan.class).filter("user.idG", s.getIdG()).list();
 		}
 		return plans;
+	}
+
+	public Plan getPlanById(Long planId) {
+		Plan pToReturn = null;
+		if(planId != null){			
+			pToReturn = ofy().load().type(Plan.class).id(planId).now();
+		}
+		return pToReturn;
+	}
+
+	public void deletePlan(Plan plan) {
+		if(plan != null){
+			if(plan.getSemesters() != null && plan.getSemesters().size() > 0){
+				
+				SemesterDao semesterDao = new SemesterDao();
+				SubjectValuesDao subjectValuesDao = new SubjectValuesDao();
+				
+				for(Semester s : plan.getSemesters()){
+					if(s.getSubjects() != null && s.getSubjects().size() > 0){
+						for(SubjectValues sV : s.getSubjects()){
+							if(sV.getId() != null && sV.getId().equals("") == false){
+								subjectValuesDao.deleteSubjectValues(sV.getId());
+							}
+						}
+					}
+					if(s.getId() != null && s.getId().equals("") == false){					
+						semesterDao.deleteSemester(s.getId());
+					}
+				}
+			}			
+			if(plan.getId() != null && plan.getId().equals("") == false){				
+				deletePlan(plan.getId());
+			}
+		}
 	}
 
 }

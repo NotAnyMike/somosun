@@ -722,5 +722,40 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		return planValuesToReturn;
 	}
 
+	@Override
+	public void deletePlanFromUser(String planId) {
+		LoginServiceImpl loginService = new LoginServiceImpl();
+		Student s = loginService.login("").getStudent();
+		
+		PlanDao planDao = new PlanDao();
+		Plan plan = planDao.getPlanById(Long.valueOf(planId));
+		
+		if(plan != null && plan.getUser().getIdSun().equals(s.getIdSun()) == true){
+			planDao.deletePlan(plan);
+		}
+	}
+
+	@Override
+	public Plan getPlanByUser(String planId) {
+		Plan planToReturn = null;
+		
+		if(planId != null && planId.isEmpty() == false){
+			
+			PlanDao planDao = new PlanDao();
+			planToReturn = planDao.getPlanById(Long.valueOf(planId));
+			
+			if(planToReturn != null){
+				LoginServiceImpl loginService = new LoginServiceImpl();
+				Student s = loginService.login("").getStudent();
+				
+				if(planToReturn.getUser().getIdSun().equals(s.getIdSun()) == false){
+					planToReturn = null;
+				}
+			}
+			
+		}
+		return planToReturn;
+	}
+
 	
 }

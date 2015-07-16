@@ -15,12 +15,14 @@ import com.google.gwt.user.client.ui.HasWidgets;
 import com.uibinder.index.client.event.ContinueDefaultCareerEvent;
 import com.uibinder.index.client.event.ContinueDefaultCareerEventHandler;
 import com.uibinder.index.client.event.GenerateAcademicHistoryFromStringEvent;
+import com.uibinder.index.client.event.LoadPlanEvent;
 import com.uibinder.index.client.event.NewEmptyPlanEvent;
 import com.uibinder.index.client.service.SUNService;
 import com.uibinder.index.client.service.SUNServiceAsync;
 import com.uibinder.index.client.view.CreateView;
 import com.uibinder.index.client.view.CreateViewImpl;
 import com.uibinder.index.shared.LoginInfo;
+import com.uibinder.index.shared.PlanValuesResult;
 import com.uibinder.index.shared.SomosUNUtils;
 import com.uibinder.index.shared.control.Career;
 
@@ -124,6 +126,47 @@ public class CreatePresenter implements Presenter, CreateView.Presenter {
 	public void onNewAnalyzedPlanButtonClicked(String careerCode) {
 		eventBus.fireEvent(new NewEmptyPlanEvent(careerCode));
 	}
+	
+	public void onSelectPlanButtonClicked(String planId){
+		eventBus.fireEvent(new LoadPlanEvent(planId));
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void onDeletePlanButtonClicked(String planId) {
+		rpcService.deletePlanFromUser(planId, new AsyncCallback(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("error deleting");
+			}
+
+			@Override
+			public void onSuccess(Object result) {
+				Window.alert("deleted");
+				loadPlans();
+			}
+		});
+	}
+	
+	public void loadPlans() {
+		
+		rpcService.getPlanValuesByUserLoggedIn(new AsyncCallback<List<PlanValuesResult>>(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("error loading the user's plans");
+			}
+
+			@Override
+			public void onSuccess(List<PlanValuesResult> result) {
+				view.addPlans(result);
+			}
+			
+		});
+		
+	}
+	
 	
 	
 }

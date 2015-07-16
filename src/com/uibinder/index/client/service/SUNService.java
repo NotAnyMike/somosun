@@ -45,8 +45,10 @@ public interface SUNService extends RemoteService{
 	public Career getCareerToUse(String careerCode);
 	
 	public Plan getPlanDefaultFromString(String careerCode);
+	public Plan getPlanByUser(String planId);
 	public List<Plan> getPlansByUserLoggedIn();
 	public List<PlanValuesResult> getPlanValuesByUserLoggedIn();
+	public void deletePlanFromUser(String planId);
 	
 	public void toTest();
 	

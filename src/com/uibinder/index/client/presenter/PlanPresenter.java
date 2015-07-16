@@ -1336,6 +1336,29 @@ DefaultSubjectCreationView.Presenter{
 		savePlan();
 		view.hidePopups();
 	}
+	
+	public void onDeletePlanButtonClicked() {
+		
+		if(plan.getId() != null && plan.getId().equals("") == false){
+			String planId = plan.getId().toString();
+			
+			rpcService.deletePlanFromUser(planId, new AsyncCallback(){
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					Window.alert("error deleting");
+				}
+				
+				@Override
+				public void onSuccess(Object result) {
+					Window.alert("deleted");
+					Window.Location.reload();
+				}
+			});
+		}else{
+			Window.Location.reload();
+		}
+	}
 
 	
 }

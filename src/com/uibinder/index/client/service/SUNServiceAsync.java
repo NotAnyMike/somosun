@@ -88,4 +88,8 @@ public interface SUNServiceAsync {
 	void getPlanValuesByUserLoggedIn(
 			AsyncCallback<List<PlanValuesResult>> callback);
 
+	void deletePlanFromUser(String planId, AsyncCallback<Void> callback);
+
+	void getPlanByUser(String planId, AsyncCallback<Plan> callback);
+
 }

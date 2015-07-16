@@ -2,6 +2,7 @@ package com.uibinder.index.client.view;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ListBox;
 import org.gwtbootstrap3.client.ui.TextBox;
 
@@ -12,7 +13,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -26,9 +26,14 @@ public class CreateViewImpl extends Composite implements CreateView {
 	@UiField Button modelAnalyzedPlanButton;
 	@UiField Button newAnalyzedPlanButton;
 	@UiField Button resetButton;
+	@UiField Button deletePlanButton;
+	@UiField Button selectPlanButton;
+	
 	@UiField TextBox textBoxCreate;
+	
 	@UiField ListBox listBoxCreate;
 	@UiField ListBox listBoxSelectPlanSaved;
+	
 	@UiField HTMLPanel htmlPanelWarning;
 
 	private static CreateViewUiBinder uiBinder = GWT
@@ -97,11 +102,17 @@ public class CreateViewImpl extends Composite implements CreateView {
 		if(planValuesList != null && planValuesList.size() > 0){
 			listBoxSelectPlanSaved.clear();
 			for(PlanValuesResult values : planValuesList){
-				listBoxSelectPlanSaved.addItem(values.getName(), values.getName());
+				listBoxSelectPlanSaved.addItem(values.getName(), values.getValue());
 			}
 		}
 		
 	}
+	
+	@Override
+	public void onDeletePlanButtonClicked(ClickEvent e) {
+		presenter.onDeletePlanButtonClicked(listBoxSelectPlanSaved.getSelectedValue());		
+	}
+
 	
 	/********************* Firing Events *********************/
 	
@@ -142,5 +153,16 @@ public class CreateViewImpl extends Composite implements CreateView {
 	public void onNewAnalyzedPlanButtonClicked(ClickEvent event){
 		presenter.onNewAnalyzedPlanButtonClicked(listBoxCreate.getSelectedValue());
 	}
+	
+	@UiHandler("selectPlanButton")
+	public void onSelectPlanButtonClicked(ClickEvent e){
+		presenter.onSelectPlanButtonClicked(listBoxSelectPlanSaved.getSelectedValue());
+	}
+	
+	@UiHandler("deletePlanButton")
+	public void onDeltePlanButtonClicked(ClickEvent e){
+		presenter.onDeletePlanButtonClicked(listBoxSelectPlanSaved.getSelectedValue());
+	}
 
+	
 }

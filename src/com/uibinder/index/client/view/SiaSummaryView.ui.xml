@@ -27,7 +27,7 @@
 			</b:DropDownMenu>
 		</b:ButtonGroup>
         <b:AnchorButton ui:field="changePlanNameButton">Cambiar nombre</b:AnchorButton>
-        <b:AnchorButton ui:field="newPlanButton" href="#create">Nuevo plan</b:AnchorButton>
+        <b:AnchorButton ui:field="newPlanButton" href="#create">Nuevo/Cargar plan</b:AnchorButton>
         <b:AnchorButton type="WARNING" ui:field="deletePlanButton">Eliminar plan</b:AnchorButton>
       </b:VerticalButtonGroup>
       </div>

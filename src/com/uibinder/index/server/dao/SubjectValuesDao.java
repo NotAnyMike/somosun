@@ -33,4 +33,9 @@ public class SubjectValuesDao {
 		Key<SubjectValues> key = f.allocateId(SubjectValues.class);
 		return key.getId();
 	}
+
+	public void deleteSubjectValues(Long id) {
+		Key<SubjectValues> key = Key.create(SubjectValues.class, id);
+		ofy().delete().key(key).now();
+	}
 }

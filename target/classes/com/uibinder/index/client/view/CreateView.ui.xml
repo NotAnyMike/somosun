@@ -18,14 +18,14 @@
 	        <b:ListBox ui:field="listBoxSelectPlanSaved" addStyleNames="{third.lead} {second.textboxCreate}">
 	        </b:ListBox>
 	        <div>
-	          <button class="btn btn-default">Seleccionar</button>
-	          <button class="btn btn-default">Eliminar</button>
+	          <b:Button type="DEFAULT" ui:field="selectPlanButton">Seleccionar</b:Button>
+	          <b:Button type="DEFAULT" ui:field="deletePlanButton">Eliminar</b:Button>
 	        </div>
 	      </div>
 	      <hl class="secondContainerCreatePlan-hl"></hl>
 	      <div class="secondContainerCreatePlan-new"> 
 	        <p style="font-size:30px; margin-right: inherit; text-align: end;" class="lead main-text">Crear un plan nuevo</p><b:ListBox ui:field="listBoxCreate" addStyleNames="{third.lead} {second.textboxCreate}"></b:ListBox>
-	        <div><g:Button ui:field="newAnalyzedPlanButton" addStyleNames="{third.btn} {third.btn-default}">Nuevo plan vacio</g:Button>   <g:Button ui:field="modelAnalyzedPlanButton" addStyleNames="{third.btn} {third.btn-default}">Cargar plan modelo</g:Button></div>
+	        <div><b:Button ui:field="newAnalyzedPlanButton" addStyleNames="{third.btn} {third.btn-default}">Nuevo plan vacio</b:Button>   <b:Button ui:field="modelAnalyzedPlanButton" addStyleNames="{third.btn} {third.btn-default}">Cargar plan modelo</b:Button></div>
 	      </div>
 	    </div>
 	    <div class="middleContainerCreatePlan">
@@ -40,7 +40,7 @@
 	        <li><kbd>ctrl + C</kbd></li>
 	        <li>Pégalo aquí <kbd>ctrl + V</kbd></li>
 	      </ol><b:TextBox ui:field="textBoxCreate" styleName="{second.textboxCreate}"></b:TextBox>
-	      <div><g:Button ui:field="continueButton" addStyleNames="{third.btn} {third.btn-default}">Continuar</g:Button>  <g:Button ui:field="resetButton" addStyleNames="{third.btn} {third.btn-default}">Limpiar</g:Button></div>
+	      <div><b:Button ui:field="continueButton" addStyleNames="{third.btn} {third.btn-default}">Continuar</b:Button>  <b:Button ui:field="resetButton" addStyleNames="{third.btn} {third.btn-default}">Limpiar</b:Button></div>
 	      <p style="font-size:16px; text-align: initial" class="lead main-text">*O solamente copia desde el título "Mi historia académica" hasta comenzar las palabras "Resumen académico"</p>
 	    </div>
 	  </section>

@@ -49,4 +49,9 @@ public class SemesterDao {
 		
 	}
 
+	public void deleteSemester(Long id) {
+		Key<Semester> key = Key.create(Semester.class, id);
+		ofy().delete().key(key).now();
+	}
+
 }

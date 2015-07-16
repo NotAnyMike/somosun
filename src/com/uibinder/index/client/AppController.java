@@ -19,6 +19,8 @@ import com.uibinder.index.client.event.ContinueDefaultCareerEvent;
 import com.uibinder.index.client.event.ContinueDefaultCareerEventHandler;
 import com.uibinder.index.client.event.GenerateAcademicHistoryFromStringEvent;
 import com.uibinder.index.client.event.GenerateAcademicHistoryFromStringEventHandler;
+import com.uibinder.index.client.event.LoadPlanEvent;
+import com.uibinder.index.client.event.LoadPlanEventHandler;
 import com.uibinder.index.client.event.NewEmptyPlanEvent;
 import com.uibinder.index.client.event.NewEmptyPlanEventHandler;
 import com.uibinder.index.client.event.SavePlanAsDefaultEvent;
@@ -138,12 +140,15 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 		});
 		
 		eventBus.addHandler(NewEmptyPlanEvent.TYPE, new NewEmptyPlanEventHandler(){
-
-			@Override
 			public void onNewEmptyPlanButtonClicked(String careerCode) {
 				generateEmptyPlan(careerCode);
 			}
-			
+		});
+		
+		eventBus.addHandler(LoadPlanEvent.TYPE, new LoadPlanEventHandler(){
+			public void onLoadPlanEventHandler(String planId) {
+				loadSpecificPlan(planId);
+			}
 		});
 	}
 	
@@ -250,34 +255,16 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 				}
 				if(createPresenter == null){
 					createPresenter = new CreatePresenter(rpcService, eventBus, createView);
-					rpcService.getPlanValuesByUserLoggedIn(new AsyncCallback<List<PlanValuesResult>>(){
-
-						@Override
-						public void onFailure(Throwable caught) {
-							Window.alert("error loading the user's plans");
-						}
-
-						@Override
-						public void onSuccess(List<PlanValuesResult> result) {
-							createView.addPlans(result);
-						}
-						
-					});
+					createPresenter.loadPlans(); 
 				}
 				if(student == null){					
 					createPresenter.showWarning();
 				}else{
 					createPresenter.hideWarning();
 				}
+				createPresenter.loadPlans();
 				createPresenter.go(RootPanel.get("centerArea"));
 			} else if(token.equals("plan")) {
-//				if(planView == null){
-//					planView = new PlanViewImpl();
-//					siaSummaryView = new SiaSummaryViewImpl();
-//				}
-//				if(planPresenter == null){
-//					planPresenter = new PlanPresenter(rpcService, eventBus, planView, siaSummaryView, student);
-//				}
 				if(planView != null && planPresenter != null){
 					planPresenter.go(RootPanel.get("centerArea"));
 					if(student == null){
@@ -477,4 +464,26 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 		History.newItem("plan");
 	}
 	
+	private void loadSpecificPlan(String planId){
+		
+		showLoadingPage();
+		
+		rpcService.getPlanByUser(planId, new AsyncCallback<Plan>(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Error loading the plan selected");
+				Window.Location.reload();
+			}
+
+			@Override
+			public void onSuccess(Plan result) {
+				if(result != null){					
+					setPlanPresenter(result);
+				}
+			}
+			
+		});
+		
+	}
 }
