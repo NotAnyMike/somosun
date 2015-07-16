@@ -11,7 +11,7 @@ $(window).load(function(){
 });
 
 function arrangeLeft(id){
-	$(window).scroll(correctMaringLeft(id));
+	$(window).scroll(function() { correctMaringLeft(id) });
 };
 
 function correctMaringLeft(id){

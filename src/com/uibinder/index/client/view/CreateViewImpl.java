@@ -1,5 +1,9 @@
 package com.uibinder.index.client.view;
 
+import java.util.List;
+
+import org.gwtbootstrap3.client.ui.ListBox;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -10,11 +14,9 @@ import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.uibinder.index.shared.PlanValuesResult;
 
 public class CreateViewImpl extends Composite implements CreateView {
 	
@@ -26,6 +28,7 @@ public class CreateViewImpl extends Composite implements CreateView {
 	@UiField Button resetButton;
 	@UiField TextBox textBoxCreate;
 	@UiField ListBox listBoxCreate;
+	@UiField ListBox listBoxSelectPlanSaved;
 	@UiField HTMLPanel htmlPanelWarning;
 
 	private static CreateViewUiBinder uiBinder = GWT
@@ -88,6 +91,16 @@ public class CreateViewImpl extends Composite implements CreateView {
 	public void hideWarning() {
 		htmlPanelWarning.setVisible(false);
 		htmlPanelWarning.getElement().setAttribute("style", "display: none");
+	}
+
+	public void addPlans(List<PlanValuesResult> planValuesList) {
+		if(planValuesList != null && planValuesList.size() > 0){
+			listBoxSelectPlanSaved.clear();
+			for(PlanValuesResult values : planValuesList){
+				listBoxSelectPlanSaved.addItem(values.getName(), values.getName());
+			}
+		}
+		
 	}
 	
 	/********************* Firing Events *********************/

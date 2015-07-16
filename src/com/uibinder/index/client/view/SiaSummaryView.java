@@ -9,6 +9,7 @@ public interface SiaSummaryView {
 		void deleteAdminButtons();
 		void onSavePlanAsDefaultClicked();
 		void onAddMandatorySubjectsButton();
+		void showChangeNamePopup();
 	}
 	
 	void setPresenter(Presenter presenter);
@@ -28,5 +29,6 @@ public interface SiaSummaryView {
 	void showWarning();
 	void hideWarning();
 	void onAddMandatorySubjectsButton(ClickEvent e);
+	void onChangeNameClick(ClickEvent e);
 
 }

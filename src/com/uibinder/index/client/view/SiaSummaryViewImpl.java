@@ -213,4 +213,9 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 		presenter.onAddMandatorySubjectsButton();
 	}
 
+	@UiHandler("changePlanNameButton")
+	public void onChangeNameClick(ClickEvent e) {
+		presenter.showChangeNamePopup();
+	}
+
 }

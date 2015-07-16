@@ -20,6 +20,8 @@ import com.uibinder.index.server.dao.PlanDao;
 import com.uibinder.index.server.dao.StudentDao;
 import com.uibinder.index.server.dao.SubjectDao;
 import com.uibinder.index.server.dao.SubjectGroupDao;
+import com.uibinder.index.shared.LoginInfo;
+import com.uibinder.index.shared.PlanValuesResult;
 import com.uibinder.index.shared.RandomPhrase;
 import com.uibinder.index.shared.SiaResultGroups;
 import com.uibinder.index.shared.SiaResultSubjects;
@@ -241,6 +243,30 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		}
 	}
 
+	@Override
+	public void savePlan(Student student, Plan plan) {
+		if(plan != null){
+			PlanDao pDao = new PlanDao();
+			
+			LoginServiceImpl login = new LoginServiceImpl();
+			LoginInfo loginInfo = login.login("");
+			
+			if(loginInfo.getStudent().getIdSun().equals(student.getIdSun()) == true){
+				student = loginInfo.getStudent();
+				if(student != null){
+					
+					plan.setUser(student);
+					plan.setDefault(false);
+					
+					pDao.updatePlan(plan);
+					
+				}
+			}
+			
+			
+		}
+	}
+	
 	public Plan getPlanDefault(String careerCode){
 		Plan p = null;
 		if(careerCode.equals("") == false){
@@ -623,9 +649,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 	@Override
 	public Career getCareerToUse(String careerCode) {
 
-		log.info("hola");
-		AppLogLine log = new AppLogLine();
-		log.setLogMessage("olaaasas");
+		log.info("hola ... SUNServiceImpl");
 		
 		Career c = null;
 		CareerDao careerDao = new CareerDao();
@@ -663,5 +687,40 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		
 		return listToReturn;
 	}
+	
+	public List<Plan> getPlansByUserLoggedIn(){
+		LoginServiceImpl loginService = new LoginServiceImpl();
+		Student s = loginService.login("").getStudent();
+		
+		List<Plan> plansToReturn = null;
+		
+		if(s != null){
+			plansToReturn = new ArrayList<Plan>();
+			PlanDao planDao = new PlanDao();
+			List<Plan> plans = planDao.getPlanByUser(s);
+			
+			for(Plan p : plans){
+				plansToReturn.add(p);
+			}
+		}
+		return plansToReturn;
+	}
+
+	@Override
+	public List<PlanValuesResult> getPlanValuesByUserLoggedIn() {
+		List<Plan> plans = getPlansByUserLoggedIn();
+		List<PlanValuesResult> planValuesToReturn = null;
+		
+		if(plans != null && plans.size() > 0){
+			planValuesToReturn = new ArrayList<PlanValuesResult>();
+			for(Plan p : plans){
+				PlanValuesResult value = new PlanValuesResult(p.getName(), Long.toString(p.getId()));
+				planValuesToReturn.add(value);
+			}
+		}
+		
+		return planValuesToReturn;
+	}
+
 	
 }

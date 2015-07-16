@@ -14,10 +14,12 @@ import org.json.JSONObject;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
+import com.googlecode.objectify.VoidWork;
 import com.uibinder.index.shared.control.Career;
 import com.uibinder.index.shared.control.ComplementaryValues;
 import com.uibinder.index.shared.control.Plan;
 import com.uibinder.index.shared.control.Semester;
+import com.uibinder.index.shared.control.Student;
 import com.uibinder.index.shared.control.Subject;
 import com.uibinder.index.shared.control.SubjectValues;
 
@@ -216,7 +218,51 @@ public class PlanDao {
 
 	public Plan getPlanDefault(String careerCode) {
 		Plan p = (Plan) ofy().load().type(Plan.class).filter("isDefault", true).filter("career.code", careerCode).first().now();
+		p.setUser(null);
+		p.setDefault(false);
+		if(p != null){
+			for(Semester s : p.getSemesters()){
+				s.setId(null);
+				for(SubjectValues sV : s.getSubjects()){
+					sV.setId(null);
+				}
+			}
+		}
 		return p;
+	}
+
+	public void updatePlan(Plan plan) {
+		if(plan.getId() == null){
+			savePlan(plan);
+		}else{
+			updatePlanTransaction(plan);
+		}
+	}
+	
+	public void deletePlan(Long id) {
+		Key<Plan> key = Key.create(Plan.class, id);
+		ofy().delete().key(key).now();
+		
+	}
+
+	private void updatePlanTransaction(final Plan plan) {
+		ofy().transact(new VoidWork (){
+			public void vrun() {
+				deletePlan(plan.getId());
+				savePlan(plan);
+			}
+			
+		});
+	}
+
+	public List<Plan> getPlanByUser(Student s) {
+		
+		List<Plan> plans = null;
+		
+		if(s != null && s.getIdSun() != null){
+			plans = ofy().load().type(Plan.class).filter("user.idG", s.getIdG()).list();
+		}
+		return plans;
 	}
 
 }

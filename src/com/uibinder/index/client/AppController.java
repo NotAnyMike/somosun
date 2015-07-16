@@ -45,6 +45,7 @@ import com.uibinder.index.client.view.PlanViewImpl;
 import com.uibinder.index.client.view.SiaSummaryViewImpl;
 import com.uibinder.index.client.view.TopBarViewImpl;
 import com.uibinder.index.shared.LoginInfo;
+import com.uibinder.index.shared.PlanValuesResult;
 import com.uibinder.index.shared.RandomPhrase;
 import com.uibinder.index.shared.control.Career;
 import com.uibinder.index.shared.control.Plan;
@@ -248,7 +249,20 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 					createView = new CreateViewImpl();
 				}
 				if(createPresenter == null){
-					createPresenter = new CreatePresenter(rpcService, eventBus, createView);					
+					createPresenter = new CreatePresenter(rpcService, eventBus, createView);
+					rpcService.getPlanValuesByUserLoggedIn(new AsyncCallback<List<PlanValuesResult>>(){
+
+						@Override
+						public void onFailure(Throwable caught) {
+							Window.alert("error loading the user's plans");
+						}
+
+						@Override
+						public void onSuccess(List<PlanValuesResult> result) {
+							createView.addPlans(result);
+						}
+						
+					});
 				}
 				if(student == null){					
 					createPresenter.showWarning();

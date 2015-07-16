@@ -23,7 +23,8 @@ public class Plan implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	@Id Long id=null;
+	@Index @Id Long id=null;
+	private String name = null;
 	@Index private Career career = null;
     private List<Semester> semesters = null;
     private double PAPA = 0;
@@ -169,6 +170,14 @@ public class Plan implements Serializable {
 
 	public void setDefault(boolean isDefault) {
 		this.isDefault = isDefault;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
     /*public static void main(String[] args) {

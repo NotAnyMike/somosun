@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import com.uibinder.index.shared.PlanValuesResult;
 import com.uibinder.index.shared.RandomPhrase;
 import com.uibinder.index.shared.SiaResultGroups;
 import com.uibinder.index.shared.SiaResultSubjects;
@@ -44,6 +45,8 @@ public interface SUNService extends RemoteService{
 	public Career getCareerToUse(String careerCode);
 	
 	public Plan getPlanDefaultFromString(String careerCode);
+	public List<Plan> getPlansByUserLoggedIn();
+	public List<PlanValuesResult> getPlanValuesByUserLoggedIn();
 	
 	public void toTest();
 	
@@ -57,6 +60,7 @@ public interface SUNService extends RemoteService{
 	public void analyzeCareer(String careerCode);
 	
 	public void savePlanAsDefault(Student student, Plan plan);
+	public void savePlan(Student student, Plan plan);
 	public Plan getPlanDefault(String careerCode);
 	
 	public List<SubjectGroup> getSubjectGroups(String careerCode);

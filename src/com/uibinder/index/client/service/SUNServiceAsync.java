@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.uibinder.index.shared.PlanValuesResult;
 import com.uibinder.index.shared.RandomPhrase;
 import com.uibinder.index.shared.SiaResultGroups;
 import com.uibinder.index.shared.SiaResultSubjects;
@@ -79,5 +80,12 @@ public interface SUNServiceAsync {
 	void getCareerToUse(String careerCode, AsyncCallback<Career> callback);
 
 	void getMandatoryComplementaryValues(String careerCode,	AsyncCallback<List<ComplementaryValues>> callback);
+
+	void savePlan(Student student, Plan plan, AsyncCallback<Void> callback);
+
+	void getPlansByUserLoggedIn(AsyncCallback<List<Plan>> callback);
+
+	void getPlanValuesByUserLoggedIn(
+			AsyncCallback<List<PlanValuesResult>> callback);
 
 }

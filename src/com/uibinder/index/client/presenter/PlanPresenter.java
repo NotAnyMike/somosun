@@ -118,7 +118,7 @@ DefaultSubjectCreationView.Presenter{
 	private int[] levelingCredits = {0,0,0};
 	
 	//Control classes
-	private Plan plan = null;
+	private Plan plan = new Plan();
 
 	//Widget classes
 	private PlanWidget planWidget;
@@ -319,13 +319,14 @@ DefaultSubjectCreationView.Presenter{
 	public void setPlan(Plan plan2) {
 		init();
 		this.plan = plan2;
+		//this.plan.setSemesters(semesterList); // then the semesters in plan2 become semesterList
 		//this.plan = new Plan();
 		
 		//rpcService.getComplementaryValuesFromMisPlanes(plan.getCareerCode(), asyncGetComplementaryValuesByCareer);
 		
 		setCareer(plan.getCareer());
 		
-		if(plan.getSemesters() != null) {
+		if(plan2.getSemesters() != null) {
 			List<Semester> semesterListPlan = plan2.getSemesters();
 			//Map<SubjectValues, Subject> subjectMapPlan = plan2.getValuesAndSubjectMap();
 			//List<SubjectValues> subjectValuesListPlan = null;
@@ -346,6 +347,8 @@ DefaultSubjectCreationView.Presenter{
 					}
 				}
 			}
+			
+			plan.setSemesters(semesterList);
 			
 			getCareers("bog");
 			
@@ -673,6 +676,7 @@ DefaultSubjectCreationView.Presenter{
 		Semester semester = semesterList.get(valueOfSemester);
 		SemesterWidget semesterW = semesterAndWidgetBiMap.get(semester);
 
+		
 		while(semester.getSubjects().size() != 0){
 			deleteSubject(semester.getSubjects().get(0));
 		}
@@ -691,9 +695,29 @@ DefaultSubjectCreationView.Presenter{
 		
 		updateSemestersNumber();
 		
-		connectionsController.addConnection(subjectWidgetList.get(0), subjectWidgetList.get(6), "pre");
-		connectionsController.addConnection(subjectWidgetList.get(0), subjectWidgetList.get(7), "pre");
+		savePlan();
 		
+	}
+
+	@SuppressWarnings("unchecked")
+	private void savePlan() {
+		if(plan.getName() == null || plan.getName().isEmpty() == true){
+			showChangeNamePopup();
+		}else{
+			rpcService.savePlan(student, plan, new AsyncCallback(){
+
+				@Override
+				public void onFailure(Throwable caught) {
+					Window.alert("error saving plan");
+				}
+
+				@Override
+				public void onSuccess(Object result) {
+					Window.alert("Plan saved");
+				}
+				
+			});
+		}
 	}
 
 	/**
@@ -1295,6 +1319,22 @@ DefaultSubjectCreationView.Presenter{
 			}
 			
 		});
+	}
+
+	@Override
+	public void showChangeNamePopup() {
+		view.showCurtain();
+		if((plan.getName() != null ? plan.getName().isEmpty() == true : true)){
+			view.setSugestionText("Plan de " + plan.getCareer().getName());
+		}
+		view.showChangeName();
+	}
+
+	@Override
+	public void planNameChanged(String s) {
+		plan.setName(s);
+		savePlan();
+		view.hidePopups();
 	}
 
 	

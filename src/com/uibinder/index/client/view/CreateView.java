@@ -1,9 +1,12 @@
 package com.uibinder.index.client.view;
 
 
+import java.util.List;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Widget;
+import com.uibinder.index.shared.PlanValuesResult;
 
 public interface CreateView {
 
@@ -29,5 +32,6 @@ public interface CreateView {
 	void showWarning();
 	void hideWarning();
 	void onNewAnalyzedPlanButtonClicked(ClickEvent e);
+	void addPlans(List<PlanValuesResult> planValue);
 	
 }

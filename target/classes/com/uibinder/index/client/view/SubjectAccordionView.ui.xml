@@ -10,13 +10,13 @@
 	<ui:style field="third" src="styles/bootstrap.css" />
 	<ui:style field="forth" src="styles/bootstrap-theme.min.css" />
 	<g:HTMLPanel>
-	    <html ng-app="ui.bootstrapdemo">
+	   <!-- <html ng-app="ui.bootstrapdemo">
 	        <head>
 			    <script src="angular.min.js"></script>
-			    <script src="bootstrap-gh-pages/ui-bootstrap-tpls-0.12.0.js"></script>
-			    <script src="example.js"></script> 
+			     <script src="bootstrap-gh-pages/ui-bootstrap-tpls-0.12.0.js"></script> 
+			    <script src="example.js"></script>
   			</head>
- 			<body>
+ 			<body>-->
  			    
  			    <b:Panel ui:field="accordionContainer">
 				    <b:PanelHeader dataParent="#accordion2" dataToggle="COLLAPSE" dataTarget="#collapseOne" ui:field="header">
@@ -169,7 +169,7 @@
 				    </b:PanelCollapse>
 				</b:Panel>
  			    
-			</body>
-		</html>
+		<!-- 	</body>
+		</html> -->
 	</g:HTMLPanel>
 </ui:UiBinder> 
