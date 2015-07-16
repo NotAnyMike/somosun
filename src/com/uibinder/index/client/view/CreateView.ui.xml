@@ -15,13 +15,8 @@
 	      <div class="secondContainerCreatePlan-saved"> 
 	        <p style="font-size:30px; margin-right: inherit; text-align: end;" class="lead main-text">Cargar un plan guardado</p>
 	        <p style="margin: 0px" class="lead main-text">selecciona tu plan</p>
-	        <b:ListBox ui:field="listBoxSelectPlanSaved">
+	        <b:ListBox ui:field="listBoxSelectPlanSaved" addStyleNames="{third.lead} {second.textboxCreate}">
 	        </b:ListBox>
-	        <select style="margin: 0px; font-size: 16px" class="textboxCreate lead">
-	          <option>Economía - 70% avance</option>
-	          <option>Economía </option>
-	          <option>Economía - PAPA 4.5</option>
-	        </select>
 	        <div>
 	          <button class="btn btn-default">Seleccionar</button>
 	          <button class="btn btn-default">Eliminar</button>
@@ -44,7 +39,7 @@
 	        <li><kbd>ctrl + A</kbd> o <kbd>ctrl + E</kbd>*</li>
 	        <li><kbd>ctrl + C</kbd></li>
 	        <li>Pégalo aquí <kbd>ctrl + V</kbd></li>
-	      </ol><g:TextBox ui:field="textBoxCreate" styleName="{second.textboxCreate}"></g:TextBox>
+	      </ol><b:TextBox ui:field="textBoxCreate" styleName="{second.textboxCreate}"></b:TextBox>
 	      <div><g:Button ui:field="continueButton" addStyleNames="{third.btn} {third.btn-default}">Continuar</g:Button>  <g:Button ui:field="resetButton" addStyleNames="{third.btn} {third.btn-default}">Limpiar</g:Button></div>
 	      <p style="font-size:16px; text-align: initial" class="lead main-text">*O solamente copia desde el título "Mi historia académica" hasta comenzar las palabras "Resumen académico"</p>
 	    </div>
