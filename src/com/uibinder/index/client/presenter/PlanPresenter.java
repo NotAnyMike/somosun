@@ -193,56 +193,7 @@ DefaultSubjectCreationView.Presenter{
 		
 	}
 	
-	/**
-	 * Constructor to create a Plan based on one plan send by user
-	 * 
-	 * @param eventBus
-	 * @param view
-	 * @param plan
-	 */
-	public PlanPresenter(SUNServiceAsync rpcService, HandlerManager eventBus, PlanViewImpl view, SiaSummaryViewImpl siaSummaryView, Plan plan, Student student){
 
-		this.rpcService = rpcService;
-		this.eventBus = eventBus;
-		this.view = view;
-		this.view.setPresenter(this);
-		this.setStudent(student);
-		warningDeleteSubjectView.setPresenter(this);
-		searchSubjectView.setPresenter(this);
-		defaultSubjectCreationView.setPresenter(this);
-		searchSubjectView.fill();
-		this.siaSummaryView = siaSummaryView;
-		connectionsController = new ConnectionsController(this);
-				
-		setPlan(plan);	
-		
-	}
-
-
-	/**
-	 * Constructor to create a Plan based on one career
-	 * 
-	 * @param eventBus
-	 * @param view
-	 * @param career
-	 */
-	public PlanPresenter(SUNServiceAsync rpcService, HandlerManager eventBus, PlanViewImpl view, SiaSummaryViewImpl siaSummaryView, String career, Student student){
-		
-		this.rpcService = rpcService;
-		this.eventBus = eventBus;
-		this.view = view;
-		this.view.setPresenter(this);
-		this.setStudent(student);
-		warningDeleteSubjectView.setPresenter(this);
-		searchSubjectView.setPresenter(this);
-		defaultSubjectCreationView.setPresenter(this);
-		searchSubjectView.fill();
-		this.siaSummaryView = siaSummaryView;
-		connectionsController = new ConnectionsController(this);
-		
-		setPlan(plan);
-		
-	}
 
 	@Override
 	public void go(HasWidgets container) {
@@ -400,7 +351,7 @@ DefaultSubjectCreationView.Presenter{
 		//TODO avoid the same subject twice in the same semester
 		
 		
-		SubjectWidget subjectWidget = new SubjectWidget(subject.getName(), subject.getCode(), subject.getCredits(), subjectValues.getGrade(), subjectValues.getComplementaryValues().isMandatory(), subjectValues.getComplementaryValues().getTypology(), subjectValues.getSubjectValuesPublicId(), (subjectValues.getComplementaryValues().getSubjectGroup() != null ? subjectValues.getComplementaryValues().getSubjectGroup().getName() : ""));
+		SubjectWidget subjectWidget = new SubjectWidget(subject.getName(), subject.getCode(), subject.getCredits(), subjectValues.getGrade(), subjectValues.getComplementaryValues().isMandatory(), subjectValues.getComplementaryValues().getTypology(), subjectValues.getSubjectValuesPublicId(), (subjectValues.getComplementaryValues().getSubjectGroup() != null ? subjectValues.getComplementaryValues().getSubjectGroup().getName() : ""), this);
 		subjectWidgetList.add(subjectWidget);
 		makeSubjectWidgetDraggable(subjectWidget);
 		semesterAndWidgetBiMap.get(semester).addSubject(subjectWidget);
@@ -410,6 +361,7 @@ DefaultSubjectCreationView.Presenter{
 		updateCredits(subjectValues, semester, true);
 		
 		addClickHandlerSubjectWidget(subjectWidget);
+		showToolTip();
 		
 	}
 	
@@ -1381,5 +1333,7 @@ DefaultSubjectCreationView.Presenter{
 		view.showGeneralPopup();
 	}
 
-	
+	public void onGradeAdded(String publicId, String grade){
+		Window.alert("publicId: " + publicId +" grade: " + grade);
+	}
 }

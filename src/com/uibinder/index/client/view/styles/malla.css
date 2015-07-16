@@ -33,7 +33,7 @@ h1 {
   margin: 15px 6px 6px;
 }
 
-.cosa {
+/*.cosa {
 	background-color:#000;
 }
 
@@ -53,7 +53,7 @@ h1 {
 	background-color: #FFF;
 	height: 150px;
 	width: 100%;
-}
+}*/
 .subjectBox {
 	margin:10px;
 	float:none;
@@ -157,6 +157,19 @@ h1 {
 	width: 35px;
 	height:18px;
 	color:#000;
+}
+.textBoxGrade{
+	width: 34px;
+	float: left;
+	height: 20px;
+	border-bottom-left-radius: 5px;
+	-moz-border-bottom-left-radius: 5px;
+	-ms-border-bottom-left-radius: 5px;
+	-o-border-bottom-left-radius: 5px;
+	-webkit-border-bottom-left-radius: 5px;
+	border: 0px;
+	font-size: 12px;
+	text-align: center;
 }
 .wrapword{
 	 white-space: -moz-pre-wrap !important;  /*Mozilla, since 1999 */

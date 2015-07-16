@@ -3,13 +3,21 @@ package com.uibinder.index.client.widget;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.uibinder.index.client.presenter.PlanPresenter;
 import com.uibinder.index.shared.control.Subject;
 import com.uibinder.index.shared.control.SubjectValues;
 
@@ -20,6 +28,8 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 	private static final String[] TYPENESS = {"N", "F", "D", "L", "P", "-"};
 	private static final String[] TYPENESS_STYLE = {"nivelacion", "fundamentacion", "disciplinar", "libreEleccion", "otra", "otra"};
 	private static final String[] TYPENESS_NAMES = {"Nivelación", "Fundamentación", "Disciplinar", "Libre Elección", "Otra", "Otra"};
+
+	private PlanPresenter presenter = null;
 	
 	private String name = null;
 	private String code = null;
@@ -40,6 +50,8 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 	private Label obligatorinessLabel = new Label();
 	private Label gradeLabel = new Label();
 	private Label typeLabel = new Label();
+	private TextBox textBoxGrade = new TextBox();
+	
 	private List<SubjectWidget> preList = new ArrayList<SubjectWidget>();
 	private List<SubjectWidget> posList = new ArrayList<SubjectWidget>();
 	private List<SubjectWidget> coList = new ArrayList<SubjectWidget>();
@@ -54,7 +66,7 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 	 * @param obligatoriness
 	 * @param type
 	 */
-	public SubjectWidget(String name, String code, int credits, double grade, boolean obligatoriness, int type, String publicId){
+	public SubjectWidget(String name, String code, int credits, double grade, boolean obligatoriness, int type, String publicId, PlanPresenter presenter){
 		this.setName(name);
 		this.setCode(code);
 		this.setCredits(credits);
@@ -64,13 +76,14 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 		this.setObligatoriness(obligatoriness);
 		this.setType(type);
 		this.setPublicId(publicId);
+		this.presenter = presenter;
 		
 		//setAttributes();
 		
 		joinWidgets();
 	}
 	
-	public SubjectWidget(String name, String code, int credits, double grade, boolean obligatoriness, String type, String publicId, String subjectGroup){
+	public SubjectWidget(String name, String code, int credits, double grade, boolean obligatoriness, String type, String publicId, String subjectGroup, PlanPresenter presenter){
 		this.setName(name);
 		this.setCode(code);
 		this.setCredits(credits);
@@ -81,6 +94,7 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 		this.setType(getTypeFromString(type));
 		this.setPublicId(publicId);
 		this.setSubjectGroup(subjectGroup);
+		this.presenter = presenter;
 		
 		//setAttributes();
 		
@@ -95,7 +109,7 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 	 * @param obligatoriness
 	 * @param type
 	 */
-	public SubjectWidget(String name, String code, int credits, boolean obligatoriness, int type, String publicId){
+	public SubjectWidget(String name, String code, int credits, boolean obligatoriness, int type, String publicId, PlanPresenter presenter){
 		this.setName(name);
 		this.setCode(code);
 		this.setCredits(credits);
@@ -105,6 +119,7 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 		this.setObligatoriness(obligatoriness);
 		this.setType(type);
 		this.setPublicId(publicId);
+		this.presenter = presenter;
 		
 		//setAttributes();
 		
@@ -115,7 +130,7 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 	 * TODO: fix the obligatoriness
 	 * @param s
 	 */
-	public SubjectWidget(Subject s, SubjectValues sV){
+	public SubjectWidget(Subject s, SubjectValues sV, PlanPresenter presenter){
 		this.setName(s.getName());
 		this.setCode(s.getCode());
 		this.setCredits(s.getCredits());
@@ -125,6 +140,7 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 		this.setObligatoriness(sV.getComplementaryValues().isMandatory());
 		this.setType(getTypeFromString(sV.getComplementaryValues().getTypology()));
 		this.setPublicId(sV.getSubjectValuesPublicId());
+		this.presenter = presenter;
 		
 		//setAttributes();
 		
@@ -166,6 +182,10 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 		
 		AddStyles();
 		
+		textBoxGrade.getElement().setAttribute("placeholder","3.9");
+		
+		textBoxGrade.setVisible(false);
+		bottomPart.add(textBoxGrade);
 		bottomPart.add(gradeLabel);
 		bottomPart.add(creditsLabel);
 		bottomPart.add(obligatorinessLabel);
@@ -174,8 +194,57 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 		this.add(codeLabel);	
 		this.add(nameLabel);
 		this.add(bottomPart);
+		
+		addHandlers();
+		
 	}
 	
+	private void addHandlers() {
+		
+		gradeLabel.addClickHandler(new ClickHandler(){
+
+			@Override
+			public void onClick(ClickEvent event) {
+				if(codeLabel.getText().contains("optativa") == false || codeLabel.getText().contains("libre") == false){
+					gradeLabel.setVisible(false);
+					textBoxGrade.setVisible(true);
+					textBoxGrade.setFocus(true);
+					setTextOfGradeText((gradeLabel.getText().equals("-") ? "" : gradeLabel.getText()));
+					event.stopPropagation();
+				}
+			}
+		});
+		
+		textBoxGrade.addBlurHandler(new BlurHandler(){
+
+			@Override
+			public void onBlur(BlurEvent event) {
+				textBoxGrade.setVisible(false);
+				gradeLabel.setVisible(true);
+				if(getTextOfGradeTextBox().isEmpty() == false){					
+					presenter.onGradeAdded(publicId, getTextOfGradeTextBox());
+				}
+			}
+			
+		});
+		
+		textBoxGrade.addKeyUpHandler(new KeyUpHandler(){
+
+			@Override
+			public void onKeyUp(KeyUpEvent event) {
+				int key = event.getNativeKeyCode();
+				if(key == KeyCodes.KEY_ENTER){
+					textBoxGrade.setVisible(false);
+					gradeLabel.setVisible(true);
+					if(getTextOfGradeTextBox().isEmpty() == false){					
+						presenter.onGradeAdded(publicId, getTextOfGradeTextBox());
+					}
+				}
+			}
+			
+		});
+	}
+
 	private void AddStyles() {
 		this.addStyleName("subjectBox");
 		
@@ -194,7 +263,36 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 		
 		typeLabel.addStyleName("typeBottomSubjectBox");
 		typeLabel.addStyleName(TYPENESS_STYLE[((getType()>4) ? 4 : getType())]);
+		
+		textBoxGrade.setStyleName("textBoxGrade");
+		textBoxGrade.setTitle("Enter o click por fuera para guardar");
+		
+		codeLabel.getElement().setAttribute("data-placement", "top");
+		codeLabel.getElement().setAttribute("data-toggle", "tooltip");
+		codeLabel.getElement().setAttribute("data-container", "body");
+		
+		gradeLabel.getElement().setAttribute("data-placement", "bottom");
+		gradeLabel.getElement().setAttribute("data-toggle", "tooltip");
+		gradeLabel.getElement().setAttribute("data-container", "body");
+		
+		creditsLabel.getElement().setAttribute("data-placement", "bottom");
+		creditsLabel.getElement().setAttribute("data-toggle", "tooltip");
+		creditsLabel.getElement().setAttribute("data-container", "body");
+		
+		obligatorinessLabel.getElement().setAttribute("data-placement", "bottom");
+		obligatorinessLabel.getElement().setAttribute("data-toggle", "tooltip");
+		obligatorinessLabel.getElement().setAttribute("data-container", "body");
+		
+		typeLabel.getElement().setAttribute("data-placement", "bottom");
+		typeLabel.getElement().setAttribute("data-toggle", "tooltip");
+		typeLabel.getElement().setAttribute("data-container", "body");
+		
+		textBoxGrade.getElement().setAttribute("data-placement", "bottom");
+		textBoxGrade.getElement().setAttribute("data-toggle", "tooltip");
+		textBoxGrade.getElement().setAttribute("data-container", "body");
+		
 	}
+	
 	public Widget getNameLabel(){
 		return nameLabel.asWidget();
 	}
@@ -218,6 +316,7 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 	public Widget getTypeLabel(){
 		return typeLabel.asWidget();
 	}
+	
 	public int getCredits() {
 		return credits;
 	}
@@ -359,7 +458,7 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 		this.grade = grade;
 		this.getElement().setAttribute("grade", Double.toString(getGrade()));
 		gradeLabel.setText(isTaken() == false ? "-" : Double.toString(getGrade()));
-		gradeLabel.setTitle((getGrade()==0) ? "Nota no registrada" : "nota de la clase: " + getGrade());
+		gradeLabel.setTitle((getGrade()==0) ? "Nota no registrada, para registrarla haz click" : "nota de la clase: " + getGrade());
 	}
 
 	public boolean isApproved() {
@@ -393,5 +492,13 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 
 	public void setSelected(boolean selected) {
 		this.selected = selected;
+	}
+	
+	public void setTextOfGradeText(String s){
+		textBoxGrade.setText(s);
+	}
+	
+	public String getTextOfGradeTextBox(){
+		return textBoxGrade.getText();
 	}
 }

@@ -266,12 +266,13 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 				createPresenter.go(RootPanel.get("centerArea"));
 			} else if(token.equals("plan")) {
 				if(planView != null && planPresenter != null){
-					planPresenter.go(RootPanel.get("centerArea"));
 					if(student == null){
 						siaSummaryView.showWarning();
 					}else{
 						siaSummaryView.hideWarning();						
 					}
+					planPresenter.go(RootPanel.get("centerArea"));
+					planPresenter.showToolTip();
 				}else{
 					History.newItem("create");
 				}
