@@ -13,10 +13,11 @@
 	    <g:HTMLPanel ui:field="curtainHTMLPanel"><div class="curtain"></div></g:HTMLPanel>
 	    <g:HTMLPanel ui:field="changeNameHTMLPanel">
 			<div class="mainContainerChangeName">
-				<h3>Cambia el nombre a tu plan</h3>
+				<h3>Quieres guardar tu plan?</h3>
 				<b:TextBox ui:field="textBoxChangeNamePlan"></b:TextBox>
-				<b:Button ui:field="changeNameButton" type="SUCCESS">Cambiar</b:Button>
-				<b:Button ui:field="cancelChangeNameButton" type="WARNING">Cancelar</b:Button>
+				Solo es necesario guardar una vez, luego los cambios se guardarán automáticamente.
+				<b:Button ui:field="cancelChangeNameButton" type="DANGER">No Guardar</b:Button>
+				<b:Button ui:field="changeNameButton" type="PRIMARY">Guardar</b:Button>
 			</div>
 	    </g:HTMLPanel>	
 	    <g:HTMLPanel ui:field="generalConfirmationHTMLPanel">

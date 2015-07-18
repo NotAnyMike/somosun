@@ -3,8 +3,6 @@ package com.uibinder.index.client;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -336,7 +334,8 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 		
 		if(phrases==null){
 			getRandomPhrases();
-			RandomPhrase toReturn = new RandomPhrase("Estudia para la vida, no para los exámenes", "Anónimo");
+			RandomPhrase toReturn = new RandomPhrase(
+					"Estudia para la vida, no para los exámenes", "Anónimo");
 			return toReturn;
 		}else{
 			
@@ -427,7 +426,8 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 		}
 		if(loadingPresenter == null){
 			loadingPresenter = new LoadingPresenter(rpcService, eventBus, loadingView);
-			loadingPresenter.setLabel("hola no sé que estoy escribiendo, bla bla bla, espero pasar de linea cuando esto sea muy largo");
+			loadingPresenter
+					.setLabel("hola no sé que estoy escribiendo, bla bla bla, espero pasar de linea cuando esto sea muy largo");
 		}
 		loadingPresenter.go(RootPanel.get("centerArea"));
 	}
@@ -525,17 +525,18 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 						
 						@Override
 						public void onFailure(Throwable caught) {
-							Window.alert("error saving plan");
+							GWT.log("Error saving plan - appController");
 						}
 						
 						@Override
 						public void onSuccess(Object result) {
-							Window.alert("Plan saved");
+							GWT.log("Plan saved - appController");
 						}
 						
 					});
 					
 				}
+
 			}
 		}
 		

@@ -3,45 +3,53 @@ package com.uibinder.index.client.widget;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.HasChangeHandlers;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.uibinder.index.client.event.PlanChangeEvent;
 import com.uibinder.index.client.presenter.PlanPresenter;
 import com.uibinder.index.shared.control.Subject;
 import com.uibinder.index.shared.control.SubjectValues;
 
-public class SubjectWidget extends FlowPanel implements HasClickHandlers{
+public class SubjectWidget extends FlowPanel implements HasClickHandlers {
 	
 	private static final String ENTER_HTMLCODE = "&#xA;";//"&#013;";
 	
 	private static final String[] TYPENESS = {"N", "F", "D", "L", "P", "-"};
 	private static final String[] TYPENESS_STYLE = {"nivelacion", "fundamentacion", "disciplinar", "libreEleccion", "otra", "otra"};
-	private static final String[] TYPENESS_NAMES = { "Nivelación",
-			"Fundamentación", "Disciplinar", "Libre Elección", "Otra", "Otra" };
+	private static final String[] TYPENESS_NAMES = { "Nivelación", "Fundamentación", "Disciplinar", "Libre Elección", "Otra", "Otra" };
 
 	private PlanPresenter presenter = null;
 	
-	private String name = null;
-	private String code = null;
 	private String publicId = null;
-	private boolean obligatoriness = false;
-	private int credits = 0;
-	private double grade = 0.0;
-	private boolean approved = false; //it could happen that it took the class and fail it
-	private boolean taken = false; //because to calculate the credits requirement I need to know if it was(not) taken and (not) passed/failed  
-	private int type = 0;
-	private String subjectGroup = null;
 	private boolean selected = false;
+	// private String name = null;
+	// private String code = null;
+	// private boolean obligatoriness = false;
+	// private int credits = 0;
+	// private double grade = 0.0;
+	// private boolean approved = false; //it could happen that it took the
+	// class and fail it
+	// private boolean taken = false; //because to calculate the credits
+	// requirement I need to know if it was(not) taken and (not) passed/failed
+	// private int type = 0;
+	// private String subjectGroup = null;
 	
 	private FlowPanel bottomPart = new FlowPanel();
 	private Label nameLabel = new Label();
@@ -67,12 +75,13 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 	 * @param type
 	 */
 	public SubjectWidget(String name, String code, int credits, double grade, boolean obligatoriness, int type, String publicId, PlanPresenter presenter){
+		
 		this.setName(name);
 		this.setCode(code);
 		this.setCredits(credits);
 		this.setGrade(grade);
-		this.setApproved(((grade >= 3) ? true : false));
-		this.setTaken(false);
+		// this.setApproved(((grade >= 3) ? true : false));
+		// this.setTaken(false);
 		this.setObligatoriness(obligatoriness);
 		this.setType(type);
 		this.setPublicId(publicId);
@@ -88,8 +97,8 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 		this.setCode(code);
 		this.setCredits(credits);
 		this.setGrade(grade);
-		this.setApproved(((grade >= 3) ? true : false));
-		this.setTaken(false);
+		// this.setApproved(((grade >= 3) ? true : false));
+		// this.setTaken(false);
 		this.setObligatoriness(obligatoriness);
 		this.setType(getTypeFromString(type));
 		this.setPublicId(publicId);
@@ -116,8 +125,8 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 		this.setCode(code);
 		this.setCredits(credits);
 		this.setGrade(0.0);
-		this.setApproved(false);
-		this.setTaken(false);
+		// this.setApproved(false);
+		// this.setTaken(false);
 		this.setObligatoriness(obligatoriness);
 		this.setType(type);
 		this.setPublicId(publicId);
@@ -137,8 +146,8 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 		this.setCode(s.getCode());
 		this.setCredits(s.getCredits());
 		this.setGrade(0.0);
-		this.setApproved(true);
-		this.setTaken(sV.isTaken());
+		// this.setApproved(true);
+		// this.setTaken(sV.isTaken());
 		this.setObligatoriness(sV.getComplementaryValues().isMandatory());
 		this.setType(getTypeFromString(sV.getComplementaryValues().getTypology()));
 		this.setPublicId(sV.getSubjectValuesPublicId());
@@ -236,15 +245,12 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 			public void onKeyUp(KeyUpEvent event) {
 				int key = event.getNativeKeyCode();
 				if(key == KeyCodes.KEY_ENTER){
-					textBoxGrade.setVisible(false);
-					gradeLabel.setVisible(true);
-					if(getTextOfGradeTextBox().isEmpty() == false){					
-						presenter.onGradeAdded(publicId, getTextOfGradeTextBox());
-					}
+					textBoxGrade.setFocus(false);
 				}
 			}
 			
 		});
+
 	}
 
 	private void AddStyles() {
@@ -264,7 +270,8 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 		obligatorinessLabel.addStyleName("obligBottomSubjectBox");
 		
 		typeLabel.addStyleName("typeBottomSubjectBox");
-		typeLabel.addStyleName(TYPENESS_STYLE[((getType()>4) ? 4 : getType())]);
+		int type = Integer.valueOf(this.getElement().getAttribute("type"));
+		typeLabel.addStyleName(TYPENESS_STYLE[((type > 4) ? 4 : type)]);
 		
 		textBoxGrade.setStyleName("textBoxGrade");
 		textBoxGrade.setTitle("Enter o click por fuera para guardar");
@@ -319,8 +326,8 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 		return typeLabel.asWidget();
 	}
 	
-	public int getCredits() {
-		return credits;
+	public String getCredits() {
+		return creditsLabel.getText();
 	}
 	
 	public void addPre(SubjectWidget subject){
@@ -334,6 +341,7 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 			preList.remove(subject);
 		}
 	}
+
 	public void addPos(SubjectWidget subject){
 		if(posList.contains(subject)==false){
 			posList.add(subject);
@@ -371,31 +379,27 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 	}
 	
 	public String getName(){
-		return name;
+		return nameLabel.getText();
 	}
 	
 	public String getCode(){
-		return code;
+		return codeLabel.getText();
 	}
 	
-	public boolean getApproved(){
-		return isApproved();
+	public String getGrade() {
+		return gradeLabel.getText();
 	}
 	
-	public double getGrade(){
-		return grade;
-	}
-	
-	public boolean isOblig(){
-		return isObligatoriness();
+	public String isOblig() {
+		return obligatorinessLabel.getText();
 	}
 	
 	/**
 	 * Type = 0 Nivelación, 1 Fundamentación, 2 Disiplinar, 3 libre elección, 4
 	 * Añadir para posgrado
 	 */
-	public int getType(){
-		return type;
+	public String getType() {
+		return typeLabel.getText();
 	}
 
 	public String getPublicId() {
@@ -403,90 +407,84 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 	}
 
 	@Override
-	public HandlerRegistration addClickHandler(
-	        ClickHandler handler)
-	    {
+	public HandlerRegistration addClickHandler(ClickHandler handler) {
 	        return addDomHandler(handler, ClickEvent.getType());
 	    }
 
-	public String getSubjectGroup() {
-		return subjectGroup;
-	}
-
 	public void setSubjectGroup(String subjectGroup) {
-		this.subjectGroup = subjectGroup;
+		// this.subjectGroup = subjectGroup;
 		codeLabel.setTitle("Agrupación: " + subjectGroup);
 	}
 
 	public void setName(String name) {
-		this.name = name;
-		this.getElement().setAttribute("name", getName());
+		// this.name = name;
+		this.getElement().setAttribute("name", name);
 		nameLabel.setText(name);
 	}
 
 	public void setCode(String code) {
-		this.code = code;
-		this.getElement().setAttribute("code", getCode());
+		// this.code = code;
+		this.getElement().setAttribute("code", code);
 		codeLabel.setText(code);
 	}
 
 	public void setPublicId(String publicId) {
 		this.publicId = publicId;
-		this.getElement().setAttribute("publicId", "" + getPublicId());
+		this.getElement().setAttribute("publicId", "" + publicId);
 	}
 
-	public boolean isObligatoriness() {
-		return obligatoriness;
+	public String isObligatoriness() {
+		return this.obligatorinessLabel.getText();
 	}
 
 	public void setObligatoriness(boolean obligatoriness) {
-		this.obligatoriness = obligatoriness;
-		this.getElement().setAttribute("obligatoriness", Boolean.toString(isObligatoriness()));
-		obligatorinessLabel.setText("oblig: " + ((isObligatoriness() == true) ? "Si" : "No"));
-		obligatorinessLabel.setTitle("Es obligatoria: " + ((isObligatoriness() == true) ? "Si" : "No"));
+		// this.obligatoriness = obligatoriness;
+		this.getElement().setAttribute("obligatoriness",
+				Boolean.toString(obligatoriness));
+		obligatorinessLabel.setText("oblig: "
+				+ ((obligatoriness == true) ? "Si" : "No"));
+		obligatorinessLabel.setTitle("Es obligatoria: "
+				+ ((obligatoriness == true) ? "Si" : "No"));
 	}
 
 	public void setCredits(int credits) {
-		this.credits = credits;
-		this.getElement().setAttribute("credits", Integer.toString(getCredits()));
-		creditsLabel.setText("c: " + Integer.toString(getCredits()));
-		creditsLabel.setTitle("créditos: " + getCredits());
+		// this.credits = credits;
+		this.getElement().setAttribute("credits", Integer.toString(credits));
+		creditsLabel.setText("c: " + Integer.toString(credits));
+		creditsLabel.setTitle("créditos: " + credits);
 	}
 
-	public void setGrade(double grade) {
-		if(grade >= 0 && grade <= 5){			
-			this.grade = grade;
-			this.getElement().setAttribute("grade", Double.toString(getGrade()));
+	public void setGrade(Double grade) {
+		if (grade == null || (grade >= 0 && grade <= 5)) {
+			// this.grade = grade;
+			this.getElement().setAttribute("grade", Double.toString(grade));
 		}
-		Double gradeFixed = (double) Math.round(getGrade() * 10) / 10;
-		gradeLabel.setText((isTaken() ? Double.toString(gradeFixed) : "-"));
-		gradeLabel.setTitle((isTaken() == false ? "Nota no registrada, para registrarla haz click" : "nota de la clase: " + getGrade()));
-	}
 
-	public boolean isApproved() {
-		return approved;
-	}
+		String gradeString = null;
+		String title = null;
 
-	public void setApproved(boolean approved) {
-		this.approved = approved;
-		this.getElement().setAttribute("approved", ((isApproved() == true) ? "1" : "0"));
-	}
-
-	public boolean isTaken() {
-		return taken;
-	}
-
-	public void setTaken(boolean taken) {
-		this.taken = taken;
-		this.getElement().setAttribute("taken", ((isTaken() == true) ? "1" : "0"));
+		if (grade == null) {
+			gradeString = "-";
+			title = "Nota no registrada, para registrarla haz click";
+		} else {
+			double gradeFixed = (double) Math.round(grade * 10) / 10;
+			gradeString = NumberFormat.getFormat("0.0").format(gradeFixed);
+			title = "nota de la clase: " + gradeString;
+		}
+		
+		gradeLabel.setText(gradeString);
+		gradeLabel.setTitle(title);
+		
+		this.fireEvent(new PlanChangeEvent("gradeChange"));
+		
 	}
 
 	public void setType(int type) {
-		this.type = type;
-		this.getElement().setAttribute("type", Integer.toString(getType()));
-		typeLabel.setText((getType()>4) ? "-" : TYPENESS[getType()]);
+		// this.type = type;
+		this.getElement().setAttribute("type", Integer.toString(type));
+		typeLabel.setText((type > 4) ? "-" : TYPENESS[type]);
 		typeLabel.setTitle("Tipología: "
-				+ TYPENESS_NAMES[((getType() > 4) ? 4 : getType())]);
+				+ TYPENESS_NAMES[((type > 4) ? 4 : type)]);
 	}
 
 	public boolean isSelected() {
@@ -504,4 +502,5 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 	public String getTextOfGradeTextBox(){
 		return textBoxGrade.getText();
 	}
+
 }

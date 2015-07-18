@@ -10,6 +10,9 @@ import org.gwtbootstrap3.client.ui.constants.IconType;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.gwt.core.shared.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerManager;
@@ -23,6 +26,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.uibinder.index.client.connection.ConnectionsController;
 import com.uibinder.index.client.dnd.PickUpDragController;
 import com.uibinder.index.client.dnd.SemesterDropController;
+import com.uibinder.index.client.event.PlanChangeEvent;
+import com.uibinder.index.client.event.PlanChangeEventHandler;
 import com.uibinder.index.client.event.SavePlanAsDefaultEvent;
 import com.uibinder.index.client.service.SUNServiceAsync;
 import com.uibinder.index.client.view.DefaultSubjectCreationView;
@@ -206,7 +211,7 @@ DefaultSubjectCreationView.Presenter{
 		
 		planWidget = new PlanWidget();
 		
-		addClickHandlerAddSemester();
+		addClickHandlersToPlan();
 		
 	}
 	
@@ -300,7 +305,6 @@ DefaultSubjectCreationView.Presenter{
 			getCareers("bog");
 			
 		}
-		
 	}
 
 	private void setCareer(Career career) {
@@ -319,7 +323,7 @@ DefaultSubjectCreationView.Presenter{
 		semesterWidgetList.add(semesterW);
 		semesterAndWidgetBiMap.put(semester, semesterW);
 		semesters++;
-		planWidget.add(semesterW);
+		planWidget.addSemesterWidget(semesterW);
 		
 		addClickHandlerDeleteSemesterButton(semesterW);
 		
@@ -348,8 +352,16 @@ DefaultSubjectCreationView.Presenter{
 		
 		
 		SubjectWidget subjectWidget = new SubjectWidget(subject.getName(), subject.getCode(), subject.getCredits(), subjectValues.getGrade(), subjectValues.getComplementaryValues().isMandatory(), subjectValues.getComplementaryValues().getTypology(), subjectValues.getSubjectValuesPublicId(), (subjectValues.getComplementaryValues().getSubjectGroup() != null ? subjectValues.getComplementaryValues().getSubjectGroup().getName() : ""), this);
-		subjectWidget.setTaken(subjectValues.isTaken());
+		// subjectWidget.setTaken(subjectValues.isTaken());
 		subjectWidget.setGrade(subjectValues.getGrade());
+//		subjectWidget.addHandler(new PlanChangeEventHandler(){
+//
+//			@Override
+//			public void onPlanChanges(String triggerer) {
+//				GWT.log("got it");
+//			}
+//			
+//		}, PlanChangeEvent.TYPE);
 		
 		subjectWidgetList.add(subjectWidget);
 		makeSubjectWidgetDraggable(subjectWidget);
@@ -650,12 +662,11 @@ DefaultSubjectCreationView.Presenter{
 		if(plan.getName() == null || plan.getName().isEmpty() == true){
 			showChangeNamePopup();
 		}else{
-			
 			rpcService.savePlan(student, plan, new AsyncCallback<Long>(){
 
 				@Override
 				public void onFailure(Throwable caught) {
-					Window.alert("error saving plan");
+					GWT.log("Error saving the plan - PlanPresenter");
 				}
 
 				@Override
@@ -663,6 +674,7 @@ DefaultSubjectCreationView.Presenter{
 					if(plan.getId() == null){
 						plan.setId(result);
 					}
+					GWT.log("Plan saved - PlanPresenter");
 				}
 				
 			});
@@ -805,7 +817,7 @@ DefaultSubjectCreationView.Presenter{
 		subContainer.add(l);
 	}
 
-	private void addClickHandlerAddSemester(){
+	private void addClickHandlersToPlan(){
 		planWidget.getLabelAddSemester().addClickHandler(new ClickHandler(){
 
 			@Override
@@ -821,6 +833,16 @@ DefaultSubjectCreationView.Presenter{
 			}
 			
 		});
+
+		planWidget.addHandler(new PlanChangeEventHandler(){
+
+			@Override
+			public void onPlanChanges(String triggerer) {
+				GWT.log("triggered from PlanPresenter");
+			}
+			
+		}, PlanChangeEvent.TYPE);
+		
 	}
 	
 	private void addClickHandlerAddSubject(final SemesterWidget semesterW){
@@ -1080,8 +1102,6 @@ DefaultSubjectCreationView.Presenter{
 		deleteSemester(semester-1);
 	}
 	
-	
-	
 	/******************** JQUERY FUNCTIONS *********************/
 
 	/**
@@ -1119,8 +1139,13 @@ DefaultSubjectCreationView.Presenter{
 	
 	/************************************************************/
 
-	/************ Behaviors when clicked *******************/
+	/*********************** Behaviors **************************/
 	
+	public void onPlanChange() {
+		GWT.log("onPlanChange()");
+		savePlan();
+	}
+
 	public void onSpecificSubjectSelected(String subjectName, String subjectCode, String careerCode) {
 		
 		SelectedSubjectViewImpl sSV = new SelectedSubjectViewImpl();
@@ -1358,7 +1383,6 @@ DefaultSubjectCreationView.Presenter{
 				
 				SubjectWidget sW = subjectValuesAndWidgetBiMap.get(sV);
 				if(sW != null){
-					sW.setTaken(true);
 					sW.setGrade(gradeDouble);
 				}
 			}
@@ -1367,4 +1391,5 @@ DefaultSubjectCreationView.Presenter{
 		hideAndUpdateTooltips();
 
 	}
+	
 }

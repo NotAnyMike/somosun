@@ -1,17 +1,18 @@
 package com.uibinder.index.client.widget;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.google.gwt.user.client.Window;
+import com.google.gwt.core.shared.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.HasChangeHandlers;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.uibinder.index.client.presenter.PlanPresenter;
+import com.uibinder.index.client.event.PlanChangeEvent;
+import com.uibinder.index.client.event.PlanChangeEventHandler;
 
-public class PlanWidget extends HorizontalPanel {
+public class PlanWidget extends HorizontalPanel implements HasChangeHandlers {
 	
 	private Image addSemesterImage = new Image("images/addSemester.png");
 	private Label label = new Label(" add");
@@ -35,9 +36,31 @@ public class PlanWidget extends HorizontalPanel {
 		return addSemesterImage;
 	}
 	
+	public void addSemesterWidget(SemesterWidget sW) {
+		
+		this.fireEvent(new PlanChangeEvent("SemesterAdd"));
+
+		sW.addHandler(new PlanChangeEventHandler(){
+
+			@Override
+			public void onPlanChanges(String triggerer) {
+				fireEvent(new PlanChangeEvent(triggerer));
+			}
+			
+		}, PlanChangeEvent.TYPE);
+		
+		add(sW.asWidget());
+	}
+
 	@Override
 	public void add(Widget w){
 		super.insert(w, this.getWidgetCount()-1);
+	}
+
+
+	@Override
+	public HandlerRegistration addChangeHandler(ChangeHandler handler) {
+		return addDomHandler(handler, ChangeEvent.getType());
 	}
 	
 }

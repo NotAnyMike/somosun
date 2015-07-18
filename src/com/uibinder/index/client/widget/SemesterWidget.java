@@ -6,12 +6,18 @@ import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.HasChangeHandlers;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.uibinder.index.client.event.PlanChangeEvent;
+import com.uibinder.index.client.event.PlanChangeEventHandler;
 import com.uibinder.index.client.presenter.PlanPresenter;
 
-public class SemesterWidget extends VerticalPanel {
+public class SemesterWidget extends VerticalPanel implements HasChangeHandlers {
 	
 	private static final String[] SEMESTER_ROMAN = {"I", "II", "III", "IV", "V", "VI", 
 		"VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX"};
@@ -21,7 +27,7 @@ public class SemesterWidget extends VerticalPanel {
 	private Label creditsLabel = new Label();
 	private Label semesterLabel = new Label();
 	private HorizontalPanel bottomPart = new HorizontalPanel();
-	private VerticalPanel subjectPanel = new SubjectPanel();
+	private SubjectPanel subjectPanel = new SubjectPanel();
 	private VerticalPanel bottomBigPanel = new VerticalPanel();
 	private Button deleteSemesterButton = new Button("Eliminar semestre");
 	
@@ -61,6 +67,16 @@ public class SemesterWidget extends VerticalPanel {
 		deleteSemesterButton.setSize(ButtonSize.EXTRA_SMALL);
 		
 		generateWidget();
+		
+		subjectPanel.addHandler(new PlanChangeEventHandler(){
+
+			@Override
+			public void onPlanChanges(String triggerer) {
+				fireEvent(new PlanChangeEvent(triggerer));
+			}
+			
+		}, PlanChangeEvent.TYPE);
+
 	}
 	
 	private void generateWidget() {
@@ -90,6 +106,7 @@ public class SemesterWidget extends VerticalPanel {
 
 	public void clearSemester(){
 		subjectPanel.clear();
+		this.fireEvent(new PlanChangeEvent("SemesterClear"));
 	}
 	
 	public VerticalPanel getMainPanel(){
@@ -97,7 +114,7 @@ public class SemesterWidget extends VerticalPanel {
 	}
 
 	public void addSubject(SubjectWidget subject) {
-		subjectPanel.add(subject);		
+		subjectPanel.add(subject);
 	}
 	
 	public Button getDeleteSemesterButton(){
@@ -106,5 +123,11 @@ public class SemesterWidget extends VerticalPanel {
 	
 	public Button getAddButton(){
 		return addButton;
+	}
+
+
+	@Override
+	public HandlerRegistration addChangeHandler(ChangeHandler handler) {
+		return addDomHandler(handler, ChangeEvent.getType());
 	}
 }
