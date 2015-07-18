@@ -15,7 +15,16 @@ public class SubjectValuesDao {
 	}
 
 	public void saveSubjectValue(SubjectValues sV){
-		ofy().save().entity(sV).now();
+		
+		if(sV != null){
+
+			if(sV.getGrade() > 5 || sV.getGrade() < 0){
+				sV.setTaken(false);
+			}
+			
+			ofy().save().entity(sV).now();
+			
+		}
 	}
 	
 	/**

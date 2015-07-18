@@ -13,7 +13,6 @@ import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -27,7 +26,8 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 	
 	private static final String[] TYPENESS = {"N", "F", "D", "L", "P", "-"};
 	private static final String[] TYPENESS_STYLE = {"nivelacion", "fundamentacion", "disciplinar", "libreEleccion", "otra", "otra"};
-	private static final String[] TYPENESS_NAMES = {"Nivelación", "Fundamentación", "Disciplinar", "Libre Elección", "Otra", "Otra"};
+	private static final String[] TYPENESS_NAMES = { "Nivelación",
+			"Fundamentación", "Disciplinar", "Libre Elección", "Otra", "Otra" };
 
 	private PlanPresenter presenter = null;
 	
@@ -102,7 +102,9 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 	}
 	
 	/**
-	 * Type = 0 Nivelación, 1 Fundamentación, 2 Disiplinar, 3 libre elección, 4 Añadir para posgrado
+	 * Type = 0 Nivelación, 1 Fundamentación, 2 Disiplinar, 3 libre elección, 4
+	 * Añadir para posgrado
+	 * 
 	 * @param name
 	 * @param code
 	 * @param credits
@@ -148,14 +150,16 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 	}
 
 	/**
-	 * will return: <br></br>
-	 * p -> 0 <br></br>
-	 * b -> 1 <br></br> 
-	 * c -> 2 <br></br>
-	 * l -> 3 <br></br>
+	 * will return: <br>
+	 * </br> p -> 0 <br>
+	 * </br> b -> 1 <br>
+	 * </br> c -> 2 <br>
+	 * </br> l -> 3 <br>
+	 * </br>
 	 * 
-	 * Type = 0 Nivelación, 1 Fundamentación, 2 Disiplinar, 3 libre elección, 4 Añadir para posgrado
-	 * <br></br>
+	 * Type = 0 Nivelación, 1 Fundamentación, 2 Disiplinar, 3 libre elección, 4
+	 * Añadir para posgrado <br>
+	 * </br>
 	 * 
 	 * @param typology
 	 * @return
@@ -205,13 +209,11 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 
 			@Override
 			public void onClick(ClickEvent event) {
-				if(codeLabel.getText().contains("optativa") == false || codeLabel.getText().contains("libre") == false){
-					gradeLabel.setVisible(false);
-					textBoxGrade.setVisible(true);
-					textBoxGrade.setFocus(true);
-					setTextOfGradeText((gradeLabel.getText().equals("-") ? "" : gradeLabel.getText()));
-					event.stopPropagation();
-				}
+				gradeLabel.setVisible(false);
+				textBoxGrade.setVisible(true);
+				textBoxGrade.setFocus(true);
+				setTextOfGradeText((gradeLabel.getText().equals("-") ? "" : gradeLabel.getText()));
+				event.stopPropagation();
 			}
 		});
 		
@@ -376,10 +378,6 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 		return code;
 	}
 	
-	public boolean getTaken(){
-		return isTaken();
-	}
-	
 	public boolean getApproved(){
 		return isApproved();
 	}
@@ -393,7 +391,8 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 	}
 	
 	/**
-	 * Type = 0 Nivelación, 1 Fundamentación, 2 Disiplinar, 3 libre elección, 4 Añadir para posgrado
+	 * Type = 0 Nivelación, 1 Fundamentación, 2 Disiplinar, 3 libre elección, 4
+	 * Añadir para posgrado
 	 */
 	public int getType(){
 		return type;
@@ -455,10 +454,13 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 	}
 
 	public void setGrade(double grade) {
-		this.grade = grade;
-		this.getElement().setAttribute("grade", Double.toString(getGrade()));
-		gradeLabel.setText(isTaken() == false ? "-" : Double.toString(getGrade()));
-		gradeLabel.setTitle((getGrade()==0) ? "Nota no registrada, para registrarla haz click" : "nota de la clase: " + getGrade());
+		if(grade >= 0 && grade <= 5){			
+			this.grade = grade;
+			this.getElement().setAttribute("grade", Double.toString(getGrade()));
+		}
+		Double gradeFixed = (double) Math.round(getGrade() * 10) / 10;
+		gradeLabel.setText((isTaken() ? Double.toString(gradeFixed) : "-"));
+		gradeLabel.setTitle((isTaken() == false ? "Nota no registrada, para registrarla haz click" : "nota de la clase: " + getGrade()));
 	}
 
 	public boolean isApproved() {
@@ -483,7 +485,8 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers{
 		this.type = type;
 		this.getElement().setAttribute("type", Integer.toString(getType()));
 		typeLabel.setText((getType()>4) ? "-" : TYPENESS[getType()]);
-		typeLabel.setTitle("Tipología: " + TYPENESS_NAMES[((getType()>4) ? 4 : getType())]);
+		typeLabel.setTitle("Tipología: "
+				+ TYPENESS_NAMES[((getType() > 4) ? 4 : getType())]);
 	}
 
 	public boolean isSelected() {

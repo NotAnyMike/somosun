@@ -3,9 +3,9 @@ package com.uibinder.index.client;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import com.google.appengine.api.log.AppLogLine;
-import com.google.appengine.api.log.LogServiceFactory;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -47,7 +47,6 @@ import com.uibinder.index.client.view.PlanViewImpl;
 import com.uibinder.index.client.view.SiaSummaryViewImpl;
 import com.uibinder.index.client.view.TopBarViewImpl;
 import com.uibinder.index.shared.LoginInfo;
-import com.uibinder.index.shared.PlanValuesResult;
 import com.uibinder.index.shared.RandomPhrase;
 import com.uibinder.index.shared.control.Career;
 import com.uibinder.index.shared.control.Plan;
@@ -55,7 +54,7 @@ import com.uibinder.index.shared.control.Semester;
 import com.uibinder.index.shared.control.Student;
 
 public class AppController implements Presenter, ValueChangeHandler<String> {
-
+	
 	// Creating all the views that will exist once for all to save them to let users go back to their view
 	private IndexPresenter indexPresenter;
 	private TopBarPresenter topBarPresenter;
@@ -84,6 +83,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	private final SUNServiceAsync rpcService;
 	private HasWidgets container;
 	private String token;
+	private String lastToken;
 	
 	private LoginInfo loginInfo = new LoginInfo();
 	private Student student;
@@ -230,6 +230,12 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 				topBarPresenter.go(RootPanel.get("topArea"));
 			}
 			
+			if(lastToken.equals("plan")){
+				if(planPresenter != null){
+					savePlan();
+				}
+			}
+			
 			/**
 			 * This part will take care of the stability of the plan widget when its height changes due
 			 * to the changes on the number of max subjects on one semester
@@ -302,6 +308,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 				indexPresenter.go(RootPanel.get("centerArea"));
 			}
 			setLabelsOnTopBar(token);
+			lastToken = token;
 		}
 		
 	}
@@ -485,6 +492,52 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 			}
 			
 		});
+		
+	}
+
+	@SuppressWarnings("unchecked")
+	private void savePlan() {
+		if(planPresenter != null){
+			
+			Plan plan = planPresenter.getPlan();
+			
+			if(plan != null){				
+				
+				boolean toSave = false;
+				
+				if(plan.getSemesters() != null){
+					for(Semester s : plan.getSemesters()){
+						if(s.getSubjects() != null && s.getSubjects().size() > 0){
+							toSave = true;
+							break;
+						}
+					}
+				}
+				
+				//It deserves to be saved
+				if(toSave){
+					
+					if(plan.getName() == null || plan.getName().isEmpty() == true){
+						plan.setName(plan.getCareer().getName());
+					}
+					
+					rpcService.savePlan(student, plan, new AsyncCallback(){
+						
+						@Override
+						public void onFailure(Throwable caught) {
+							Window.alert("error saving plan");
+						}
+						
+						@Override
+						public void onSuccess(Object result) {
+							Window.alert("Plan saved");
+						}
+						
+					});
+					
+				}
+			}
+		}
 		
 	}
 }

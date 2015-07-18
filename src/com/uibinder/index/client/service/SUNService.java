@@ -49,6 +49,9 @@ public interface SUNService extends RemoteService{
 	public List<Plan> getPlansByUserLoggedIn();
 	public List<PlanValuesResult> getPlanValuesByUserLoggedIn();
 	public void deletePlanFromUser(String planId);
+	public void savePlanAsDefault(Student student, Plan plan);
+	public Long savePlan(Student student, Plan plan);
+	public Plan getPlanDefault(String careerCode);
 	
 	public void toTest();
 	
@@ -60,10 +63,6 @@ public interface SUNService extends RemoteService{
 	List<ComplementaryValues> getComplementaryValues(List<String> selectedSubjectCodeStrings, List<String> selectedSubjectCareerStrings);
 	
 	public void analyzeCareer(String careerCode);
-	
-	public void savePlanAsDefault(Student student, Plan plan);
-	public void savePlan(Student student, Plan plan);
-	public Plan getPlanDefault(String careerCode);
 	
 	public List<SubjectGroup> getSubjectGroups(String careerCode);
 	

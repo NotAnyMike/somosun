@@ -77,6 +77,7 @@ public class WarningDeleteSubjectViewImpl extends Composite implements WarningDe
 	@Override
 	public void showIt() {
 		this.asWidget().setVisible(true);
+		deleteButton.setFocus(true);
 	}
 
 	@Override

@@ -15,6 +15,7 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.VoidWork;
+import com.googlecode.objectify.cmd.Deferred;
 import com.uibinder.index.shared.control.Career;
 import com.uibinder.index.shared.control.ComplementaryValues;
 import com.uibinder.index.shared.control.Plan;
@@ -112,7 +113,10 @@ public class PlanDao {
 		return intToReturn;
 	}
 	
-	public void savePlan(Plan plan){
+	public Long savePlan(Plan plan){
+		
+		Long id = null;
+		
 		if(plan != null){
 			if(plan.getCareer() != null){
 				//save everything inside
@@ -121,10 +125,10 @@ public class PlanDao {
 				ComplementaryValuesDao complementaryValueDao = new ComplementaryValuesDao();
 				SubjectValuesDao subjectValuesDao = new SubjectValuesDao();
 				SubjectDao subjectDao = new SubjectDao();
-				GroupDao groupDao = new GroupDao();
-				BlockDao blockDao = new BlockDao();
-				TeacherDao teacherDao = new TeacherDao();
-				SemesterValueDao  semesterValueDao = new SemesterValueDao();
+//				GroupDao groupDao = new GroupDao();
+//				BlockDao blockDao = new BlockDao();
+//				TeacherDao teacherDao = new TeacherDao();
+//				SemesterValueDao  semesterValueDao = new SemesterValueDao();
 
 				List<Semester> semesters = plan.getSemesters();
 				List<SubjectValues> sVToRemoveList = new ArrayList<SubjectValues>();
@@ -134,17 +138,16 @@ public class PlanDao {
 					sVToRemoveList.clear();
 
 					List<SubjectValues> subjectValuesList = s.getSubjects();
-					if(s.getId() == null || true){
+					
 						if(subjectValuesList != null){
 							if(subjectValuesList.size() != 0){
 								for(SubjectValues sV : subjectValuesList){
-									if(sV.getId() == null || true){
-										
+									
 										ComplementaryValues cV = sV.getComplementaryValues();
 										if(cV != null){
-											if(cV.getId() == null || true){
+											
 												if(cV.getCareer() != null && cV.getSubject() != null){
-													//TODO
+
 													Subject s2 = cV.getSubject();
 													if(s2 != null){
 														if(s2.getId() == null){
@@ -179,24 +182,30 @@ public class PlanDao {
 														}
 													}
 													
-													cV.setId(complementaryValueDao.generateId());
+													if(cV.getId() == null){														
+														cV.setId(complementaryValueDao.generateId());
+													}
 													complementaryValueDao.saveComplementaryValues(cV);
 												}else{
 													sV.setComplementaryValues(null);
 												}
+											
+											if(sV.getId() == null){												
+												sV.setId(subjectValuesDao.generateId()); 
 											}
-											sV.setId(subjectValuesDao.generateId()); 
 											subjectValuesDao.saveSubjectValue(sV);
 										}else{
 											sVToRemoveList.add(sV);
 										}
-									}
+									
 								}
 							}
 						}
-						s.setId(semesterDao.generateId(s));
+						if(s.getId() == null){
+							s.setId(semesterDao.generateId(s));
+						}
 						semesterDao.saveSemester(s);
-					}
+					
 					
 					for(SubjectValues sVT : sVToRemoveList){						
 						s.getSubjects().remove(sVT);
@@ -204,10 +213,17 @@ public class PlanDao {
 					
 				}
 				
-				plan.setId(generateId());
-				ofy().save().entity(plan).now();
+				if(plan.getId() == null){
+					plan.setId(generateId());
+				}
+				//TODO not sure of the functionality of Defer
+				ofy().defer().save().entity(plan);
+				id = plan.getId();
 			}
 		}
+		
+		return id;
+		
 	}
 
 	private Long generateId() {
@@ -230,14 +246,6 @@ public class PlanDao {
 		}
 		return p;
 	}
-
-	public void updatePlan(Plan plan) {
-		if(plan.getId() == null){
-			savePlan(plan);
-		}else{
-			updatePlanTransaction(plan);
-		}
-	}
 	
 	/**
 	 * This method will only delete the plan entity, will not delete the semesters nor the subjectValues in it.
@@ -251,15 +259,6 @@ public class PlanDao {
 		}
 	}
 
-	private void updatePlanTransaction(final Plan plan) {
-		ofy().transact(new VoidWork (){
-			public void vrun() {
-				deletePlan(plan.getId());
-				savePlan(plan);
-			}
-			
-		});
-	}
 
 	public List<Plan> getPlanByUser(Student s) {
 		

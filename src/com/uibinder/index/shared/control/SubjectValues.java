@@ -18,7 +18,7 @@ public class SubjectValues implements Serializable {
 	@Id private Long id = null;
 	@Index private Group group = null;
 	@Ignore private String subjectValuesPublicId = null;
-    private double grade = 0;
+    private Double grade = null;
     private boolean taken = false;
     private ComplementaryValues complementaryValues = null;
     
@@ -62,8 +62,11 @@ public class SubjectValues implements Serializable {
 		return grade;
 	}
 
-	public void setGrade(double grade) {
-		this.grade = grade;
+	public void setGrade(Double grade) {
+		if(grade >= 0 && grade <= 5){			
+			this.grade = grade;
+			//if(grade != null) setTaken(true);
+		}
 	}
 
 	public static long getSerialversionuid() {
@@ -80,6 +83,9 @@ public class SubjectValues implements Serializable {
 
 	public void setTaken(boolean taken) {
 		this.taken = taken;
+		if(taken == false){
+			setGrade(0.0);
+		}
 	}
 
 	public String getSubjectValuesPublicId() {

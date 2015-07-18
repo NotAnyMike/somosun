@@ -17,9 +17,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
-import com.google.gwt.user.client.ui.HasHorizontalAlignment.HorizontalAlignmentConstant;
 import com.google.gwt.user.client.ui.HasWidgets;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.uibinder.index.client.connection.ConnectionsController;
@@ -193,8 +191,6 @@ DefaultSubjectCreationView.Presenter{
 		
 	}
 	
-
-
 	@Override
 	public void go(HasWidgets container) {
 		container.clear();
@@ -352,6 +348,9 @@ DefaultSubjectCreationView.Presenter{
 		
 		
 		SubjectWidget subjectWidget = new SubjectWidget(subject.getName(), subject.getCode(), subject.getCredits(), subjectValues.getGrade(), subjectValues.getComplementaryValues().isMandatory(), subjectValues.getComplementaryValues().getTypology(), subjectValues.getSubjectValuesPublicId(), (subjectValues.getComplementaryValues().getSubjectGroup() != null ? subjectValues.getComplementaryValues().getSubjectGroup().getName() : ""), this);
+		subjectWidget.setTaken(subjectValues.isTaken());
+		subjectWidget.setGrade(subjectValues.getGrade());
+		
 		subjectWidgetList.add(subjectWidget);
 		makeSubjectWidgetDraggable(subjectWidget);
 		semesterAndWidgetBiMap.get(semester).addSubject(subjectWidget);
@@ -651,7 +650,8 @@ DefaultSubjectCreationView.Presenter{
 		if(plan.getName() == null || plan.getName().isEmpty() == true){
 			showChangeNamePopup();
 		}else{
-			rpcService.savePlan(student, plan, new AsyncCallback(){
+			
+			rpcService.savePlan(student, plan, new AsyncCallback<Long>(){
 
 				@Override
 				public void onFailure(Throwable caught) {
@@ -659,8 +659,10 @@ DefaultSubjectCreationView.Presenter{
 				}
 
 				@Override
-				public void onSuccess(Object result) {
-					Window.alert("Plan saved");
+				public void onSuccess(Long result) {
+					if(plan.getId() == null){
+						plan.setId(result);
+					}
 				}
 				
 			});
@@ -1053,9 +1055,8 @@ DefaultSubjectCreationView.Presenter{
 	
 	public void deletePlanConfirmed(){
 		view.hidePopups();
-		if(plan.getId() != null && plan.getId().equals("") == false){
+		if(plan.getId() != null){
 			String planId = plan.getId().toString();
-			
 			rpcService.deletePlanFromUser(planId, new AsyncCallback(){
 				
 				@Override
@@ -1065,12 +1066,12 @@ DefaultSubjectCreationView.Presenter{
 				
 				@Override
 				public void onSuccess(Object result) {
-					Window.alert("deleted");
-					Window.Location.reload();
+					Window.alert("Plan deleted");
+					Window.Location.assign("#create");
 				}
 			});
 		}else{
-			Window.Location.reload();
+			Window.Location.assign("#create");
 		}
 	}
 
@@ -1078,6 +1079,8 @@ DefaultSubjectCreationView.Presenter{
 		view.hidePopups();
 		deleteSemester(semester-1);
 	}
+	
+	
 	
 	/******************** JQUERY FUNCTIONS *********************/
 
@@ -1092,7 +1095,7 @@ DefaultSubjectCreationView.Presenter{
 	 * This method takes care of showing the property "title" in a better way
 	 */
 	public static native void showToolTip() /*-{
-	  $wnd.showTooltip();
+		$wnd.showTooltip();
 	}-*/;
 	
 	/**
@@ -1108,6 +1111,10 @@ DefaultSubjectCreationView.Presenter{
 
 	public static native void addEventListenerOnChangeToSiaSummary() /*-{
 		$wnd.addEventListenerOnScroll()
+	}-*/;
+	
+	public static native void hideAndUpdateTooltips() /*-{
+		$wnd.hideAndUpdateTooltips()
 	}-*/;
 	
 	/************************************************************/
@@ -1301,7 +1308,9 @@ DefaultSubjectCreationView.Presenter{
 	@Override
 	public void showChangeNamePopup() {
 		view.showCurtain();
-		if((plan.getName() != null ? plan.getName().isEmpty() == true : true)){
+		if((plan.getName() != null ? plan.getName().isEmpty() == false : false)){
+			view.setSugestionText(plan.getName());
+		}else{
 			view.setSugestionText("Plan de " + plan.getCareer().getName());
 		}
 		view.showChangeName();
@@ -1334,6 +1343,28 @@ DefaultSubjectCreationView.Presenter{
 	}
 
 	public void onGradeAdded(String publicId, String grade){
-		Window.alert("publicId: " + publicId +" grade: " + grade);
+		if(publicId != null && publicId.isEmpty() == false){
+			
+			
+			SubjectValues sV = getSubjectValuesByPublicId(publicId);
+			
+			grade = grade.trim().replaceAll(",", ".");
+			Double gradeDouble = Double.valueOf(grade);
+			
+			if(sV != null && gradeDouble >= 0 && gradeDouble <= 5){
+				
+				sV.setTaken(true);
+				sV.setGrade(gradeDouble);
+				
+				SubjectWidget sW = subjectValuesAndWidgetBiMap.get(sV);
+				if(sW != null){
+					sW.setTaken(true);
+					sW.setGrade(gradeDouble);
+				}
+			}
+		}
+
+		hideAndUpdateTooltips();
+
 	}
 }

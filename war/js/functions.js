@@ -29,7 +29,7 @@ function arrangeTopOfSearchBox(){
 }
 
 function showTooltip(){
-	$('[data-toggle="tooltip"]').tooltip();	
+	$('[data-toggle="tooltip"]').tooltip();
 };
 
 function addClickSearchField(){
@@ -54,4 +54,9 @@ function stopPropagationOfClickOnSelectSubject(){
 		Array.prototype.forEach.call(els, function(el) {
     		el.addEventListener('click', function(event){event.stopPropagation();});
 		});
+}
+
+function hideAndUpdateTooltips(){
+	$('[data-toggle="tooltip"]').tooltip('hide')
+          .tooltip('fixTitle')
 }

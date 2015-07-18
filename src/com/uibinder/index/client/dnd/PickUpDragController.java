@@ -173,6 +173,8 @@ public class PickUpDragController extends AbstractDragController {
 	  public void dragStart() {
 	    super.dragStart();
 	    
+	    planPresenter.hideAndUpdateTooltips();
+	    
 	    
 	    //To deselect every subject when dragging starts
 	    //planPresenter.deleteAllOpacities();

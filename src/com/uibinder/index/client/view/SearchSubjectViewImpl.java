@@ -98,6 +98,7 @@ public class SearchSubjectViewImpl extends Composite implements SearchSubjectVie
 	@Override
 	public void showIt() {
 		this.asWidget().setVisible(true);
+		searchField.setFocus(true);
 	}
 
 	public void addCareerToListBox(String name, String code) {

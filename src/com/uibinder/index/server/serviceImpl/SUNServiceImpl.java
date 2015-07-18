@@ -244,7 +244,10 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 	}
 
 	@Override
-	public void savePlan(Student student, Plan plan) {
+	public Long savePlan(Student student, Plan plan) {
+		
+		Long id = null;
+		
 		if(plan != null){
 			PlanDao pDao = new PlanDao();
 			
@@ -258,13 +261,15 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 					plan.setUser(student);
 					plan.setDefault(false);
 					
-					pDao.updatePlan(plan);
+					id = pDao.savePlan(plan);
 					
 				}
 			}
 			
 			
 		}
+		
+		return id;
 	}
 	
 	public Plan getPlanDefault(String careerCode){

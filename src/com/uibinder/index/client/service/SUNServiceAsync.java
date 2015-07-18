@@ -81,7 +81,7 @@ public interface SUNServiceAsync {
 
 	void getMandatoryComplementaryValues(String careerCode,	AsyncCallback<List<ComplementaryValues>> callback);
 
-	void savePlan(Student student, Plan plan, AsyncCallback<Void> callback);
+	void savePlan(Student student, Plan plan, AsyncCallback<Long> callback);
 
 	void getPlansByUserLoggedIn(AsyncCallback<List<Plan>> callback);
 
