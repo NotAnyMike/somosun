@@ -48,7 +48,7 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 	@UiField AnchorListItem savePlanAsDefaultButton;
 	@UiField AnchorListItem addMandatorySubjectsButton;
 	
-	@UiField AnchorButton changePlanNameButton;
+	@UiField AnchorButton savePlanNameButton;
 	@UiField AnchorButton newPlanButton;
 	@UiField AnchorButton deletePlanButton;
 
@@ -213,9 +213,9 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 		presenter.onAddMandatorySubjectsButton();
 	}
 
-	@UiHandler("changePlanNameButton")
-	public void onChangeNameClick(ClickEvent e) {
-		presenter.showChangeNamePopup();
+	@UiHandler("savePlanNameButton")
+	public void onSavePlanClick(ClickEvent e) {
+		presenter.showSavePlanPopup();
 	}
 	
 	@UiHandler("deletePlanButton")

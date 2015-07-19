@@ -155,7 +155,7 @@ public class PlanDao {
 															if(s2.getCode().isEmpty() == false) sT = subjectDao.getSubjectByCode(s2.getCode());
 															else sT = subjectDao.getSubjectByName(s2.getName());
 															
-															if(sT == null){
+															if(sT.getId() == null){
 																s2.setId(subjectDao.generateId());
 																subjectDao.saveSubject(s2);																
 															}
@@ -174,7 +174,8 @@ public class PlanDao {
 															if(s3.getCode().isEmpty() == false) sT = subjectDao.getSubjectByCode(s3.getCode());
 															else sT = subjectDao.getSubjectByName(s3.getName());
 															
-															if(sT == null){
+															//OLD if(sR == null){
+															if(s3.getId() == null){
 																s3.setId(subjectDao.generateId());
 																subjectDao.saveSubject(s3);																
 															}

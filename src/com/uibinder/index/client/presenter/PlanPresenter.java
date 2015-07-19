@@ -143,6 +143,8 @@ DefaultSubjectCreationView.Presenter{
 	private List<SubjectAccordionViewImpl> accordions = new ArrayList<SubjectAccordionViewImpl>();
 	private List<SelectedSubjectViewImpl> selectedSubjects = new ArrayList<SelectedSubjectViewImpl>();
 	
+	private boolean changeNameAsked = false;
+	
 	/********************** asyncCallbacks varaibles *******************************/
 	
 	AsyncCallback<List<Career>> asyncGetCareers = new AsyncCallback<List<Career>>() {
@@ -288,7 +290,7 @@ DefaultSubjectCreationView.Presenter{
 			//Map<SubjectValues, Subject> subjectMap2 = new HashMap<SubjectValues, Subject>();
 			
 			for(Semester semester2 : semesterListPlan){
-				createSemester(semester2);
+				createSemester(semester2, false);
 				for(SubjectValues subjectValues2 : semester2.getSubjects()){
 					if(subjectValues2 != null){
 						if(subjectValues2.getComplementaryValues() != null){
@@ -314,7 +316,11 @@ DefaultSubjectCreationView.Presenter{
 		disciplinaryCredits[2] = career.getDisciplinaryCredits();
 	}
 
-	private void createSemester(Semester semester) {
+	private void createSemester(Semester semester){
+		createSemester(semester, true);
+	}
+	
+	private void createSemester(Semester semester, boolean save) {
 		
 		semesterList.add(semester);
 		credits.put(semester, 0);
@@ -334,12 +340,15 @@ DefaultSubjectCreationView.Presenter{
 		
 		addClickHandlerAddSubject(semesterW);
 		
-		planChanged("NewSemester");
+		if(save == true){			
+			planChanged("NewSemester");
+		}
 		
 	}
 	
 	public void planChanged(String triggered){
 		GWT.log(triggered);
+		savePlan();
 	}
 
 	private void createSubject(Subject subject, SubjectValues subjectValues, Semester semester) {
@@ -656,11 +665,8 @@ DefaultSubjectCreationView.Presenter{
 		
 	}
 
-	@SuppressWarnings("unchecked")
 	private void savePlan() {
-		if(plan.getName() == null || plan.getName().isEmpty() == true){
-			showChangeNamePopup();
-		}else{
+		if(plan.getName() != null && plan.getName().isEmpty() == false){
 			rpcService.savePlan(student, plan, new AsyncCallback<Long>(){
 
 				@Override
@@ -673,10 +679,13 @@ DefaultSubjectCreationView.Presenter{
 					if(plan.getId() == null){
 						plan.setId(result);
 					}
-					GWT.log("Plan saved - PlanPresenter");
+					GWT.log("Plan saved - PP");
 				}
 				
 			});
+		}else if(changeNameAsked == false){
+			changeNameAsked = true;
+			showSavePlanPopup();
 		}
 	}
 
@@ -1003,7 +1012,12 @@ DefaultSubjectCreationView.Presenter{
 		return selected;
 	}
 	
+	
 	private void addSubjectsToPlan(List<ComplementaryValues> result, String semesterString) {
+		addSubjectsToPlan(result, semesterString, true);
+	}
+	
+	private void addSubjectsToPlan(List<ComplementaryValues> result, String semesterString, boolean toSave) {
 		
 		int semesterNumber = Integer.valueOf(semesterString);
 		Semester semester = semesterList.get(semesterNumber);
@@ -1019,7 +1033,9 @@ DefaultSubjectCreationView.Presenter{
 			createSubject(sV.getComplementaryValues().getSubject(), sV, semester);
 		}
 		
-		planChanged("NewSubjects");
+		if(toSave == true){			
+			planChanged("NewSubjects");
+		}
 
 	}
 	
@@ -1044,22 +1060,26 @@ DefaultSubjectCreationView.Presenter{
 		});
 	}
 	
+	
 	private void loadMandatoryValues(List<ComplementaryValues> list){
 		
 		if(plan != null && list != null){
-			for(int x = 0; x < 9; x++){
+			for(int x = 0; x < 10; x++){
 				if(list.isEmpty() == false){					
 					List<ComplementaryValues> cVToAdd = new ArrayList<ComplementaryValues>(); 
 					for(int y = 0; y < 5; y++){
 						if(list.isEmpty() == false){						
 							cVToAdd.add(list.get(0));
 							list.remove(0);
-							System.out.println("Plan Presenter");
 						}else{
 							break;
 						}
 					}
-					if(cVToAdd.isEmpty() == false) addSubjectsToPlan(cVToAdd, Integer.toString(x));
+					boolean toSave = false;
+					if(list.size() == 0 || x == 9){
+						toSave = true;
+					}
+					if(cVToAdd.isEmpty() == false) addSubjectsToPlan(cVToAdd, Integer.toString(x), toSave);
 				}else{
 					break;
 				}
@@ -1320,7 +1340,7 @@ DefaultSubjectCreationView.Presenter{
 	}
 
 	@Override
-	public void showChangeNamePopup() {
+	public void showSavePlanPopup() {
 		view.showCurtain();
 		if((plan.getName() != null ? plan.getName().isEmpty() == false : false)){
 			view.setSugestionText(plan.getName());
@@ -1329,11 +1349,12 @@ DefaultSubjectCreationView.Presenter{
 		}
 		view.showChangeName();
 	}
+	
 
 	@Override
 	public void planNameChanged(String s) {
-		planChanged("NewName");
 		plan.setName(s);
+		planChanged("NewName");
 		view.hidePopups();
 	}
 	

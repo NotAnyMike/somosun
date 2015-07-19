@@ -608,6 +608,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 							
 							subjectDefault.setDefault(true);
 							subjectDefault.setId(subjectDao.generateId());
+							//prehasp this is duplicating the subjects in the db, if not then delete this comment later on
 							subjectDao.saveSubject(subjectDefault);
 							
 							String t = null;

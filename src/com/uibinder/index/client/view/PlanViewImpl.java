@@ -6,6 +6,10 @@ import org.gwtbootstrap3.client.ui.TextBox;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -49,7 +53,7 @@ public class PlanViewImpl extends Composite implements PlanView {
 		hidePopups();
 		
 	}
-	
+
 	public void hidePopups() {
 		hideCurtain();
 		hideChangeName();
@@ -68,7 +72,9 @@ public class PlanViewImpl extends Composite implements PlanView {
 		}
 		generalConfirmationHTMLPanel.asWidget().setVisible(true);
 		deleteGeneralButton.setFocus(true);
+		textBoxChangeNamePlan.setFocus(false);
 		showCurtain();
+		
 	}
 	
 	public void setSemester(String s){
@@ -84,6 +90,7 @@ public class PlanViewImpl extends Composite implements PlanView {
 	public void showChangeName(){
 		changeNameHTMLPanel.asWidget().setVisible(true);
 		textBoxChangeNamePlan.setFocus(true);
+		deleteGeneralButton.setFocus(false);
 	}
 	
 	public void hideChangeName(){
@@ -102,6 +109,10 @@ public class PlanViewImpl extends Composite implements PlanView {
 		textBoxChangeNamePlan.setValue(s);
 	}
 	
+	public void doSavePlanButton(){
+		presenter.planNameChanged(textBoxChangeNamePlan.getValue());
+	}
+	
 	/********************** Handlers ***************************/
 
 	@Override
@@ -115,8 +126,8 @@ public class PlanViewImpl extends Composite implements PlanView {
 	}
 
 	@UiHandler("changeNameButton")
-	public void changeNameButton(ClickEvent e){
-		presenter.planNameChanged(textBoxChangeNamePlan.getValue());
+	public void savePlanButton(ClickEvent e){
+		doSavePlanButton();
 	}
 	
 	@UiHandler("cancelGeneralButton")
@@ -131,6 +142,14 @@ public class PlanViewImpl extends Composite implements PlanView {
 		}else{
 			presenter.deleteSemesterConfirmed(Integer.valueOf(deleteGeneralButton.getElement().getAttribute("semester")));
 		}
+	}
+	
+	@UiHandler("textBoxChangeNamePlan")
+	public void onEnterInTextBoxChangeNamePlan(KeyPressEvent e){
+		if(e.getUnicodeCharCode() == KeyCodes.KEY_ENTER){
+			doSavePlanButton();
+		}
+		e.stopPropagation();
 	}
 	
 }

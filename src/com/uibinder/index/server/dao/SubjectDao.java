@@ -83,8 +83,11 @@ public class SubjectDao extends Dao {
 		if(subject != null){
 			subjectToReturn = getSubjectByCode(subject.getCode());
 			if(subjectToReturn==null){
-				subjectToReturn = subject;
+				if(subject.getId() == null){
+					subject.setId(generateId());
+				}
 				saveSubject(subject);
+				subjectToReturn = subject;
 			} else {
 				if(isSiaProxy && subjectToReturn.equals(subject)==false){ //takes care of the update just if the info is coming from the siaProxy class
 					subjectToReturn.setCode(subject.getCode());
@@ -92,7 +95,7 @@ public class SubjectDao extends Dao {
 					subjectToReturn.setLocation(subject.getLocation());
 					subjectToReturn.setName(subject.getName());
 					subjectToReturn.setSiaCode(subject.getSiaCode());
-					updateSubject(subjectToReturn);
+					saveSubject(subjectToReturn);
 				}
 			}
 		}
@@ -108,11 +111,6 @@ public class SubjectDao extends Dao {
 		ofy().delete().key(key).now();
 	}
 	
-	private void updateSubject(Subject s){
-		deleteSubject(s.getId());
-		saveSubject(s);		
-	}
-	
 	/**
 	 * This will save the @param subject in the db, if it has no code, then subject.setSpecial(true)
 	 * 
@@ -120,14 +118,19 @@ public class SubjectDao extends Dao {
 	 * 
 	 * @param subject
 	 */
-	public void saveSubject(Subject subject){
+	public Long saveSubject(Subject subject){
 		if(subject != null){
 			if(subject.getCode().isEmpty()){
 				subject.setSpecial(true);
 			}
+			if(subject.getId() == null){
+				subject.setId(generateId());
+			}
 			subject.setName(standardizeString(subject.getName()));
 			ofy().save().entity(subject).now();				
 		}
+		
+		return subject.getId();
 	}
 
 	public Long generateId() {

@@ -22,7 +22,7 @@ public interface PlanView {
 	void hideChangeName();
 	void setSugestionText(String s);
 	void cancelChangeNameButtonClicked(ClickEvent e);
-	void changeNameButton(ClickEvent e);
+	void savePlanButton(ClickEvent e);
 	void cancelGeneralButton(ClickEvent e);
 	void onDeleteGeneralButtonClick(ClickEvent e);
 }
