@@ -26,8 +26,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.uibinder.index.client.connection.ConnectionsController;
 import com.uibinder.index.client.dnd.PickUpDragController;
 import com.uibinder.index.client.dnd.SemesterDropController;
-import com.uibinder.index.client.event.PlanChangeEvent;
-import com.uibinder.index.client.event.PlanChangeEventHandler;
+import com.uibinder.index.client.event.GradeChangeEvent;
+import com.uibinder.index.client.event.GradeChangeEventHandler;
 import com.uibinder.index.client.event.SavePlanAsDefaultEvent;
 import com.uibinder.index.client.service.SUNServiceAsync;
 import com.uibinder.index.client.view.DefaultSubjectCreationView;
@@ -334,8 +334,14 @@ DefaultSubjectCreationView.Presenter{
 		
 		addClickHandlerAddSubject(semesterW);
 		
+		planChanged("NewSemester");
+		
 	}
 	
+	public void planChanged(String triggered){
+		GWT.log(triggered);
+	}
+
 	private void createSubject(Subject subject, SubjectValues subjectValues, Semester semester) {
 		
 		//To control where and what subject is dropped
@@ -346,22 +352,15 @@ DefaultSubjectCreationView.Presenter{
 			subjectValuesList.add(subjectValues);
 			if(subjectTimesUpdated.containsKey(subject) == false) subjectTimesUpdated.put(subject, 0);
 		}
-		//if(valuesAndSubjectMap.containsKey(subjectValues)==false) valuesAndSubjectMap.put(subjectValues, subject); OLD, I don't save Maps anymore //although the condition here can be removed because it can will just override it
+		
 		if(semester.getSubjects().contains(subjectValues) == false) semester.addSubject(subjectValues);
 		//TODO avoid the same subject twice in the same semester
 		
+		SubjectWidget subjectWidget = new SubjectWidget(subject.getName(), subject.getCode(), subject.getCredits(), subjectValues.getComplementaryValues().isMandatory(), subjectValues.getComplementaryValues().getTypology(), subjectValues.getSubjectValuesPublicId(), (subjectValues.getComplementaryValues().getSubjectGroup() != null ? subjectValues.getComplementaryValues().getSubjectGroup().getName() : ""), this);
+		if(subjectValues.isTaken() == true){			
+			subjectWidget.setGrade(subjectValues.getGrade());
+		}
 		
-		SubjectWidget subjectWidget = new SubjectWidget(subject.getName(), subject.getCode(), subject.getCredits(), subjectValues.getGrade(), subjectValues.getComplementaryValues().isMandatory(), subjectValues.getComplementaryValues().getTypology(), subjectValues.getSubjectValuesPublicId(), (subjectValues.getComplementaryValues().getSubjectGroup() != null ? subjectValues.getComplementaryValues().getSubjectGroup().getName() : ""), this);
-		// subjectWidget.setTaken(subjectValues.isTaken());
-		subjectWidget.setGrade(subjectValues.getGrade());
-//		subjectWidget.addHandler(new PlanChangeEventHandler(){
-//
-//			@Override
-//			public void onPlanChanges(String triggerer) {
-//				GWT.log("got it");
-//			}
-//			
-//		}, PlanChangeEvent.TYPE);
 		
 		subjectWidgetList.add(subjectWidget);
 		makeSubjectWidgetDraggable(subjectWidget);
@@ -375,7 +374,7 @@ DefaultSubjectCreationView.Presenter{
 		showToolTip();
 		
 	}
-	
+
 	public void moveArrows(String publicId){
 		SubjectValues sV = getSubjectValuesByPublicId(publicId);
 		if(sV != null){
@@ -653,7 +652,7 @@ DefaultSubjectCreationView.Presenter{
 		
 		updateSemestersNumber();
 		
-		savePlan();
+		planChanged("SemesterDelete");
 		
 	}
 
@@ -833,15 +832,6 @@ DefaultSubjectCreationView.Presenter{
 			}
 			
 		});
-
-		planWidget.addHandler(new PlanChangeEventHandler(){
-
-			@Override
-			public void onPlanChanges(String triggerer) {
-				GWT.log("triggered from PlanPresenter");
-			}
-			
-		}, PlanChangeEvent.TYPE);
 		
 	}
 	
@@ -883,6 +873,7 @@ DefaultSubjectCreationView.Presenter{
 
 	public void confirmedDeleteSubject(SubjectValues sV) {
 		deleteSubject(sV);
+		planChanged("SubjectDelete");
 		warningDeleteSubjectView.hideIt();
 	}
 
@@ -1028,6 +1019,8 @@ DefaultSubjectCreationView.Presenter{
 			createSubject(sV.getComplementaryValues().getSubject(), sV, semester);
 		}
 		
+		planChanged("NewSubjects");
+
 	}
 	
 	private void showDefaultSubectCreationView(String s){
@@ -1141,10 +1134,6 @@ DefaultSubjectCreationView.Presenter{
 
 	/*********************** Behaviors **************************/
 	
-	public void onPlanChange() {
-		GWT.log("onPlanChange()");
-		savePlan();
-	}
 
 	public void onSpecificSubjectSelected(String subjectName, String subjectCode, String careerCode) {
 		
@@ -1343,8 +1332,8 @@ DefaultSubjectCreationView.Presenter{
 
 	@Override
 	public void planNameChanged(String s) {
+		planChanged("NewName");
 		plan.setName(s);
-		savePlan();
 		view.hidePopups();
 	}
 	
@@ -1385,6 +1374,8 @@ DefaultSubjectCreationView.Presenter{
 				if(sW != null){
 					sW.setGrade(gradeDouble);
 				}
+				
+				planChanged("NewGrade");
 			}
 		}
 

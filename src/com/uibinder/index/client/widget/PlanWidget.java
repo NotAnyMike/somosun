@@ -9,8 +9,8 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
-import com.uibinder.index.client.event.PlanChangeEvent;
-import com.uibinder.index.client.event.PlanChangeEventHandler;
+import com.uibinder.index.client.event.GradeChangeEvent;
+import com.uibinder.index.client.event.GradeChangeEventHandler;
 
 public class PlanWidget extends HorizontalPanel implements HasChangeHandlers {
 	
@@ -38,16 +38,7 @@ public class PlanWidget extends HorizontalPanel implements HasChangeHandlers {
 	
 	public void addSemesterWidget(SemesterWidget sW) {
 		
-		this.fireEvent(new PlanChangeEvent("SemesterAdd"));
-
-		sW.addHandler(new PlanChangeEventHandler(){
-
-			@Override
-			public void onPlanChanges(String triggerer) {
-				fireEvent(new PlanChangeEvent(triggerer));
-			}
-			
-		}, PlanChangeEvent.TYPE);
+		this.fireEvent(new GradeChangeEvent("SemesterAdd"));
 		
 		add(sW.asWidget());
 	}

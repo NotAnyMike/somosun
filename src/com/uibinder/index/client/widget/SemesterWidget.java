@@ -13,8 +13,8 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.uibinder.index.client.event.PlanChangeEvent;
-import com.uibinder.index.client.event.PlanChangeEventHandler;
+import com.uibinder.index.client.event.GradeChangeEvent;
+import com.uibinder.index.client.event.GradeChangeEventHandler;
 import com.uibinder.index.client.presenter.PlanPresenter;
 
 public class SemesterWidget extends VerticalPanel implements HasChangeHandlers {
@@ -68,14 +68,14 @@ public class SemesterWidget extends VerticalPanel implements HasChangeHandlers {
 		
 		generateWidget();
 		
-		subjectPanel.addHandler(new PlanChangeEventHandler(){
+		subjectPanel.addHandler(new GradeChangeEventHandler(){
 
 			@Override
 			public void onPlanChanges(String triggerer) {
-				fireEvent(new PlanChangeEvent(triggerer));
+				fireEvent(new GradeChangeEvent(triggerer));
 			}
 			
-		}, PlanChangeEvent.TYPE);
+		}, GradeChangeEvent.TYPE);
 
 	}
 	
@@ -106,7 +106,7 @@ public class SemesterWidget extends VerticalPanel implements HasChangeHandlers {
 
 	public void clearSemester(){
 		subjectPanel.clear();
-		this.fireEvent(new PlanChangeEvent("SemesterClear"));
+		this.fireEvent(new GradeChangeEvent("SemesterClear"));
 	}
 	
 	public VerticalPanel getMainPanel(){

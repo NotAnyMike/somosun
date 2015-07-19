@@ -22,7 +22,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
-import com.uibinder.index.client.event.PlanChangeEvent;
+import com.uibinder.index.client.event.GradeChangeEvent;
 import com.uibinder.index.client.presenter.PlanPresenter;
 import com.uibinder.index.shared.control.Subject;
 import com.uibinder.index.shared.control.SubjectValues;
@@ -74,14 +74,12 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers {
 	 * @param obligatoriness
 	 * @param type
 	 */
-	public SubjectWidget(String name, String code, int credits, double grade, boolean obligatoriness, int type, String publicId, PlanPresenter presenter){
+	public SubjectWidget(String name, String code, int credits, boolean obligatoriness, int type, String publicId, PlanPresenter presenter){
 		
 		this.setName(name);
 		this.setCode(code);
 		this.setCredits(credits);
-		this.setGrade(grade);
-		// this.setApproved(((grade >= 3) ? true : false));
-		// this.setTaken(false);
+		this.setGrade(null);
 		this.setObligatoriness(obligatoriness);
 		this.setType(type);
 		this.setPublicId(publicId);
@@ -92,13 +90,11 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers {
 		joinWidgets();
 	}
 	
-	public SubjectWidget(String name, String code, int credits, double grade, boolean obligatoriness, String type, String publicId, String subjectGroup, PlanPresenter presenter){
+	public SubjectWidget(String name, String code, int credits, boolean obligatoriness, String type, String publicId, String subjectGroup, PlanPresenter presenter){
 		this.setName(name);
 		this.setCode(code);
 		this.setCredits(credits);
-		this.setGrade(grade);
-		// this.setApproved(((grade >= 3) ? true : false));
-		// this.setTaken(false);
+		this.setGrade(null);
 		this.setObligatoriness(obligatoriness);
 		this.setType(getTypeFromString(type));
 		this.setPublicId(publicId);
@@ -109,34 +105,7 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers {
 		
 		joinWidgets();
 	}
-	
-	/**
-	 * Type = 0 Nivelación, 1 Fundamentación, 2 Disiplinar, 3 libre elección, 4
-	 * Añadir para posgrado
-	 * 
-	 * @param name
-	 * @param code
-	 * @param credits
-	 * @param obligatoriness
-	 * @param type
-	 */
-	public SubjectWidget(String name, String code, int credits, boolean obligatoriness, int type, String publicId, PlanPresenter presenter){
-		this.setName(name);
-		this.setCode(code);
-		this.setCredits(credits);
-		this.setGrade(0.0);
-		// this.setApproved(false);
-		// this.setTaken(false);
-		this.setObligatoriness(obligatoriness);
-		this.setType(type);
-		this.setPublicId(publicId);
-		this.presenter = presenter;
 		
-		//setAttributes();
-		
-		joinWidgets();
-	}
-	
 	/**
 	 * TODO: fix the obligatoriness
 	 * @param s
@@ -145,9 +114,7 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers {
 		this.setName(s.getName());
 		this.setCode(s.getCode());
 		this.setCredits(s.getCredits());
-		this.setGrade(0.0);
-		// this.setApproved(true);
-		// this.setTaken(sV.isTaken());
+		this.setGrade(null);
 		this.setObligatoriness(sV.getComplementaryValues().isMandatory());
 		this.setType(getTypeFromString(sV.getComplementaryValues().getTypology()));
 		this.setPublicId(sV.getSubjectValuesPublicId());
@@ -457,7 +424,7 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers {
 	public void setGrade(Double grade) {
 		if (grade == null || (grade >= 0 && grade <= 5)) {
 			// this.grade = grade;
-			this.getElement().setAttribute("grade", Double.toString(grade));
+			this.getElement().setAttribute("grade", (grade == null ? "" : Double.toString(grade)));
 		}
 
 		String gradeString = null;
@@ -473,10 +440,7 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers {
 		}
 		
 		gradeLabel.setText(gradeString);
-		gradeLabel.setTitle(title);
-		
-		this.fireEvent(new PlanChangeEvent("gradeChange"));
-		
+		gradeLabel.setTitle(title);		
 	}
 
 	public void setType(int type) {

@@ -113,13 +113,14 @@ public class PickUpDragController extends AbstractDragController {
 	    	}
 	    	planPresenter.onSubjectDelete(context.draggable.asWidget().getElement().getAttribute("publicid"));
 	    } else {
-	      context.dropController.onDrop(context);
-	      context.dropController.onLeave(context);
-	      context.dropController = null;
+		    context.dropController.onDrop(context);
+		    context.dropController.onLeave(context);
+		    context.dropController = null;
+		    planPresenter.planChanged("SubjectMoved");
 	    }
 
 	    if (!getBehaviorDragProxy()) {
-	      restoreSelectedWidgetsStyle();
+	    	restoreSelectedWidgetsStyle();
 	    }
 	    movablePanel.removeFromParent();
 	    movablePanel = null;
