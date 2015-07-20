@@ -92,4 +92,6 @@ public interface SUNServiceAsync {
 
 	void getPlanByUser(String planId, AsyncCallback<Plan> callback);
 
+	void generatePlanFromAcademicHistory(String academicHistory, AsyncCallback<Plan> callback);
+
 }

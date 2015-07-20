@@ -764,4 +764,17 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 	}
 
 	
+	@Override
+	public Plan generatePlanFromAcademicHistory(String academicHistory) {
+		
+		Plan plan = null;
+		
+		if(academicHistory != null){
+			PlanDao planDao = new PlanDao();
+			plan = planDao.generatePlanFromAcademicHistory(academicHistory);
+		}
+		return plan;
+	}
+
+	
 }

@@ -26,8 +26,8 @@
 				<b:AnchorListItem ui:field="savePlanAsDefaultButton">Save as default</b:AnchorListItem>
 			</b:DropDownMenu>
 		</b:ButtonGroup>
-        <b:AnchorButton ui:field="savePlanNameButton">Guardar plan</b:AnchorButton>
         <b:AnchorButton ui:field="newPlanButton" href="#create">Nuevo/Cargar plan</b:AnchorButton>
+        <b:AnchorButton type="SUCCESS" ui:field="savePlanNameButton">Guardar plan</b:AnchorButton>
         <b:AnchorButton type="WARNING" ui:field="deletePlanButton">Eliminar plan</b:AnchorButton>
       </b:VerticalButtonGroup>
       </div>

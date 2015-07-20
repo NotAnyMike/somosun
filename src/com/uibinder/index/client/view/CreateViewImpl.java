@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ListBox;
+import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 
 import com.google.gwt.core.client.GWT;
@@ -29,7 +30,7 @@ public class CreateViewImpl extends Composite implements CreateView {
 	@UiField Button deletePlanButton;
 	@UiField Button selectPlanButton;
 	
-	@UiField TextBox textBoxCreate;
+	@UiField TextArea textBoxCreate;
 	
 	@UiField ListBox listBoxCreate;
 	@UiField ListBox listBoxSelectPlanSaved;
@@ -134,7 +135,7 @@ public class CreateViewImpl extends Composite implements CreateView {
 	
 	@UiHandler("continueButton")
 	void onContinueButtonClicked(ClickEvent event){
-		String academicHistory = textBoxCreate.getValue();
+		String academicHistory = textBoxCreate.getText();
 		if(presenter != null && academicHistory != null && academicHistory != ""){
 			presenter.onContinueButtonClicked(academicHistory);
 		}

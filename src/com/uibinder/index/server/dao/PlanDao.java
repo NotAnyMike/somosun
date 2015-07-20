@@ -2,11 +2,14 @@ package com.uibinder.index.server.dao;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
+import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -16,6 +19,10 @@ import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.VoidWork;
 import com.googlecode.objectify.cmd.Deferred;
+import com.uibinder.index.server.dummy.SemesterDummy;
+import com.uibinder.index.server.dummy.SubjectDummy;
+import com.uibinder.index.server.serviceImpl.LoginServiceImpl;
+import com.uibinder.index.shared.SomosUNUtils;
 import com.uibinder.index.shared.control.Career;
 import com.uibinder.index.shared.control.ComplementaryValues;
 import com.uibinder.index.shared.control.Plan;
@@ -303,6 +310,174 @@ public class PlanDao {
 				deletePlan(plan.getId());
 			}
 		}
+	}
+
+	
+	public Plan generatePlanFromAcademicHistory(String academicHistory) {
+		
+		Plan planToReturn = null;
+
+		if(academicHistory != null){
+			
+			String siaString = SomosUNUtils.removeAccents(academicHistory);
+			if(siaString.contains("mi historia academica") == true){
+				siaString = siaString.substring(siaString.lastIndexOf("mi historia academica"));
+			}
+			if(siaString.contains("promedio academico")== true){
+				siaString = siaString.substring(0, siaString.indexOf("promedio academico"));
+			}
+			
+			Pattern newLine = Pattern.compile("\n");
+			String lines[] = newLine.split(siaString);
+			
+			// Defining patterns
+			
+			String careerLinePattern = "\\d+ . .*";
+			String semesterLinePattern = "  \\d{2}\tperiodo academico . \\d+-i+.+";
+			//String approvedLinePattern = "(no )*aprobado";
+			//String subjectLinePattern = "(\\d+)-(\\d+)\\t(.+)\\t(\\d+)\\t(\\d+)\\t(\\d+)\\t([a-z]+)\\t(\\d+)\\t(\\d+)\\t{2}\\d+\\p{Punct}\\d+.*";
+			String subjectLinePattern = "(\\d+)-(\\d+)\\t(.+)\\t(\\d+)\\t(\\d+)\\t(\\d+)\\t([a-z]+)\\t(\\d+)\\t(\\d+)\\t(\\t\\d+\\p{Punct}\\d+)|(.+\\t((ap)|(na))).*";
+			
+			String careerCode = null;
+			SemesterDummy semesterD = null;
+			List<SemesterDummy> semesters = new ArrayList<SemesterDummy>();
+			
+			for(String s : lines){
+				
+				SubjectDummy subjectD = null;
+				
+				boolean careerBoolean = Pattern.matches(careerLinePattern,s);
+				boolean semesterBoolean = Pattern.matches(semesterLinePattern,s);
+				boolean subjectBoolean = Pattern.matches(subjectLinePattern,s);
+				
+
+				@SuppressWarnings("unused")
+				int x = 0;
+				
+				//Save the career
+				if(careerBoolean == true && careerCode == null){
+					careerCode = s.substring(0, s.indexOf("|")).trim();
+				}
+	
+				//Save the semester
+				if(semesterBoolean == true){
+					semesterD = generateSemesterDummy(s);
+					semesters.add(semesterD);
+				}
+				
+				//detect subject
+				if(subjectBoolean == true && semesterD != null){
+					assert subjectD == null;
+					
+					subjectD = generateSubjectDummy(s);
+					semesterD.addSubjectDummy(subjectD);
+					
+				}
+				
+			}
+			
+			planToReturn = generatePlanFromDummies(careerCode, semesters);
+		}
+		
+		return planToReturn;
+	}
+	
+	private Plan generatePlanFromDummies(String careerCode, List<SemesterDummy> semestersD) {
+		Plan planToReturn = null;
+		
+		//getCareer
+		CareerDao careerDao = new CareerDao();
+		Career career = careerDao.getCareerByCode(careerCode);
+		
+		if(career != null){
+			//getUser
+			LoginServiceImpl login = new LoginServiceImpl();
+			Student student = login.login("").getStudent();
+			
+			//name
+			String name = "Historia académica - " + career.getName() + " " + new Date().toString();
+			
+			//isDefault
+			boolean isDefault = false;
+			
+			//semesters list of subjectValues
+			List<Semester> semesters = new ArrayList<Semester>();
+			for(SemesterDummy semesterD : semestersD){
+				Semester semester = new Semester();
+				
+				//TODO
+				//Add the info to the semester
+				//for subjects
+				
+			}
+			
+			planToReturn = new Plan();
+			planToReturn.setCareer(career);
+			planToReturn.setUser(student);
+			planToReturn.setDefault(isDefault);
+			planToReturn.setSemesters(semesters);
+			
+		}
+		
+		return planToReturn;
+	}
+
+	private SemesterDummy generateSemesterDummy(String s) {
+		SemesterDummy semesterD = null;
+		
+		String positionString = s.substring(0, s.indexOf("\t")).trim();
+		String yearString = s.substring(s.indexOf("|")+1, s.indexOf("-")).trim();
+		String semesterString = s.substring(s.indexOf("-")+1, s.length()).trim();
+		
+		int semesterInt = 0;
+		if(semesterString.equals("i")) semesterInt = 1;
+		else if(semesterString.equals("ii")) semesterInt = 2;
+		else if(semesterString.equals("iii")) semesterInt = 3;
+		
+		semesterD = new SemesterDummy(
+				Integer.valueOf(positionString),
+				Integer.valueOf(yearString),
+				semesterInt);
+		
+		
+		return semesterD;
+	}
+
+	private SubjectDummy generateSubjectDummy(String s) {
+		SubjectDummy subjectD = null;
+		
+		String codeString = s.substring(0, s.indexOf("-")).trim();
+		String groupString = s.substring(s.indexOf("-")+1, s.indexOf("\t")).trim();
+		s = s.substring(s.indexOf("\t") +1);
+	
+		String nameString = s.substring(0, s.indexOf("\t")).trim();
+		
+		s = s.substring(s.indexOf("\t") +2 );
+		s = s.substring(s.indexOf("\t")+1);
+		s = s.substring(s.indexOf("\t")+1);
+		s = s.substring(s.indexOf("\t")+1);
+		
+		String typoString = s.substring(0,s.indexOf("\t")).trim();
+		s = s.substring(s.indexOf("\t")+1);
+		String creditsString = s.substring(0,s.indexOf("\t")).trim();
+		String gradeString = s.substring(s.lastIndexOf("\t")+1).trim();
+		
+		subjectD = new SubjectDummy();
+		subjectD.setCode(codeString);
+		subjectD.setGroup(Integer.valueOf(groupString));
+		subjectD.setName(nameString);
+		subjectD.setTypology(typoString);
+		subjectD.setCredits(Integer.valueOf(creditsString));
+		if(gradeString.equals("ap")){
+			subjectD.setApproved(true);
+		}else if(gradeString.equals("na")){
+			subjectD.setApproved(false);
+		}else{			
+			subjectD.setGrade(Double.valueOf(gradeString));
+		}
+		
+		
+		return subjectD;
 	}
 
 }

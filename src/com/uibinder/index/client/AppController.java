@@ -198,7 +198,22 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	
 	private void generateAcademicHistoryFromString(String academicHistory){
 		Window.alert("This should create an academic history from the string: " + academicHistory);
-		//TODO 
+		rpcService.generatePlanFromAcademicHistory(academicHistory, new AsyncCallback<Plan>(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				GWT.log("Unable to generate plan from academic history");
+				Window.alert("Hubo un error, asegúrate de que copiaste bien la información y vuelve a intentar");
+			}
+
+			@Override
+			public void onSuccess(Plan result) {
+				
+				GWT.log("Plan from academic history generated");
+				
+			}
+			
+		}); 
 	}
 	
 	@Override

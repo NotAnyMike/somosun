@@ -39,7 +39,8 @@
 	        <li><kbd>ctrl + A</kbd> o <kbd>ctrl + E</kbd>*</li>
 	        <li><kbd>ctrl + C</kbd></li>
 	        <li>Pégalo aquí <kbd>ctrl + V</kbd></li>
-	      </ol><b:TextBox ui:field="textBoxCreate" styleName="{second.textboxCreate}"></b:TextBox>
+	      </ol>
+	      <b:TextArea ui:field="textBoxCreate"></b:TextArea>
 	      <div><b:Button ui:field="continueButton" addStyleNames="{third.btn} {third.btn-default}">Continuar</b:Button>  <b:Button ui:field="resetButton" addStyleNames="{third.btn} {third.btn-default}">Limpiar</b:Button></div>
 	      <p style="font-size:16px; text-align: initial" class="lead main-text">*O solamente copia desde el título "Mi historia académica" hasta comenzar las palabras "Resumen académico"</p>
 	    </div>

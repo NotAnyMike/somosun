@@ -24,7 +24,7 @@ public class SemesterValue implements Serializable {
 	@Index private int numberSemester;
 	
 	public static final int CURRENT_YEAR = 2015;
-	public static final int CURRENT_NUMBER_SEMESTER = 1;
+	public static final int CURRENT_NUMBER_SEMESTER = 2;
 	
 	public SemesterValue(){
 	}

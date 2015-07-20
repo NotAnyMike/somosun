@@ -52,6 +52,7 @@ public interface SUNService extends RemoteService{
 	public void savePlanAsDefault(Student student, Plan plan);
 	public Long savePlan(Student student, Plan plan);
 	public Plan getPlanDefault(String careerCode);
+	public Plan generatePlanFromAcademicHistory(String academicHistory);
 	
 	public void toTest();
 	

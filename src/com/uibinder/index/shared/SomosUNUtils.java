@@ -83,7 +83,12 @@ public class SomosUNUtils {
 					.replaceAll("é", "e")
 					.replaceAll("í", "i")
 					.replaceAll("ó", "o")
-					.replaceAll("ú", "u");
+					.replaceAll("ú", "u")
+					.replaceAll("à", "a")
+					.replaceAll("è", "e")
+					.replaceAll("ì", "i")
+					.replaceAll("ò", "o")
+					.replaceAll("ù", "u");
 		}
 		return sToReturn;
 	}
