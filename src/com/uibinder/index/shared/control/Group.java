@@ -1,6 +1,7 @@
 package com.uibinder.index.shared.control;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.googlecode.objectify.annotation.Entity;
@@ -26,7 +27,7 @@ public class Group implements Serializable {
     @Index private int freePlaces;
     private int totalPlaces;
     private List<Block> schedule=null;
-    @Index private List<Career> careers = null;
+    private List<Career> careers = null;
 
     public Group(){
     }
@@ -39,10 +40,18 @@ public class Group implements Serializable {
         this.groupNumber = groupNumber;
         this.totalPlaces = totalPlaces;
         this.schedule = schedule;
-        this.careers = careers;
+        this.setCareers(careers);
     }
     
-    /**
+    public Group(Subject subject, SemesterValue semesterValue, Integer groupInt) {
+    	this.subject = subject;
+        this.semesterValue = semesterValue;
+        this.groupNumber = groupInt;
+        setCareers(new ArrayList<Career>());
+	}
+    
+
+	/**
      * Two groups will be the same group if the subject,
      * teacher, semester, freePLaces, groupNumber, totalPlaces and schedule are the same
      * 
@@ -144,14 +153,33 @@ public class Group implements Serializable {
 		return careers;
 	}
 
-	public void setCareers(List<Career> careers) {
-		this.careers = careers;
-	}
-
 	public void setId(Long id) {
 		this.id = id;
 	}
-    
-    
-    
+
+	
+	public void addCareer(Career career) {
+		getCareers().add(career);
+	}
+
+	public boolean containsCareer(String code) {
+		boolean toReturn = false;
+		
+		for(Career c : getCareers()){
+			if(c.getCode().equals(code)){
+				toReturn = true;
+				break;
+			}
+		}
+		return toReturn;
+	}
+
+	/**
+	 * Be carefull with this, because if the list careers is not empty then it can be deleted 
+	 * @param careers
+	 */
+	private void setCareers(List<Career> careers) {
+		this.careers = careers;
+	}
+
 }

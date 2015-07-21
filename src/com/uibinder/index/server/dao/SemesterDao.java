@@ -41,7 +41,7 @@ public class SemesterDao {
 		}
 	}
 	
-	public Long generateId(Semester s){
+	public Long generateId(){
 		
 		 ObjectifyFactory f = new ObjectifyFactory();
 		 Key<Semester> key = f.allocateId(Semester.class);
@@ -54,4 +54,5 @@ public class SemesterDao {
 		ofy().delete().key(key).now();
 	}
 
+	
 }

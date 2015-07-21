@@ -27,7 +27,7 @@ public class SubjectDummy {
 	private Double grade = null;
 	private String typology = null;
 	private Integer group = null;
-	private Boolean approved = null; // this one will always be false iff the subject is the one that only can be AP and NP
+	private boolean approved = false; // true is grade takes the valus ap or np
 	
 	public SubjectDummy(){
 	}

@@ -49,6 +49,7 @@ import com.uibinder.index.shared.control.Student;
 import com.uibinder.index.shared.control.Subject;
 import com.uibinder.index.shared.control.SubjectGroup;
 import com.uibinder.index.shared.control.Teacher;
+import com.uibinder.index.shared.values.SubjectGroupCodes;
 
 /**
  * 
@@ -405,7 +406,6 @@ public class SiaProxy {
 		
 	}
 	
-	
 	public static String getSubjects2Delete(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede){
 		
 		sede = confirmSede(sede);
@@ -646,7 +646,14 @@ public class SiaProxy {
 				group.setTotalPlaces(cuposTotal);
 				group.setGroupNumber(groupNumber); //be careful here, because it could be some group that has no number and instead a char
 				group.setSemesterValue(semesterValueDao.getCurrentSemester());
-				if(careers != null && careers.size() != 0) group.setCareers(careers);
+				if(careers != null && careers.size() != 0) {
+					//group.setCareers(careers);
+					for(Career careerT : careers){
+						if(group.containsCareer(careerT.getCode()) == false){
+							group.addCareer(careerT);
+						}
+					}
+				}
 				group = groupDao.getGroupByGroup(group, true); //TODO remove the synchronized call i.e. .now()
 				if(group != null) if(groupList.contains(group) == false) groupList.add(group);
 				if(group.getId() != null) bullshit = group.getId() + " ";
@@ -949,7 +956,9 @@ public class SiaProxy {
 	}
 	
 	/**
-	 * This method will download all available requisites for a career
+	 * This method will download all available requisites for a career based on two url, the subjectGroup and the plan (where all pre/co rrequisites are) url.
+	 * <br></br>
+	 * This mehtod will make career.hasAnalysis() true
 	 */
 	public static void getRequisitesForACareer(String careerCode){
 		
@@ -1962,17 +1971,17 @@ public class SiaProxy {
 		 * TODO: SearchFor the libre elección and the Nivelación subjectGroups. if found, do nothing, otherwise create them
 		 */
 		//for libre eleccion
-		SubjectGroup subjectGroupIndividual = subjectGroupDao.getSubjectGroup(SomosUNUtils.LIBRE_AGRUPACION_NAME, career.getCode());
+		SubjectGroup subjectGroupIndividual = subjectGroupDao.getSubjectGroup(SubjectGroupCodes.LIBRE_NAME, career.getCode());
 		if(subjectGroupIndividual == null)
 		{
-			subjectGroupIndividual = new SubjectGroup(SomosUNUtils.LIBRE_AGRUPACION_NAME, career, false, 0, 0, false);
+			subjectGroupIndividual = new SubjectGroup(SubjectGroupCodes.LIBRE_NAME, career, false, 0, 0, false);
 			subjectGroupDao.saveSubjectGroup(subjectGroupIndividual);
 		}
 		//for nivelación
-			subjectGroupIndividual = subjectGroupDao.getSubjectGroup(SomosUNUtils.NIVELACION_NAME, career.getCode());
+			subjectGroupIndividual = subjectGroupDao.getSubjectGroup(SubjectGroupCodes.NIVELACION_NAME, career.getCode());
 			if(subjectGroupIndividual == null)
 			{
-				subjectGroupIndividual = new SubjectGroup(SomosUNUtils.NIVELACION_NAME, career, false, 0, 0, false);
+				subjectGroupIndividual = new SubjectGroup(SubjectGroupCodes.NIVELACION_NAME, career, false, 0, 0, false);
 				subjectGroupDao.saveSubjectGroup(subjectGroupIndividual);
 			}
 		
@@ -2262,12 +2271,12 @@ public class SiaProxy {
 					if(typology.equals("P"))
 					{
 						//get the Nivelación subjectGroup
-						sG = subjectGroupDao.getSubjectGroup(SomosUNUtils.NIVELACION_NAME, cV.getCareer().getCode());
+						sG = subjectGroupDao.getSubjectGroup(SubjectGroupCodes.NIVELACION_NAME, cV.getCareer().getCode());
 					}
 					else if(typology.equals("L"))
 					{
 						//get the Libre elección subjectGroup
-						sG = subjectGroupDao.getSubjectGroup(SomosUNUtils.LIBRE_AGRUPACION_NAME, cV.getCareer().getCode());
+						sG = subjectGroupDao.getSubjectGroup(SubjectGroupCodes.LIBRE_NAME, cV.getCareer().getCode());
 					}
 					
 					//create the complementaryValue and add it to the mapSCV

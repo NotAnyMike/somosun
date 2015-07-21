@@ -78,4 +78,16 @@ public class SiaResultSubjects extends SiaResult implements Serializable{
 		this.typology.put(subject, "");
 	}
 	
+	public String getTypologyForASubject(String subjectCode){
+		String typologyToReturn = null;
+		
+		for(Subject subjectT : typology.keySet()){
+			if(subjectT.getCode().equals(subjectCode)){
+				typologyToReturn = typology.get(subjectT);
+				break;
+			}
+		}
+		
+		return typologyToReturn;
+	}
 }

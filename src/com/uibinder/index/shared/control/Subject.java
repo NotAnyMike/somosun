@@ -24,13 +24,14 @@ public class Subject implements Serializable {
     @Index private String code = null;   
     @Index private String siaCode = null;
     private String location = null;
+    private boolean isApprovenType = false;
     /**
      * A special subject is a kind of subject that will NOT be shown as a subject in the planPresenter, but still need to be a subject. e.g. "80% de los créditos de..."
      */
     @Index private boolean special  = false;
     /**
      * A dummy subject is a kind of subject that will be shown as a subject in the planPresenter, but still need to be a subject, and can appears in 
-     * searchs only if searching Old Uncontinued subjects. e.g. Old subjects
+     * searches only if searching Old/Uncontinued subjects. e.g. Old subjects
      */
     @Index private boolean isDummy = false;
     /**
@@ -206,6 +207,14 @@ public class Subject implements Serializable {
 		this.isDefault = isDefault;
 		this.special = false;
 		this.isDummy = false;
+	}
+
+	public boolean isApprovenType() {
+		return isApprovenType;
+	}
+
+	public void setApprovenType(boolean isApprovenType) {
+		this.isApprovenType = isApprovenType;
 	}
 }
    

@@ -1011,8 +1011,7 @@ DefaultSubjectCreationView.Presenter{
 		
 		return selected;
 	}
-	
-	
+		
 	private void addSubjectsToPlan(List<ComplementaryValues> result, String semesterString) {
 		addSubjectsToPlan(result, semesterString, true);
 	}
@@ -1059,7 +1058,6 @@ DefaultSubjectCreationView.Presenter{
 			
 		});
 	}
-	
 	
 	private void loadMandatoryValues(List<ComplementaryValues> list){
 		
@@ -1153,7 +1151,6 @@ DefaultSubjectCreationView.Presenter{
 	/************************************************************/
 
 	/*********************** Behaviors **************************/
-	
 
 	public void onSpecificSubjectSelected(String subjectName, String subjectCode, String careerCode) {
 		
@@ -1349,7 +1346,6 @@ DefaultSubjectCreationView.Presenter{
 		}
 		view.showChangeName();
 	}
-	
 
 	@Override
 	public void planNameChanged(String s) {

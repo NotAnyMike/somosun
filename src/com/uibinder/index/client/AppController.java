@@ -151,7 +151,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	}
 	
 	private void genereteDefaultPlan(String careerCode){
-		showLoadingPage();
+		showLoadingPage("Cargando el plan por default ...");
 		
 		
 		rpcService.getPlanDefault(careerCode, new AsyncCallback<Plan>(){
@@ -174,7 +174,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	}
 	
 	private void generateEmptyPlan(String careerCode) {
-		showLoadingPage();
+		showLoadingPage("Creando un plan vacío ... ");
 		/**
 		 * use the rpcService.createEmptyPlan(careerCode);
 		 */
@@ -198,18 +198,21 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	
 	private void generateAcademicHistoryFromString(String academicHistory){
 		Window.alert("This should create an academic history from the string: " + academicHistory);
+		showLoadingPage("Creando tu plan, buscando y descargando la información ... ");
 		rpcService.generatePlanFromAcademicHistory(academicHistory, new AsyncCallback<Plan>(){
 
 			@Override
 			public void onFailure(Throwable caught) {
 				GWT.log("Unable to generate plan from academic history");
 				Window.alert("Hubo un error, asegúrate de que copiaste bien la información y vuelve a intentar");
+				History.fireCurrentHistoryState();
 			}
 
 			@Override
 			public void onSuccess(Plan result) {
 				
 				GWT.log("Plan from academic history generated");
+				setPlanPresenter(result);
 				
 			}
 			
@@ -434,15 +437,14 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 			}});
 	}
 	
-	private void showLoadingPage()
+	private void showLoadingPage(String label)
 	{
 		if(loadingView == null){
 			loadingView = new LoadingViewImpl();
 		}
 		if(loadingPresenter == null){
 			loadingPresenter = new LoadingPresenter(rpcService, eventBus, loadingView);
-			loadingPresenter
-					.setLabel("hola no sé que estoy escribiendo, bla bla bla, espero pasar de linea cuando esto sea muy largo");
+			loadingPresenter.setLabel(label);
 		}
 		loadingPresenter.go(RootPanel.get("centerArea"));
 	}
@@ -489,7 +491,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	
 	private void loadSpecificPlan(String planId){
 		
-		showLoadingPage();
+		showLoadingPage("Loading your plan ...");
 		
 		rpcService.getPlanByUser(planId, new AsyncCallback<Plan>(){
 

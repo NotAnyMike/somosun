@@ -10,6 +10,7 @@ import com.uibinder.index.shared.control.Career;
 import com.uibinder.index.shared.control.ComplementaryValues;
 import com.uibinder.index.shared.control.Subject;
 import com.uibinder.index.shared.control.SubjectGroup;
+import com.uibinder.index.shared.values.SubjectGroupCodes;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
@@ -73,11 +74,11 @@ public class SubjectGroupDao extends Dao {
 
 	public SubjectGroup getUnkownSubjectGroup(String careerCode, boolean isFundamental) {
 		SubjectGroup sG = null;
-		sG = this.getSubjectGroup(SomosUNUtils.UKNOWN_SG_NAME, isFundamental, careerCode);
+		sG = this.getSubjectGroup(SubjectGroupCodes.UKNOWN_NAME, isFundamental, careerCode);
 		if(sG == null){
 			CareerDao cDao = new CareerDao();
 			Career career = cDao.getCareerByCode(careerCode);
-			sG = new SubjectGroup(SomosUNUtils.UKNOWN_SG_NAME, career, isFundamental, 0, 0, true);
+			sG = new SubjectGroup(SubjectGroupCodes.UKNOWN_NAME, career, isFundamental, 0, 0, true);
 			sG.setId(generateId());
 			saveSubjectGroup(sG);
 		}

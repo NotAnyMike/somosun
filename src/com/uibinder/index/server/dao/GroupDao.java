@@ -32,7 +32,7 @@ public class GroupDao {
 	}
 
 	public Group getGroup(Subject subject, SemesterValue semesterValue, int groupNumber){
-		return (Group) ofy().load().type(Group.class).filter("groupNumber", groupNumber).filter("subject.code", subject.getCode()).filter("semesterValue.year", semesterValue.getYear()).first().now();
+		return ofy().load().type(Group.class).filter("groupNumber", groupNumber).filter("subject.code", subject.getCode()).filter("semesterValue.year", semesterValue.getYear()).first().now();
 	}
 	
 	/**
@@ -71,12 +71,26 @@ public class GroupDao {
 		}
 		
 	}
-
+	
 	public Long generateId() {
 		ObjectifyFactory f = new ObjectifyFactory();
 		Key<Group> key = f.allocateId(Group.class);
 		return key.getId();
 	}
-	
+
+	public Group getOrCreateGroup(Subject subject, SemesterValue semesterValue, Integer groupInt) {
+		Group group = null;
+		
+		group = getGroup(subject, semesterValue, groupInt);
+		
+		if(group == null){
+			group = new Group(subject, semesterValue, groupInt);
+			group.setId(generateId());
+		}
+		
+		
+		return group;
+	}
+
 	
 }

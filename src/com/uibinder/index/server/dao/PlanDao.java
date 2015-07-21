@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import org.json.JSONArray;
@@ -19,19 +20,25 @@ import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.VoidWork;
 import com.googlecode.objectify.cmd.Deferred;
+import com.uibinder.index.server.SiaProxy;
 import com.uibinder.index.server.dummy.SemesterDummy;
 import com.uibinder.index.server.dummy.SubjectDummy;
 import com.uibinder.index.server.serviceImpl.LoginServiceImpl;
+import com.uibinder.index.server.serviceImpl.SUNServiceImpl;
 import com.uibinder.index.shared.SomosUNUtils;
 import com.uibinder.index.shared.control.Career;
 import com.uibinder.index.shared.control.ComplementaryValues;
+import com.uibinder.index.shared.control.Group;
 import com.uibinder.index.shared.control.Plan;
 import com.uibinder.index.shared.control.Semester;
+import com.uibinder.index.shared.control.SemesterValue;
 import com.uibinder.index.shared.control.Student;
 import com.uibinder.index.shared.control.Subject;
 import com.uibinder.index.shared.control.SubjectValues;
 
 public class PlanDao {
+	
+	private static final Logger log = Logger.getLogger("PlanDao");
 	
 	private final String ECONOMIA = "{'sede':'bog','name':'Economía','code':'2522','lvl':'pre','semesters':[{'number':1,'courses':[{'code':'1000004','normal':true,'type':'l','oblig':true},{'code':'2016007','normal':true,'type':'l','oblig':true},{'code':'2016008','normal':true,'type':'l','oblig':true},{'code':'2015270','normal':true,'type':'l','oblig':true},{'code':'2016015','normal':true,'type':'l','oblig':true},{'code':'1000044','normal':true,'type':'n','oblig':true}]},{'number':2,'courses':[{'code':'2016021','normal':true,'type':'l','oblig':true},{'code':'2016011','normal':true,'type':'c','oblig':true},{'code':'2016017','normal':true,'type':'c','oblig':true},{'code':'2016012','normal':true,'type':'c','oblig':true},{'code':'libre elección','normal':false,'credits':2,'type':'l','oblig':false},{'code':'1000045','normal':true,'type':'n','oblig':true}]},{'number':3,'courses':[{'code':'2016020','normal':true,'type':'c','oblig':true},{'code':'2016009','normal':true,'type':'c','oblig':true},{'code':'2016018','normal':true,'type':'c','oblig':true},{'code':'2016013','normal':true,'type':'c','oblig':true},{'code':'optativa contenido cualitativo','normal':false,'credits':3,'type':'l','oblig':false},{'code':'1000046','normal':true,'type':'n','oblig':true}]},{'number':4,'courses':[{'code':'2016002','normal':true,'type':'c','oblig':true},{'code':'2016005','normal':true,'type':'c','oblig':true},{'code':'2016014','normal':true,'type':'c','oblig':true},{'code':'2016019','normal':true,'type':'c','oblig':true},{'code':'libre elección','normal':false,'credits':2,'type':'l','oblig':false},{'code':'1000047','normal':true,'type':'n','oblig':true},]},{'number':5,'courses':[{'code':'2016022','normal':true,'type':'c','oblig':true},{'code':'2016023','normal':true,'type':'c','oblig':true},{'code':'2016003','normal':true,'type':'c','oblig':true},{'code':'2016006','normal':true,'type':'c','oblig':true},{'code':'2016001','normal':true,'type':'c','oblig':true},]},{'number':6,'courses':[{'code':'2016004','normal':true,'type':'c','oblig':true},{'code':'2016010','normal':true,'type':'c','oblig':true},{'code':'2016024','normal':true,'type':'c','oblig':true},{'code':'2016016','normal':true,'type':'l','oblig':true},{'code':'libre elección','normal':false,'credits':2,'type':'l','oblig':false}]},{'number':7,'courses':[{'code':'optativa interdsciplinar','normal':false,'credits':3,'type':'l','oblig':false},{'code':'optativa interdsciplinar','normal':false,'credits':3,'type':'l','oblig':false},{'code':'libre elección seminario profesional','normal':false,'credits':3,'type':'l','oblig':false},{'code':'libre elección seminario profesional','normal':false,'credits':3,'type':'l','oblig':false}]},{'number':8,'courses':[{'code':'optativa interdsciplinar','normal':false,'credits':3,'type':'l','oblig':false},{'code':'optativa interdsciplinar','normal':false,'credits':3,'type':'l','oblig':false},{'code':'libre elección seminario profesional','normal':false,'credits':3,'type':'l','oblig':false},{'code':'libre elección seminario profesional','normal':false,'credits':3,'type':'l','oblig':false}]},{'number':9,'courses':[{'code':'libre elección','normal':false,'credits':3,'type':'l','oblig':false},{'code':'libre elección','normal':false,'credits':3,'type':'l','oblig':false},{'code':'libre elección','normal':false,'credits':3,'type':'l','oblig':false},{'code':'libre elección','normal':false,'credits':3,'type':'l','oblig':false}]},{'number':10,'courses':[{'code':'2015300','normal':true,'type':'c','oblig':true}]}]}]}";  
 	private final String CAREERS_DEFAULTS[] = {ECONOMIA};
@@ -210,7 +217,7 @@ public class PlanDao {
 							}
 						}
 						if(s.getId() == null){
-							s.setId(semesterDao.generateId(s));
+							s.setId(semesterDao.generateId());
 						}
 						semesterDao.saveSemester(s);
 					
@@ -266,7 +273,6 @@ public class PlanDao {
 			ofy().delete().key(key).now();
 		}
 	}
-
 
 	public List<Plan> getPlanByUser(Student s) {
 		
@@ -367,7 +373,7 @@ public class PlanDao {
 				
 				//detect subject
 				if(subjectBoolean == true && semesterD != null){
-					assert subjectD == null;
+					assert subjectD != null;
 					
 					subjectD = generateSubjectDummy(s);
 					semesterD.addSubjectDummy(subjectD);
@@ -383,6 +389,9 @@ public class PlanDao {
 	}
 	
 	private Plan generatePlanFromDummies(String careerCode, List<SemesterDummy> semestersD) {
+		
+		long totalStartTime = System.nanoTime();
+		
 		Plan planToReturn = null;
 		
 		//getCareer
@@ -390,6 +399,10 @@ public class PlanDao {
 		Career career = careerDao.getCareerByCode(careerCode);
 		
 		if(career != null){
+			if(career.hasAnalysis() == false){
+				SiaProxy.getRequisitesForACareer(career.getCode());
+			}
+			
 			//getUser
 			LoginServiceImpl login = new LoginServiceImpl();
 			Student student = login.login("").getStudent();
@@ -401,25 +414,276 @@ public class PlanDao {
 			boolean isDefault = false;
 			
 			//semesters list of subjectValues
+			SubjectDao subjectDao = new SubjectDao();
+			SubjectValuesDao subjectValuesDao = new SubjectValuesDao();
+			GroupDao groupDao = new GroupDao();
+			SemesterDao semesterDao = new SemesterDao();
+			SemesterValueDao semesterValueDao = new SemesterValueDao();
+			ComplementaryValuesDao complementaryValuesDao = new ComplementaryValuesDao();
+			
 			List<Semester> semesters = new ArrayList<Semester>();
+			List<SubjectDummy> problematicSubjects = new ArrayList<SubjectDummy>();
+			List<Subject> subjectsToUpdate = new ArrayList<Subject>();
 			for(SemesterDummy semesterD : semestersD){
 				Semester semester = new Semester();
+				semester.setId(semesterDao.generateId());
+				semesters.add(semester);
 				
-				//TODO
 				//Add the info to the semester
+				semester.setDate(semesterD.getYear() + "-" + semesterD.getSemester());
+				
 				//for subjects
+				List<SubjectValues> subjects = new ArrayList<SubjectValues>();
+				for(SubjectDummy subjectD : semesterD.getSubjects()){
+					
+					//Get subject
+					Subject subject = subjectDao.getSubjectByCode(subjectD.getCode());
+					assert subject != null;
+					
+					if(subject != null){
+						SubjectValues subjectV = new SubjectValues();
+						subjectV.setId(subjectValuesDao.generateId());
+						
+						//  Get semesterValue
+						SemesterValue semesterValue = semesterValueDao.getOrCreateSemester(semesterD.getYear(), semesterD.getSemester());
+
+						//Get group
+						Group group = groupDao.getOrCreateGroup(subject, semesterValue, subjectD.getGroup());
+						//  Add career to careers list
+						if(group.containsCareer(career.getCode()) == false){
+							group.addCareer(career);
+						}
+						
+						
+						//Get complementaryValue
+						ComplementaryValues complementaryValues = complementaryValuesDao.getComplementaryValues(careerCode, subject.getCode());
+						if(complementaryValues != null){
+							
+							subjectV.setComplementaryValues(complementaryValues);
+							subjectV.setGrade(subjectD.getGrade());
+							if(subjectD.getApproved()){								
+								subject.setApprovenType(true);
+								subjectsToUpdate.add(subject);
+							}
+							subjectV.setTaken(true);
+							subjectV.setGroup(group);
+							
+							subjects.add(subjectV);
+							
+						}else{
+							//complementaryValuesNotFound.add(subjectD);
+							problematicSubjects.add(subjectD);
+						}
+					}else{
+						//subjectsNotFound.add(subjectD);
+						problematicSubjects.add(subjectD);
+					}
+					
+				}
+				
+				semester.setSubjects(subjects);
 				
 			}
 			
+			long problematicStartTime = System.nanoTime();
+			long siaSearchStartTime = 0;
+			long siaSearchEndTime = 0;
+			long siaSearchForAllCareerStartTime = 0;
+			
+			List<SubjectDummy> subjectToBeDummy = new ArrayList<SubjectDummy>();
+			if(problematicSubjects.size() > 0){
+				
+				List<ComplementaryValues> complementaryValuesProblematics = null;
+				List<String> subjectCodes = new ArrayList<String>();
+				List<String> careerCodes = new ArrayList<String>(); //in order to be send to te function in the siaProxy
+				for(SubjectDummy subjectDT : problematicSubjects){
+					subjectCodes.add(subjectDT.getCode());
+					careerCodes.add(career.getCode());
+				}
+
+				//Get the list from the sia search
+				//complementaryValues not found
+				//Save the cV from the sia search result
+				
+				//subjectsNotFound
+				//Save the subject from the siaSearch result
+				//Save the cV from the sia Search resutl
+
+				//getComplementaryValues
+				
+
+				siaSearchStartTime = System.nanoTime();
+				SUNServiceImpl service = new SUNServiceImpl();
+				complementaryValuesProblematics = service.getComplementaryValues(subjectCodes, careerCodes);
+				siaSearchEndTime = System.nanoTime();
+				
+				//Add the cV to the subjectValue 
+				//add it to the subject and add it to a semester in the plan
+				
+				for(ComplementaryValues complementaryValuesT : complementaryValuesProblematics){
+					
+					SubjectDummy subjectDummyT = getSubjectDummy(problematicSubjects, complementaryValuesT.getSubject().getCode());
+					assert subjectDummyT != null;
+					
+					if(subjectDummyT != null){
+						SemesterDummy semesterDummyT = getSemesterDummy(semestersD, subjectDummyT.getCode());
+						assert semesterDummyT != null;
+						
+						if(semesterDummyT != null){
+							
+							SubjectValues subjectValuesT = new SubjectValues();
+							subjectValuesT.setId(subjectValuesDao.generateId());
+							
+							subjectValuesT.setComplementaryValues(complementaryValuesT);
+							subjectValuesT.setGrade(subjectDummyT.getGrade());
+							if(subjectDummyT.getApproved() == true){
+								complementaryValuesT.getSubject().setApprovenType(true);
+								subjectsToUpdate.add(complementaryValuesT.getSubject());
+							}
+							
+							SemesterValue semesterValueT = semesterValueDao.getOrCreateSemester(semesterDummyT.getYear(), semesterDummyT.getSemester());
+							Group groupT = groupDao.getOrCreateGroup(complementaryValuesT.getSubject(), semesterValueT, subjectDummyT.getGroup());
+							subjectValuesT.setGroup(groupT);
+							
+							subjectValuesT.setTaken(true);
+							
+							Semester semester = semesters.get(semesterDummyT.getPosition());
+							semester.addSubject(subjectValuesT);
+							
+						}
+					}
+					
+				}
+				
+				//if there is any subjectDummy left, e.g. when people takes twice the same class (failed one) and was a "nonFoundSubject"
+				if(problematicSubjects.size() > 0){
+					for(SubjectDummy subjectDummyT : problematicSubjects){
+						
+						//new subjectValue
+						SubjectValues subjectValuesT = new SubjectValues();
+						subjectValuesT.setId(subjectValuesDao.generateId());
+						
+						//get complementaryValue
+						ComplementaryValues complementaryValuesT = complementaryValuesDao.getComplementaryValues(career.getCode(), subjectDummyT.getCode());
+						
+						//get semesterDummy
+						SemesterDummy semesterDummyT = getSemesterDummy(semestersD, subjectDummyT.getCode());
+						
+						if(complementaryValuesT != null && semesterDummyT != null){
+							SemesterValue semesterValueT = semesterValueDao.getOrCreateSemester(semesterDummyT.getYear(), semesterDummyT.getSemester());
+							Group groupT = groupDao.getOrCreateGroup(complementaryValuesT.getSubject(), semesterValueT, subjectDummyT.getGroup());
+							
+							subjectValuesT.setComplementaryValues(complementaryValuesT);
+							subjectValuesT.setGroup(groupT);
+							subjectValuesT.setGrade(subjectDummyT.getGrade());
+							if(subjectDummyT.getApproved() == true){
+								complementaryValuesT.getSubject().setApprovenType(true);
+								subjectsToUpdate.add(complementaryValuesT.getSubject());
+							}
+							subjectValuesT.setTaken(true);
+							
+							Semester semester = semesters.get(semesterDummyT.getPosition());
+							
+							if(semester != null){
+								semester.addSubject(subjectValuesT);
+							}
+						}else{
+							//dummySubject
+							subjectToBeDummy.add(subjectDummyT);
+						}
+					}
+				}
+			}
+			
+			if(subjectToBeDummy.size() > 0){
+				/************************taking care of the old subjects *************************/
+				
+				
+				
+				/*********************************************************************************/				
+			}
+			
+			
+			//update subjects to update
+			for(Subject subject : subjectsToUpdate){
+				subjectDao.saveSubject(subject);
+			}
+			
+			PlanDao planDao = new PlanDao();
+			
 			planToReturn = new Plan();
+			planToReturn.setId(planDao.generateId());
+			
+			planToReturn.setName(name);
 			planToReturn.setCareer(career);
 			planToReturn.setUser(student);
 			planToReturn.setDefault(isDefault);
 			planToReturn.setSemesters(semesters);
 			
+			planDao.savePlan(planToReturn);
+			
+			long totalEndTime = System.nanoTime();
+			
+			long totalDuration = (totalEndTime - totalStartTime)/1000000;
+			long normalDuration = (problematicStartTime - totalStartTime)/1000000;
+			long problematicDuration = (totalEndTime - problematicStartTime)/1000000;
+			long siaTotalSearchDuration = (siaSearchEndTime - siaSearchStartTime)/1000000;
+			long siaNormalSearchDuration = (siaSearchForAllCareerStartTime - siaSearchStartTime)/1000000;
+			long siaForAllSearchDuration = (siaSearchEndTime - siaSearchForAllCareerStartTime)/1000000;
+			
+			
+			Double normalPercentage = ((double) normalDuration / totalDuration)*100;
+			Double problematicPercentage = ((double) problematicDuration/totalDuration)*100;
+			Double siaSearchPercentage = ((double) siaTotalSearchDuration / problematicDuration)*100;
+			Double siaSearchNormalPercentage = ((double) siaNormalSearchDuration / problematicDuration)*100;
+			Double siaSearchForAllPercentage = ((double) siaForAllSearchDuration / problematicDuration)*100;
+			
+			log.info("GeneratePlanFromDummies - problematic took "+ problematicDuration + "ms (" + problematicPercentage + "%)");
+			log.info("Searching the sia total took " + siaTotalSearchDuration + "ms (" + siaSearchPercentage  +"% of problematic)");
+			//log.info("Searching the sia first time took " + siaNormalSearchDuration + "ms (" + siaSearchNormalPercentage  +"% of problematic)");
+			//log.info("Searching the sia first time took " + siaForAllSearchDuration + "ms (" + siaSearchForAllPercentage  +"% of problematic)");
+			log.info("The other methods took " + normalDuration + "ms (" + normalPercentage  + "%)");
+			log.info("total time was " + totalDuration + "ms (100%)" );
+			
 		}
 		
 		return planToReturn;
+	}
+
+	private SemesterDummy getSemesterDummy(List<SemesterDummy> semestersD, String code) {
+		
+		SemesterDummy semesterDummy = null;
+		
+		for(SemesterDummy semesterDummyT : semestersD){
+			SubjectDummy subjectDummyT = getSubjectDummy(semesterDummyT.getSubjects(), code);
+			if(subjectDummyT != null){
+				semesterDummy = semesterDummyT;
+				break;
+			}
+		}
+		
+		return semesterDummy;
+	}
+
+	/**
+	 * This will remove the subjectDummy selected from the list, to avoid sending the same subjectDummy if the user repeated it
+	 * 
+	 * @param listToSearch
+	 * @param codeToFind
+	 * @return
+	 */
+	private SubjectDummy getSubjectDummy(List<SubjectDummy> listToSearch, String codeToFind) {
+		SubjectDummy subjectDummy = null;
+		
+		for(SubjectDummy subjectDummyT : listToSearch){
+			if(subjectDummyT.getCode().equals(codeToFind) == true){
+				subjectDummy = subjectDummyT;
+				listToSearch.remove(subjectDummyT);
+				break;
+			}
+		}
+			
+		return subjectDummy;
 	}
 
 	private SemesterDummy generateSemesterDummy(String s) {
@@ -470,9 +734,12 @@ public class PlanDao {
 		subjectD.setCredits(Integer.valueOf(creditsString));
 		if(gradeString.equals("ap")){
 			subjectD.setApproved(true);
+			subjectD.setGrade(3.0);
 		}else if(gradeString.equals("na")){
 			subjectD.setApproved(false);
-		}else{			
+			subjectD.setGrade(0.0);
+		}else{
+			subjectD.setApproved(false);
 			subjectD.setGrade(Double.valueOf(gradeString));
 		}
 		

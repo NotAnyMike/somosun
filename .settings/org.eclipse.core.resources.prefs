@@ -16,3 +16,5 @@ encoding//src/com/uibinder/index/server/serviceImpl/SUNServiceImpl.java=UTF-8
 encoding//src/com/uibinder/index/shared/SomosUNUtils.java=UTF-8
 encoding//src/com/uibinder/index/shared/control/Plan.java=UTF-8
 encoding//src/com/uibinder/index/shared/control/Subject.java=UTF-8
+encoding//src/com/uibinder/index/shared/values/SubjectGroupCodes.java=UTF-8
+encoding//src/com/uibinder/index/shared/values/TypologyCodes.java=UTF-8

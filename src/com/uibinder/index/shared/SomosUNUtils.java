@@ -11,16 +11,11 @@ import com.uibinder.index.shared.control.Career;
  *
  */
 public class SomosUNUtils {
-	
-	public static final String NIVELACION_NAME = "nivelacion";
-	public static final String LIBRE_AGRUPACION_NAME = "libre eleccion";
+
 	public static final String LIBRE_CODE = "libre";
-	public static final String OPTATIVA_CODE ="opativa";
 	public static final String LIBRE_NAME = "libre eleccion";
+	public static final String OPTATIVA_CODE ="opativa";
 	public static final String OPTATIVA_NAME ="opativa";
-	
-	public static final String UKNOWN_SG_CODE = "unknown";
-	public static final String UKNOWN_SG_NAME = "Agrupación desconocida";
 	
 	public static final String COLOR_CO = "9C27B0";
 	public static final String COLOR_PRE = "E91E63";
@@ -119,7 +114,11 @@ public class SomosUNUtils {
 			tToReturn = "p";
 			break;
 		case "f":
+		case "fundamental":
 			tToReturn = "b";
+			break;
+		case "l":
+			tToReturn = "l";
 			break;
 		}
 		return tToReturn;
