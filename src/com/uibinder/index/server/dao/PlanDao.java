@@ -34,7 +34,9 @@ import com.uibinder.index.shared.control.Semester;
 import com.uibinder.index.shared.control.SemesterValue;
 import com.uibinder.index.shared.control.Student;
 import com.uibinder.index.shared.control.Subject;
+import com.uibinder.index.shared.control.SubjectGroup;
 import com.uibinder.index.shared.control.SubjectValues;
+import com.uibinder.index.shared.values.TypologyCodes;
 
 public class PlanDao {
 	
@@ -488,7 +490,6 @@ public class PlanDao {
 			long problematicStartTime = System.nanoTime();
 			long siaSearchStartTime = 0;
 			long siaSearchEndTime = 0;
-			long siaSearchForAllCareerStartTime = 0;
 			
 			List<SubjectDummy> subjectToBeDummy = new ArrayList<SubjectDummy>();
 			if(problematicSubjects.size() > 0){
@@ -512,10 +513,10 @@ public class PlanDao {
 				//getComplementaryValues
 				
 
-				siaSearchStartTime = System.nanoTime();
+					siaSearchStartTime = System.nanoTime();
 				SUNServiceImpl service = new SUNServiceImpl();
 				complementaryValuesProblematics = service.getComplementaryValues(subjectCodes, careerCodes);
-				siaSearchEndTime = System.nanoTime();
+					siaSearchEndTime = System.nanoTime();
 				
 				//Add the cV to the subjectValue 
 				//add it to the subject and add it to a semester in the plan
@@ -596,11 +597,52 @@ public class PlanDao {
 			}
 			
 			if(subjectToBeDummy.size() > 0){
-				/************************taking care of the old subjects *************************/
+				/************************ taking care of the old subjects *************************/
+				SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
 				
+				for(SubjectDummy subjectD : subjectToBeDummy){
+					
+					SemesterDummy semesterDummyT = getSemesterDummy(semestersD, subjectD.getCode());
+					assert semesterDummyT != null;
+					
+					if(semesterDummyT != null){
+						
+						int credits = subjectD.getCredits();
+						String code = subjectD.getCode();
+						String siaCode = null;
+						String nameSubject = subjectD.getName();
+						String location ="bog";
+						Subject subject = new Subject(credits, code, siaCode, nameSubject, location);
+						subject.setDummy(true);
+						subject.setId(subjectDao.generateId());
+						
+						boolean mandatory = false;
+						String typology = TypologyCodes.getTypology(subjectD.getTypology());
+						SubjectGroup subjectGroup = subjectGroupDao.getSubjectGroupFromTypology(career, typology);
+						ComplementaryValues complementaryValues = new ComplementaryValues(career, subject, typology, mandatory, subjectGroup);
+						complementaryValues.setId(complementaryValuesDao.generateId());
+						
+						SemesterValue semesterValue = semesterValueDao.getOrCreateSemester(semesterDummyT.getYear(), semesterDummyT.getSemester());
+						Group group = groupDao.getOrCreateGroup(subject, semesterValue, subjectD.getGroup());
+						
+						SubjectValues subjectValuesT = new SubjectValues();
+						subjectValuesT.setId(subjectValuesDao.generateId());
+						subjectValuesT.setComplementaryValues(complementaryValues);
+						subjectValuesT.setGrade(subjectD.getGrade());
+						if(subjectD.getApproved() == true){
+							subject.setApprovenType(true);
+						}
+						subjectValuesT.setGroup(group);
+						subjectValuesT.setTaken(true);
+						
+						subjectDao.saveSubject(subject);
+						complementaryValuesDao.saveComplementaryValues(complementaryValues);
+						subjectValuesDao.saveSubjectValue(subjectValuesT);
+						
+					}
+				}
 				
-				
-				/*********************************************************************************/				
+				/**********************************************************************************/				
 			}
 			
 			
@@ -628,20 +670,13 @@ public class PlanDao {
 			long normalDuration = (problematicStartTime - totalStartTime)/1000000;
 			long problematicDuration = (totalEndTime - problematicStartTime)/1000000;
 			long siaTotalSearchDuration = (siaSearchEndTime - siaSearchStartTime)/1000000;
-			long siaNormalSearchDuration = (siaSearchForAllCareerStartTime - siaSearchStartTime)/1000000;
-			long siaForAllSearchDuration = (siaSearchEndTime - siaSearchForAllCareerStartTime)/1000000;
-			
 			
 			Double normalPercentage = ((double) normalDuration / totalDuration)*100;
 			Double problematicPercentage = ((double) problematicDuration/totalDuration)*100;
 			Double siaSearchPercentage = ((double) siaTotalSearchDuration / problematicDuration)*100;
-			Double siaSearchNormalPercentage = ((double) siaNormalSearchDuration / problematicDuration)*100;
-			Double siaSearchForAllPercentage = ((double) siaForAllSearchDuration / problematicDuration)*100;
 			
 			log.info("GeneratePlanFromDummies - problematic took "+ problematicDuration + "ms (" + problematicPercentage + "%)");
 			log.info("Searching the sia total took " + siaTotalSearchDuration + "ms (" + siaSearchPercentage  +"% of problematic)");
-			//log.info("Searching the sia first time took " + siaNormalSearchDuration + "ms (" + siaSearchNormalPercentage  +"% of problematic)");
-			//log.info("Searching the sia first time took " + siaForAllSearchDuration + "ms (" + siaSearchForAllPercentage  +"% of problematic)");
 			log.info("The other methods took " + normalDuration + "ms (" + normalPercentage  + "%)");
 			log.info("total time was " + totalDuration + "ms (100%)" );
 			
