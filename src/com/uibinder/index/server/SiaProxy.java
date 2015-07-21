@@ -7,14 +7,17 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jetty.util.log.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -61,6 +64,8 @@ import com.uibinder.index.shared.values.SubjectGroupCodes;
  *
  */
 public class SiaProxy {
+	
+	private static final Logger log = Logger.getLogger("SiaProxy");
 
 	//This is the page that shows information about the subject in MIS PLANES, not in the sia buscador
 	// OLD public final static String SIA_SUBJECT_BOG_HTML = "http://www.sia.unal.edu.co/academia/catalogo-programas/info-asignatura.sdo";
@@ -148,9 +153,17 @@ public class SiaProxy {
 	
 	        } catch (MalformedURLException e) {
 	            respString ="MalformedURLException";
+	            log.warning("SiaProxy - MalformedURLException with UrlToConnect: " + URLToConnect + " and data: " + data);
+	            error = false;
+	        } catch (SocketTimeoutException e){
+	        	respString ="SocketTimeoutException";
+	        	log.warning("SocketTimeoutException");
 	            error = false;
 	        } catch (IOException e) {
-	            respString ="IOException";
+	        	respString ="MalformedURLException";
+	            error = false;
+	        } catch (Exception e){
+	        	respString ="Some exception";
 	            error = false;
 	        }
 			

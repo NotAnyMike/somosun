@@ -35,7 +35,6 @@ import com.uibinder.index.shared.control.Student;
 import com.uibinder.index.shared.control.Subject;
 import com.uibinder.index.shared.control.SubjectGroup;
 import com.uibinder.index.shared.values.SubjectGroupCodes;
-import com.uibinder.index.shared.values.TypologyCodes;
 
 /**
  * 
@@ -52,7 +51,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private static final Logger log = Logger.getLogger("testing-sunServiceImpl");
+	private static final Logger log = Logger.getLogger("SunServiceImpl");
 
 
 	@Override

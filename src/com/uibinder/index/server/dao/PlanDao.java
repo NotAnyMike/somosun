@@ -548,7 +548,7 @@ public class PlanDao {
 							
 							subjectValuesT.setTaken(true);
 							
-							Semester semester = semesters.get(semesterDummyT.getPosition());
+							Semester semester = semesters.get(semesterDummyT.getPosition()-1);
 							semester.addSubject(subjectValuesT);
 							
 						}
@@ -560,6 +560,8 @@ public class PlanDao {
 				if(problematicSubjects.size() > 0){
 					for(SubjectDummy subjectDummyT : problematicSubjects){
 						
+						boolean isProblematic = false;
+						
 						//new subjectValue
 						SubjectValues subjectValuesT = new SubjectValues();
 						subjectValuesT.setId(subjectValuesDao.generateId());
@@ -567,29 +569,36 @@ public class PlanDao {
 						//get complementaryValue
 						ComplementaryValues complementaryValuesT = complementaryValuesDao.getComplementaryValues(career.getCode(), subjectDummyT.getCode());
 						
-						//get semesterDummy
-						SemesterDummy semesterDummyT = getSemesterDummy(semestersD, subjectDummyT.getCode());
-						
-						if(complementaryValuesT != null && semesterDummyT != null){
-							SemesterValue semesterValueT = semesterValueDao.getOrCreateSemester(semesterDummyT.getYear(), semesterDummyT.getSemester());
-							Group groupT = groupDao.getOrCreateGroup(complementaryValuesT.getSubject(), semesterValueT, subjectDummyT.getGroup());
+						if(complementaryValuesT != null){
+
+							//get semesterDummy
+							SemesterDummy semesterDummyT = getSemesterDummy(semestersD, subjectDummyT.getCode());
 							
-							subjectValuesT.setComplementaryValues(complementaryValuesT);
-							subjectValuesT.setGroup(groupT);
-							subjectValuesT.setGrade(subjectDummyT.getGrade());
-							if(subjectDummyT.getApproved() == true){
-								complementaryValuesT.getSubject().setApprovenType(true);
-								subjectsToUpdate.add(complementaryValuesT.getSubject());
-							}
-							subjectValuesT.setTaken(true);
-							
-							Semester semester = semesters.get(semesterDummyT.getPosition());
-							
-							if(semester != null){
-								semester.addSubject(subjectValuesT);
+							if(semesterDummyT != null){
+								SemesterValue semesterValueT = semesterValueDao.getOrCreateSemester(semesterDummyT.getYear(), semesterDummyT.getSemester());
+								Group groupT = groupDao.getOrCreateGroup(complementaryValuesT.getSubject(), semesterValueT, subjectDummyT.getGroup());
+								
+								subjectValuesT.setComplementaryValues(complementaryValuesT);
+								subjectValuesT.setGroup(groupT);
+								subjectValuesT.setGrade(subjectDummyT.getGrade());
+								if(subjectDummyT.getApproved() == true){
+									complementaryValuesT.getSubject().setApprovenType(true);
+									subjectsToUpdate.add(complementaryValuesT.getSubject());
+								}
+								subjectValuesT.setTaken(true);
+								
+								Semester semester = semesters.get(semesterDummyT.getPosition()-1);
+								
+								if(semester != null){
+									semester.addSubject(subjectValuesT);
+								}
+							}else{
+								isProblematic = true;
 							}
 						}else{
-							//dummySubject
+							isProblematic = true;
+						}
+						if(isProblematic){							
 							subjectToBeDummy.add(subjectDummyT);
 						}
 					}
@@ -638,6 +647,12 @@ public class PlanDao {
 						subjectDao.saveSubject(subject);
 						complementaryValuesDao.saveComplementaryValues(complementaryValues);
 						subjectValuesDao.saveSubjectValue(subjectValuesT);
+						
+						Semester semester = semesters.get(semesterDummyT.getPosition()-1);
+
+						if(semester != null){
+							semester.addSubject(subjectValuesT);
+						}
 						
 					}
 				}
