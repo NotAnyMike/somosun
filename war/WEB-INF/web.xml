@@ -8,22 +8,22 @@
   <!-- Servlets -->
   <servlet>
       <servlet-name>SUNServiceImpl</servlet-name>
-      <servlet-class>com.uibinder.index.server.serviceImpl.SUNServiceImpl</servlet-class>
+      <servlet-class>com.uibinder.server.serviceImpl.SUNServiceImpl</servlet-class>
   </servlet>
   
   <servlet-mapping>
       <servlet-name>SUNServiceImpl</servlet-name>
-      <url-pattern>/uibinderindex/sunService</url-pattern>
+      <url-pattern>/index/sunService</url-pattern>
   </servlet-mapping>
   
   <servlet>
       <servlet-name>LoginServiceImpl</servlet-name>
-      <servlet-class>com.uibinder.index.server.serviceImpl.LoginServiceImpl</servlet-class>
+      <servlet-class>com.uibinder.server.serviceImpl.LoginServiceImpl</servlet-class>
   </servlet>
   
   <servlet-mapping>
       <servlet-name>LoginServiceImpl</servlet-name>
-      <url-pattern>/uibinderindex/loginService</url-pattern>
+      <url-pattern>/index/loginService</url-pattern>
   </servlet-mapping>
   
   <filter>
@@ -37,7 +37,7 @@
   
   <!-- Default page to serve -->
   <welcome-file-list>
-    <welcome-file>UiBinderIndex.html</welcome-file>
+    <welcome-file>Index.html</welcome-file>
   </welcome-file-list>
 
 </web-app>
