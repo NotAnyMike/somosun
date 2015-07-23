@@ -34,6 +34,16 @@
 		<url-pattern>/admin/loginService</url-pattern>
 	</servlet-mapping>
 	
+	<servlet>
+		<servlet-name>AdminServiceImpl</servlet-name>
+		<servlet-class>com.uibinder.server.serviceImpl.AdminServiceImpl</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>AdminServiceImpl</servlet-name>
+		<url-pattern>/admin/adminService</url-pattern>
+	</servlet-mapping>
+	
 	<filter>
 		<filter-name>ObjectifyFilter</filter-name>
 		<filter-class>com.googlecode.objectify.ObjectifyFilter</filter-class>
