@@ -22,7 +22,7 @@ import com.uibinder.shared.PlanValuesResult;
 public class CreateViewImpl extends Composite implements CreateView {
 	
 	private Presenter presenter;
-	
+
 	@UiField Button continueButton;
 	@UiField Button modelAnalyzedPlanButton;
 	@UiField Button newAnalyzedPlanButton;

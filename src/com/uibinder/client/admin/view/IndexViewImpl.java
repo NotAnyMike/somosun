@@ -34,6 +34,8 @@ public class IndexViewImpl extends Composite implements IndexView {
 	@UiField Button deleteAllSubjectsButton;
 	@UiField Button deleteAllSubjectGroupsButton;
 	@UiField Button resetAllHasDefaultButton;
+	@UiField Button deleteAllSemestersButton;
+	@UiField Button deleteAllSubjectValueButton;
 	@UiField InputButton deleteCertainDefaultPlanButton;
 	@UiField InputButton resetCertainHasAnalysisButton;
 	@UiField InputButton deleteCertainComplementaryValuesButton;
@@ -184,6 +186,22 @@ public class IndexViewImpl extends Composite implements IndexView {
 			presenter.onResetCertainHasDefaultButton(careerCode);
 		}
 		setTimes(resetCertainHasDefaultButton.getElement());
+	}
+	
+	@UiHandler("deleteAllSemestersButton")
+	public void onDeleteAllSemestersButton(ClickEvent e){
+		if(getTimes(deleteAllSemestersButton.getElement()).equals("1")){
+			presenter.onDeleteAllSemestersButton();
+		}
+		setTimes(deleteAllSemestersButton.getElement());
+	}
+	
+	@UiHandler("deleteAllSubjectValueButton")
+	public void onDeleteAllSubjectValueButton(ClickEvent e){
+		if(getTimes(deleteAllSubjectValueButton.getElement()).equals("1")){
+			presenter.onDeleteAllSubjectValueButton();
+		}
+		setTimes(deleteAllSubjectValueButton.getElement());
 	}
 
 }

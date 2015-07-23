@@ -71,6 +71,7 @@
 						<div class="panel-heading">Semester</div>
 						<div class="panel-body">
 							<b:VerticalButtonGroup>
+								<b:Button type="DANGER" ui:field="deleteAllSemestersButton" enabled="true">- Delete ALL semesters -</b:Button>
 								<b:Button type="DEFAULT" enabled="false">Change current semester</b:Button>
 							</b:VerticalButtonGroup>
 						</div>
@@ -105,6 +106,16 @@
 									</b:InputGroupButton>
 									<b:ListBox ui:field="subjectGroupListBox"></b:ListBox>
 								</b:InputGroup>
+							</b:VerticalButtonGroup>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-12 col-sm-4 col-lg-3">
+					<div class="panel panel-default">
+						<div class="panel-heading">SubjectValue</div>
+						<div class="panel-body">
+							<b:VerticalButtonGroup>
+								<b:Button type="DANGER" ui:field="deleteAllSubjectValueButton" enabled="true"> - Delete ALL subjectValues -</b:Button>
 							</b:VerticalButtonGroup>
 						</div>
 					</div>

@@ -485,7 +485,6 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		return listToReturn;
 	}
 	
-
 	/**
 	 * Will the return the full list of subjects complementaryValues, if it is necessary it will create the complementaryValue and search for its values
 	 * <br></br>The only case where it will not return a complementaryValue for a subject is when the subject does not exist in the Sia results

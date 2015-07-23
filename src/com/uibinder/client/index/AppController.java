@@ -197,7 +197,6 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	}
 	
 	private void generateAcademicHistoryFromString(String academicHistory){
-		Window.alert("This should create an academic history from the string: " + academicHistory);
 		showLoadingPage("Creando tu plan, buscando y descargando la información ... ");
 		rpcService.generatePlanFromAcademicHistory(academicHistory, new AsyncCallback<Plan>(){
 
@@ -207,7 +206,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 				Window.alert("Hubo un error, asegúrate de que copiaste bien la información y vuelve a intentar");
 				History.fireCurrentHistoryState();
 			}
-
+			
 			@Override
 			public void onSuccess(Plan result) {
 				

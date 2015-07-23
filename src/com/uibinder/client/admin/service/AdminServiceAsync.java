@@ -27,5 +27,9 @@ public interface AdminServiceAsync {
 	void resetAllHasDefaultField(AsyncCallback asyncCallback);
 
 	void resetCertainHasDefaultField(String careerCode, AsyncCallback asyncCallback);
+
+	void deleteAllSemesters(AsyncCallback asyncCallback);
+
+	void deleteAllSubjectValue(AsyncCallback<Void> callback);
 	
 }

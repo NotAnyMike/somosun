@@ -184,7 +184,7 @@ public class PlanDao {
 													requisitesList.addAll(cV.getListPrerequisitesOf());
 													
 													for(Subject s3 : requisitesList){
-														if(s3.getId() == null){
+														if(s3 != null && s3.getId() == null){
 															
 															Subject sT = null;
 															if(s3.getCode().isEmpty() == false) sT = subjectDao.getSubjectByCode(s3.getCode());

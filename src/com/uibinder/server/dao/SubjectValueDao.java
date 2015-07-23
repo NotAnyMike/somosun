@@ -1,5 +1,7 @@
 package com.uibinder.server.dao;
 
+import java.util.List;
+
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
@@ -46,5 +48,16 @@ public class SubjectValueDao {
 	public void deleteSubjectValue(Long id) {
 		Key<SubjectValue> key = Key.create(SubjectValue.class, id);
 		ofy().delete().key(key).now();
+	}
+
+	public void deleteAllSubjectValues() {
+		List<SubjectValue> list = getAllSubjectValues();
+		for(SubjectValue sV : list){
+			deleteSubjectValue(sV.getId());
+		}
+	}
+
+	private List<SubjectValue> getAllSubjectValues() {
+		return ofy().load().type(SubjectValue.class).list();
 	}
 }

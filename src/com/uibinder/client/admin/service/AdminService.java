@@ -18,4 +18,6 @@ public interface AdminService extends RemoteService{
 	void deleteAllSubjectGroup();
 	void resetAllHasDefaultField();
 	void resetCertainHasDefaultField(String careerCode);
+	void deleteAllSemesters();
+	void deleteAllSubjectValue();
 }

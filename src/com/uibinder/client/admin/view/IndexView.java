@@ -19,6 +19,8 @@ public interface IndexView {
 		void onDeleteAllSubjectGroupsButton();
 		void onResetAllHasDefaultButton();
 		void onResetCertainHasDefaultButton(String careerCode);
+		void onDeleteAllSemestersButton();
+		void onDeleteAllSubjectValueButton();
 	}
 	
 	Widget asWidget();
@@ -35,4 +37,6 @@ public interface IndexView {
 	void onDeleteAllSubjectGroupsButton(ClickEvent e);
 	void onResetAllHasDefaultButton(ClickEvent e);
 	void onResetCertainHasDefaultButton(ClickEvent e);
+	void onDeleteAllSemestersButton(ClickEvent e);
+	void onDeleteAllSubjectValueButton(ClickEvent e);
 }

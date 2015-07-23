@@ -54,5 +54,16 @@ public class SemesterDao {
 		ofy().delete().key(key).now();
 	}
 
+	public void deleteAllSemesters() {
+		List<Semester> list = getAllSemesters();
+		for(Semester s : list){
+			deleteSemester(s.getId());
+		}
+	}
+
+	private List<Semester> getAllSemesters() {
+		return ofy().load().type(Semester.class).list(); 
+	}
+
 	
 }

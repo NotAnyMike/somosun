@@ -78,8 +78,8 @@ public class IndexPresenter implements Presenter, IndexView.Presenter {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Window.alert("Error happend while deleting all the default plans - none was deleted");
-				GWT.log("Error happend while deleting all the default plans - none was deleted");
+				Window.alert("Error happend while deleting all the default plans - some were deleted");
+				GWT.log("Error happend while deleting all the default plans - some were deleted");
 			}
 
 			@Override
@@ -164,8 +164,8 @@ public class IndexPresenter implements Presenter, IndexView.Presenter {
 	public void onDeleteAllPlansButton() {
 		rpcAdminService.deleteAllPlans(new AsyncCallback(){
 			public void onFailure(Throwable caught) {
-				Window.alert("error while deleting all plans - none was deleted");
-				GWT.log("error while deleting all plans - none was deleted");
+				Window.alert("error while deleting all plans - some were deleted");
+				GWT.log("error while deleting all plans - some were deleted");
 			}
 			public void onSuccess(Object result) {
 				Window.alert("All plans deleted");
@@ -178,8 +178,8 @@ public class IndexPresenter implements Presenter, IndexView.Presenter {
 	public void onDeleteAllComplementaryValuesButton() {
 		rpcAdminService.deleteAllComplementaryValues(new AsyncCallback(){
 			public void onFailure(Throwable caught) {
-				Window.alert("error while deleting all complementaryValues - none was deleted");
-				GWT.log("error while deleting all complementaryValues - none was deleted");
+				Window.alert("error while deleting all complementaryValues - some were deleted");
+				GWT.log("error while deleting all complementaryValues - some were deleted");
 			}
 			public void onSuccess(Object result) {
 				Window.alert("All complementaryValues deleted");
@@ -193,8 +193,8 @@ public class IndexPresenter implements Presenter, IndexView.Presenter {
 	public void onDeleteCertainComplementaryValuesButton(final String careerCode) {
 		rpcAdminService.deleteCertainComplementaryValues(careerCode, new AsyncCallback(){
 			public void onFailure(Throwable caught) {
-				Window.alert("error while deleting all complementaryValues for career " + careerCode + "- none was deleted");
-				GWT.log("error while deleting all complementaryValues for career " + careerCode + "- none was deleted");
+				Window.alert("error while deleting all complementaryValues for career " + careerCode + "- Some were deleted");
+				GWT.log("error while deleting all complementaryValues for career " + careerCode + "- Some were deleted");
 			}
 			public void onSuccess(Object result) {
 				Window.alert("All complementaryValues for career " + careerCode + " deleted");
@@ -208,8 +208,8 @@ public class IndexPresenter implements Presenter, IndexView.Presenter {
 	public void onDeleteAllSubjectsButton() {
 		rpcAdminService.deleteAllSubjects(new AsyncCallback(){
 			public void onFailure(Throwable caught) {
-				Window.alert("Error deleting all the subjects - none was deleted");
-				GWT.log("Error deleting all the subjects - none was deleted");
+				Window.alert("Error deleting all the subjects - Some were deleted");
+				GWT.log("Error deleting all the subjects - Some were deleted");
 			}
 			public void onSuccess(Object result) {
 				Window.alert("All subjects deleted");
@@ -223,8 +223,8 @@ public class IndexPresenter implements Presenter, IndexView.Presenter {
 	public void onDeleteAllSubjectGroupsButton() {
 		rpcAdminService.deleteAllSubjectGroup(new AsyncCallback(){
 			public void onFailure(Throwable caught) {
-				Window.alert("Error deleting all the subjectGroups - none was deleted");
-				GWT.log("Error deleting all the subjectGroups - none was deleted");
+				Window.alert("Error deleting all the subjectGroups - some were deleted");
+				GWT.log("Error deleting all the subjectGroups - some were deleted");
 			}
 			public void onSuccess(Object result) {
 				Window.alert("All subjectGroups deleted");
@@ -258,6 +258,36 @@ public class IndexPresenter implements Presenter, IndexView.Presenter {
 			public void onSuccess(Object result) {
 				Window.alert(careerCode + " has no default");
 				GWT.log(careerCode + " has no default");
+			}
+			
+		});
+	}
+
+	@Override
+	public void onDeleteAllSemestersButton() {
+		rpcAdminService.deleteAllSemesters(new AsyncCallback(){
+			public void onFailure(Throwable caught) {
+				Window.alert("Error deleting all the semesters");
+				GWT.log("Error deleting all the semesters");
+			}
+			public void onSuccess(Object result) {
+				Window.alert("All semester were deleted");
+				GWT.log("All semester were deleted");
+			}
+			
+		});
+	}
+
+	@Override
+	public void onDeleteAllSubjectValueButton() {
+		rpcAdminService.deleteAllSubjectValue(new AsyncCallback(){
+			public void onFailure(Throwable caught) {
+				Window.alert("Error deleting all the subjectValues");
+				GWT.log("Error deleting all the subjectValues");
+			}
+			public void onSuccess(Object result) {
+				Window.alert("All subjectValues were deleted");
+				GWT.log("All subjectValues were deleted");
 			}
 			
 		});

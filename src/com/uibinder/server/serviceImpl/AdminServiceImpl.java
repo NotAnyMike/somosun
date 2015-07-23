@@ -8,8 +8,10 @@ import com.uibinder.server.SiaProxy;
 import com.uibinder.server.dao.CareerDao;
 import com.uibinder.server.dao.ComplementaryValueDao;
 import com.uibinder.server.dao.PlanDao;
+import com.uibinder.server.dao.SemesterDao;
 import com.uibinder.server.dao.SubjectDao;
 import com.uibinder.server.dao.SubjectGroupDao;
+import com.uibinder.server.dao.SubjectValueDao;
 import com.uibinder.shared.control.Student;
 
 public class AdminServiceImpl extends RemoteServiceServlet implements AdminService{
@@ -138,6 +140,26 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 		if(getUserLogged().isAdmin() == true){
 			CareerDao careerDao = new CareerDao();
 			careerDao.resetHasDefaultForCareer(careerCode);
+		}
+	}
+
+	/**
+	 * Admin method
+	 */
+	public void deleteAllSemesters() {
+		if(getUserLogged().isAdmin() == true){
+			SemesterDao semesterDao = new SemesterDao();
+			semesterDao.deleteAllSemesters();
+		}
+	}
+
+	/**
+	 * Admin method
+	 */
+	public void deleteAllSubjectValue() {
+		if(getUserLogged().isAdmin() == true){
+			SubjectValueDao sVDao = new SubjectValueDao();
+			sVDao.deleteAllSubjectValues();
 		}
 	}
 
