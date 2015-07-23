@@ -19,7 +19,7 @@ public class Semester implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	@Id private Long id = null;
-	private List<SubjectValues> subjectValuesList;
+	private List<SubjectValue> subjectValuesList;
 	private String date;
 	
 	public Semester(){
@@ -31,7 +31,7 @@ public class Semester implements Serializable {
         this.date=date;
     }
     
-    public List<SubjectValues> getSubjects(){
+    public List<SubjectValue> getSubjects(){
         return this.subjectValuesList;
     }
 
@@ -47,17 +47,17 @@ public class Semester implements Serializable {
 		this.date = date;
 	}
 
-	public void setSubjects(List<SubjectValues> subjects) {
+	public void setSubjects(List<SubjectValue> subjects) {
 		this.subjectValuesList = subjects;
 	}
 
-	public void deleteSubject(SubjectValues subjectValues) {
+	public void deleteSubject(SubjectValue subjectValues) {
 		if(subjectValuesList.contains(subjectValues)==true){
 			subjectValuesList.remove(subjectValues);
 		}
 	}
 
-	public void addSubject(SubjectValues subjectValues) {
+	public void addSubject(SubjectValue subjectValues) {
 		if(subjectValues != null){
 			subjectValuesList.add(subjectValues);
 		}

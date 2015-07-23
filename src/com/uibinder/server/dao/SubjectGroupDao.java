@@ -7,7 +7,7 @@ import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 import com.uibinder.shared.SomosUNUtils;
 import com.uibinder.shared.control.Career;
-import com.uibinder.shared.control.ComplementaryValues;
+import com.uibinder.shared.control.ComplementaryValue;
 import com.uibinder.shared.control.Subject;
 import com.uibinder.shared.control.SubjectGroup;
 import com.uibinder.shared.values.SubjectGroupCodes;

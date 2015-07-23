@@ -7,19 +7,19 @@ import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 import com.uibinder.shared.SomosUNUtils;
 import com.uibinder.shared.control.Career;
-import com.uibinder.shared.control.ComplementaryValues;
+import com.uibinder.shared.control.ComplementaryValue;
 import com.uibinder.shared.control.Subject;
 import com.uibinder.shared.control.SubjectGroup;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
-public class ComplementaryValuesDao extends Dao {
+public class ComplementaryValueDao extends Dao {
 
 	static{
-		ObjectifyService.register(ComplementaryValues.class);
+		ObjectifyService.register(ComplementaryValue.class);
 	}
 	
-	public void saveComplementaryValues(ComplementaryValues cV){
+	public void saveComplementaryValues(ComplementaryValue cV){
 		if(cV != null)
 		{
 			if(cV.getSubjectGroup() != null && cV.getSubject() != null && cV.getCareer() != null)
@@ -41,17 +41,16 @@ public class ComplementaryValuesDao extends Dao {
 		}
 	}
 	
-	public ComplementaryValues getComplementaryValues(Career career, Subject subject){
+	public ComplementaryValue getComplementaryValues(Career career, Subject subject){
 		return getComplementaryValues(career.getCode(), subject.getCode());
 	}
 	
-	public void deleteComplementaryValues(ComplementaryValues cV){
+	public void deleteComplementaryValues(ComplementaryValue cV){
 		if(cV != null)
 		{
 			ofy().delete().entity(cV).now();			
 		}
 	}
-	
 	
 	/**
 	 * Will create a unique key if the entity X has an embedded entity Y which has an empty id, this will not allow to save the X entity,
@@ -62,22 +61,22 @@ public class ComplementaryValuesDao extends Dao {
 	public Long generateId() {
 		
 		ObjectifyFactory f = new ObjectifyFactory();
-		Key<ComplementaryValues> key = f.allocateId(ComplementaryValues.class);
+		Key<ComplementaryValue> key = f.allocateId(ComplementaryValue.class);
 		
 		return key.getId();
 		
 	}
 
-	public List<ComplementaryValues> getComplementaryValues(String code) {
-		return ofy().load().type(ComplementaryValues.class).filter("career.code", code).list();
+	public List<ComplementaryValue> getComplementaryValues(String code) {
+		return ofy().load().type(ComplementaryValue.class).filter("career.code", code).list();
 	}
 
-	public ComplementaryValues getComplementaryValues(String careerCode, String subjectCode) {
+	public ComplementaryValue getComplementaryValues(String careerCode, String subjectCode) {
 		
-		ComplementaryValues toReturn = null;
+		ComplementaryValue toReturn = null;
 		if(subjectCode != null && careerCode != null)
 		{
-			toReturn = (ComplementaryValues) ofy().load().type(ComplementaryValues.class).filter("career.code", careerCode).filter("subject.code", subjectCode).first().now();
+			toReturn = (ComplementaryValue) ofy().load().type(ComplementaryValue.class).filter("career.code", careerCode).filter("subject.code", subjectCode).first().now();
 		}
 		
 		return toReturn;
@@ -94,8 +93,8 @@ public class ComplementaryValuesDao extends Dao {
 			SubjectGroup sG = subjectGroupDao.getSubjectGroup(SomosUNUtils.LIBRE_CODE, careerCode);
 			
 			if(s != null && c != null && sG != null){				
-				ComplementaryValues cVT = new ComplementaryValues(c, s, "l", false, sG);
-				ComplementaryValuesDao cVDao = new ComplementaryValuesDao();
+				ComplementaryValue cVT = new ComplementaryValue(c, s, "l", false, sG);
+				ComplementaryValueDao cVDao = new ComplementaryValueDao();
 				cVDao.saveComplementaryValues(cVT);
 			}
 			
@@ -113,8 +112,8 @@ public class ComplementaryValuesDao extends Dao {
 			SubjectGroup sG = subjectGroupDao.getSubjectGroupById(subjectGroupId);
 			
 			if(s != null && c != null && sG != null){				
-				ComplementaryValues cVT = new ComplementaryValues(c, s, (sG.isFundamental() == true ? "b" : "p"), false, sG);
-				ComplementaryValuesDao cVDao = new ComplementaryValuesDao();
+				ComplementaryValue cVT = new ComplementaryValue(c, s, (sG.isFundamental() == true ? "b" : "p"), false, sG);
+				ComplementaryValueDao cVDao = new ComplementaryValueDao();
 				cVDao.saveComplementaryValues(cVT);
 			}
 			
@@ -122,13 +121,18 @@ public class ComplementaryValuesDao extends Dao {
 		
 	}
 
-	public List<ComplementaryValues> getMandatoryComplementaryValues(String careerCode) {
+	public List<ComplementaryValue> getMandatoryComplementaryValues(String careerCode) {
 		
-		List<ComplementaryValues> list = null;
+		List<ComplementaryValue> list = null;
 		
-		list = ofy().load().type(ComplementaryValues.class).filter("career.code", careerCode).filter("mandatory", true).list();
+		list = ofy().load().type(ComplementaryValue.class).filter("career.code", careerCode).filter("mandatory", true).list();
 				
 		return list;
+	}
+
+	public void deleteComplementaryValues(Long id) {
+		Key<ComplementaryValue> key = Key.create(ComplementaryValue.class, id);
+		ofy().delete().key(key);//.now();
 	}
 
 	

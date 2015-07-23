@@ -9,7 +9,7 @@ import com.uibinder.shared.RandomPhrase;
 import com.uibinder.shared.SiaResultGroups;
 import com.uibinder.shared.SiaResultSubjects;
 import com.uibinder.shared.control.Career;
-import com.uibinder.shared.control.ComplementaryValues;
+import com.uibinder.shared.control.ComplementaryValue;
 import com.uibinder.shared.control.Plan;
 import com.uibinder.shared.control.Student;
 import com.uibinder.shared.control.Subject;
@@ -56,12 +56,12 @@ public interface SUNService extends RemoteService{
 	
 	public void toTest();
 	
-	public ComplementaryValues getComplementaryValuesFromMisPlanes(String career, String code);
-	public List<ComplementaryValues> getComplementaryValuesFromMisPlanes(String careerCode);
-	public List<ComplementaryValues> getMandatoryComplementaryValues(String careerCode);
-	public ComplementaryValues createDefaultSubject(String subjectGroupName, String credits, String careerCode, Student student);
+	public ComplementaryValue getComplementaryValuesFromMisPlanes(String career, String code);
+	public List<ComplementaryValue> getComplementaryValuesFromMisPlanes(String careerCode);
+	public List<ComplementaryValue> getMandatoryComplementaryValues(String careerCode);
+	public ComplementaryValue createDefaultSubject(String subjectGroupName, String credits, String careerCode, Student student);
 	
-	List<ComplementaryValues> getComplementaryValues(List<String> selectedSubjectCodeStrings, List<String> selectedSubjectCareerStrings);
+	List<ComplementaryValue> getComplementaryValues(List<String> selectedSubjectCodeStrings, List<String> selectedSubjectCareerStrings);
 	
 	public void analyzeCareer(String careerCode);
 	

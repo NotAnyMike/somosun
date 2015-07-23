@@ -13,7 +13,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.uibinder.client.index.presenter.PlanPresenter;
 import com.uibinder.shared.control.Subject;
-import com.uibinder.shared.control.SubjectValues;
+import com.uibinder.shared.control.SubjectValue;
 
 public class WarningDeleteSubjectViewImpl extends Composite implements WarningDeleteSubjectView {
 	
@@ -26,7 +26,7 @@ public class WarningDeleteSubjectViewImpl extends Composite implements WarningDe
 	@UiField Button cancelButton;
 	@UiField Button deleteButton;
 	
-	private SubjectValues sV;
+	private SubjectValue sV;
 	
 	private PlanPresenter presenter;
 
@@ -81,7 +81,7 @@ public class WarningDeleteSubjectViewImpl extends Composite implements WarningDe
 	}
 
 	@Override
-	public void setSubject(SubjectValues sV, Subject s) {
+	public void setSubject(SubjectValue sV, Subject s) {
 		this.sV = sV;
 		subjectName.setText(s.getName());
 		subjectCode.setText(s.getCode());

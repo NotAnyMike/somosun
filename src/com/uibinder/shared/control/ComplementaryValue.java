@@ -16,7 +16,7 @@ import com.googlecode.objectify.annotation.Index;
  *
  */
 @Entity
-public class ComplementaryValues implements Serializable {
+public class ComplementaryValue implements Serializable {
 	
 	/**
 	 * 
@@ -38,7 +38,7 @@ public class ComplementaryValues implements Serializable {
     /**
      * Do NOT use this method
      */
-    public ComplementaryValues(){
+    public ComplementaryValue(){
     	
     	this.listPrerequisites = new ArrayList<Subject>();
 		this.listCorequisites = new ArrayList<Subject>();
@@ -46,7 +46,7 @@ public class ComplementaryValues implements Serializable {
 		this.listCorequisitesOf = new ArrayList<Subject>();
     }
 
-	public ComplementaryValues(Career career, Subject subject,	List<Subject> listPrerequisites, List<Subject> listCorequisites, String typology,	boolean mandatory) {
+	public ComplementaryValue(Career career, Subject subject,	List<Subject> listPrerequisites, List<Subject> listCorequisites, String typology,	boolean mandatory) {
 		
 		this.career = career;
 		this.subject = subject;
@@ -58,7 +58,7 @@ public class ComplementaryValues implements Serializable {
 		this.mandatory = mandatory;
 	}
 	
-	public ComplementaryValues(Career career, Subject subject,	List<Subject> listPrerequisites, List<Subject> listCorequisites, String typology,	boolean mandatory, SubjectGroup subjectGroup) {
+	public ComplementaryValue(Career career, Subject subject,	List<Subject> listPrerequisites, List<Subject> listCorequisites, String typology,	boolean mandatory, SubjectGroup subjectGroup) {
 		
 		this.career = career;
 		this.subject = subject;
@@ -71,7 +71,7 @@ public class ComplementaryValues implements Serializable {
 		this.subjectGroup = subjectGroup;
 	}
 
-	public ComplementaryValues(Career career, Subject subject, String typology,	boolean mandatory) {
+	public ComplementaryValue(Career career, Subject subject, String typology,	boolean mandatory) {
 		
 		this.career = career;
 		this.subject = subject;
@@ -85,7 +85,7 @@ public class ComplementaryValues implements Serializable {
 		this.mandatory = mandatory;
 	}
 	
-	public ComplementaryValues(Career career, Subject subject,	String typology, boolean mandatory, SubjectGroup subjectGroup) {
+	public ComplementaryValue(Career career, Subject subject,	String typology, boolean mandatory, SubjectGroup subjectGroup) {
 		
 		this.career = career;
 		this.subject = subject;
@@ -100,7 +100,7 @@ public class ComplementaryValues implements Serializable {
 		this.subjectGroup = subjectGroup;
 	}
 	
-	public ComplementaryValues(Career career, Subject subject) {
+	public ComplementaryValue(Career career, Subject subject) {
 		
 		this.career = career;
 		this.subject = subject;
@@ -115,7 +115,7 @@ public class ComplementaryValues implements Serializable {
 	 * @param cV
 	 * @return true if career, subjectGroup, subject, mandatory, and the four lists are the exact sames 
 	 */
-	public boolean equals(ComplementaryValues cV){
+	public boolean equals(ComplementaryValue cV){
 		
 		boolean toReturn = false;
 		

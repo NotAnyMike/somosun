@@ -27,7 +27,7 @@ import com.uibinder.server.serviceImpl.LoginServiceImpl;
 import com.uibinder.server.serviceImpl.SUNServiceImpl;
 import com.uibinder.shared.SomosUNUtils;
 import com.uibinder.shared.control.Career;
-import com.uibinder.shared.control.ComplementaryValues;
+import com.uibinder.shared.control.ComplementaryValue;
 import com.uibinder.shared.control.Group;
 import com.uibinder.shared.control.Plan;
 import com.uibinder.shared.control.Semester;
@@ -35,7 +35,7 @@ import com.uibinder.shared.control.SemesterValue;
 import com.uibinder.shared.control.Student;
 import com.uibinder.shared.control.Subject;
 import com.uibinder.shared.control.SubjectGroup;
-import com.uibinder.shared.control.SubjectValues;
+import com.uibinder.shared.control.SubjectValue;
 import com.uibinder.shared.values.TypologyCodes;
 
 public class PlanDao {
@@ -53,7 +53,7 @@ public class PlanDao {
 		
 		CareerDao careerDao = new CareerDao();
 		SubjectDao subjectDao = new SubjectDao();
-		ComplementaryValuesDao complementaryValuesDao = new ComplementaryValuesDao();
+		ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
 		
 		Plan plan = new Plan();
 		Career career = null;
@@ -61,11 +61,11 @@ public class PlanDao {
 		String name = "";
 		List<Semester> semesters = new ArrayList<Semester>();
 		Semester semester = null;
-		List<SubjectValues> subjects = null;
+		List<SubjectValue> subjects = null;
 		Subject subject = null;
-		ComplementaryValues complementaryValues = null;
-		SubjectValues subjectValues = null;
-		HashMap<SubjectValues, Subject> subjectMap = new HashMap<SubjectValues, Subject>();;
+		ComplementaryValue complementaryValue = null;
+		SubjectValue subjectValues = null;
+		HashMap<SubjectValue, Subject> subjectMap = new HashMap<SubjectValue, Subject>();;
 	
 		JSONObject jsonPlan = new JSONObject(CAREERS_DEFAULTS[getCareerIndex(careerCode)]);
 		JSONArray jsonSemesters = jsonPlan.getJSONArray("semesters");
@@ -81,7 +81,7 @@ public class PlanDao {
 		for(int i = 0; i < jsonSemesters.length(); i++){
 			semester = new Semester(Integer.toString(i));
 			jsonSubjects = jsonSemesters.getJSONObject(i).getJSONArray("courses");
-			subjects = new ArrayList<SubjectValues>();
+			subjects = new ArrayList<SubjectValue>();
 			
 			for(int j = 0; j < jsonSubjects.length(); j++){
 				jsonSubject = jsonSubjects.getJSONObject(j);
@@ -90,17 +90,17 @@ public class PlanDao {
 				}else{
 					subject = new Subject(jsonSubject.getInt("credits"), jsonSubject.getString("code"), jsonSubject.getString("code"), jsonSubject.getString("code"), sede);
 				}
-				subjectValues = new SubjectValues();
+				subjectValues = new SubjectValue();
 				//getting the complementary values
 				if(subject!= null){
-					complementaryValues = complementaryValuesDao.getComplementaryValues(career, subject);
-					if(complementaryValues != null) {subjectValues.setComplementaryValues(complementaryValues);}
+					complementaryValue = complementaryValueDao.getComplementaryValues(career, subject);
+					if(complementaryValue != null) {subjectValues.setComplementaryValues(complementaryValue);}
 					else 
 					{
-						complementaryValues = new ComplementaryValues(career, subject);
+						complementaryValue = new ComplementaryValue(career, subject);
 						subjectValues.getComplementaryValues().setMandatory(jsonSubject.getBoolean("oblig"));
 						subjectValues.getComplementaryValues().setTypology(jsonSubject.getString("type"));
-						if(jsonSubject.getBoolean("normal") == true && subject != null) complementaryValuesDao.saveComplementaryValues(complementaryValues);
+						if(jsonSubject.getBoolean("normal") == true && subject != null) complementaryValueDao.saveComplementaryValues(complementaryValue);
 					}
 				}				
 				
@@ -138,8 +138,8 @@ public class PlanDao {
 				//save everything inside
 				
 				SemesterDao semesterDao = new SemesterDao();
-				ComplementaryValuesDao complementaryValueDao = new ComplementaryValuesDao();
-				SubjectValuesDao subjectValuesDao = new SubjectValuesDao();
+				ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
+				SubjectValueDao subjectValueDao = new SubjectValueDao();
 				SubjectDao subjectDao = new SubjectDao();
 //				GroupDao groupDao = new GroupDao();
 //				BlockDao blockDao = new BlockDao();
@@ -147,19 +147,19 @@ public class PlanDao {
 //				SemesterValueDao  semesterValueDao = new SemesterValueDao();
 
 				List<Semester> semesters = plan.getSemesters();
-				List<SubjectValues> sVToRemoveList = new ArrayList<SubjectValues>();
+				List<SubjectValue> sVToRemoveList = new ArrayList<SubjectValue>();
 				
 				for(Semester s : semesters){
 					//be careful because I can be saving more than once the same semester
 					sVToRemoveList.clear();
 
-					List<SubjectValues> subjectValuesList = s.getSubjects();
+					List<SubjectValue> subjectValuesList = s.getSubjects();
 					
 						if(subjectValuesList != null){
 							if(subjectValuesList.size() != 0){
-								for(SubjectValues sV : subjectValuesList){
+								for(SubjectValue sV : subjectValuesList){
 									
-										ComplementaryValues cV = sV.getComplementaryValues();
+										ComplementaryValue cV = sV.getComplementaryValues();
 										if(cV != null){
 											
 												if(cV.getCareer() != null && cV.getSubject() != null){
@@ -208,9 +208,9 @@ public class PlanDao {
 												}
 											
 											if(sV.getId() == null){												
-												sV.setId(subjectValuesDao.generateId()); 
+												sV.setId(subjectValueDao.generateId()); 
 											}
-											subjectValuesDao.saveSubjectValue(sV);
+											subjectValueDao.saveSubjectValue(sV);
 										}else{
 											sVToRemoveList.add(sV);
 										}
@@ -224,7 +224,7 @@ public class PlanDao {
 						semesterDao.saveSemester(s);
 					
 					
-					for(SubjectValues sVT : sVToRemoveList){						
+					for(SubjectValue sVT : sVToRemoveList){						
 						s.getSubjects().remove(sVT);
 					}
 					
@@ -256,7 +256,7 @@ public class PlanDao {
 		if(p != null){
 			for(Semester s : p.getSemesters()){
 				s.setId(null);
-				for(SubjectValues sV : s.getSubjects()){
+				for(SubjectValue sV : s.getSubjects()){
 					sV.setId(null);
 				}
 			}
@@ -296,31 +296,60 @@ public class PlanDao {
 
 	public void deletePlan(Plan plan) {
 		if(plan != null){
-			if(plan.getSemesters() != null && plan.getSemesters().size() > 0){
-				
-				SemesterDao semesterDao = new SemesterDao();
-				SubjectValuesDao subjectValuesDao = new SubjectValuesDao();
-				
-				for(Semester s : plan.getSemesters()){
-					if(s.getSubjects() != null && s.getSubjects().size() > 0){
-						for(SubjectValues sV : s.getSubjects()){
-							if(sV.getId() != null && sV.getId().equals("") == false){
-								subjectValuesDao.deleteSubjectValues(sV.getId());
-							}
+			SubjectDao subjectDao = new SubjectDao();
+			ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
+			SemesterDao semesterDao = new SemesterDao();
+			SubjectValueDao subjectValueDao = new SubjectValueDao();
+			List<Semester> semesters = plan.getSemesters();
+			for(Semester semester : semesters){
+				List<SubjectValue> subjectValues = semester.getSubjects();
+				for(SubjectValue subjectValue : subjectValues){
+					ComplementaryValue complementaryValue = subjectValue.getComplementaryValues();
+					
+					Subject subject = complementaryValue.getSubject();
+					if(subject.isDefault() == true){
+						
+						//delete all the Default Subjects
+						subjectDao.deleteSubject(subject.getId());
+						if(subject.getId() == null) {
+							log.severe("Subject id:" + subject.getCode() + " name: " + subject.getName() + " has no id");
 						}
+						//delete all the complementaryValues
+						complementaryValueDao.deleteComplementaryValues(complementaryValue.getId());
 					}
-					if(s.getId() != null && s.getId().equals("") == false){					
-						semesterDao.deleteSemester(s.getId());
-					}
+					//Delete subjectValue
+					subjectValueDao.deleteSubjectValue(subjectValue.getId());
 				}
-			}			
-			if(plan.getId() != null && plan.getId().equals("") == false){				
-				deletePlan(plan.getId());
+				//delete all the semesters
+				semesterDao.deleteSemester(semester.getId());
 			}
+			//Delete the plan
+			deletePlan(plan.getId());
+			
+//			if(plan.getSemesters() != null && plan.getSemesters().size() > 0){
+//				
+//				SemesterDao semesterDao = new SemesterDao();
+//				SubjectValueDao subjectValueDao = new SubjectValueDao();
+//				
+//				for(Semester s : plan.getSemesters()){
+//					if(s.getSubjects() != null && s.getSubjects().size() > 0){
+//						for(SubjectValue sV : s.getSubjects()){
+//							if(sV.getId() != null && sV.getId().equals("") == false){
+//								subjectValueDao.deleteSubjectValue(sV.getId());
+//							}
+//						}
+//					}
+//					if(s.getId() != null && s.getId().equals("") == false){					
+//						semesterDao.deleteSemester(s.getId());
+//					}
+//				}
+//			}			
+//			if(plan.getId() != null && plan.getId().equals("") == false){				
+//				deletePlan(plan.getId());
+//			}
 		}
 	}
 
-	
 	public Plan generatePlanFromAcademicHistory(String academicHistory) {
 		
 		Plan planToReturn = null;
@@ -417,11 +446,11 @@ public class PlanDao {
 			
 			//semesters list of subjectValues
 			SubjectDao subjectDao = new SubjectDao();
-			SubjectValuesDao subjectValuesDao = new SubjectValuesDao();
+			SubjectValueDao subjectValueDao = new SubjectValueDao();
 			GroupDao groupDao = new GroupDao();
 			SemesterDao semesterDao = new SemesterDao();
 			SemesterValueDao semesterValueDao = new SemesterValueDao();
-			ComplementaryValuesDao complementaryValuesDao = new ComplementaryValuesDao();
+			ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
 			
 			List<Semester> semesters = new ArrayList<Semester>();
 			List<SubjectDummy> problematicSubjects = new ArrayList<SubjectDummy>();
@@ -435,7 +464,7 @@ public class PlanDao {
 				semester.setDate(semesterD.getYear() + "-" + semesterD.getSemester());
 				
 				//for subjects
-				List<SubjectValues> subjects = new ArrayList<SubjectValues>();
+				List<SubjectValue> subjects = new ArrayList<SubjectValue>();
 				for(SubjectDummy subjectD : semesterD.getSubjects()){
 					
 					//Get subject
@@ -443,8 +472,8 @@ public class PlanDao {
 					assert subject != null;
 					
 					if(subject != null){
-						SubjectValues subjectV = new SubjectValues();
-						subjectV.setId(subjectValuesDao.generateId());
+						SubjectValue subjectV = new SubjectValue();
+						subjectV.setId(subjectValueDao.generateId());
 						
 						//  Get semesterValue
 						SemesterValue semesterValue = semesterValueDao.getOrCreateSemester(semesterD.getYear(), semesterD.getSemester());
@@ -458,10 +487,10 @@ public class PlanDao {
 						
 						
 						//Get complementaryValue
-						ComplementaryValues complementaryValues = complementaryValuesDao.getComplementaryValues(careerCode, subject.getCode());
-						if(complementaryValues != null){
+						ComplementaryValue complementaryValue = complementaryValueDao.getComplementaryValues(careerCode, subject.getCode());
+						if(complementaryValue != null){
 							
-							subjectV.setComplementaryValues(complementaryValues);
+							subjectV.setComplementaryValues(complementaryValue);
 							subjectV.setGrade(subjectD.getGrade());
 							if(subjectD.getApproved()){								
 								subject.setApprovenType(true);
@@ -494,7 +523,7 @@ public class PlanDao {
 			List<SubjectDummy> subjectToBeDummy = new ArrayList<SubjectDummy>();
 			if(problematicSubjects.size() > 0){
 				
-				List<ComplementaryValues> complementaryValuesProblematics = null;
+				List<ComplementaryValue> complementaryValuesProblematics = null;
 				List<String> subjectCodes = new ArrayList<String>();
 				List<String> careerCodes = new ArrayList<String>(); //in order to be send to te function in the siaProxy
 				for(SubjectDummy subjectDT : problematicSubjects){
@@ -521,7 +550,7 @@ public class PlanDao {
 				//Add the cV to the subjectValue 
 				//add it to the subject and add it to a semester in the plan
 				
-				for(ComplementaryValues complementaryValuesT : complementaryValuesProblematics){
+				for(ComplementaryValue complementaryValuesT : complementaryValuesProblematics){
 					
 					SubjectDummy subjectDummyT = getSubjectDummy(problematicSubjects, complementaryValuesT.getSubject().getCode());
 					assert subjectDummyT != null;
@@ -532,8 +561,8 @@ public class PlanDao {
 						
 						if(semesterDummyT != null){
 							
-							SubjectValues subjectValuesT = new SubjectValues();
-							subjectValuesT.setId(subjectValuesDao.generateId());
+							SubjectValue subjectValuesT = new SubjectValue();
+							subjectValuesT.setId(subjectValueDao.generateId());
 							
 							subjectValuesT.setComplementaryValues(complementaryValuesT);
 							subjectValuesT.setGrade(subjectDummyT.getGrade());
@@ -563,11 +592,11 @@ public class PlanDao {
 						boolean isProblematic = false;
 						
 						//new subjectValue
-						SubjectValues subjectValuesT = new SubjectValues();
-						subjectValuesT.setId(subjectValuesDao.generateId());
+						SubjectValue subjectValuesT = new SubjectValue();
+						subjectValuesT.setId(subjectValueDao.generateId());
 						
 						//get complementaryValue
-						ComplementaryValues complementaryValuesT = complementaryValuesDao.getComplementaryValues(career.getCode(), subjectDummyT.getCode());
+						ComplementaryValue complementaryValuesT = complementaryValueDao.getComplementaryValues(career.getCode(), subjectDummyT.getCode());
 						
 						if(complementaryValuesT != null){
 
@@ -628,15 +657,15 @@ public class PlanDao {
 						boolean mandatory = false;
 						String typology = TypologyCodes.getTypology(subjectD.getTypology());
 						SubjectGroup subjectGroup = subjectGroupDao.getSubjectGroupFromTypology(career, typology);
-						ComplementaryValues complementaryValues = new ComplementaryValues(career, subject, typology, mandatory, subjectGroup);
-						complementaryValues.setId(complementaryValuesDao.generateId());
+						ComplementaryValue complementaryValue = new ComplementaryValue(career, subject, typology, mandatory, subjectGroup);
+						complementaryValue.setId(complementaryValueDao.generateId());
 						
 						SemesterValue semesterValue = semesterValueDao.getOrCreateSemester(semesterDummyT.getYear(), semesterDummyT.getSemester());
 						Group group = groupDao.getOrCreateGroup(subject, semesterValue, subjectD.getGroup());
 						
-						SubjectValues subjectValuesT = new SubjectValues();
-						subjectValuesT.setId(subjectValuesDao.generateId());
-						subjectValuesT.setComplementaryValues(complementaryValues);
+						SubjectValue subjectValuesT = new SubjectValue();
+						subjectValuesT.setId(subjectValueDao.generateId());
+						subjectValuesT.setComplementaryValues(complementaryValue);
 						subjectValuesT.setGrade(subjectD.getGrade());
 						if(subjectD.getApproved() == true){
 							subject.setApprovenType(true);
@@ -645,8 +674,8 @@ public class PlanDao {
 						subjectValuesT.setTaken(true);
 						
 						subjectDao.saveSubject(subject);
-						complementaryValuesDao.saveComplementaryValues(complementaryValues);
-						subjectValuesDao.saveSubjectValue(subjectValuesT);
+						complementaryValueDao.saveComplementaryValues(complementaryValue);
+						subjectValueDao.saveSubjectValue(subjectValuesT);
 						
 						Semester semester = semesters.get(semesterDummyT.getPosition()-1);
 
@@ -795,6 +824,44 @@ public class PlanDao {
 		
 		
 		return subjectD;
+	}
+	
+	public void deleteAllDefaultPlans() {
+		ofy().transact(new VoidWork(){
+			public void vrun() {
+				List<Plan> plans = getAllDefaultPlans();
+				for(Plan plan : plans){
+					deletePlan(plan);
+					CareerDao careerDao = new CareerDao();
+					Career career = plan.getCareer();
+					career.setHasDefault(false);
+					careerDao.saveCareer(career);
+				}
+			}
+		});
+	}
+	
+	private List<Plan> getAllDefaultPlans() {
+		List<Plan> plans = ofy().load().type(Plan.class).filter("isDefault", true).list();
+		return plans;
+	}
+
+	public void deleteDefaultPlan(final String careerCode) {
+		final Plan plan = getPlanDefault(careerCode);
+		if(plan != null){
+			ofy().transact(new VoidWork(){
+
+				@Override
+				public void vrun() {
+					deletePlan(plan);
+					CareerDao careerDao = new CareerDao();
+					Career career = careerDao.getCareerByCode(careerCode);
+					career.setHasDefault(false);
+					careerDao.saveCareer(career);
+				}
+				
+			});
+		}
 	}
 
 }

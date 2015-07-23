@@ -6,7 +6,7 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 import com.uibinder.shared.control.Semester;
-import com.uibinder.shared.control.SubjectValues;
+import com.uibinder.shared.control.SubjectValue;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
@@ -18,11 +18,11 @@ public class SemesterDao {
 	
 	public void saveSemester(Semester s){
 		if(s != null) {
-			List<SubjectValues> subjectValuesList = s.getSubjects();
-			SubjectValuesDao sVDao = new SubjectValuesDao();
+			List<SubjectValue> subjectValuesList = s.getSubjects();
+			SubjectValueDao sVDao = new SubjectValueDao();
 			GroupDao gDao = new GroupDao();
-			ComplementaryValuesDao cVDao = new ComplementaryValuesDao();
-			for(SubjectValues sV : subjectValuesList){
+			ComplementaryValueDao cVDao = new ComplementaryValueDao();
+			for(SubjectValue sV : subjectValuesList){
 				if(sV.getId() == null){
 					if(sV.getGroup() != null){
 						if(sV.getGroup().getId() == null){

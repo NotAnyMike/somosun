@@ -25,7 +25,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.uibinder.client.index.event.GradeChangeEvent;
 import com.uibinder.client.index.presenter.PlanPresenter;
 import com.uibinder.shared.control.Subject;
-import com.uibinder.shared.control.SubjectValues;
+import com.uibinder.shared.control.SubjectValue;
 
 public class SubjectWidget extends FlowPanel implements HasClickHandlers {
 	
@@ -110,7 +110,7 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers {
 	 * TODO: fix the obligatoriness
 	 * @param s
 	 */
-	public SubjectWidget(Subject s, SubjectValues sV, PlanPresenter presenter){
+	public SubjectWidget(Subject s, SubjectValue sV, PlanPresenter presenter){
 		this.setName(s.getName());
 		this.setCode(s.getCode());
 		this.setCredits(s.getCredits());

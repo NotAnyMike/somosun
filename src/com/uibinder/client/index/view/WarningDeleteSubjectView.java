@@ -4,7 +4,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.uibinder.client.index.presenter.PlanPresenter;
 import com.uibinder.client.index.view.SiaSummaryView.Presenter;
 import com.uibinder.shared.control.Subject;
-import com.uibinder.shared.control.SubjectValues;
+import com.uibinder.shared.control.SubjectValue;
 
 public interface WarningDeleteSubjectView {
 	
@@ -15,6 +15,6 @@ public interface WarningDeleteSubjectView {
 	Widget asWidget();
 	void hideIt();
 	void showIt();
-	void setSubject(SubjectValues sV, Subject s);
+	void setSubject(SubjectValue sV, Subject s);
 
 }

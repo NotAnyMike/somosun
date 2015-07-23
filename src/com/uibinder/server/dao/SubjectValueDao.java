@@ -4,17 +4,17 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 import com.uibinder.shared.control.Group;
-import com.uibinder.shared.control.SubjectValues;
+import com.uibinder.shared.control.SubjectValue;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
-public class SubjectValuesDao {
+public class SubjectValueDao {
 	
 	static{
-		ObjectifyService.register(SubjectValues.class);
+		ObjectifyService.register(SubjectValue.class);
 	}
 
-	public void saveSubjectValue(SubjectValues sV){
+	public void saveSubjectValue(SubjectValue sV){
 		
 		if(sV != null){
 
@@ -33,18 +33,18 @@ public class SubjectValuesDao {
 	 * @param g
 	 * @return
 	 */
-	public SubjectValues getSubjectValuesByGroup(Group g){
-		return (SubjectValues) ofy().load().type(SubjectValues.class).filter("group", g).first().now();
+	public SubjectValue getSubjectValuesByGroup(Group g){
+		return (SubjectValue) ofy().load().type(SubjectValue.class).filter("group", g).first().now();
 	}
 
 	public Long generateId() {
 		ObjectifyFactory f = new ObjectifyFactory();
-		Key<SubjectValues> key = f.allocateId(SubjectValues.class);
+		Key<SubjectValue> key = f.allocateId(SubjectValue.class);
 		return key.getId();
 	}
 
-	public void deleteSubjectValues(Long id) {
-		Key<SubjectValues> key = Key.create(SubjectValues.class, id);
+	public void deleteSubjectValue(Long id) {
+		Key<SubjectValue> key = Key.create(SubjectValue.class, id);
 		ofy().delete().key(key).now();
 	}
 }

@@ -13,9 +13,16 @@
 						<div class="panel-heading">Career</div>
 						<div class="panel-body">
 							<b:VerticalButtonGroup>
+								<b:Button type="WARNING">Reset all hasAnalysis</b:Button>
+								<b:InputGroup>
+									<b:ListBox ui:field="careerAnalysisListBox"></b:ListBox>
+									<b:InputGroupButton>									
+										<b:InputButton type="WARNING">hasAnalysis=0</b:InputButton>
+									</b:InputGroupButton>
+								</b:InputGroup>
 								<b:Button type="DANGER">Reset all hasDefault</b:Button>
 								<b:InputGroup>
-									<b:ListBox ui:field="careerListBox"></b:ListBox>
+									<b:ListBox ui:field="careerDefaultListBox"></b:ListBox>
 									<b:InputGroupButton>									
 										<b:InputButton type="WARNING">hasDefault=0</b:InputButton>
 									</b:InputGroupButton>
@@ -46,10 +53,10 @@
 						<div class="panel-heading">Plan</div>
 						<div class="panel-body">
 							<b:VerticalButtonGroup>
-								<b:Button type="DANGER">Delete all default plans</b:Button>
+								<b:Button type="DANGER" ui:field="deleteAllDefaultPlansButton">Delete all default plans</b:Button>
 								<b:InputGroup>
 									<b:InputGroupButton>									
-										<b:InputButton type="WARNING">delete defaul plan for</b:InputButton>
+										<b:InputButton type="WARNING" ui:field="deleteCertainDefaultPlanButton">delete default plan for</b:InputButton>
 									</b:InputGroupButton>
 									<b:ListBox ui:field="planListBox"></b:ListBox>
 								</b:InputGroup>

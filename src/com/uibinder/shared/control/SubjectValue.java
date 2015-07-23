@@ -12,7 +12,7 @@ import com.googlecode.objectify.annotation.Id;
  * @author Mike, of stuff is from Cesar A. Villamizar
  */
 @Entity
-public class SubjectValues implements Serializable {
+public class SubjectValue implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	@Id private Long id = null;
@@ -20,34 +20,34 @@ public class SubjectValues implements Serializable {
 	@Ignore private String subjectValuesPublicId = null;
     private Double grade = null;
     private boolean taken = false;
-    private ComplementaryValues complementaryValues = null;
+    private ComplementaryValue complementaryValue = null;
     
     /**
      * people should try to avoid using this constructor
      */
-    public SubjectValues(){
-    	this.complementaryValues = new ComplementaryValues();
+    public SubjectValue(){
+    	this.complementaryValue = new ComplementaryValue();
     }
 
-    public SubjectValues(Group group, double grade,boolean taken, ComplementaryValues complementaryValues) {
+    public SubjectValue(Group group, double grade,boolean taken, ComplementaryValue complementaryValue) {
         this.group = group;
         this.grade = grade;
         this.taken = taken;
-        this.complementaryValues = complementaryValues;
+        this.complementaryValue = complementaryValue;
     }
     
-    public SubjectValues(double grade,boolean taken, ComplementaryValues complementaryValues) {
+    public SubjectValue(double grade,boolean taken, ComplementaryValue complementaryValue) {
         this.group = group;
         this.grade = grade;
         this.taken = taken;
-        this.complementaryValues = complementaryValues;
+        this.complementaryValue = complementaryValue;
     }
     
-    public SubjectValues(Group group, double grade,boolean taken) {
+    public SubjectValue(Group group, double grade,boolean taken) {
         this.group = group;
         this.grade = grade;
         this.taken = taken;
-        this.complementaryValues = new ComplementaryValues();
+        this.complementaryValue = new ComplementaryValue();
     }
 
 	public Group getGroup() {
@@ -96,12 +96,12 @@ public class SubjectValues implements Serializable {
 		this.subjectValuesPublicId = subjectValuesPublicId;
 	}
 
-	public ComplementaryValues getComplementaryValues() {
-		return complementaryValues;
+	public ComplementaryValue getComplementaryValues() {
+		return complementaryValue;
 	}
 
-	public void setComplementaryValues(ComplementaryValues complementaryValues) {
-		this.complementaryValues = complementaryValues;
+	public void setComplementaryValues(ComplementaryValue complementaryValue) {
+		this.complementaryValue = complementaryValue;
 	}
 
 	public void setId(Long id) {

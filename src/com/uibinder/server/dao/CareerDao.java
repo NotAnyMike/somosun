@@ -15,21 +15,6 @@ public class CareerDao {
 		ObjectifyService.register(Career.class);
 	}
 	
-	/**
-	 * Only when some admin is going to update the careers the second if must be changed to true,
-	 * otherwise it is not going to UPDATE the db.
-	 * 
-	 * @param career
-	 */
-	public void updateCareer(Career career){
-		Career careerFromDB = getCareerByCode(career.getCode());
-		if(careerFromDB == null){
-			saveCareer(career);
-		}else{
-			updateCareerTransaction(careerFromDB, career);
-		}
-	}
-	
 	private void deleteCareer(Career career) {
 		if(career != null)
 		{			
@@ -43,12 +28,11 @@ public class CareerDao {
 	}
 	
 	/**
-	 * This method must be used only by this class, it could create some
-	 * big security problems if some other class uses it
+	 * Will save the career, if the career has Id then this method will update it
 	 * 
 	 * @param career
 	 */
-	private void saveCareer(Career career){
+	public void saveCareer(Career career){
 		if(career != null){
 			ofy().save().entity(career).now();
 		}
@@ -76,15 +60,6 @@ public class CareerDao {
 		}
 		
 		return s;
-	}
-
-	private void updateCareerTransaction(final Career oldCareer, final Career newCareer) {
-		ofy().transact(new VoidWork() {
-			public void vrun(){
-				deleteCareer(oldCareer);
-				saveCareer(newCareer);
-			}
-		});
 	}
 
 }

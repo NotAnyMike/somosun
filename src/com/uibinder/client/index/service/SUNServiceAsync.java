@@ -9,7 +9,7 @@ import com.uibinder.shared.RandomPhrase;
 import com.uibinder.shared.SiaResultGroups;
 import com.uibinder.shared.SiaResultSubjects;
 import com.uibinder.shared.control.Career;
-import com.uibinder.shared.control.ComplementaryValues;
+import com.uibinder.shared.control.ComplementaryValue;
 import com.uibinder.shared.control.Plan;
 import com.uibinder.shared.control.Student;
 import com.uibinder.shared.control.Subject;
@@ -57,11 +57,11 @@ public interface SUNServiceAsync {
 
 	void toTest(AsyncCallback<Void> callback);
 
-	void getComplementaryValuesFromMisPlanes(String career, String code,	AsyncCallback<ComplementaryValues> callback);
+	void getComplementaryValuesFromMisPlanes(String career, String code,	AsyncCallback<ComplementaryValue> callback);
 
 	void getSubjectsFromSia(String nameOrCode, String typology, String career, String sede, int page, Student student, AsyncCallback<SiaResultSubjects> callback);
 
-	void getComplementaryValuesFromMisPlanes(String careerCode,	AsyncCallback<List<ComplementaryValues>> asyncGetComplementaryValuesByCareer);
+	void getComplementaryValuesFromMisPlanes(String careerCode,	AsyncCallback<List<ComplementaryValue>> asyncGetComplementaryValuesByCareer);
 
 	void savePlanAsDefault(Student student, Plan plan,	AsyncCallback<Void> callback);
 
@@ -69,17 +69,17 @@ public interface SUNServiceAsync {
 
 	void analyzeCareer(String careerCode, AsyncCallback<Void> callback);
 
-	void getComplementaryValues(List<String> subjectCodeStrings, List<String> subjectCareerStrings, AsyncCallback<List<ComplementaryValues>> callback);
+	void getComplementaryValues(List<String> subjectCodeStrings, List<String> subjectCareerStrings, AsyncCallback<List<ComplementaryValue>> callback);
 
 	void getSubjectFromSia(String nameOrCode, String typology, String career,String scheduleCP, int page, int ammount, String sede,	Student student, AsyncCallback<SiaResultSubjects> callback);
 
-	void createDefaultSubject(String subjectGroupName, String credits,String careerCode, Student student,AsyncCallback<ComplementaryValues> callback);
+	void createDefaultSubject(String subjectGroupName, String credits,String careerCode, Student student,AsyncCallback<ComplementaryValue> callback);
 
 	void getSubjectGroups(String careerCode, AsyncCallback<List<SubjectGroup>> callback);
 
 	void getCareerToUse(String careerCode, AsyncCallback<Career> callback);
 
-	void getMandatoryComplementaryValues(String careerCode,	AsyncCallback<List<ComplementaryValues>> callback);
+	void getMandatoryComplementaryValues(String careerCode,	AsyncCallback<List<ComplementaryValue>> callback);
 
 	void savePlan(Student student, Plan plan, AsyncCallback<Long> callback);
 
