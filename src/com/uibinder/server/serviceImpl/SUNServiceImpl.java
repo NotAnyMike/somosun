@@ -290,7 +290,6 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 
 	public List<ComplementaryValue> getComplementaryValues(List<String> subjectCodeStrings, List<String> subjectCareerStrings){
 		
-		@SuppressWarnings("unused")
 		CareerDao careerDao = new CareerDao();
 		SubjectDao subjectDao = new SubjectDao();
 		ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();

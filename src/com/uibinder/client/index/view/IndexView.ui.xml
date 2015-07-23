@@ -19,7 +19,7 @@
 						<li style="width: 260px"><g:Anchor href="#create" ui:field="createButton" styleName="{second.buttonCursor}">Mi plan de estudio</g:Anchor></li>
 						<li style="width: 130px"><g:Anchor href="#dnd" ui:field="commingSoonButton" styleName="{second.buttonCursor}">blank...</g:Anchor></li>
 						<li style="width: 260px"><g:Anchor href="#aboutUs" ui:field="aboutUsButton" styleName="{second.buttonCursor}" title="Convocatoria">Sobre #SomosUN</g:Anchor></li>
-						<li style="width: 210px"><g:Anchor href="https://twitter.com/SomosUNal" ui:field="twitterButton" styleName="{second.buttonCursor}" target="_blank">@SomosUNal</g:Anchor></li>
+						<li style="width: 205px"><g:Anchor href="https://twitter.com/SomosUNal" ui:field="twitterButton" styleName="{second.buttonCursor}" target="_blank">@SomosUNal</g:Anchor></li>
 					</ul>
 				</nav>
 			</div>

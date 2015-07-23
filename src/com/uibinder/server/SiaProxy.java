@@ -230,7 +230,12 @@ public class SiaProxy {
 	 * must have at least one non-empty field (page and amount are mandatory), if all parameters are null or
 	 * empty then it will return an empty list.</br></br>
 	 * 
-	 * This method search my code too, in that case, the @param nameOrCode must
+	 * To search all subjects, or at least every subject that is between 6-21h (6am - 9pm) in the 
+	 * week, send @param nameOrCode, @param typology, @param career, @param scheduleCP must be empty, then the 
+	 * code will change @param schedyleCP to L6-21:M6-21:C6-21:J6-21:V6-21:S6-21:D6-21 (i.e. a subject available in any hour in any day)
+	 * </br></br>
+	 * 
+	 * This method search the code too, in that case, the @param nameOrCode must
 	 * be the code.</br></br>
 	 * 
 	 * If the only non-empty @param is the career code, then it will return the
@@ -265,6 +270,10 @@ public class SiaProxy {
 	 * search returned a empty json string
 	 */
 	public static SiaResultSubjects getSubjectsWithFilter(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede, List<String> subjectCodeListToFilter){
+		
+		if(nameOrCode.isEmpty() && typology.isEmpty() && career.isEmpty() && scheduleCP.isEmpty()){
+			scheduleCP = "L6-21:M6-21:C6-21:J6-21:V6-21:S6-21:D6-21";
+		}
 		
 		sede = confirmSede(sede);
 		nameOrCode = SomosUNUtils.removeAccents(nameOrCode).replaceAll("  ", " ");

@@ -174,7 +174,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	}
 	
 	private void generateEmptyPlan(String careerCode) {
-		showLoadingPage("Creando un plan vac??o ... ");
+		showLoadingPage("Creando un plan vacío ... ");
 		/**
 		 * use the rpcService.createEmptyPlan(careerCode);
 		 */
