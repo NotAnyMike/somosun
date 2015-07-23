@@ -1,14 +1,13 @@
 package com.uibinder.server.dao;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
-import com.uibinder.shared.SomosUNUtils;
+import com.googlecode.objectify.VoidWork;
 import com.uibinder.shared.control.Career;
-import com.uibinder.shared.control.ComplementaryValue;
-import com.uibinder.shared.control.Subject;
 import com.uibinder.shared.control.SubjectGroup;
 import com.uibinder.shared.values.SubjectGroupCodes;
 import com.uibinder.shared.values.TypologyCodes;
@@ -17,6 +16,8 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
 
 public class SubjectGroupDao extends Dao {
 
+	private static final Logger log = Logger.getLogger("SubjectGroupDao");
+	
 	static{
 		ObjectifyService.register(SubjectGroup.class);
 	}
@@ -46,10 +47,15 @@ public class SubjectGroupDao extends Dao {
 		SubjectGroup toDelete = getSubjectGroup(name, isFundamental, careerCode);
 		if(toDelete != null)
 		{
-			ofy().delete().entity(toDelete).now();
+			deleteSubjectGroup(toDelete.getId());
 		}
 	}
 	
+	private void deleteSubjectGroup(Long id) {
+		Key<SubjectGroup> key = Key.create(SubjectGroup.class, id);
+		ofy().delete().key(key).now();
+	}
+
 	/**
 	 * Will create a unique key if the entity X has an embedded entity Y which has an empty id, this will not allow to save the X entity,
 	 * then use this method in order to set the Y's id.
@@ -130,5 +136,17 @@ public class SubjectGroupDao extends Dao {
 		}
 		
 		return subjectGroup;
+	}
+
+	public void deleteAllSubjectGroups() {
+		final List<SubjectGroup> list = getAllSubjectGroups();
+		for(SubjectGroup sG : list){
+			deleteSubjectGroup(sG.getId());
+		}
+		log.warning("All subjectGroup deleted");
+	}
+
+	private List<SubjectGroup> getAllSubjectGroups() {
+		return ofy().load().type(SubjectGroup.class).list();
 	}
 }

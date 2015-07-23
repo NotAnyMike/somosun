@@ -1,10 +1,12 @@
 package com.uibinder.server.dao;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
+import com.googlecode.objectify.VoidWork;
 import com.uibinder.shared.SomosUNUtils;
 import com.uibinder.shared.control.Career;
 import com.uibinder.shared.control.ComplementaryValue;
@@ -15,6 +17,8 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
 
 public class ComplementaryValueDao extends Dao {
 
+	private static final Logger log = Logger.getLogger("ComplementaryValueDao");
+	
 	static{
 		ObjectifyService.register(ComplementaryValue.class);
 	}
@@ -130,9 +134,37 @@ public class ComplementaryValueDao extends Dao {
 		return list;
 	}
 
-	public void deleteComplementaryValues(Long id) {
+	public void deleteComplementaryValue(Long id) {
 		Key<ComplementaryValue> key = Key.create(ComplementaryValue.class, id);
-		ofy().delete().key(key);//.now();
+		ofy().delete().key(key).now();
+	}
+
+	public void deleteAllComplementeryValues() {
+		List<ComplementaryValue> list = getAllComplementaryValues();
+		for(ComplementaryValue cV : list){
+			deleteComplementaryValue(cV.getId());
+		}
+		log.warning("All complementaryValues deleted");
+	}
+
+	private List<ComplementaryValue> getAllComplementaryValues() {
+		return ofy().load().type(ComplementaryValue.class).list();
+	}
+
+	public void deleteCertainComplementeryValues(final String careerCode) {
+		final List<ComplementaryValue> list = getComplementaryValuesForCareer(careerCode);
+		ofy().transact(new VoidWork(){
+			public void vrun() {
+				for(ComplementaryValue cV : list){
+					deleteComplementaryValue(cV.getId());
+				}
+				log.warning("All complementaryValues for " + careerCode + " were deleted");
+			}
+		});
+	}
+
+	private List<ComplementaryValue> getComplementaryValuesForCareer(String careerCode) {
+		return ofy().load().type(ComplementaryValue.class).filter("career.code", careerCode).list();
 	}
 
 	

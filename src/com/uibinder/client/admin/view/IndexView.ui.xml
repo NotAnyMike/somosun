@@ -13,34 +13,34 @@
 						<div class="panel-heading">Career</div>
 						<div class="panel-body">
 							<b:VerticalButtonGroup>
-								<b:Button type="WARNING">Reset all hasAnalysis</b:Button>
+								<b:Button type="WARNING" ui:field="resetAllHasAnalysisButton" g:id="goas">Reset all hasAnalysis</b:Button>
 								<b:InputGroup>
 									<b:ListBox ui:field="careerAnalysisListBox"></b:ListBox>
 									<b:InputGroupButton>									
-										<b:InputButton type="WARNING">hasAnalysis=0</b:InputButton>
+										<b:InputButton type="WARNING" ui:field="resetCertainHasAnalysisButton">hasAnalysis=0</b:InputButton>
 									</b:InputGroupButton>
 								</b:InputGroup>
-								<b:Button type="DANGER">Reset all hasDefault</b:Button>
+								<b:Button type="DANGER" ui:field="resetAllHasDefaultButton" enabled="true">Reset all hasDefault</b:Button>
 								<b:InputGroup>
 									<b:ListBox ui:field="careerDefaultListBox"></b:ListBox>
 									<b:InputGroupButton>									
-										<b:InputButton type="WARNING">hasDefault=0</b:InputButton>
+										<b:InputButton type="WARNING" ui:field="resetCertainHasDefaultButton" enabled="true">hasDefault=0</b:InputButton>
 									</b:InputGroupButton>
 								</b:InputGroup>
-								<b:Button type="DEFAULT">Reset (update) careers</b:Button>
+								<b:Button type="DEFAULT" ui:field="resetUpdateCareersButton">Reset (update) careers</b:Button>
 							</b:VerticalButtonGroup>
 						</div>
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-4 col-lg-3">
 					<div class="panel panel-default">
-						<div class="panel-heading">ComplementaryValues</div>
+						<div class="panel-heading">ComplementaryValue</div>
 						<div class="panel-body">
 							<b:VerticalButtonGroup>
-								<b:Button type="DANGER">Delete all</b:Button>
+								<b:Button type="DANGER" ui:field="deleteAllComplementaryValuesButton" enabled="true">- Delete ALL -</b:Button>
 								<b:InputGroup>
 									<b:InputGroupButton>									
-										<b:InputButton type="WARNING">delte for:</b:InputButton>
+										<b:InputButton type="WARNING" ui:field="deleteCertainComplementaryValuesButton" enabled="true">delete for:</b:InputButton>
 									</b:InputGroupButton>
 									<b:ListBox ui:field="complementaryValuesListBox"></b:ListBox>
 								</b:InputGroup>
@@ -53,13 +53,14 @@
 						<div class="panel-heading">Plan</div>
 						<div class="panel-body">
 							<b:VerticalButtonGroup>
-								<b:Button type="DANGER" ui:field="deleteAllDefaultPlansButton">Delete all default plans</b:Button>
+								<b:Button type="DANGER" ui:field="deleteAllDefaultPlansButton">- Delete ALL default plans -</b:Button>
 								<b:InputGroup>
 									<b:InputGroupButton>									
 										<b:InputButton type="WARNING" ui:field="deleteCertainDefaultPlanButton">delete default plan for</b:InputButton>
 									</b:InputGroupButton>
 									<b:ListBox ui:field="planListBox"></b:ListBox>
 								</b:InputGroup>
+								<b:Button type="DANGER" ui:field="deleteAllPlansButton">- Delete ALL plans -</b:Button>
 							</b:VerticalButtonGroup>
 						</div>
 					</div>
@@ -70,7 +71,7 @@
 						<div class="panel-heading">Semester</div>
 						<div class="panel-body">
 							<b:VerticalButtonGroup>
-								<b:Button type="DEFAULT">Change current semester</b:Button>
+								<b:Button type="DEFAULT" enabled="false">Change current semester</b:Button>
 							</b:VerticalButtonGroup>
 						</div>
 					</div>
@@ -81,17 +82,12 @@
 						<div class="panel-heading">Subject</div>
 						<div class="panel-body">
 							<b:VerticalButtonGroup>
+								<b:Button type="DANGER" ui:field="deleteAllSubjectsButton" enabled="true"> - Delete ALL subjects -</b:Button>
 								<b:InputGroup>
 									<b:TextBox></b:TextBox>
 									<b:InputGroupButton>
-										<b:InputButton>Edit</b:InputButton>
+										<b:InputButton type="DEFAULT" enabled="false">Edit</b:InputButton>
 									</b:InputGroupButton>
-								</b:InputGroup>
-								<b:InputGroup>
-									<b:InputGroupButton>									
-										<b:InputButton type="WARNING">Delete all for</b:InputButton>
-									</b:InputGroupButton>
-									<b:ListBox ui:field="subjectListBox"></b:ListBox>
 								</b:InputGroup>
 							</b:VerticalButtonGroup>
 						</div>
@@ -102,10 +98,10 @@
 						<div class="panel-heading">SubjectGroup</div>
 						<div class="panel-body">
 							<b:VerticalButtonGroup>
-								<b:Button type="DANGER">Delete ALL</b:Button>
+								<b:Button type="DANGER" ui:field="deleteAllSubjectGroupsButton" enabled="true"> - Delete ALL subjectGroups -</b:Button>
 								<b:InputGroup>
 									<b:InputGroupButton>									
-										<b:InputButton type="WARNING">Delete all for</b:InputButton>
+										<b:InputButton type="WARNING" enabled="false">Delete all for</b:InputButton>
 									</b:InputGroupButton>
 									<b:ListBox ui:field="subjectGroupListBox"></b:ListBox>
 								</b:InputGroup>
@@ -118,7 +114,7 @@
 						<div class="panel-heading">Errors</div>
 						<div class="panel-body">
 							<b:VerticalButtonGroup>
-								<b:Button type="DEFAULT">Clean all</b:Button>
+								<b:Button type="DEFAULT" enabled="false">Clean all</b:Button>
 							</b:VerticalButtonGroup>
 						</div>
 					</div>

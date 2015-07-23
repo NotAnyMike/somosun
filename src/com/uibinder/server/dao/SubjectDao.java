@@ -1,16 +1,20 @@
 package com.uibinder.server.dao;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
+import com.googlecode.objectify.VoidWork;
 import com.uibinder.shared.SomosUNUtils;
 import com.uibinder.shared.control.Subject;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
 public class SubjectDao extends Dao {
+	
+	private static final Logger log = Logger.getLogger("SubjectDao");
 	
 	static {
 		ObjectifyService.register(Subject.class);
@@ -102,10 +106,6 @@ public class SubjectDao extends Dao {
 		return subjectToReturn;
 	}
 	
-	public List<Subject> getSubjectsByCareer(String career){
-		return null;
-	}
-	
 	public void deleteSubject(Long id){
 		Key<Subject> key = Key.create(Subject.class, id);
 		ofy().delete().key(key).now();
@@ -141,6 +141,18 @@ public class SubjectDao extends Dao {
 
 	public Subject getDummySubjectByCode(String code) {
 		return ofy().load().type(Subject.class).filter("isDummy", true).filter("code", code).first().now();
+	}
+
+	public void deleteAllSubjects() {
+		final List<Subject> list = getAllSubjects();
+		for(Subject s : list){
+			deleteSubject(s.getId());
+		}
+		log.warning("All subjects deleted");
+	}
+
+	private List<Subject> getAllSubjects() {
+		return ofy().load().type(Subject.class).list();
 	}
 
 }

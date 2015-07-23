@@ -301,27 +301,31 @@ public class PlanDao {
 			SemesterDao semesterDao = new SemesterDao();
 			SubjectValueDao subjectValueDao = new SubjectValueDao();
 			List<Semester> semesters = plan.getSemesters();
-			for(Semester semester : semesters){
-				List<SubjectValue> subjectValues = semester.getSubjects();
-				for(SubjectValue subjectValue : subjectValues){
-					ComplementaryValue complementaryValue = subjectValue.getComplementaryValues();
-					
-					Subject subject = complementaryValue.getSubject();
-					if(subject.isDefault() == true){
+			if(semesters != null){
+				for(Semester semester : semesters){
+					List<SubjectValue> subjectValues = semester.getSubjects();
+					for(SubjectValue subjectValue : subjectValues){
+						ComplementaryValue complementaryValue = subjectValue.getComplementaryValues();
 						
-						//delete all the Default Subjects
-						subjectDao.deleteSubject(subject.getId());
-						if(subject.getId() == null) {
-							log.severe("Subject id:" + subject.getCode() + " name: " + subject.getName() + " has no id");
+						if(complementaryValue != null){						
+							Subject subject = complementaryValue.getSubject();
+							if(subject != null && subject.isDefault() == true){
+								
+								//delete all the Default Subjects
+								subjectDao.deleteSubject(subject.getId());
+								if(subject.getId() == null) {
+									log.severe("Subject id:" + subject.getCode() + " name: " + subject.getName() + " has no id");
+								}
+								//delete all the complementaryValues
+								complementaryValueDao.deleteComplementaryValue(complementaryValue.getId());
+							}
+							//Delete subjectValue
+							subjectValueDao.deleteSubjectValue(subjectValue.getId());
 						}
-						//delete all the complementaryValues
-						complementaryValueDao.deleteComplementaryValues(complementaryValue.getId());
 					}
-					//Delete subjectValue
-					subjectValueDao.deleteSubjectValue(subjectValue.getId());
+					//delete all the semesters
+					semesterDao.deleteSemester(semester.getId());
 				}
-				//delete all the semesters
-				semesterDao.deleteSemester(semester.getId());
 			}
 			//Delete the plan
 			deletePlan(plan.getId());
@@ -837,6 +841,7 @@ public class PlanDao {
 					career.setHasDefault(false);
 					careerDao.saveCareer(career);
 				}
+				log.warning("All default plans were delted");
 			}
 		});
 	}
@@ -849,19 +854,23 @@ public class PlanDao {
 	public void deleteDefaultPlan(final String careerCode) {
 		final Plan plan = getPlanDefault(careerCode);
 		if(plan != null){
-			ofy().transact(new VoidWork(){
-
-				@Override
-				public void vrun() {
-					deletePlan(plan);
-					CareerDao careerDao = new CareerDao();
-					Career career = careerDao.getCareerByCode(careerCode);
-					career.setHasDefault(false);
-					careerDao.saveCareer(career);
-				}
-				
-			});
+			deletePlan(plan);
+			CareerDao careerDao = new CareerDao();
+			Career career = careerDao.getCareerByCode(careerCode);
+			career.setHasDefault(false);
+			careerDao.saveCareer(career);
 		}
 	}
 
+	public void deleteAllPlans() {
+		final List<Plan> plans = getAllPlans();
+		for(Plan plan : plans){
+			deletePlan(plan);
+		}
+		log.warning("All plans where deleted");
+	}
+
+	private List<Plan> getAllPlans() {
+		return ofy().load().type(Plan.class).list();
+	}
 }

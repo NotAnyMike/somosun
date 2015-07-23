@@ -62,4 +62,32 @@ public class CareerDao {
 		return s;
 	}
 
+	public void resetAllHasAnalysis() {
+		List<Career> careers = getCareersBySede("bog");
+		for(Career career : careers){
+			career.setHasAnalysis(false);
+			saveCareer(career);
+		}
+	}
+
+	public void resetCertainHasAnalysis(String careerCode) {
+		Career career = getCareerByCode(careerCode);
+		career.setHasAnalysis(false);
+		saveCareer(career);
+	}
+
+	public void resetAllHasDefault() {
+		List<Career> careers = getCareersBySede("bog");
+		for(Career career : careers){
+			career.setHasDefault(false);
+			saveCareer(career);
+		}
+	}
+
+	public void resetHasDefaultForCareer(String careerCode) {
+		Career career = getCareerByCode(careerCode);
+		career.setHasDefault(false);
+		saveCareer(career);
+	}
+
 }
