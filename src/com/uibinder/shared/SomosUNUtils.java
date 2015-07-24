@@ -55,7 +55,7 @@ public class SomosUNUtils {
 			stringToReturn = s.trim();
 			stringToReturn = stringToReturn.toLowerCase()
 					.replaceAll("&nbsp;", "")
-					.replaceAll(" ", "") //this space is different fromt he below one, this is un html (the above one) DO NOT DELETE!
+					.replaceAll(" ", "") //this space is different from the below one, this is un html (the above one) DO NOT DELETE!
 					.replaceAll(" ", "");
 			stringToReturn = removeAccents(stringToReturn);
 			stringToReturn

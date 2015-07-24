@@ -825,8 +825,6 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 	 */
 	@Override
 	public Career getCareerToUse(String careerCode) {
-
-		log.info("hola ... SUNServiceImpl");
 		
 		Career c = null;
 		CareerDao careerDao = new CareerDao();

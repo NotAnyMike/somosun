@@ -1007,8 +1007,9 @@ public class SiaProxy {
 		
 		try {
 			htmlPlanURL = getUrlSource(SIA_COMPLEMENTARY_VALUES_AND_PLAN_BOG + careerCode);
-		} catch (IOException e) {
+		} catch (Exception e){
 			e.printStackTrace();
+			log.severe("Error getting the info for analyse the career " + careerCode);
 		}
 		if(htmlPlanURL != null)
 		{
@@ -1024,10 +1025,14 @@ public class SiaProxy {
 				htmlPlan = getUrlSource(planURL);
 			} catch (IOException e) {
 				e.printStackTrace();
+			} catch (Exception e){
+				e.printStackTrace();
 			}
 			try {
 				htmlRequisites = getUrlSource(requisiteURL);
 			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (Exception e){
 				e.printStackTrace();
 			}
 			
@@ -1048,7 +1053,7 @@ public class SiaProxy {
 				
 				//Deleting unnecessary tables
 				for(Element e : tablesFalse){
-					if(e.toString().toLowerCase().contains("agrupaci")==true && e.toString().toLowerCase().contains("obligatorios") && e.toString().toLowerCase().contains("optativos")==true){
+					if(e.toString().toLowerCase().contains("agrupaci")==true && e.toString().toLowerCase().contains("obligatori") && e.toString().toLowerCase().contains("optativ")==true){
 						tablesTrue.add(e);
 					}
 				}
@@ -1179,10 +1184,11 @@ public class SiaProxy {
 					int x = 0;
 					SubjectGroupDummy sGFromPlan = null;
 					//partialText = partialText.replaceAll("s", "").replaceAll("-","").replaceAll("/", "");
-					partialText = standardizeString(partialText, true);
+					partialText = SomosUNUtils.standardizeString(partialText, true);
+					
 					//To get the closest subjectGroup for this table (e)
 					for(SubjectGroupDummy sGDTemporary : subjectGroups1){
-						String toSearch = standardizeString(sGDTemporary.getName(), true);//.toLowerCase().replaceAll(" ", "");
+						String toSearch = SomosUNUtils.standardizeString(sGDTemporary.getName(), true);//.toLowerCase().replaceAll(" ", "");
 						//Deleting characters that maybe were removed by a human mistake in the other page
 						toSearch = toSearch.replaceAll("s", "").replaceAll("-", "").replaceAll("/","");
 						int position = partialText.toLowerCase().lastIndexOf(toSearch);
@@ -1193,19 +1199,20 @@ public class SiaProxy {
 					}
 					
 					//TODO implement these
+					@SuppressWarnings("unused")
 					int mandatoryCredits = 0;
 					int optativeCredits = 0;
 
 					if(sGFromPlan != null){
 						SubjectGroupDummy sGD = new SubjectGroupDummy(sGFromPlan.getName(), 0, 0, isFundamental, e);
-						String name1Temporary  = standardizeString(sGD.getName(), false);
+						String name1Temporary  = SomosUNUtils.standardizeString(sGD.getName(), false);
 						boolean isInList = false;
 						
 						//This is to make sure that if a subjectGroup with the same name, not to add it again
 						// see Odontología with Agrupación Indagación e Investigación, at the end there are two tables for the same subjectGroup
 						for(SubjectGroupDummy sGDTemporary : subjectGroups2)
 						{
-							String name2Temporary  = standardizeString(sGDTemporary.getName(), false);
+							String name2Temporary  = SomosUNUtils.standardizeString(sGDTemporary.getName(), false);
 							if(name1Temporary.equals(name2Temporary)) {
 								isInList = true;
 								break;
@@ -1255,7 +1262,7 @@ public class SiaProxy {
 						for(int row3 = titleRows; row3 < table.length; row3 ++){
 							String tableColspan = table[row3][col3].attr("colspan");
 							if((tableColspan.equals("")== true && minColspan.equals("0")) || (tableColspan.equals(minColspan) == true )){
-								String textToTest = standardizeString(table[row3][col3].text(), false);
+								String textToTest = SomosUNUtils.standardizeString(table[row3][col3].text(), false);
 								if(textToTest.equals("") == false){
 									empty = false;
 									 
@@ -1307,7 +1314,7 @@ public class SiaProxy {
 						for(int row = 0; row < titleRows; row ++){
 							textOfColumnTitle = textOfColumnTitle + table[row][col].text();
 						}
-						textOfColumnTitle = standardizeString(textOfColumnTitle, false);
+						textOfColumnTitle = SomosUNUtils.standardizeString(textOfColumnTitle, false);
 						
 						if(textOfColumnTitle.contains("nombre") == true || textOfColumnTitle.contains("asignatura") == true)
 							if(subjectName == -1){
@@ -1327,7 +1334,7 @@ public class SiaProxy {
 						for(int row = 0; row < titleRows; row ++){
 							textOfColumnTitle = textOfColumnTitle + table[row][col].text();
 						}
-						textOfColumnTitle = standardizeString(textOfColumnTitle, false);
+						textOfColumnTitle = SomosUNUtils.standardizeString(textOfColumnTitle, false);
 						
 						if(textOfColumnTitle.contains("credito") == true){
 							if(subjectCredits == -1)
@@ -1353,7 +1360,7 @@ public class SiaProxy {
 						for(int row = 0; row < titleRows; row ++){
 							textOfColumnTitle = textOfColumnTitle + table[row][col].text();
 						}
-						textOfColumnTitle = standardizeString(textOfColumnTitle, false);
+						textOfColumnTitle = SomosUNUtils.standardizeString(textOfColumnTitle, false);
 						
 						if(textOfColumnTitle.contains("requisito"))
 							if(requisiteSubjectType == -1){
@@ -1370,7 +1377,7 @@ public class SiaProxy {
 						for(int row = 0; row < titleRows; row ++){
 							textOfColumnTitle = textOfColumnTitle + table[row][col].text();
 						}
-						textOfColumnTitle = standardizeString(textOfColumnTitle, false);
+						textOfColumnTitle = SomosUNUtils.standardizeString(textOfColumnTitle, false);
 						
 						if(textOfColumnTitle.contains("obligatoria"))
 						{	
@@ -1405,13 +1412,13 @@ public class SiaProxy {
 										hasCode = true;
 								}
 								boolean isTheRowATitleName = false;
-								String name2 = standardizeString(cols[subjectName].text(), false);
-								String nameTitle = standardizeString(table[0][subjectName].text(), false);
+								String name2 = SomosUNUtils.standardizeString(cols[subjectName].text(), false);
+								String nameTitle = SomosUNUtils.standardizeString(table[0][subjectName].text(), false);
 								if(name2.equals(nameTitle)) isTheRowATitleName = true;
 								boolean isTheRowATitleCode = false;
 								if(subjectCode != -1){
-									String code2 = standardizeString(cols[subjectCode].text(), false);
-									String codeTitle = standardizeString(table[0][subjectCode].text(), false);
+									String code2 = SomosUNUtils.standardizeString(cols[subjectCode].text(), false);
+									String codeTitle = SomosUNUtils.standardizeString(table[0][subjectCode].text(), false);
 									if(code2.equals(codeTitle)) isTheRowATitleCode = true;
 								}
 								if((name2.equals("") == false || hasCode) && (isTheRowATitleCode==false && isTheRowATitleName == false)){
@@ -1461,7 +1468,7 @@ public class SiaProxy {
 									for(int row2 = 0; row2 < rowspanInt; row2++){
 										if(requisiteSubjectType != -1){		
 											Element[] cols2 = table[row+row2];
-											String type = standardizeString(cols2[requisiteSubjectType].text(), false);
+											String type = SomosUNUtils.standardizeString(cols2[requisiteSubjectType].text(), false);
 											if(requisiteSubjectName != -1){
 												if(type.contains("prerrequisit")){
 													if(requisiteSubjectCode != -1){
@@ -1624,11 +1631,11 @@ public class SiaProxy {
 			
 			int credits = sD.getCredits();
 			String name = sD.getName();
-			String nameStandardized = standardizeString(name, false);
+			String nameStandardized = SomosUNUtils.standardizeString(name, false);
 			String code = sD.getCode();   
-			String codeStandardize = (code == null ? "" : standardizeString(code, false)); //to avoid NullPointerException due to an empty string
+			String codeStandardize = (code == null ? "" : SomosUNUtils.standardizeString(code, false)); //to avoid NullPointerException due to an empty string
 			String siaCode = null;
-			String siaCodeStandardize = (siaCode == null ? "" : standardizeString(siaCode, false)); //to avoid NullPointerException due to an empty string
+			String siaCodeStandardize = (siaCode == null ? "" : SomosUNUtils.standardizeString(siaCode, false)); //to avoid NullPointerException due to an empty string
 			String location = sede;
 			
 			sFromSia = getSubjectFromList(sD, (sD.getSubjectGroupDummy().isFundamental() == true ? siaResultFundamental.getSubjectList() : siaResultProfessional.getSubjectList()));
@@ -1646,8 +1653,8 @@ public class SiaProxy {
 		    if(sFromDb != null)
 			{
 		    	
-		    	codeStandardize = (code == null ? "" : standardizeString(code, false));
-		    	siaCodeStandardize = (siaCode == null ? "" : standardizeString(siaCode, false));
+		    	codeStandardize = (code == null ? "" : SomosUNUtils.standardizeString(code, false));
+		    	siaCodeStandardize = (siaCode == null ? "" : SomosUNUtils.standardizeString(siaCode, false));
 				//Comparar para ver si hay alguno más reciente y agregar el más reciente a la lista
 		    	if((credits != 0 && credits != sFromDb.getCredits()) ||
 		    			(codeStandardize != "" && codeStandardize.equals(sFromDb.getCode())==false) ||
@@ -1911,7 +1918,7 @@ public class SiaProxy {
 	private static Subject getSubjectFromList(SubjectDummy sD, List<Subject> list, boolean removeS) {
 		
 		Subject sToReturn = null;
-		String nameStandardized = (sD.getName() == null ? "" : standardizeString(sD.getName(), removeS));
+		String nameStandardized = (sD.getName() == null ? "" : SomosUNUtils.standardizeString(sD.getName(), removeS));
 		
 		//choose one subject from the list in siaResult
 		if(list != null)
@@ -1924,7 +1931,7 @@ public class SiaProxy {
 
 				for(Subject sFromSiaTemporary : list)
 				{
-					String nameFromSiaStandardized = standardizeString(sFromSiaTemporary.getName(), removeS);
+					String nameFromSiaStandardized = SomosUNUtils.standardizeString(sFromSiaTemporary.getName(), removeS);
 					String nameWithOut = nameFromSiaStandardized.replace(nameStandardized, "");
 					
 					if(charactersLeft > nameWithOut.length() == true){
@@ -1960,11 +1967,11 @@ public class SiaProxy {
 			SubjectGroup sGFinal = null;
 			
 			boolean isInDb = false;
-			String name = standardizeString(sGD.getName(), false);
+			String name = SomosUNUtils.standardizeString(sGD.getName(), false);
 			SubjectGroup sG = new SubjectGroup( sGD.getName(), career, sGD.isFundamental(), sGD.getObligatoryCredits(), sGD.getOptativeCredits(), sGD.getError());
 			
 			for(SubjectGroup sGDb : sGFromDB){
-				String nameDb = standardizeString(sGDb.getName(), false);
+				String nameDb = SomosUNUtils.standardizeString(sGDb.getName(), false);
 				if(nameDb.equals(name)){
 					if((sGD.isFundamental() != null && sGD.isFundamental().equals(sGDb.isFundamental()) == false) || 
 							((sGD.getObligatoryCredits() != 0 || sGD.getOptativeCredits() != 0) && sGD.getObligatoryCredits() != sGDb.getObligatoryCredits()) || //The first double parentesis is for the subjectGroup with 0 credits either in optative or obligatory credits  
@@ -2025,7 +2032,7 @@ public class SiaProxy {
 		List<SubjectGroupDummy> subjectGroups = new ArrayList<SubjectGroupDummy>();
 		
 		for(SubjectGroupDummy sG1 : subjectGroups1){
-			String name1 = standardizeString(sG1.getName(), false);
+			String name1 = SomosUNUtils.standardizeString(sG1.getName(), false);
 			int obligatoryCredits = sG1.getObligatoryCredits();
 			int optativeCredits = sG1.getOptativeCredits();
 			Boolean fundamental = sG1.isFundamental();
@@ -2035,7 +2042,7 @@ public class SiaProxy {
 			
 			for(int x = 0; x < subjectGroups2.size(); x++){
 				SubjectGroupDummy sG2 = subjectGroups2.get(x);
-				String name2 = standardizeString(sG2.getName(), false);
+				String name2 = SomosUNUtils.standardizeString(sG2.getName(), false);
 				
 				if(name1.equals(name2) == true){
 					
@@ -2177,23 +2184,23 @@ public class SiaProxy {
 	 * @param s
 	 * @return
 	 */
-	private static String standardizeString(String s, boolean removeS){
-		String stringToReturn = s.trim();
-		stringToReturn = stringToReturn.toLowerCase()
-				.replaceAll("&nbsp;", "")
-				.replaceAll(" ", "") //this space is different fromt he below one, this is un html (the above one) DO NOT DELETE!
-				.replaceAll(" ", "")
-				.replaceAll("á", "a")
-				.replaceAll("é", "e")
-				.replaceAll("í", "i")
-				.replaceAll("ó", "o")
-				.replaceAll("ú", "u")
-				.replaceAll("-", "")
-				.replaceAll("/", "");
-		if(removeS == true) stringToReturn = stringToReturn.replaceAll("s", "");
-		
-		return stringToReturn;
-	}
+//	private static String standardizeString(String s, boolean removeS){
+//		String stringToReturn = s.trim();
+//		stringToReturn = stringToReturn.toLowerCase()
+//				.replaceAll("&nbsp;", "")
+//				.replaceAll(" ", "") //this space is different fromt he below one, this is un html (the above one) DO NOT DELETE!
+//				.replaceAll(" ", "")
+//				.replaceAll("á", "a")
+//				.replaceAll("é", "e")
+//				.replaceAll("í", "i")
+//				.replaceAll("ó", "o")
+//				.replaceAll("ú", "u")
+//				.replaceAll("-", "")
+//				.replaceAll("/", "");
+//		if(removeS == true) stringToReturn = stringToReturn.replaceAll("s", "");
+//		
+//		return stringToReturn;
+//	}
 
 	private static void addRequisitesToBothLists(ComplementaryValue cV, Subject s, List<SubjectDummy> listSD, List<Subject> subjectListFinal, SubjectDao subjectDao, Map<Subject, ComplementaryValue> mapSCV, boolean isPre, ComplementaryValueDao complementaryValueDao, SubjectGroupDao subjectGroupDao)
 	{
@@ -2205,15 +2212,15 @@ public class SiaProxy {
 			 *  2. add it to the list of PreRequisites and PreRequisitesOF
 			 */
 			
-			String stringStandardized = (sD.getName() == null ? "" : standardizeString(sD.getName(), false)); //could be the name or the code
+			String stringStandardized = (sD.getName() == null ? "" : SomosUNUtils.standardizeString(sD.getName(), false)); //could be the name or the code
 			Subject subjectFinalT = null;
 			
 			boolean isSpecial = false;
 			int charactersLeft = 3; //to make sure that at least the subject selected by name will be 3 chrts far from the original				
 			
 			for(Subject sTemporary : subjectListFinal){
-				String nameStandardizedT = (sTemporary.getName() == null ? "" : standardizeString(sTemporary.getName(), false));
-				String codeStandardizedT = (sTemporary.getCode() == null ? "" : standardizeString(sTemporary.getCode(), false));
+				String nameStandardizedT = (sTemporary.getName() == null ? "" : SomosUNUtils.standardizeString(sTemporary.getName(), false));
+				String codeStandardizedT = (sTemporary.getCode() == null ? "" : SomosUNUtils.standardizeString(sTemporary.getCode(), false));
 				
 				if(stringStandardized.equals(codeStandardizedT))
 				{

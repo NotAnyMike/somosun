@@ -377,7 +377,8 @@ public class PlanDao {
 			String semesterLinePattern = "  \\d{2}\tperiodo academico . \\d+-i+.+";
 			//String approvedLinePattern = "(no )*aprobado";
 			//String subjectLinePattern = "(\\d+)-(\\d+)\\t(.+)\\t(\\d+)\\t(\\d+)\\t(\\d+)\\t([a-z]+)\\t(\\d+)\\t(\\d+)\\t{2}\\d+\\p{Punct}\\d+.*";
-			String subjectLinePattern = "(\\d+)-(\\d+)\\t(.+)\\t(\\d+)\\t(\\d+)\\t(\\d+)\\t([a-z]+)\\t(\\d+)\\t(\\d+)\\t(\\t\\d+\\p{Punct}\\d+)|(.+\\t((ap)|(na))).*";
+			//String subjectLinePattern = "(\\d+)-(\\d+)\\t(.+)\\t(\\d+)\\t(\\d+)\\t(\\d+)\\t([a-z]+)\\t(\\d+)\\t(\\d+)\\t(\\t\\d+\\p{Punct}\\d+)|(.+\\t((ap)|(na))).*";
+			String subjectLinePattern = "(\\d+)-(\\d+)(.){0,3}\\t(.+)\\t(\\d+)\\t(\\d+)\\t(\\d+)\\t([a-z]+)\\t(\\d+)\\t(\\d+)\\t(\\t\\d+\\p{Punct}\\d+)|(.+\\t((ap)|(na))).*"; // the (.){0,3} in the case of groups as 33c in the case of felipe
 			
 			String careerCode = null;
 			SemesterDummy semesterD = null;
@@ -811,7 +812,11 @@ public class PlanDao {
 		
 		subjectD = new SubjectDummy();
 		subjectD.setCode(codeString);
-		subjectD.setGroup(Integer.valueOf(groupString));
+		int groupInt = 0;
+		if(groupString.matches("(\\d+)")==true){
+			groupInt = Integer.valueOf(groupString);
+		}
+		subjectD.setGroup(groupInt);
 		subjectD.setName(nameString);
 		subjectD.setTypology(typoString);
 		subjectD.setCredits(Integer.valueOf(creditsString));
