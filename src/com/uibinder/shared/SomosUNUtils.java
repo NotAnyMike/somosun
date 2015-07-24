@@ -35,7 +35,9 @@ public class SomosUNUtils {
 		return toReturn;
 	}
 	
-	/** This function will delete: <br>
+	/** 
+	 * This function will delete: <br>
+	 * - WHITE SPACES!!!!<br>
 	 * - "´" accents (e.g "é"->"e") <br>
 	 * - "-" -> ""<br>
 	 * - " " -> ""<br>
@@ -43,22 +45,24 @@ public class SomosUNUtils {
 	 * - "/" -> ""<br>
 	 * will NOT delete:<br>
 	 * - "ñ"<br>
-	 * - other accents "`", etc.<br>
 	 * 
 	 * @param s
 	 * @return
 	 */
 	public static String standardizeString(String s, boolean removeS){
-		String stringToReturn = s.trim();
-		stringToReturn = stringToReturn.toLowerCase()
-				.replaceAll("&nbsp;", "")
-				.replaceAll(" ", "") //this space is different fromt he below one, this is un html (the above one) DO NOT DELETE!
-				.replaceAll(" ", "");
-		stringToReturn = removeAccents(stringToReturn);
-		stringToReturn
-				.replaceAll("-", "")
-				.replaceAll("/", "");
-		if(removeS == true) stringToReturn = stringToReturn.replaceAll("s", "");
+		String stringToReturn = null;
+		if(s != null){
+			stringToReturn = s.trim();
+			stringToReturn = stringToReturn.toLowerCase()
+					.replaceAll("&nbsp;", "")
+					.replaceAll(" ", "") //this space is different fromt he below one, this is un html (the above one) DO NOT DELETE!
+					.replaceAll(" ", "");
+			stringToReturn = removeAccents(stringToReturn);
+			stringToReturn
+					.replaceAll("-", "")
+					.replaceAll("/", "");
+			if(removeS == true) stringToReturn = stringToReturn.replaceAll("s", "");
+		}
 		
 		return stringToReturn;
 	}
@@ -107,20 +111,22 @@ public class SomosUNUtils {
 	 */
 	public static String getTypology(String t){
 		String tToReturn = t;
-		switch(tToReturn){
-		case "d":
-			tToReturn ="c";
-			break;
-		case "n":
-			tToReturn = "p";
-			break;
-		case "f":
-		case "fundamental":
-			tToReturn = "b";
-			break;
-		case "l":
-			tToReturn = "l";
-			break;
+		if(t!= null){			
+			switch(tToReturn){
+				case "d":
+					tToReturn ="c";
+					break;
+				case "n":
+					tToReturn = "p";
+					break;
+				case "f":
+				case "fundamental":
+					tToReturn = "b";
+					break;
+				case "l":
+					tToReturn = "l";
+					break;
+			}
 		}
 		return tToReturn;
 	}

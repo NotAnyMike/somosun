@@ -141,6 +141,9 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers {
 	 * @return
 	 */
 	private int getTypeFromString(String typology) {
+		if(typology == null){
+			GWT.debugger();
+		}
 		typology = typology.toLowerCase();
 		int i = 0;
 		switch(typology)

@@ -3,6 +3,7 @@ package com.uibinder.server.dao;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
+import com.uibinder.shared.SomosUNUtils;
 import com.uibinder.shared.control.Teacher;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
@@ -56,7 +57,8 @@ public class TeacherDao extends Dao {
 	void saveTeacher(Teacher t){
 		if(t != null)
 		{
-			t.setName(standardizeString(t.getName()));
+			t.setName(SomosUNUtils.removeAccents(t.getName()));
+			//OLD t.setName(SomosUNUtils.standardizeString(t.getName(), false));
 			ofy().save().entity(t).now();
 		}
 	}

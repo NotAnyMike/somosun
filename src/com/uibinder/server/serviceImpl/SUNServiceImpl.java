@@ -388,6 +388,9 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 							complementaryValue.setMandatory(false);
 														
 							String typology = careerResults.getTypologyForASubject(subjectT.getCode());
+							if(typology == null || typology.isEmpty()){
+								typology = "l";
+							}
 							complementaryValue.setTypology(SomosUNUtils.getTypology(typology));
 							
 							SubjectGroup subjectGroup = subjectGroupDao.getSubjectGroupFromTypology(career, typology);

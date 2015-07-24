@@ -39,7 +39,7 @@ public class ComplementaryValueDao extends Dao {
 					cV.getSubject().setId(id);
 				}
 				if(cV.getSubject().getId() != null && cV.getSubjectGroup().getId() != null)
-					cV.setTypology(standardizeString(cV.getTypology()));
+					cV.setTypology(SomosUNUtils.standardizeString(cV.getTypology(), false));//standardizeString(cV.getTypology()));
 					ofy().save().entity(cV).now();
 			}			
 		}

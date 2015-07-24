@@ -7,6 +7,7 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.VoidWork;
+import com.uibinder.shared.SomosUNUtils;
 import com.uibinder.shared.control.Career;
 import com.uibinder.shared.control.SubjectGroup;
 import com.uibinder.shared.values.SubjectGroupCodes;
@@ -25,7 +26,8 @@ public class SubjectGroupDao extends Dao {
 	public void saveSubjectGroup(SubjectGroup sG){
 		if(sG != null)
 		{
-			sG.setName(standardizeString(sG.getName()));
+			// OLD sG.setName(SomosUNUtils.standardizeString(sG.getName(), false));
+			sG.setName(SomosUNUtils.removeAccents(sG.getName()));
 			ofy().save().entity(sG).now();
 		}
 	}
@@ -105,7 +107,7 @@ public class SubjectGroupDao extends Dao {
 		String careerCode = career.getCode();
 		SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
 		
-		if(typology.equals(TypologyCodes.LIBRE_ELECCION) == true){
+		if(typology == null || typology.equals(TypologyCodes.LIBRE_ELECCION) == true){
 			subjectGroup = subjectGroupDao.getSubjectGroup(SubjectGroupCodes.LIBRE_NAME, careerCode);
 			if(subjectGroup == null){
 				subjectGroup = new SubjectGroup(SubjectGroupCodes.LIBRE_NAME, career, false, 0, 0, true);

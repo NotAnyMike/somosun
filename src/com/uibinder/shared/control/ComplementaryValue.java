@@ -201,11 +201,6 @@ public class ComplementaryValue implements Serializable {
 	}
 
 	public void setTypology(String typology) {
-		switch(typology){
-			case "n":
-				typology = "b"; //nivelacion
-				break;
-		}
 		this.typology = typology;
 	}
 

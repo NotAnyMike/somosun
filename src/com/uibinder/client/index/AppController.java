@@ -501,7 +501,8 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 
 			@Override
 			public void onSuccess(Plan result) {
-				if(result != null){					
+				if(result != null){			
+					GWT.log("onSuccess activated");
 					setPlanPresenter(result);
 				}
 			}
