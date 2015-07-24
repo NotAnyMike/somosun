@@ -424,25 +424,23 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers {
 		creditsLabel.setTitle("créditos: " + credits);
 	}
 
-	public void setGrade(Double grade) {
-		if (grade == null || (grade >= 0 && grade <= 5)) {
-			// this.grade = grade;
-			this.getElement().setAttribute("grade", (grade == null ? "" : Double.toString(grade)));
-		}
+	public void setGrade(String grade) {
+		this.getElement().setAttribute("grade", (grade == null ? "" :grade));
 
-		String gradeString = null;
 		String title = null;
 
 		if (grade == null) {
-			gradeString = "-";
+			grade = "-";
 			title = "Nota no registrada, para registrarla haz click";
-		} else {
-			double gradeFixed = (double) Math.round(grade * 10) / 10;
-			gradeString = NumberFormat.getFormat("0.0").format(gradeFixed);
-			title = "nota de la clase: " + gradeString;
+		} else if(grade.equals("AP")){
+			title = "nota de la clase: Aprobada";
+		} else if(grade.equals("NA")){
+			title = "nota de la clase: No Aporbada";
+		} else{
+			title = "nota de la clase: " + grade;
 		}
 		
-		gradeLabel.setText(gradeString);
+		gradeLabel.setText(grade);
 		gradeLabel.setTitle(title);		
 	}
 

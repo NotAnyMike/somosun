@@ -16,6 +16,7 @@ import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
@@ -351,33 +352,43 @@ DefaultSubjectCreationView.Presenter{
 		savePlan();
 	}
 
-	private void createSubject(Subject subject, SubjectValue subjectValues, Semester semester) {
+	private void createSubject(Subject subject, SubjectValue subjectValue, Semester semester) {
 		
 		//To control where and what subject is dropped
 		increasingSubjectValuesCounter++;
-		subjectValues.setSubjectValuesPublicId((subject.getCode() == null ? "" : subject.getCode()) + increasingSubjectValuesCounter);
+		subjectValue.setSubjectValuesPublicId((subject.getCode() == null ? "" : subject.getCode()) + increasingSubjectValuesCounter);
 		
-		if(subjectValuesList.contains(subjectValues)==false) {
-			subjectValuesList.add(subjectValues);
+		if(subjectValuesList.contains(subjectValue)==false) {
+			subjectValuesList.add(subjectValue);
 			if(subjectTimesUpdated.containsKey(subject) == false) subjectTimesUpdated.put(subject, 0);
 		}
 		
-		if(semester.getSubjects().contains(subjectValues) == false) semester.addSubject(subjectValues);
+		if(semester.getSubjects().contains(subjectValue) == false) semester.addSubject(subjectValue);
 		//TODO avoid the same subject twice in the same semester
 		
-		SubjectWidget subjectWidget = new SubjectWidget(subject.getName(), subject.getCode(), subject.getCredits(), subjectValues.getComplementaryValues().isMandatory(), subjectValues.getComplementaryValues().getTypology(), subjectValues.getSubjectValuesPublicId(), (subjectValues.getComplementaryValues().getSubjectGroup() != null ? subjectValues.getComplementaryValues().getSubjectGroup().getName() : ""), this);
-		if(subjectValues.isTaken() == true){			
-			subjectWidget.setGrade(subjectValues.getGrade());
+		SubjectWidget subjectWidget = new SubjectWidget(subject.getName(), subject.getCode(), subject.getCredits(), subjectValue.getComplementaryValues().isMandatory(), subjectValue.getComplementaryValues().getTypology(), subjectValue.getSubjectValuesPublicId(), (subjectValue.getComplementaryValues().getSubjectGroup() != null ? subjectValue.getComplementaryValues().getSubjectGroup().getName() : ""), this);
+		if(subjectValue.isTaken() == true){
+			if(subjectValue.getComplementaryValues().getSubject().isApprovenType() == true){
+				if(subjectValue.getGrade() >= 3){					
+					subjectWidget.setGrade("AP");
+				}else{
+					subjectWidget.setGrade("NA");
+				}
+			}else{
+				double gradeFixed = (double) Math.round(subjectValue.getGrade() * 10) / 10;
+				String gradeString = NumberFormat.getFormat("0.0").format(gradeFixed);
+				subjectWidget.setGrade(gradeString);
+			}
 		}
 		
 		
 		subjectWidgetList.add(subjectWidget);
 		makeSubjectWidgetDraggable(subjectWidget);
 		semesterAndWidgetBiMap.get(semester).addSubject(subjectWidget);
-		subjectValuesAndWidgetBiMap.put(subjectValues, subjectWidget);
-		subjectValuesAndSemesterMap.put(subjectValues, semester);
+		subjectValuesAndWidgetBiMap.put(subjectValue, subjectWidget);
+		subjectValuesAndSemesterMap.put(subjectValue, semester);
 		
-		updateCredits(subjectValues, semester, true);
+		updateCredits(subjectValue, semester, true);
 		
 		addClickHandlerSubjectWidget(subjectWidget);
 		showToolTip();
@@ -1389,7 +1400,17 @@ DefaultSubjectCreationView.Presenter{
 				
 				SubjectWidget sW = subjectValuesAndWidgetBiMap.get(sV);
 				if(sW != null){
-					sW.setGrade(gradeDouble);
+					if(sV.getComplementaryValues().getSubject().isApprovenType() == true){
+						if(sV.getGrade() >= 3){
+							sW.setGrade("AP");
+						}else{
+							sW.setGrade("NA");
+						}
+					}else{						
+						double gradeFixed = (double) Math.round(sV.getGrade() * 10) / 10;
+						String gradeString = NumberFormat.getFormat("0.0").format(gradeFixed);
+						sW.setGrade(gradeString);
+					}
 				}
 				
 				planChanged("NewGrade");

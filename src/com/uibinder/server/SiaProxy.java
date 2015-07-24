@@ -1023,17 +1023,15 @@ public class SiaProxy {
 			
 			try {
 				htmlPlan = getUrlSource(planURL);
-			} catch (IOException e) {
-				e.printStackTrace();
 			} catch (Exception e){
 				e.printStackTrace();
+				log.severe("Error getting the info from the two pages for " + careerCode);
 			}
 			try {
 				htmlRequisites = getUrlSource(requisiteURL);
-			} catch (IOException e) {
-				e.printStackTrace();
 			} catch (Exception e){
 				e.printStackTrace();
+				log.severe("Error getting the info from the two pages for " + careerCode);
 			}
 			
 			if(htmlRequisites != null && htmlPlan != null){
@@ -2282,14 +2280,36 @@ public class SiaProxy {
 					}
 				}
 				
-				veryFinalS = getSubjectFromList(sD, finalSubjectList, true);
+ 				veryFinalS = getSubjectFromList(sD, finalSubjectList, true);
+				
+				if(veryFinalS == null){
+					//Perhaps there is a "subject" with multiple subjects in it
+					/**
+					 * " y "
+					 * "; y"
+					 * "; y ,"
+					 * "; e"
+					 * "; y,"
+					 * "; e,"
+					 * " o "
+					 */
+					String patterns = "((\\sy\\s)|(; y)|(; y ,)|(; y,)|(\\se\\s)|(; e)|(; e,)|(\\so\\s))";
+					if(sD.getName().matches("(.+)" + patterns + "(.+)") == true){
+						@SuppressWarnings("unused")
+						String[] maybeSubjects = sD.getName().split(patterns);
+						int x = 0;
+						//Split by those patterns
+						//Take groups of (size()-1) contiues ... for instand if it splits en 3 then spli1 + split2 is posible, but split1+split3 is not
+						//Take groups of (last.size() -1) an reapet until the size is one
+					}
+				}
 				
 				if(veryFinalS != null)
 				{
 					isSpecial = false;
 					subjectFinalT = veryFinalS;
 					String typology = finalTypologyMap.get(subjectFinalT);
-					boolean mandatory = false; //becaus it is not in the law
+					boolean mandatory = false; //because it is not in the law
 					
 					/**
 					 * if typology = P then it is leveling, then it must be added to the Nivelación group, and if typology = L, add it to free Elections
