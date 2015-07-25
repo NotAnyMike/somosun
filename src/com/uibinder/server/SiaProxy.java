@@ -221,7 +221,7 @@ public class SiaProxy {
 	 * search returned a empty json string
 	 */
 	public static SiaResultSubjects getSubjects(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede){
-		return getSubjectsWithFilter(nameOrCode,  typology, career, scheduleCP, page, ammount, sede, null);
+		return getSubjectsWithFilter(nameOrCode,  typology, career, scheduleCP, page, ammount, sede, null, true);
 	}
 	
 	/**
@@ -230,12 +230,9 @@ public class SiaProxy {
 	 * must have at least one non-empty field (page and amount are mandatory), if all parameters are null or
 	 * empty then it will return an empty list.</br></br>
 	 * 
-	 * To search all subjects, or at least every subject that is between 6-21h (6am - 9pm) in the 
-	 * week, send @param nameOrCode, @param typology, @param career, @param scheduleCP must be empty, then the 
-	 * code will change @param schedyleCP to L6-21:M6-21:C6-21:J6-21:V6-21:S6-21:D6-21 (i.e. a subject available in any hour in any day)
-	 * </br></br>
+	 * In order to get the full list of the subjects available in @param sede, leave all blank
 	 * 
-	 * This method search the code too, in that case, the @param nameOrCode must
+	 * This method search by code too, in that case, the @param nameOrCode must
 	 * be the code.</br></br>
 	 * 
 	 * If the only non-empty @param is the career code, then it will return the
@@ -250,8 +247,9 @@ public class SiaProxy {
 	 * 	For graduate (for this the VALOR_NIVELACADEMICO_TIPOLOGIA var should be "POS", but works either way)
 	 * 		Obligatorio: "O"
 	 * 		Elegible: "T"
-	 * @param subjectCodeListToFilter 
 	 * @param student 
+	 * @param everyOneHasCode 
+	 * @param subjectCodeList 
 	 * 
 	 * @param nameOrCode: the words to search for, the code for the students not the internal code
 	 * @param typology: the typology of the subject, empty = all types.
@@ -264,12 +262,15 @@ public class SiaProxy {
 	 * @param page: the page of the search, must have a value, if zero then it will return an empty string.
 	 * @param ammount: the number of results per @param page, must have a value, CANNOT be zero or because it will return an error.
 	 * @param sede: sede: "ama", "bog", "car", "man", "med", "ori", "pal" or  "tum"; default "bog"
+	 * @param student
+	 * @param listToFilter: can be a list of the codes of the names, if it is names then use @param toFilterByCode
+	 * @param toFilterByCode: the list send is a list of the codes (true) or the names(false)
 	 * 
 	 * @return a list of subjects, if there were some error the first and only subject
 	 * returned will have the name of ERROR, if it is empty there were no errors so the
 	 * search returned a empty json string
 	 */
-	public static SiaResultSubjects getSubjectsWithFilter(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede, List<String> subjectCodeListToFilter){
+	public static SiaResultSubjects getSubjectsWithFilter(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede, List<String> listToFilter, boolean toFilterByCode){
 		
 		if(nameOrCode.isEmpty() && typology.isEmpty() && career.isEmpty() && scheduleCP.isEmpty()){
 			scheduleCP = "L6-21:M6-21:C6-21:J6-21:V6-21:S6-21:D6-21";
@@ -288,99 +289,72 @@ public class SiaProxy {
 		if(respString == "IOException" || respString == "MalformedURLException" || respString == null){
 			siaResult.setError(true);
 		}else{
-			siaResult = parseSubjectJSON(respString, page, ammount, subjectCodeListToFilter);		
+			siaResult = parseSubjectJSON(respString, page, ammount, listToFilter, toFilterByCode);		
 		}
 
 		return siaResult;
 	}
 	
 	/**
+	 * This will call the method getSubjects(String nameOrCode, String typology, 
+	 * String career, String scheduleCP, int page, int ammount, String sede, 
+	 * Student student, List<String> subjectCodeListToFilter, boolean toFilterByCode) 
+	 * with the @param subjectCodeListToFilter = null and the @param toFilterByCode =true
 	 * 
-	 * This will only search for subjects, not its groups nor other things, it 
-	 * must have at least one non-empty field (page and amount are mandatory), if all parameters are null or
-	 * empty then it will return an empty list.</br></br>
-	 * 
-	 * This method search my code too, in that case, the @param nameOrCode must
-	 * be the code.</br></br>
-	 * 
-	 * If the only non-empty @param is the career code, then it will return the
-	 * full list of the subjects for that career.</br></br>
-	 * 
-	 * Typology works as follows:</br></br>
-	 * 	For under-graduate (for this the VALOR_NIVELACADEMICO_TIPOLOGIA var should be "PRE", but works either way)
-	 * 		Nivelación: "P"
-	 * 		Fundamentación: "B"
-	 * 		Disciplinar/Profesional: "C"
-	 * 		Libre elección: "L"</br></br>
-	 * 	For graduate (for this the VALOR_NIVELACADEMICO_TIPOLOGIA var should be "POS", but works either way)
-	 * 		Obligatorio: "O"
-	 * 		Elegible: "T"
-	 * @param student 
-	 * @param subjectCodeList 
-	 * 
-	 * @param nameOrCode: the words to search for, the code for the students not the internal code
-	 * @param typology: the typology of the subject, empty = all types.
-	 * @param career: the code of the career, the normal code we know, empty = all careers.
-	 * @param scheduleCP: the schedule to look for, empty = all blocks. here are some examples
-	 * 		Empty: ""
-	 * 		All Monday: "L6-21:M:C:J:V:S:D"
-	 * 		Monday from 6 to 9 and 1 until the end: "L6-10,13-21:M:C:J:V:S:D"
-	 * 		The monday above + the same hours but Wednesday: "L6-10,13-21:M:C6-10,13-21:J:V:S:D"
-	 * @param page: the page of the search, must have a value, if zero then it will return an empty string.
-	 * @param ammount: the number of results per @param page, must have a value, CANNOT be zero or because it will return an error.
-	 * @param sede: sede: "ama", "bog", "car", "man", "med", "ori", "pal" or  "tum"; default "bog"
-	 * 
-	 * @return a list of subjects, if there were some error the first and only subject
-	 * returned will have the name of ERROR, if it is empty there were no errors so the
-	 * search returned a empty json string
+	 * @param nameOrCode
+	 * @param typology
+	 * @param career
+	 * @param scheduleCP
+	 * @param page
+	 * @param ammount
+	 * @param sede
+	 * @param student
+	 * @return
 	 */
 	public static SiaResultSubjects getSubjects(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede, Student student){
-		return getSubjects(nameOrCode, typology, career, scheduleCP, page, ammount, sede, student, null);
+		return getSubjects(nameOrCode, typology, career, scheduleCP, page, ammount, sede, student, null, true);
 	}
 	
 	/**
+	 * This will call the method getSubjects(String nameOrCode, String typology, 
+	 * String career, String scheduleCP, int page, int ammount, String sede, 
+	 * Student student, List<String> subjectCodeListToFilter, boolean toFilterByCode) with the @param toFilterByCode =true
 	 * 
-	 * This will only search for subjects, not its groups nor other things, it 
-	 * must have at least one non-empty field (page and amount are mandatory), if all parameters are null or
-	 * empty then it will return an empty list.</br></br>
-	 * 
-	 * This method search my code too, in that case, the @param nameOrCode must
-	 * be the code.</br></br>
-	 * 
-	 * If the only non-empty @param is the career code, then it will return the
-	 * full list of the subjects for that career.</br></br>
-	 * 
-	 * Typology works as follows:</br></br>
-	 * 	For under-graduate (for this the VALOR_NIVELACADEMICO_TIPOLOGIA var should be "PRE", but works either way)
-	 * 		Nivelación: "P"
-	 * 		Fundamentación: "B"
-	 * 		Disciplinar/Profesional: "C"
-	 * 		Libre elección: "L"</br></br>
-	 * 	For graduate (for this the VALOR_NIVELACADEMICO_TIPOLOGIA var should be "POS", but works either way)
-	 * 		Obligatorio: "O"
-	 * 		Elegible: "T"
-	 * @param student 
-	 * @param subjectCodeList 
-	 * 
-	 * @param nameOrCode: the words to search for, the code for the students not the internal code
-	 * @param typology: the typology of the subject, empty = all types.
-	 * @param career: the code of the career, the normal code we know, empty = all careers.
-	 * @param scheduleCP: the schedule to look for, empty = all blocks. here are some examples
-	 * 		Empty: ""
-	 * 		All Monday: "L6-21:M:C:J:V:S:D"
-	 * 		Monday from 6 to 9 and 1 until the end: "L6-10,13-21:M:C:J:V:S:D"
-	 * 		The monday above + the same hours but Wednesday: "L6-10,13-21:M:C6-10,13-21:J:V:S:D"
-	 * @param page: the page of the search, must have a value, if zero then it will return an empty string.
-	 * @param ammount: the number of results per @param page, must have a value, CANNOT be zero or because it will return an error.
-	 * @param sede: sede: "ama", "bog", "car", "man", "med", "ori", "pal" or  "tum"; default "bog"
-	 * 
-	 * @return a list of subjects, if there were some error the first and only subject
-	 * returned will have the name of ERROR, if it is empty there were no errors so the
-	 * search returned a empty json string
+	 * @param nameOrCode
+	 * @param typology
+	 * @param career
+	 * @param scheduleCP
+	 * @param page
+	 * @param ammount
+	 * @param sede
+	 * @param student
+	 * @param subjectCodeListToFilter
+	 * @return
 	 */
 	public static SiaResultSubjects getSubjects(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede, Student student, List<String> subjectCodeListToFilter){
+		return getSubjects(nameOrCode, typology, career, scheduleCP, page, ammount, sede, student, subjectCodeListToFilter, true);
+	}
+	
+	/**
+	 * this method will call the method getSubjectsWithFilter(nameOrCode, typology, 
+	 * career, scheduleCP, page, ammount, sede, listToFilter, toFilterByCode); and if the user is 
+	 * an admin the it will add and optativa general dummy subject to add those types of subjects
+	 * 
+	 * @param nameOrCode
+	 * @param typology
+	 * @param career
+	 * @param scheduleCP
+	 * @param page
+	 * @param ammount
+	 * @param sede
+	 * @param student
+	 * @param listToFilter
+	 * @param toFilterByCode
+	 * @return
+	 */
+	public static SiaResultSubjects getSubjects(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede, Student student, List<String> listToFilter, boolean toFilterByCode){
 		
-		SiaResultSubjects siaResultSubjects = getSubjectsWithFilter(nameOrCode, typology, career, scheduleCP, page, ammount, sede, subjectCodeListToFilter);
+		SiaResultSubjects siaResultSubjects = getSubjectsWithFilter(nameOrCode, typology, career, scheduleCP, page, ammount, sede, listToFilter, toFilterByCode);
 		
 		if(student != null){
 			StudentDao studentDao = new StudentDao();
@@ -405,21 +379,6 @@ public class SiaProxy {
 						siaResultSubjects.addSubject(subject);
 					}
 					
-					subject = subjectDao.getDummySubjectByCode(SomosUNUtils.LIBRE_CODE);
-					if(subject == null){
-						subject = new Subject();
-						subject.setCode(SomosUNUtils.LIBRE_CODE);
-						subject.setCredits(0);
-						subject.setLocation(sede);
-						subject.setName(SomosUNUtils.LIBRE_NAME);
-						subject.setSiaCode(SomosUNUtils.LIBRE_CODE);
-						subject.setSpecial(false);
-						subject.setDummy(true);
-						subject.setId(subjectDao.generateId());
-						subjectDao.saveSubject(subject);
-					}else{
-						siaResultSubjects.addSubject(subject);
-					}
 				}
 			}
 		}
@@ -441,7 +400,7 @@ public class SiaProxy {
 		if(respString == "IOException" || respString == "MalformedURLException" || respString == null || respString == "error"){
 			siaResult.setError(true);
 		}else{
-			siaResult = parseSubjectJSON(respString, page, ammount, null);		
+			siaResult = parseSubjectJSON(respString, page, ammount, null, true);		
 		}
 
 		return respString;
@@ -484,7 +443,7 @@ public class SiaProxy {
 		
 	}
 	
-	private static SiaResultSubjects parseSubjectJSON(String jsonString, int page, int ammount, List<String> subjectCodeListToFilter){		
+	private static SiaResultSubjects parseSubjectJSON(String jsonString, int page, int ammount, List<String> listToFilter, boolean toFilterByCode){		
 		SiaResultSubjects siaResult = new SiaResultSubjects();
 
 		List<Subject> subjectList = new ArrayList<Subject>();
@@ -507,14 +466,25 @@ public class SiaProxy {
 				
 				for(int i=0; i<ammountOfResults; i++){
 					jsonObject = jsonArray.getJSONObject(i);
+					
 					String code =  jsonObject.getString("id_asignatura");
+					String name = jsonObject.getString("nombre");
+					
 					boolean isNeeded = false;
-					if(subjectCodeListToFilter != null){
-						if(subjectCodeListToFilter.size() > 0){
-							for(String subjectCodeT : subjectCodeListToFilter){
-								if(subjectCodeT.equals(code) == true){
-									isNeeded = true;
-									break;
+					if(listToFilter != null){
+						if(listToFilter.size() > 0){
+							for(String subjectNameOrCodeT : listToFilter){
+								if(toFilterByCode){
+									if(subjectNameOrCodeT.equals(code) == true){
+										isNeeded = true;
+										break;
+									}									
+								}else{
+									String nameToCompare = SomosUNUtils.removeAccents(name);
+									if(subjectNameOrCodeT.equals(nameToCompare) == true){
+										isNeeded = true;
+										break;
+									}
 								}
 							}							
 						}else{
@@ -529,7 +499,6 @@ public class SiaProxy {
 						int creditos = jsonObject.getInt("creditos");
 						code =  jsonObject.getString("id_asignatura");
 						String siaCode = jsonObject.getString("codigo");
-						String name = jsonObject.getString("nombre");
 						
 						Subject subject = new Subject(creditos, code, siaCode, name, "bog");
 						subject = subjectDao.getSubjectbySubject(subject, true);
@@ -1182,11 +1151,11 @@ public class SiaProxy {
 					int x = 0;
 					SubjectGroupDummy sGFromPlan = null;
 					//partialText = partialText.replaceAll("s", "").replaceAll("-","").replaceAll("/", "");
-					partialText = SomosUNUtils.standardizeString(partialText, true);
+					partialText = SomosUNUtils.standardizeString(partialText, true, false);
 					
 					//To get the closest subjectGroup for this table (e)
 					for(SubjectGroupDummy sGDTemporary : subjectGroups1){
-						String toSearch = SomosUNUtils.standardizeString(sGDTemporary.getName(), true);//.toLowerCase().replaceAll(" ", "");
+						String toSearch = SomosUNUtils.standardizeString(sGDTemporary.getName(), true,false);//.toLowerCase().replaceAll(" ", "");
 						//Deleting characters that maybe were removed by a human mistake in the other page
 						toSearch = toSearch.replaceAll("s", "").replaceAll("-", "").replaceAll("/","");
 						int position = partialText.toLowerCase().lastIndexOf(toSearch);
@@ -1203,14 +1172,14 @@ public class SiaProxy {
 
 					if(sGFromPlan != null){
 						SubjectGroupDummy sGD = new SubjectGroupDummy(sGFromPlan.getName(), 0, 0, isFundamental, e);
-						String name1Temporary  = SomosUNUtils.standardizeString(sGD.getName(), false);
+						String name1Temporary  = SomosUNUtils.standardizeString(sGD.getName(), false, false);
 						boolean isInList = false;
 						
 						//This is to make sure that if a subjectGroup with the same name, not to add it again
 						// see Odontología with Agrupación Indagación e Investigación, at the end there are two tables for the same subjectGroup
 						for(SubjectGroupDummy sGDTemporary : subjectGroups2)
 						{
-							String name2Temporary  = SomosUNUtils.standardizeString(sGDTemporary.getName(), false);
+							String name2Temporary  = SomosUNUtils.standardizeString(sGDTemporary.getName(), false, false);
 							if(name1Temporary.equals(name2Temporary)) {
 								isInList = true;
 								break;
@@ -1260,7 +1229,7 @@ public class SiaProxy {
 						for(int row3 = titleRows; row3 < table.length; row3 ++){
 							String tableColspan = table[row3][col3].attr("colspan");
 							if((tableColspan.equals("")== true && minColspan.equals("0")) || (tableColspan.equals(minColspan) == true )){
-								String textToTest = SomosUNUtils.standardizeString(table[row3][col3].text(), false);
+								String textToTest = SomosUNUtils.standardizeString(table[row3][col3].text(), false, false);
 								if(textToTest.equals("") == false){
 									empty = false;
 									 
@@ -1312,7 +1281,7 @@ public class SiaProxy {
 						for(int row = 0; row < titleRows; row ++){
 							textOfColumnTitle = textOfColumnTitle + table[row][col].text();
 						}
-						textOfColumnTitle = SomosUNUtils.standardizeString(textOfColumnTitle, false);
+						textOfColumnTitle = SomosUNUtils.standardizeString(textOfColumnTitle, false, false);
 						
 						if(textOfColumnTitle.contains("nombre") == true || textOfColumnTitle.contains("asignatura") == true)
 							if(subjectName == -1){
@@ -1332,7 +1301,7 @@ public class SiaProxy {
 						for(int row = 0; row < titleRows; row ++){
 							textOfColumnTitle = textOfColumnTitle + table[row][col].text();
 						}
-						textOfColumnTitle = SomosUNUtils.standardizeString(textOfColumnTitle, false);
+						textOfColumnTitle = SomosUNUtils.standardizeString(textOfColumnTitle, false, false);
 						
 						if(textOfColumnTitle.contains("credito") == true){
 							if(subjectCredits == -1)
@@ -1358,7 +1327,7 @@ public class SiaProxy {
 						for(int row = 0; row < titleRows; row ++){
 							textOfColumnTitle = textOfColumnTitle + table[row][col].text();
 						}
-						textOfColumnTitle = SomosUNUtils.standardizeString(textOfColumnTitle, false);
+						textOfColumnTitle = SomosUNUtils.standardizeString(textOfColumnTitle, false, false);
 						
 						if(textOfColumnTitle.contains("requisito"))
 							if(requisiteSubjectType == -1){
@@ -1375,7 +1344,7 @@ public class SiaProxy {
 						for(int row = 0; row < titleRows; row ++){
 							textOfColumnTitle = textOfColumnTitle + table[row][col].text();
 						}
-						textOfColumnTitle = SomosUNUtils.standardizeString(textOfColumnTitle, false);
+						textOfColumnTitle = SomosUNUtils.standardizeString(textOfColumnTitle, false, false);
 						
 						if(textOfColumnTitle.contains("obligatoria"))
 						{	
@@ -1410,13 +1379,13 @@ public class SiaProxy {
 										hasCode = true;
 								}
 								boolean isTheRowATitleName = false;
-								String name2 = SomosUNUtils.standardizeString(cols[subjectName].text(), false);
-								String nameTitle = SomosUNUtils.standardizeString(table[0][subjectName].text(), false);
+								String name2 = SomosUNUtils.standardizeString(cols[subjectName].text(), false, false);
+								String nameTitle = SomosUNUtils.standardizeString(table[0][subjectName].text(), false, false);
 								if(name2.equals(nameTitle)) isTheRowATitleName = true;
 								boolean isTheRowATitleCode = false;
 								if(subjectCode != -1){
-									String code2 = SomosUNUtils.standardizeString(cols[subjectCode].text(), false);
-									String codeTitle = SomosUNUtils.standardizeString(table[0][subjectCode].text(), false);
+									String code2 = SomosUNUtils.standardizeString(cols[subjectCode].text(), false, false);
+									String codeTitle = SomosUNUtils.standardizeString(table[0][subjectCode].text(), false, false);
 									if(code2.equals(codeTitle)) isTheRowATitleCode = true;
 								}
 								if((name2.equals("") == false || hasCode) && (isTheRowATitleCode==false && isTheRowATitleName == false)){
@@ -1466,7 +1435,7 @@ public class SiaProxy {
 									for(int row2 = 0; row2 < rowspanInt; row2++){
 										if(requisiteSubjectType != -1){		
 											Element[] cols2 = table[row+row2];
-											String type = SomosUNUtils.standardizeString(cols2[requisiteSubjectType].text(), false);
+											String type = SomosUNUtils.standardizeString(cols2[requisiteSubjectType].text(), false, false);
 											if(requisiteSubjectName != -1){
 												if(type.contains("prerrequisit")){
 													if(requisiteSubjectCode != -1){
@@ -1618,8 +1587,9 @@ public class SiaProxy {
 
 		String careerString = career.getCode();		
 		String sede = "bog";
-		SiaResultSubjects siaResultFundamental = getSubjects("", "B", careerString, "", 1, 200, sede);
-		SiaResultSubjects siaResultProfessional = getSubjects("", "C", careerString, "", 1, 200, sede);
+		//SiaResultSubjects siaResultFundamental = getSubjects("", "B", careerString, "", 1, 200, sede);
+		//SiaResultSubjects siaResultProfessional = getSubjects("", "C", careerString, "", 1, 200, sede);
+		SiaResultSubjects allSiaResult = getSubjects("", "", "", "", 1, 10000, sede, null);
 				
 		for(SubjectDummy sD : subjectsD)
 		{
@@ -1629,14 +1599,15 @@ public class SiaProxy {
 			
 			int credits = sD.getCredits();
 			String name = sD.getName();
-			String nameStandardized = SomosUNUtils.standardizeString(name, false);
+			String nameStandardized = SomosUNUtils.standardizeString(name, false, false);
 			String code = sD.getCode();   
-			String codeStandardize = (code == null ? "" : SomosUNUtils.standardizeString(code, false)); //to avoid NullPointerException due to an empty string
+			String codeStandardize = SomosUNUtils.standardizeString(code, false, false); //to avoid NullPointerException due to an empty string
 			String siaCode = null;
-			String siaCodeStandardize = (siaCode == null ? "" : SomosUNUtils.standardizeString(siaCode, false)); //to avoid NullPointerException due to an empty string
+			String siaCodeStandardize = (siaCode == null ? "" : SomosUNUtils.standardizeString(siaCode, false, false)); //to avoid NullPointerException due to an empty string
 			String location = sede;
 			
-			sFromSia = getSubjectFromList(sD, (sD.getSubjectGroupDummy().isFundamental() == true ? siaResultFundamental.getSubjectList() : siaResultProfessional.getSubjectList()));
+			//OLD sFromSia = getSubjectFromList(sD, (sD.getSubjectGroupDummy().isFundamental() == true ? siaResultFundamental.getSubjectList() : siaResultProfessional.getSubjectList()));
+			sFromSia = getSubjectFromList(sD, allSiaResult.getSubjectList());
 			
 			if(sFromSia != null)
 			{
@@ -1651,15 +1622,15 @@ public class SiaProxy {
 		    if(sFromDb != null)
 			{
 		    	
-		    	codeStandardize = (code == null ? "" : SomosUNUtils.standardizeString(code, false));
-		    	siaCodeStandardize = (siaCode == null ? "" : SomosUNUtils.standardizeString(siaCode, false));
+		    	codeStandardize = (code == null ? "" : SomosUNUtils.standardizeString(code, false, false));
+		    	siaCodeStandardize = (siaCode == null ? "" : SomosUNUtils.standardizeString(siaCode, false, false));
 				//Comparar para ver si hay alguno más reciente y agregar el más reciente a la lista
 		    	if((credits != 0 && credits != sFromDb.getCredits()) ||
 		    			(codeStandardize != "" && codeStandardize.equals(sFromDb.getCode())==false) ||
 		    			(siaCodeStandardize != "" & siaCodeStandardize.equals(sFromDb.getSiaCode())==false) == true)
 		    		{
 		    			//the sTemporary is more updated thant the sFromDb ... allors udpate it
-		    			subjectDao.deleteSubject(sFromDb.getId());
+		    			sTemporary.setId(sFromDb.getId());
 		    			subjectDao.saveSubject(sTemporary);
 		    			sFinal = sTemporary;
 		    		}else{
@@ -1701,123 +1672,9 @@ public class SiaProxy {
 			ComplementaryValue cV = mapSCV.get(s);
 			
 			//for each pre and co
-			addRequisitesToBothLists(cV, s, preSD, subjectListFinal, subjectDao, mapSCV, true, complementaryValueDao, subjectGroupDao);
-			addRequisitesToBothLists(cV, s, coSD, subjectListFinal, subjectDao, mapSCV, false, complementaryValueDao, subjectGroupDao);
+			addRequisitesToBothLists(cV, s, preSD, subjectListFinal, allSiaResult, subjectDao, mapSCV, true, complementaryValueDao, subjectGroupDao);
+			addRequisitesToBothLists(cV, s, coSD, subjectListFinal, allSiaResult, subjectDao, mapSCV, false, complementaryValueDao, subjectGroupDao);
 			
-			
-			//TODO: delete this
-//			for(SubjectDummy sD : preSD){
-//				/**
-//				 *  1. get the S from the SD
-//				 *  	- be careful with the name or the code, it could be using the code
-//				 *  2. add it to the list of PreRequisites and PreRequisitesOF
-//				 */
-//				
-//				String stringStandardized = (sD.getName() == null ? "" : standardizeString(sD.getName())); //could be the name or the code
-//				Subject subjectFinalT = null;
-//				
-//				boolean isSpecial = false;
-//				int charactersLeft = 3; //to make sure that at least the subject selected by name will be 3 chrts far from the original				
-//				
-//				for(Subject sTemporary : subjectListFinal){
-//					String nameStandardizedT = (sTemporary.getName() == null ? "" : standardizeString(sTemporary.getName()));
-//					String codeStandardizedT = (sTemporary.getCode() == null ? "" : standardizeString(sTemporary.getCode()));
-//					
-//					if(stringStandardized.equals(codeStandardizedT))
-//					{
-//						subjectFinalT = sTemporary;
-//						break;
-//					}
-//					else
-//					{
-//						String withOut = nameStandardizedT.replaceAll(stringStandardized, "");
-//						if(charactersLeft > withOut.length())
-//						{
-//							charactersLeft = withOut.length();
-//							subjectFinalT = sTemporary;
-//							
-//							if(charactersLeft == 0) break;
-//						}
-//							
-//					}
-//				}
-//				
-//				if(subjectFinalT == null)
-//				{
-//					//it means that it is a special subject
-//					isSpecial = true;
-//					subjectFinalT = new Subject(0, "", "", sD.getName(), sede, isSpecial);
-//					subjectDao.saveSubject(subjectFinalT);
-//					subjectFinalT = subjectDao.getSubjectByName(subjectFinalT.getName());
-//				}
-//				
-//				if(isSpecial == true){
-//					//TODO: search for word and get the closest aproximation
-//					error
-//				}
-//				
-//				//Add subjectFinalT to the two lists
-//				cV.addPrerequisite(subjectFinalT);
-//				if(isSpecial == false)
-//				{
-//					ComplementaryValues cVT = mapSCV.get(subjectFinalT);
-//					cVT.addPrerequisiteOf(s);
-//				}
-//			}
-			
-//			for(SubjectDummy sD : coSD){
-//				/**
-//				 *  1. get the S from the SD
-//				 *  	- be careful with the name or the code, it could be using the code
-//				 *  2. add it to the list of CoRequisites and CoRequisitesOF
-//				 */
-//				
-//				String stringStandardized = (sD.getName() == null ? "" : standardizeString(sD.getName())); //could be the name or the code
-//				Subject subjectFinalT = null;
-//				
-//				boolean isSpecial = false;
-//				int charactersLeft = 3; //to make sure that at least the subject selected by name will be 3 chrts far from the original				
-//				
-//				for(Subject sTemporary : subjectListFinal){
-//					String nameStandardizedT = (sTemporary.getName() == null ? "" : standardizeString(sTemporary.getName()));
-//					String codeStandardizedT = (sTemporary.getCode() == null ? "" : standardizeString(sTemporary.getCode()));
-//					
-//					if(stringStandardized.equals(codeStandardizedT))
-//					{
-//						subjectFinalT = sTemporary;
-//						break;
-//					}
-//					else
-//					{
-//						String withOut = nameStandardizedT.replaceAll(stringStandardized, "");
-//						if(charactersLeft > withOut.length())
-//						{
-//							charactersLeft = withOut.length();
-//							subjectFinalT = sTemporary;
-//							
-//							if(charactersLeft == 0) break;
-//						}
-//							
-//					}
-//				}
-//				
-//				if(subjectFinalT == null)
-//				{
-//					//it means that it is a special subject
-//					isSpecial = true;
-//					subjectFinalT = new Subject(0, "", "", sD.getName(), sede, isSpecial);
-//					subjectDao.saveSubject(subjectFinalT);
-//					subjectFinalT = subjectDao.getSubjectByName(subjectFinalT.getName());
-//				}
-//				
-//				//Add subjectFinalT to the two lists
-//				cV.addCorequisite(subjectFinalT);
-//				if(isSpecial == false)
-//				{
-//					ComplementaryValues cVT = mapSCV.get(subjectFinalT);
-//					cVT.addCorequisiteOf(s);
-//				}
-//			}
 		}
 		
 		//Save the CV of all the S but first check if the ones in the DB are as updated as these ones
@@ -1902,7 +1759,7 @@ public class SiaProxy {
 	
 	private static Subject getSubjectFromList(SubjectDummy sD, List<Subject> list) {
 		
-		return getSubjectFromList(sD, list, false);
+		return getSubjectFromList(sD, list, false, false);
 	
 	}
 
@@ -1913,27 +1770,33 @@ public class SiaProxy {
 	 * @param siaResult
 	 * @return
 	 */
-	private static Subject getSubjectFromList(SubjectDummy sD, List<Subject> list, boolean removeS) {
+	private static Subject getSubjectFromList(SubjectDummy sD, List<Subject> list, boolean removeS, boolean removePunctuation) {
 		
+		Subject sToReturn = getSubjectFromList(sD.getName(), list, removeS, removePunctuation); 
+		
+		return sToReturn;
+		
+	}
+
+	private static Subject getSubjectFromList(String nameToFilterBy, List<Subject> listToSearchIn, boolean removeS, boolean removePunctuation) {
 		Subject sToReturn = null;
-		String nameStandardized = (sD.getName() == null ? "" : SomosUNUtils.standardizeString(sD.getName(), removeS));
-		
+		String nameStandardized = (nameToFilterBy == null ? "" : SomosUNUtils.standardizeString(nameToFilterBy, removeS, removePunctuation));
 		//choose one subject from the list in siaResult
-		if(list != null)
+		if(listToSearchIn != null)
 		{
-			if(list.size() != 0 || list.isEmpty() == false)
+			if(listToSearchIn.size() != 0 || listToSearchIn.isEmpty() == false)
 			{
 				
 				int position = -1;
 				int charactersLeft = 4; //in order to get a subject which is as far as 4 characters more
 
-				for(Subject sFromSiaTemporary : list)
+				for(Subject sFromSiaTemporary : listToSearchIn)
 				{
-					String nameFromSiaStandardized = SomosUNUtils.standardizeString(sFromSiaTemporary.getName(), removeS);
+					String nameFromSiaStandardized = SomosUNUtils.standardizeString(sFromSiaTemporary.getName(), removeS, removePunctuation);
 					String nameWithOut = nameFromSiaStandardized.replace(nameStandardized, "");
 					
 					if(charactersLeft > nameWithOut.length() == true){
-						position = list.indexOf(sFromSiaTemporary);
+						position = listToSearchIn.indexOf(sFromSiaTemporary);
 						charactersLeft = nameWithOut.length();
 					}
 							
@@ -1941,14 +1804,13 @@ public class SiaProxy {
 
 				if(position != -1)
 				{	
-					sToReturn = list.get(position);
+					sToReturn = listToSearchIn.get(position);
 				}
 
 			}
 		}else{
 			//the subject does not exist 
 		}
-		
 		return sToReturn;
 	}
 
@@ -1965,11 +1827,11 @@ public class SiaProxy {
 			SubjectGroup sGFinal = null;
 			
 			boolean isInDb = false;
-			String name = SomosUNUtils.standardizeString(sGD.getName(), false);
+			String name = SomosUNUtils.standardizeString(sGD.getName(), false, false);
 			SubjectGroup sG = new SubjectGroup( sGD.getName(), career, sGD.isFundamental(), sGD.getObligatoryCredits(), sGD.getOptativeCredits(), sGD.getError());
 			
 			for(SubjectGroup sGDb : sGFromDB){
-				String nameDb = SomosUNUtils.standardizeString(sGDb.getName(), false);
+				String nameDb = SomosUNUtils.standardizeString(sGDb.getName(), false, false);
 				if(nameDb.equals(name)){
 					if((sGD.isFundamental() != null && sGD.isFundamental().equals(sGDb.isFundamental()) == false) || 
 							((sGD.getObligatoryCredits() != 0 || sGD.getOptativeCredits() != 0) && sGD.getObligatoryCredits() != sGDb.getObligatoryCredits()) || //The first double parentesis is for the subjectGroup with 0 credits either in optative or obligatory credits  
@@ -2030,7 +1892,7 @@ public class SiaProxy {
 		List<SubjectGroupDummy> subjectGroups = new ArrayList<SubjectGroupDummy>();
 		
 		for(SubjectGroupDummy sG1 : subjectGroups1){
-			String name1 = SomosUNUtils.standardizeString(sG1.getName(), false);
+			String name1 = SomosUNUtils.standardizeString(sG1.getName(), false, false);
 			int obligatoryCredits = sG1.getObligatoryCredits();
 			int optativeCredits = sG1.getOptativeCredits();
 			Boolean fundamental = sG1.isFundamental();
@@ -2040,7 +1902,7 @@ public class SiaProxy {
 			
 			for(int x = 0; x < subjectGroups2.size(); x++){
 				SubjectGroupDummy sG2 = subjectGroups2.get(x);
-				String name2 = SomosUNUtils.standardizeString(sG2.getName(), false);
+				String name2 = SomosUNUtils.standardizeString(sG2.getName(), false, false);
 				
 				if(name1.equals(name2) == true){
 					
@@ -2115,19 +1977,6 @@ public class SiaProxy {
 			}
 		}
 		
-		//This code is just junk
-		/*for(Element row : originalTable.getElementsByTag("tr")){
-			Element e = row.getElementsByTag("td").get(0);
-			rowNumber ++;
-			if(rowspan == 0){
-				if(e.attr("rowspan")!=""){
-					rowspan = Integer.valueOf(e.attr("rowspan")) -1;
-					rowNumber += rowspan;					
-				}
-			}else{
-				rowspan --;
-			}
-		}*/
 		rowNumber = originalTable.getElementsByTag("tr").size();
 		
 		Element[][] table = new Element[rowNumber][columnNumber];
@@ -2167,58 +2016,43 @@ public class SiaProxy {
 		
 		return table;
 	}
-	
-	/**
-	 * This function will delete: <br>
-	 * - "´" accents (e.g "é"->"e") <br>
-	 * - "-" -> ""<br>
-	 * - " " -> ""<br>
-	 * - "s" -> ""<br>
-	 * - "/" -> ""<br>
-	 * will NOT delete:<br>
-	 * - "ñ"<br>
-	 * - other accents "`", etc.<br>
-	 * 
-	 * @param s
-	 * @return
-	 */
-//	private static String standardizeString(String s, boolean removeS){
-//		String stringToReturn = s.trim();
-//		stringToReturn = stringToReturn.toLowerCase()
-//				.replaceAll("&nbsp;", "")
-//				.replaceAll(" ", "") //this space is different fromt he below one, this is un html (the above one) DO NOT DELETE!
-//				.replaceAll(" ", "")
-//				.replaceAll("á", "a")
-//				.replaceAll("é", "e")
-//				.replaceAll("í", "i")
-//				.replaceAll("ó", "o")
-//				.replaceAll("ú", "u")
-//				.replaceAll("-", "")
-//				.replaceAll("/", "");
-//		if(removeS == true) stringToReturn = stringToReturn.replaceAll("s", "");
-//		
-//		return stringToReturn;
-//	}
 
-	private static void addRequisitesToBothLists(ComplementaryValue cV, Subject s, List<SubjectDummy> listSD, List<Subject> subjectListFinal, SubjectDao subjectDao, Map<Subject, ComplementaryValue> mapSCV, boolean isPre, ComplementaryValueDao complementaryValueDao, SubjectGroupDao subjectGroupDao)
+	/**
+	 * This method adds the requisites to its subjects and has no return statement
+	 * <br> 
+	 * @param cV: the complementaryValue to which the requisites will be added.
+	 * @param s: the subject that is been analysis, every subject will pass through this position.
+	 * @param listSD: The list of the pre/co-requisites of @param s. 
+	 * @param subjectListFinal: The list of all subjects found in the url (only the ones from the left, i.e. the ones that are not requisites)
+	 * @param subjectDao.
+	 * @param mapSCV: map Subject-ComplementaryValue 
+	 * @param isPre: is this a prerrequisite? 
+	 * @param complementaryValueDao
+	 * @param subjectGroupDao
+	 */
+	private static void addRequisitesToBothLists(ComplementaryValue cV, Subject s, List<SubjectDummy> listOfRequisitesSD, List<Subject> subjectListFinal, SiaResultSubjects allSubjectsSiaResult, SubjectDao subjectDao, Map<Subject, ComplementaryValue> mapSCV, boolean isPre, ComplementaryValueDao complementaryValueDao, SubjectGroupDao subjectGroupDao)
 	{
 		String sede = "bog";
-		for(SubjectDummy sD : listSD){
+		for(SubjectDummy sD : listOfRequisitesSD){
 			/**
 			 *  1. get the S from the SD
 			 *  	- be careful with the name or the code, it could be using the code
 			 *  2. add it to the list of PreRequisites and PreRequisitesOF
 			 */
 			
-			String stringStandardized = (sD.getName() == null ? "" : SomosUNUtils.standardizeString(sD.getName(), false)); //could be the name or the code
-			Subject subjectFinalT = null;
+			String stringStandardized = (sD.getName() == null ? "" : SomosUNUtils.standardizeString(sD.getName(), false, false)); //could be the name or the code
+			
+			Subject subjectFinalT = null; // This will be used to save the subject if sD is a only-subject
+			List<List<Subject>> listOfListsFinal = new ArrayList<List<Subject>>(); // this will be used to save the subjects if sD is not a only-subject (in the case of computer science)
+			List<SubjectDummy> subjectsNotFound = new ArrayList<SubjectDummy>(); //put inside all the subjects not found (if sD is a only-subject then put it in it)
 			
 			boolean isSpecial = false;
 			int charactersLeft = 3; //to make sure that at least the subject selected by name will be 3 chrts far from the original				
 			
 			for(Subject sTemporary : subjectListFinal){
-				String nameStandardizedT = (sTemporary.getName() == null ? "" : SomosUNUtils.standardizeString(sTemporary.getName(), false));
-				String codeStandardizedT = (sTemporary.getCode() == null ? "" : SomosUNUtils.standardizeString(sTemporary.getCode(), false));
+				
+				String nameStandardizedT = (sTemporary.getName() == null ? "" : SomosUNUtils.standardizeString(sTemporary.getName(), false, false));
+				String codeStandardizedT = (sTemporary.getCode() == null ? "" : SomosUNUtils.standardizeString(sTemporary.getCode(), false, false));
 				
 				if(stringStandardized.equals(codeStandardizedT))
 				{
@@ -2240,6 +2074,7 @@ public class SiaProxy {
 			}
 			
 			if(subjectFinalT == null){
+				/*********************************************************************************************************/
 				//search for word and get the closest aproximation, in the case of "matemática básica" in Odontología
 				/**
 				 * 1. Divide it into words
@@ -2253,21 +2088,21 @@ public class SiaProxy {
 				
 				Subject veryFinalS = null;
 				
+				//SiaResultSubjects allSubjectsSiaResult = getSubjects("", "", cV.getCareer().getCode(), "", 1, 1000, sede);
+				List<Subject> allSubjectsList = allSubjectsSiaResult.getSubjectList();
+				Map<Subject, String> typologyMap = allSubjectsSiaResult.getTypology();
 				for(String word : words){
-					SiaResultSubjects siaResult = getSubjects(word, "", cV.getCareer().getCode(), "", 1, 200, sede);
-					if(siaResult != null)
+					if(allSubjectsSiaResult != null)
 					{
-						if(siaResult.getSubjectList() != null)
+						if(allSubjectsSiaResult.getSubjectList() != null)
 						{
-							if(siaResult.getSubjectList().size() != 0)
+							if(allSubjectsSiaResult.getSubjectList().size() != 0)
 							{
-								List<Subject> theSearch = siaResult.getSubjectList();
-								Map<Subject, String> typologyMap = siaResult.getTypology();
 								
-								if(theSearch != null)
+								if(allSubjectsList != null)
 								{			
 									Subject sToAdd = null;
-									sToAdd =  getSubjectFromList(sD, theSearch, true);
+									sToAdd =  getSubjectFromList(sD, allSubjectsList, true, false);
 									if(sToAdd != null)
 									{
 										finalSubjectList.add(sToAdd);
@@ -2280,8 +2115,11 @@ public class SiaProxy {
 					}
 				}
 				
- 				veryFinalS = getSubjectFromList(sD, finalSubjectList, true);
+ 				veryFinalS = getSubjectFromList(sD, finalSubjectList, true, false);
 				
+ 				/*********************************************************************************************************/
+ 				/****************************** seeing if it is a bunch of subjects together *****************************/
+ 				
 				if(veryFinalS == null){
 					//Perhaps there is a "subject" with multiple subjects in it
 					/**
@@ -2293,18 +2131,70 @@ public class SiaProxy {
 					 * "; e,"
 					 * " o "
 					 */
-					String patterns = "((\\sy\\s)|(; y)|(; y ,)|(; y,)|(\\se\\s)|(; e)|(; e,)|(\\so\\s))";
-					if(sD.getName().matches("(.+)" + patterns + "(.+)") == true){
-						@SuppressWarnings("unused")
-						String[] maybeSubjects = sD.getName().split(patterns);
-						int x = 0;
-						//Split by those patterns
-						//Take groups of (size()-1) contiues ... for instand if it splits en 3 then spli1 + split2 is posible, but split1+split3 is not
-						//Take groups of (last.size() -1) an reapet until the size is one
+					String strongAndPatterns = "(; y\\s)|(; y ,)|(; y,)|(; e\\s)|(; e,)";
+					String softAndPatterns = "(\\sy\\s)|(\\se\\s)";
+					String softOrPatterns = "(\\so\\s)";
+					if(sD.getName().matches("(.+)" + "(" + softAndPatterns + "|" + softOrPatterns + "|" + strongAndPatterns + ")" + "(.+)") == true){
+						//Split by those patterns which don't need to analyse
+						List<List<Subject>> subjectsListOfLists = new ArrayList<List<Subject>>();
+						String[] subjectsStringList = sD.getName().split(strongAndPatterns);
+						
+						//Search if those in subjectsStringList are subjects
+						for(String subjectStringT : subjectsStringList){
+							
+							Subject subjectFound =  getSubjectFromList(subjectStringT, allSubjectsList, true, true);
+							
+							if(subjectFound != null){
+								List<Subject> andList = new ArrayList<Subject>();
+								andList.add(subjectFound);
+								subjectsListOfLists.add(andList);
+							}else{
+								//One split from an AND-Strong patter were not found
+								String[] maybeSubjectsStringList = subjectStringT.split("(?=(" + softAndPatterns + "|" + softOrPatterns + "))");
+								int length = maybeSubjectsStringList.length; 
+								if(length > 1){
+									//Take groups of (size()-1) contiues ... for instand if it splits en 3 then spli1 + split2 is posible, but split1+split3 is not
+									for(int groupSize=length -1; groupSize > 0; groupSize--){
+										int beginning = 0;
+										while(beginning + groupSize <= length){											
+											String group = "";
+											for(int x = 0; x < groupSize; x++){
+												String toConcat = maybeSubjectsStringList[x+beginning];
+												if(x == 0){
+													//If it is the first string to concat then remove the patterns first ("o física cuántica" -> "física cuántica" to finally get "física cuántica y relativista")
+													toConcat = toConcat.replaceAll(softOrPatterns + "|" + softAndPatterns ,"");
+												}
+												group = group.concat(toConcat);
+											} 
+											subjectFound = getSubjectFromList(group, allSubjectsList, true, true);
+											if(subjectFound != null){
+												//found at some groupSize at some beginning  //TODO
+												int yu=0;
+											}
+											beginning ++;
+										}
+									}
+									
+								}else{
+									subjectsNotFound.add(sD);
+								}
+							}
+						}
+					}else{
+						subjectsNotFound.add(sD);
 					}
 				}
+				/*********************************************************************************************************/
 				
-				if(veryFinalS != null)
+				/************************* getting the subjectGroup for the subjects **************************/
+				/********************************************************************/
+				
+				//TODO get the subjects not found in order to find its subjectGroups
+				
+				/********************************************************************/
+				
+				//OLD if(veryFinalS != null)
+				if(subjectsNotFound.size() > 0)
 				{
 					isSpecial = false;
 					subjectFinalT = veryFinalS;
@@ -2338,18 +2228,23 @@ public class SiaProxy {
 					mapSCV.put(subjectFinalT, cVToCreate);
 					
 				}
+				
+				/***********************************************************************************************/
 			}
 			
 			if(subjectFinalT == null)
 			{
+				/**************************** it must be a speacial subject *******************************/
 				//it means that it is a special subject
 				isSpecial = true;
 				subjectFinalT = new Subject(0, "", "", sD.getName(), sede);
 				subjectFinalT.setSpecial(isSpecial);
 				subjectDao.saveSubject(subjectFinalT);
 				subjectFinalT = subjectDao.getSubjectByName(subjectFinalT.getName());
+				/******************************************************************************************/
 			}
 			
+			/********************************** Saving whatever that was found *****************************************/
 			if(isPre == true)
 			{
 				//Add subjectFinalT to the two lists

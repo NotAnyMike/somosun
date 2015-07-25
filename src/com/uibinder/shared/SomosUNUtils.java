@@ -47,9 +47,10 @@ public class SomosUNUtils {
 	 * - "ñ"<br>
 	 * 
 	 * @param s
+	 * @param removePunctuation 
 	 * @return
 	 */
-	public static String standardizeString(String s, boolean removeS){
+	public static String standardizeString(String s, boolean removeS, boolean removePunctuation){
 		String stringToReturn = null;
 		if(s != null){
 			stringToReturn = s.trim();
@@ -62,9 +63,21 @@ public class SomosUNUtils {
 					.replaceAll("-", "")
 					.replaceAll("/", "");
 			if(removeS == true) stringToReturn = stringToReturn.replaceAll("s", "");
+			if(removePunctuation == true) stringToReturn = removePunctuation(stringToReturn);
 		}
 		
 		return stringToReturn;
+	}
+	
+	public static String removePunctuation(String s){
+		String toReturn = null;
+		toReturn = s;
+	
+		if(s!=null){
+			toReturn = toReturn.replaceAll("(;)|(,)|(\\.)","");
+		}
+		
+		return toReturn;
 	}
 
 	/**
