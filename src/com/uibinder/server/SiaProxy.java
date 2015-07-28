@@ -810,10 +810,10 @@ public class SiaProxy {
 				complementaryValue = new ComplementaryValue(mainCareer, mainSubject);
 			}
 			if(prerequisitesSubjectList.isEmpty() == false){//be careful it could be deleting the old list
-				complementaryValue.setListPrerequisites(prerequisitesSubjectList);
+				complementaryValue.addListToPrerequisites(prerequisitesSubjectList);
 			}
 			if(corequisitesSubjectList.isEmpty() == false){//be careful it could be deleting the old list
-				complementaryValue.setListCorequisites(corequisitesSubjectList);
+				complementaryValue.addListToCorequisites(corequisitesSubjectList);
 			}
 			
 			//to save the pos requisites = pre requisites of
@@ -2045,7 +2045,7 @@ public class SiaProxy {
 			
 			Subject subjectFinalT = null; // This will be used to save the subject if sD is a only-subject
 			List<List<Subject>> listOfListsFinal = new ArrayList<List<Subject>>(); // this will be used to save the subjects if sD is not a only-subject (in the case of computer science)
-			List<SubjectDummy> subjectsNotFound = new ArrayList<SubjectDummy>(); //put inside all the subjects not found (if sD is a only-subject then put it in it)
+			//List<SubjectDummy> subjectsNotFound = new ArrayList<SubjectDummy>(); //put inside all the subjects not found (if sD is a only-subject then put it in it)
 			
 			boolean isSpecial = false;
 			int charactersLeft = 3; //to make sure that at least the subject selected by name will be 3 chrts far from the original				
@@ -2119,6 +2119,7 @@ public class SiaProxy {
  				veryFinalS = getSubjectFromList(sD, finalSubjectList, true, false);
  				if(veryFinalS != null){
  					List<Subject> list = new ArrayList<Subject>();
+ 					list.add(veryFinalS);
  					listOfListsFinal.add(list);
  				}
 				
@@ -2135,11 +2136,13 @@ public class SiaProxy {
 					 * "; y,"
 					 * "; e,"
 					 * " o "
+					 * "/o/" <- in Admon
 					 */
 					String strongAndPatterns = "(; y\\s)|(; y ,)|(; y,)|(; e\\s)|(; e,)";
 					String softAndPatterns = "(\\sy\\s)|(\\se\\s)";
+					String strongOrPatterns = "(\\/o\\/)";
 					String softOrPatterns = "(\\so\\s)";
-					if(sD.getName().matches("(.+)" + "(" + softAndPatterns + "|" + softOrPatterns + "|" + strongAndPatterns + ")" + "(.+)") == true){
+					if(sD.getName().matches("(.+)" + "(" + softAndPatterns + "|" + softOrPatterns + "|" + strongOrPatterns + "|" + strongAndPatterns + ")" + "(.+)") == true){
 						//Split by those patterns which don't need to analyse
 						List<List<Subject>> subjectsListOfLists = new ArrayList<List<Subject>>();
 						String[] subjectsStringList = sD.getName().split(strongAndPatterns);
@@ -2154,66 +2157,65 @@ public class SiaProxy {
 								andList.add(subjectFound);
 								subjectsListOfLists.add(andList);
 							}else{
+								
+								//Do the strongOrPattern
+								
 								//One split from an AND-Strong patter were not found
-								String[] maybeSubjectsStringList = subjectStringT.split("(?=(" + softAndPatterns + "|" + softOrPatterns + "))");
+								String[] maybeSubjectsStringList = subjectStringT.split("(?=(" + softAndPatterns + "|" + softOrPatterns + "|" + strongOrPatterns + "))");
 								int length = maybeSubjectsStringList.length; 
 								
 								List<String> finalSplits = new ArrayList<String>();
 								List<Subject> splittedSubjects = new ArrayList<Subject>();
 								
-								if(length > 1){
-									//Take groups of (size()-1) contiues ... for instand if it splits en 3 then spli1 + split2 is posible, but split1+split3 is not
-									for(int groupSize=length -1; groupSize > 0; groupSize--){
-										int beginning = 0;
-										while(beginning + groupSize <= length){											
-											String group = "";
-											for(int x = 0; x < groupSize; x++){
-												String toConcat = maybeSubjectsStringList[x+beginning];
-												if(x == 0){
-													if(toConcat.isEmpty()){
-														//if the first string is empty then it must mean that it was part of a found string, therefore it must not be used
-														group = null;
-														break;
-													}
-													//If it is the first string to concat then remove the patterns first ("o física cuántica" -> "física cuántica" to finally get "física cuántica y relativista")
-													toConcat = toConcat.replaceAll(softOrPatterns + "|" + softAndPatterns ,"");
+								//Take groups of (size()-1) contiues ... for instand if it splits en 3 then spli1 + split2 is posible, but split1+split3 is not
+								for(int groupSize=length -1; groupSize > 0; groupSize--){
+									int beginning = 0;
+									while(beginning + groupSize <= length){											
+										String group = "";
+										for(int x = 0; x < groupSize; x++){
+											String toConcat = maybeSubjectsStringList[x+beginning];
+											if(x == 0){
+												if(toConcat.isEmpty()){
+													//if the first string is empty then it must mean that it was part of a found string, therefore it must not be used
+													group = null;
+													break;
 												}
-												group = group.concat(toConcat);
+												//If it is the first string to concat then remove the patterns first ("o física cuántica" -> "física cuántica" to finally get "física cuántica y relativista")
+												toConcat = toConcat.replaceAll(softOrPatterns + "|" + strongOrPatterns + "|" + softAndPatterns ,"");
 											}
-											if(group == null) {
-												beginning++;
-												continue;
-											}
-											subjectFound = getSubjectFromList(group, allSubjectsList, true, true);
-											if(subjectFound != null){
-												//add the subject to splittedSubjects list and empty the strings used
-												String stringLeft = "";
-												String stringFound = "";
-												for(int x = 0; x < groupSize + beginning; x++){
-													if(x >= beginning){
-														stringFound = stringFound.concat(maybeSubjectsStringList[x]);
-													}else{
-														stringLeft = stringLeft.concat(maybeSubjectsStringList[x]);
-													}
-													maybeSubjectsStringList[x] = "";														
-												}
-												if(stringLeft.isEmpty() == false){													
-													finalSplits.add(stringLeft);
-													//create the subject dummy and add it to splittedSubjects
-													String specialName = stringLeft.replaceFirst("^((" + strongAndPatterns + "|" + softAndPatterns + "|" + softOrPatterns + ")\\s*)", "");
-													Subject subjectNotFound = createAndSaveSpeacialSubject(specialName, sede, subjectDao);
-													splittedSubjects.add(subjectNotFound);
-												}
-												finalSplits.add(stringFound);
-												splittedSubjects.add(subjectFound);
-											}
-											beginning ++;
+											group = group.concat(toConcat);
 										}
+										if(group == null) {
+											beginning++;
+											continue;
+										}
+										subjectFound = getSubjectFromList(group, allSubjectsList, true, true);
+										if(subjectFound != null){
+											//add the subject to splittedSubjects list and empty the strings used
+											String stringLeft = "";
+											String stringFound = "";
+											for(int x = 0; x < groupSize + beginning; x++){
+												if(x >= beginning){
+													stringFound = stringFound.concat(maybeSubjectsStringList[x]);
+												}else{
+													stringLeft = stringLeft.concat(maybeSubjectsStringList[x]);
+												}
+												maybeSubjectsStringList[x] = "";														
+											}
+											if(stringLeft.isEmpty() == false){													
+												finalSplits.add(stringLeft);
+												//create the subject dummy and add it to splittedSubjects
+												String specialName = stringLeft.replaceFirst("^((" + strongAndPatterns + "|" + softAndPatterns + "|" + softOrPatterns + "|" + strongOrPatterns + ")\\s*)", "");
+												Subject subjectNotFound = createAndSaveSpeacialSubject(specialName, sede, subjectDao);
+												splittedSubjects.add(subjectNotFound);
+											}
+											finalSplits.add(stringFound);
+											splittedSubjects.add(subjectFound);
+										}
+										beginning ++;
 									}
-									
-								}else{
-									subjectsNotFound.add(sD);
 								}
+									
 								
 								String theLeftOvers = "";
 								for(int x = 0; x < maybeSubjectsStringList.length; x++){
@@ -2221,7 +2223,7 @@ public class SiaProxy {
 								}
 								if(theLeftOvers.isEmpty() == false){
 									finalSplits.add(theLeftOvers);
-									String specialName = theLeftOvers.replaceFirst("^((" + strongAndPatterns + "|" + softAndPatterns + "|" + softOrPatterns + ")\\s*)", "");
+									String specialName = theLeftOvers.replaceFirst("^((" + strongAndPatterns + "|" + softAndPatterns + "|" + softOrPatterns + "|" + strongOrPatterns + ")\\s*)", "");
 									Subject subjectNotFound = createAndSaveSpeacialSubject(specialName, sede, subjectDao);
 									splittedSubjects.add(subjectNotFound);
 								}
@@ -2230,12 +2232,28 @@ public class SiaProxy {
 								List<Subject> list = null;
 								for(int x = 0; x < finalSplits.size(); x++){
 									String actualString = new String(finalSplits.get(x));
-									boolean hasOr = actualString.matches("(^(" + softOrPatterns + "(\\s*)))(.*)");
+									boolean hasOr = actualString.matches("(^((" + softOrPatterns + "|" + strongOrPatterns + ")(\\s*)))(.*)");
+									boolean hasMiddleOr = actualString.matches("(.*)(\\w+)(\\s*)(((" + strongOrPatterns + ")(\\s*)))(\\w+)(.*)");
 									if(list == null || hasOr == false){
 										list = new ArrayList<Subject>();
 										subjectsListOfLists.add(list);
 									}
-									list.add(splittedSubjects.get(x));
+									//If contains a strongOrPattern then in the middle dive it, create the subjects and add the to the list
+									if(hasMiddleOr == true){
+										String[] middleOrs = actualString.split(strongOrPatterns);
+										for(String stringSplitted : middleOrs){
+											String orName = stringSplitted.replaceFirst("^((" + strongAndPatterns + "|" + softAndPatterns + "|" + softOrPatterns + "|" + strongOrPatterns + ")\\s*)", "");
+											orName = orName.replaceAll("(\\s*)" + strongOrPatterns + "(\\s*)", "");
+											orName = orName.replaceAll("^(\\s+)", "");
+											orName = orName.replaceAll("&(\\s+)","");
+											if(orName.isEmpty() == false){												
+												Subject subjectWithStrongOr = createAndSaveSpeacialSubject(orName, sede, subjectDao);
+												list.add(subjectWithStrongOr);
+											}
+										}
+									}else{										
+										list.add(splittedSubjects.get(x));
+									}
 								}
 								
 							}
@@ -2304,9 +2322,9 @@ public class SiaProxy {
 								ComplementaryValue cVFromDb = complementaryValueDao.getComplementaryValues(cV.getCareer(), subjectTemporary);
 								ComplementaryValue cVToCreate = new ComplementaryValue(cV.getCareer(), subjectTemporary, typology, mandatory, sG);
 								if(cVFromDb != null){
-									cVToCreate.setListCorequisites(cVFromDb.getListCorequisites());
+									cVToCreate.setListCorequisites(cVFromDb.getCorequisitesLists());
 									cVToCreate.setListCorequisitesOf(cVFromDb.getListCorequisitesOf());
-									cVToCreate.setListPrerequisites(cVFromDb.getListPrerequisites());
+									cVToCreate.setListPrerequisites(cVFromDb.getPrerequisitesLists());
 									cVToCreate.setListPrerequisitesOf(cVFromDb.getListPrerequisitesOf());
 								}
 								
@@ -2318,11 +2336,17 @@ public class SiaProxy {
 					}
 				}
 				/****************************************************************************************************/
+			}else{
+				List<Subject> list = new ArrayList<Subject>();
+				list.add(subjectFinalT);
+				listOfListsFinal.add(list);
 			}
 			
+			@SuppressWarnings("unused")
+			int x = 0; 
+			
 			/********************************** Saving whatever that was found *****************************************/
-			if(isPre == true)
-			{
+			if(isPre == true && false){
 				//Add subjectFinalT to the two lists
 				cV.addPrerequisite(subjectFinalT);
 				if(isSpecial == false)
@@ -2339,7 +2363,7 @@ public class SiaProxy {
 					}
 				}				
 			}
-			else
+			else if(false)
 			{
 				//Add subjectFinalT to the two lists
 				cV.addCorequisite(subjectFinalT);
