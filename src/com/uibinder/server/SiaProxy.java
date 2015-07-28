@@ -2,7 +2,6 @@ package com.uibinder.server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -15,9 +14,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jetty.util.log.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,7 +26,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import com.googlecode.objectify.annotation.Index;
 import com.uibinder.server.dao.BlockDao;
 import com.uibinder.server.dao.CareerDao;
 import com.uibinder.server.dao.ComplementaryValueDao;
@@ -40,7 +38,6 @@ import com.uibinder.server.dao.TeacherDao;
 import com.uibinder.server.dummy.ComponentDummy;
 import com.uibinder.server.dummy.SubjectDummy;
 import com.uibinder.server.dummy.SubjectGroupDummy;
-import com.uibinder.shared.SiaResult;
 import com.uibinder.shared.SiaResultGroups;
 import com.uibinder.shared.SiaResultSubjects;
 import com.uibinder.shared.SomosUNUtils;
@@ -1590,6 +1587,7 @@ public class SiaProxy {
 		//SiaResultSubjects siaResultFundamental = getSubjects("", "B", careerString, "", 1, 200, sede);
 		//SiaResultSubjects siaResultProfessional = getSubjects("", "C", careerString, "", 1, 200, sede);
 		SiaResultSubjects allSiaResult = getSubjects("", "", "", "", 1, 10000, sede, null);
+		SiaResultSubjects careerSiaResult = getSubjects("", "", careerString, "", 1, 10000, sede, null);
 				
 		for(SubjectDummy sD : subjectsD)
 		{
@@ -1672,8 +1670,8 @@ public class SiaProxy {
 			ComplementaryValue cV = mapSCV.get(s);
 			
 			//for each pre and co
-			addRequisitesToBothLists(cV, s, preSD, subjectListFinal, allSiaResult, subjectDao, mapSCV, true, complementaryValueDao, subjectGroupDao);
-			addRequisitesToBothLists(cV, s, coSD, subjectListFinal, allSiaResult, subjectDao, mapSCV, false, complementaryValueDao, subjectGroupDao);
+			addRequisitesToBothLists(cV, s, preSD, subjectListFinal, allSiaResult, careerSiaResult, subjectDao, mapSCV, true, complementaryValueDao, subjectGroupDao);
+			addRequisitesToBothLists(cV, s, coSD, subjectListFinal, allSiaResult, careerSiaResult, subjectDao, mapSCV, false, complementaryValueDao, subjectGroupDao);
 			
 		}
 		
@@ -1709,10 +1707,13 @@ public class SiaProxy {
 		boolean isUpdated = isLastComplementaryValueUpdated(cV, cVFromDb);
 		if(isUpdated == false){
 			//Update the cV from the db - i.e. delete it and save the new one -
-			if(cVFromDb != null && cV != null) 
-				complementaryValueDao.deleteComplementaryValues(cVFromDb);
-			if(cV != null) 
-				complementaryValueDao.saveComplementaryValues(cV);
+			if(cV != null) {
+				if(cVFromDb != null && cVFromDb.getId() != null){
+					cV.setId(cVFromDb.getId());
+				}
+				//complementaryValueDao.deleteComplementaryValues(cVFromDb); 
+				complementaryValueDao.saveComplementaryValues(cV);				
+			}
 		}
 		
 	}
@@ -2030,7 +2031,7 @@ public class SiaProxy {
 	 * @param complementaryValueDao
 	 * @param subjectGroupDao
 	 */
-	private static void addRequisitesToBothLists(ComplementaryValue cV, Subject s, List<SubjectDummy> listOfRequisitesSD, List<Subject> subjectListFinal, SiaResultSubjects allSubjectsSiaResult, SubjectDao subjectDao, Map<Subject, ComplementaryValue> mapSCV, boolean isPre, ComplementaryValueDao complementaryValueDao, SubjectGroupDao subjectGroupDao)
+	private static void addRequisitesToBothLists(ComplementaryValue cV, Subject s, List<SubjectDummy> listOfRequisitesSD, List<Subject> subjectListFinal, SiaResultSubjects allSubjectsSiaResult, SiaResultSubjects careerSubjectsSiaResult, SubjectDao subjectDao, Map<Subject, ComplementaryValue> mapSCV, boolean isPre, ComplementaryValueDao complementaryValueDao, SubjectGroupDao subjectGroupDao)
 	{
 		String sede = "bog";
 		for(SubjectDummy sD : listOfRequisitesSD){
@@ -2116,6 +2117,10 @@ public class SiaProxy {
 				}
 				
  				veryFinalS = getSubjectFromList(sD, finalSubjectList, true, false);
+ 				if(veryFinalS != null){
+ 					List<Subject> list = new ArrayList<Subject>();
+ 					listOfListsFinal.add(list);
+ 				}
 				
  				/*********************************************************************************************************/
  				/****************************** seeing if it is a bunch of subjects together *****************************/
@@ -2152,6 +2157,10 @@ public class SiaProxy {
 								//One split from an AND-Strong patter were not found
 								String[] maybeSubjectsStringList = subjectStringT.split("(?=(" + softAndPatterns + "|" + softOrPatterns + "))");
 								int length = maybeSubjectsStringList.length; 
+								
+								List<String> finalSplits = new ArrayList<String>();
+								List<Subject> splittedSubjects = new ArrayList<Subject>();
+								
 								if(length > 1){
 									//Take groups of (size()-1) contiues ... for instand if it splits en 3 then spli1 + split2 is posible, but split1+split3 is not
 									for(int groupSize=length -1; groupSize > 0; groupSize--){
@@ -2161,15 +2170,42 @@ public class SiaProxy {
 											for(int x = 0; x < groupSize; x++){
 												String toConcat = maybeSubjectsStringList[x+beginning];
 												if(x == 0){
+													if(toConcat.isEmpty()){
+														//if the first string is empty then it must mean that it was part of a found string, therefore it must not be used
+														group = null;
+														break;
+													}
 													//If it is the first string to concat then remove the patterns first ("o física cuántica" -> "física cuántica" to finally get "física cuántica y relativista")
 													toConcat = toConcat.replaceAll(softOrPatterns + "|" + softAndPatterns ,"");
 												}
 												group = group.concat(toConcat);
-											} 
+											}
+											if(group == null) {
+												beginning++;
+												continue;
+											}
 											subjectFound = getSubjectFromList(group, allSubjectsList, true, true);
 											if(subjectFound != null){
-												//found at some groupSize at some beginning  //TODO
-												int yu=0;
+												//add the subject to splittedSubjects list and empty the strings used
+												String stringLeft = "";
+												String stringFound = "";
+												for(int x = 0; x < groupSize + beginning; x++){
+													if(x >= beginning){
+														stringFound = stringFound.concat(maybeSubjectsStringList[x]);
+													}else{
+														stringLeft = stringLeft.concat(maybeSubjectsStringList[x]);
+													}
+													maybeSubjectsStringList[x] = "";														
+												}
+												if(stringLeft.isEmpty() == false){													
+													finalSplits.add(stringLeft);
+													//create the subject dummy and add it to splittedSubjects
+													String specialName = stringLeft.replaceFirst("^((" + strongAndPatterns + "|" + softAndPatterns + "|" + softOrPatterns + ")\\s*)", "");
+													Subject subjectNotFound = createAndSaveSpeacialSubject(specialName, sede, subjectDao);
+													splittedSubjects.add(subjectNotFound);
+												}
+												finalSplits.add(stringFound);
+												splittedSubjects.add(subjectFound);
 											}
 											beginning ++;
 										}
@@ -2178,70 +2214,110 @@ public class SiaProxy {
 								}else{
 									subjectsNotFound.add(sD);
 								}
+								
+								String theLeftOvers = "";
+								for(int x = 0; x < maybeSubjectsStringList.length; x++){
+									theLeftOvers = theLeftOvers.concat(maybeSubjectsStringList[x]);
+								}
+								if(theLeftOvers.isEmpty() == false){
+									finalSplits.add(theLeftOvers);
+									String specialName = theLeftOvers.replaceFirst("^((" + strongAndPatterns + "|" + softAndPatterns + "|" + softOrPatterns + ")\\s*)", "");
+									Subject subjectNotFound = createAndSaveSpeacialSubject(specialName, sede, subjectDao);
+									splittedSubjects.add(subjectNotFound);
+								}
+								
+								//arranges the Ifs, Ors and the not found subjects
+								List<Subject> list = null;
+								for(int x = 0; x < finalSplits.size(); x++){
+									String actualString = new String(finalSplits.get(x));
+									boolean hasOr = actualString.matches("(^(" + softOrPatterns + "(\\s*)))(.*)");
+									if(list == null || hasOr == false){
+										list = new ArrayList<Subject>();
+										subjectsListOfLists.add(list);
+									}
+									list.add(splittedSubjects.get(x));
+								}
+								
 							}
 						}
+						if(subjectsListOfLists.size() > 0){
+							listOfListsFinal.addAll(subjectsListOfLists);
+						}
+						@SuppressWarnings("unused")
+						int yu=0;
 					}else{
-						subjectsNotFound.add(sD);
+						/**************************** it must be a speacial subject *******************************/
+						//it means that it is a special subject
+						isSpecial = true;
+						subjectFinalT = createAndSaveSpeacialSubject(sD.getName(), sede, subjectDao);
+						List<Subject> list = new ArrayList<Subject>();
+						list.add(subjectFinalT);
+						listOfListsFinal.add(list);
+						/******************************************************************************************/
 					}
 				}
+				
 				/*********************************************************************************************************/
 				
-				/************************* getting the subjectGroup for the subjects **************************/
-				/********************************************************************/
-				
-				//TODO get the subjects not found in order to find its subjectGroups
-				
-				/********************************************************************/
+				/************************* getting the complementaryValue for the subjects **************************/
+			
+				//for each subject in the list of list and remove the specials
 				
 				//OLD if(veryFinalS != null)
-				if(subjectsNotFound.size() > 0)
-				{
-					isSpecial = false;
-					subjectFinalT = veryFinalS;
-					String typology = finalTypologyMap.get(subjectFinalT);
-					boolean mandatory = false; //because it is not in the law
+				if(listOfListsFinal.size() > 0){
 					
-					/**
-					 * if typology = P then it is leveling, then it must be added to the Nivelación group, and if typology = L, add it to free Elections
-					 * Otherwise the val is null
-					 */
-					
-					SubjectGroup sG = null;
-					if(typology.equals("P"))
-					{
-						//get the Nivelación subjectGroup
-						sG = subjectGroupDao.getSubjectGroup(SubjectGroupCodes.NIVELACION_NAME, cV.getCareer().getCode());
+					// For each one of the subjects found (or not found)
+					for(List<Subject> listTemporary : listOfListsFinal){
+						for(Subject subjectTemporary : listTemporary){
+							
+							//Ignore the not-found subjects
+							if(subjectTemporary.isSpecial() == false){
+								
+								isSpecial = false;
+								//subjectTemporary = veryFinalS;
+								String typology = null;					
+								typology = careerSubjectsSiaResult.getTypologyForASubject(subjectTemporary.getCode());//finalTypologyMap.get(subjectFinalT);
+								if(typology == null || typology.isEmpty()){
+									typology = "L";
+								}
+								boolean mandatory = false; //because it is not in the law
+								
+								/**
+								 * if typology = P then it is leveling, then it must be added to the Nivelación group, and if typology = L, add it to free Elections
+								 * Otherwise the val is null
+								 */
+								
+								SubjectGroup sG = null;
+								if(typology.equals("P"))
+								{
+									//get the Nivelación subjectGroup
+									sG = subjectGroupDao.getSubjectGroup(SubjectGroupCodes.NIVELACION_NAME, cV.getCareer().getCode());
+								}
+								else if(typology.equals("L"))
+								{
+									//get the Libre elección subjectGroup
+									sG = subjectGroupDao.getSubjectGroup(SubjectGroupCodes.LIBRE_NAME, cV.getCareer().getCode());
+								}
+								
+								//create the complementaryValue and add it to the mapSCV
+								//FIXME the cV should have been created (a new one) in order to update the info once in a while, be carerful not (perhaps) to update it from somewhere else
+								ComplementaryValue cVFromDb = complementaryValueDao.getComplementaryValues(cV.getCareer(), subjectTemporary);
+								ComplementaryValue cVToCreate = new ComplementaryValue(cV.getCareer(), subjectTemporary, typology, mandatory, sG);
+								if(cVFromDb != null){
+									cVToCreate.setListCorequisites(cVFromDb.getListCorequisites());
+									cVToCreate.setListCorequisitesOf(cVFromDb.getListCorequisitesOf());
+									cVToCreate.setListPrerequisites(cVFromDb.getListPrerequisites());
+									cVToCreate.setListPrerequisitesOf(cVFromDb.getListPrerequisitesOf());
+								}
+								
+								updateTwoComplementaryValues(cVToCreate, cVFromDb, complementaryValueDao);
+								
+								mapSCV.put(subjectTemporary, cVToCreate);
+							}
+						}
 					}
-					else if(typology.equals("L"))
-					{
-						//get the Libre elección subjectGroup
-						sG = subjectGroupDao.getSubjectGroup(SubjectGroupCodes.LIBRE_NAME, cV.getCareer().getCode());
-					}
-					
-					//create the complementaryValue and add it to the mapSCV
-					
-					ComplementaryValue cVToCreate = new ComplementaryValue(cV.getCareer(), subjectFinalT, typology, mandatory, sG);
-					ComplementaryValue cVFromDb = complementaryValueDao.getComplementaryValues(cV.getCareer(), subjectFinalT);
-					
-					updateTwoComplementaryValues(cVToCreate, cVFromDb, complementaryValueDao);
-					
-					mapSCV.put(subjectFinalT, cVToCreate);
-					
 				}
-				
-				/***********************************************************************************************/
-			}
-			
-			if(subjectFinalT == null)
-			{
-				/**************************** it must be a speacial subject *******************************/
-				//it means that it is a special subject
-				isSpecial = true;
-				subjectFinalT = new Subject(0, "", "", sD.getName(), sede);
-				subjectFinalT.setSpecial(isSpecial);
-				subjectDao.saveSubject(subjectFinalT);
-				subjectFinalT = subjectDao.getSubjectByName(subjectFinalT.getName());
-				/******************************************************************************************/
+				/****************************************************************************************************/
 			}
 			
 			/********************************** Saving whatever that was found *****************************************/
@@ -2258,6 +2334,7 @@ public class SiaProxy {
 					}
 					else
 					{						
+						//FIXME make sure it is not there already
 						cVT.addPrerequisiteOf(s);
 					}
 				}				
@@ -2274,12 +2351,27 @@ public class SiaProxy {
 						throw new RuntimeException("Error, the subject " + subjectFinalT.getName() + " is a subject and has no complementary value");
 					}
 					else
-					{						
+					{					
+						//FIXME make sure it is not there already
 						cVT.addCorequisiteOf(s);
 					}
 				}	
 			}
 		}
+	}
+
+	private static Subject createAndSaveSpeacialSubject(String name, String sede, SubjectDao subjectDao) {
+		Subject subjectFinalT = null;
+		
+		if(name != null){
+			subjectFinalT = new Subject(0, "", "", name, sede);
+			subjectFinalT.setSpecial(true);
+			Long id = subjectDao.saveSubject(subjectFinalT);
+			subjectFinalT.setId(id);			
+		}
+		
+		
+		return subjectFinalT;
 	}
 
 	private static List<String> getWordsInString(String s)

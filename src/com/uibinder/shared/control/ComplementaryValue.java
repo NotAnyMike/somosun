@@ -146,7 +146,8 @@ public class ComplementaryValue implements Serializable {
 	
 	public void addPrerequisite(Subject subject){
 		if(listPrerequisites == null) listPrerequisites = new ArrayList<Subject>();
-		if(listPrerequisites.contains(subject) == false){
+		boolean containsSubject = containsSubject(listPrerequisites, subject);
+		if(containsSubject == false){
 			listPrerequisites.add(subject);
 		}
 	}
@@ -158,12 +159,15 @@ public class ComplementaryValue implements Serializable {
 	}
 	
 	public void addPrerequisiteOf(Subject subject){
-		if(listPrerequisitesOf == null) listPrerequisitesOf = new ArrayList<Subject>();
-		if(listPrerequisitesOf.contains(subject) == false){
+		if(listPrerequisitesOf == null) {
+			listPrerequisitesOf = new ArrayList<Subject>();
+		}
+		boolean containsSubject = containsSubject(listPrerequisitesOf, subject);
+		if(containsSubject == false){
 			listPrerequisitesOf.add(subject);
 		}
 	}
-	
+
 	public void removePrerequisiteOf(Subject subject){
 		if(listPrerequisitesOf.contains(subject) == true){
 			listPrerequisitesOf.remove(subject);
@@ -172,7 +176,8 @@ public class ComplementaryValue implements Serializable {
 	
 	public void addCorequisite(Subject subject){
 		if(listCorequisites == null) listCorequisites = new ArrayList<Subject>();
-		if(listCorequisites.contains(subject) == false){
+		boolean containsSubject = containsSubject(listCorequisites, subject);
+		if(containsSubject == false){
 			listCorequisites.add(subject);
 		}
 	}
@@ -185,7 +190,8 @@ public class ComplementaryValue implements Serializable {
 	
 	public void addCorequisiteOf(Subject subject){
 		if(listCorequisitesOf == null) listCorequisitesOf = new ArrayList<Subject>();
-		if(listCorequisitesOf.contains(subject) == false){
+		boolean containsSubject = containsSubject(listCorequisitesOf, subject);
+		if(containsSubject == false){
 			listCorequisitesOf.add(subject);
 		}
 	}
@@ -258,6 +264,26 @@ public class ComplementaryValue implements Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+	
+	private boolean containsSubject(List<Subject> list, Subject subject) {
+		boolean toReturn = false;
+		
+		for(Subject s : list){
+			if(s.getCode().isEmpty() == false){
+				if(s.getCode().equals(subject) == true){
+					toReturn = true;
+					break;
+				}
+			}else{
+				if(s.getName().equals(subject.getName()) == true){
+					toReturn = true;
+					break;
+				}
+			}
+		}
+		
+		return toReturn;
 	}
 
 }
