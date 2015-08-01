@@ -148,19 +148,9 @@ public class SiaProxy {
 	            }
 	            reader.close();
 	
-	        } catch (MalformedURLException e) {
-	            respString ="MalformedURLException";
-	            log.warning("SiaProxy - MalformedURLException with UrlToConnect: " + URLToConnect + " and data: " + data);
-	            error = false;
-	        } catch (SocketTimeoutException e){
-	        	respString ="SocketTimeoutException";
-	        	log.warning("SocketTimeoutException");
-	            error = false;
-	        } catch (IOException e) {
-	        	respString ="MalformedURLException";
-	            error = false;
 	        } catch (Exception e){
-	        	respString ="Some exception";
+	        	respString = e.getMessage();
+	        	log.warning("SiaProxy - " + respString + " with UrlToConnect: " + URLToConnect + " and data: " + data);
 	            error = false;
 	        }
 			
@@ -1434,19 +1424,30 @@ public class SiaProxy {
 											Element[] cols2 = table[row+row2];
 											String type = SomosUNUtils.standardizeString(cols2[requisiteSubjectType].text(), false, false);
 											if(requisiteSubjectName != -1){
-												if(type.contains("prerrequisit")){
-													if(requisiteSubjectCode != -1){
-														prerrequisites.add(new SubjectDummy(cols2[requisiteSubjectName].text(), cols2[requisiteSubjectCode].text()));													
+												Elements tagPs = cols2[requisiteSubjectName].getElementsByTag("p");
+												for(Element tagP : tagPs){
+													String requisiteName = null;
+													if(tagPs.size()>1){
+														requisiteName = tagP.text();
 													}else{
-														prerrequisites.add(new SubjectDummy(cols2[requisiteSubjectName].text()));
+														requisiteName = cols2[requisiteSubjectName].text();
 													}
-												} else if(type.contains("correquisit")){
-													if(requisiteSubjectCode != -1){
-														correquisites.add(new SubjectDummy(cols2[requisiteSubjectName].text(), cols2[requisiteSubjectCode].text()));													
-													}else{
-														correquisites.add(new SubjectDummy(cols2[requisiteSubjectName].text()));
+													if(requisiteName != null && SomosUNUtils.standardizeString(requisiteName, false, false).isEmpty() == false){														
+														if(type.contains("prerrequisit")){
+															if(requisiteSubjectCode != -1){
+																prerrequisites.add(new SubjectDummy(requisiteName, cols2[requisiteSubjectCode].text()));													
+															}else{
+																prerrequisites.add(new SubjectDummy(requisiteName));
+															}
+														} else if(type.contains("correquisit")){
+															if(requisiteSubjectCode != -1){
+																correquisites.add(new SubjectDummy(requisiteName, cols2[requisiteSubjectCode].text()));													
+															}else{
+																correquisites.add(new SubjectDummy(requisiteName));
+															}
+														}											
 													}
-												}											
+												}
 											}
 										}
 									}
@@ -2278,6 +2279,8 @@ public class SiaProxy {
 				/*********************************************************************************************************/
 				
 				/************************* getting the complementaryValue for the subjects **************************/
+				/************************* in order to use the cV created here to populate **************************/
+				/************************* the list prerequisitesOf and the other list     **************************/
 			
 				//for each subject in the list of list and remove the specials
 				
@@ -2291,46 +2294,52 @@ public class SiaProxy {
 							//Ignore the not-found subjects
 							if(subjectTemporary.isSpecial() == false){
 								
-								isSpecial = false;
-								//subjectTemporary = veryFinalS;
-								String typology = null;					
-								typology = careerSubjectsSiaResult.getTypologyForASubject(subjectTemporary.getCode());//finalTypologyMap.get(subjectFinalT);
-								if(typology == null || typology.isEmpty()){
-									typology = "L";
+								//If it has a complementaryValues the next, else create it
+								
+								ComplementaryValue complementaryValueFromMap = null;
+								complementaryValueFromMap = mapSCV.get(subjectTemporary);
+								if(complementaryValueFromMap == null){
+									/** 
+									 * the emptyness of complementaryValueFromMap means that the subject 
+									 * was not found in the page of requisites as a subject and not as a 
+									 * requisite, therfore the subject in this instation of the loop is 
+									 * not mandatory and the cV must be created
+									 */
+									String typology = null;					
+									typology = careerSubjectsSiaResult.getTypologyForASubject(subjectTemporary.getCode());//finalTypologyMap.get(subjectFinalT);
+									if(typology == null || typology.isEmpty()){
+										typology = "L";
+									}
+									
+									boolean mandatory = false; //because the subject was not find as a subject, just as a requisite
+									
+									/**
+									 * if typology = P then it is leveling, then it must be added to the Nivelación group, and if typology = L, add it to free Elections
+									 * Otherwise the val is null
+									 */
+									
+									SubjectGroup sG = null;
+									if(typology.equals("P"))
+									{
+										//get the Nivelación subjectGroup
+										sG = subjectGroupDao.getSubjectGroup(SubjectGroupCodes.NIVELACION_NAME, cV.getCareer().getCode());
+									}
+									else if(typology.equals("L"))
+									{
+										//get the Libre elección subjectGroup
+										sG = subjectGroupDao.getSubjectGroup(SubjectGroupCodes.LIBRE_NAME, cV.getCareer().getCode());
+									}
+									
+									//create the complementaryValue and add it to the mapSCV
+									//FIXME the cV should have been created (a new one) in order to update the info once in a while, be carerful not (perhaps) to update it from somewhere else
+									//SHOULD NOT RETRIVE FROM THE DB BECAUSE THIS IS THE ONLY PLACE WHERE THE CV CAN BE CREATED ComplementaryValue cVFromDb = complementaryValueDao.getComplementaryValues(cV.getCareer(), subjectTemporary);
+									ComplementaryValue cVToCreate = new ComplementaryValue(cV.getCareer(), subjectTemporary, typology, mandatory, sG);
+									
+									//updateTwoComplementaryValues(cVToCreate, cVFromDb, complementaryValueDao);
+									
+									mapSCV.put(subjectTemporary, cVToCreate);
 								}
-								boolean mandatory = false; //because it is not in the law
 								
-								/**
-								 * if typology = P then it is leveling, then it must be added to the Nivelación group, and if typology = L, add it to free Elections
-								 * Otherwise the val is null
-								 */
-								
-								SubjectGroup sG = null;
-								if(typology.equals("P"))
-								{
-									//get the Nivelación subjectGroup
-									sG = subjectGroupDao.getSubjectGroup(SubjectGroupCodes.NIVELACION_NAME, cV.getCareer().getCode());
-								}
-								else if(typology.equals("L"))
-								{
-									//get the Libre elección subjectGroup
-									sG = subjectGroupDao.getSubjectGroup(SubjectGroupCodes.LIBRE_NAME, cV.getCareer().getCode());
-								}
-								
-								//create the complementaryValue and add it to the mapSCV
-								//FIXME the cV should have been created (a new one) in order to update the info once in a while, be carerful not (perhaps) to update it from somewhere else
-								ComplementaryValue cVFromDb = complementaryValueDao.getComplementaryValues(cV.getCareer(), subjectTemporary);
-								ComplementaryValue cVToCreate = new ComplementaryValue(cV.getCareer(), subjectTemporary, typology, mandatory, sG);
-								if(cVFromDb != null){
-									cVToCreate.setListCorequisites(cVFromDb.getCorequisitesLists());
-									cVToCreate.setListCorequisitesOf(cVFromDb.getListCorequisitesOf());
-									cVToCreate.setListPrerequisites(cVFromDb.getPrerequisitesLists());
-									cVToCreate.setListPrerequisitesOf(cVFromDb.getListPrerequisitesOf());
-								}
-								
-								updateTwoComplementaryValues(cVToCreate, cVFromDb, complementaryValueDao);
-								
-								mapSCV.put(subjectTemporary, cVToCreate);
 							}
 						}
 					}
@@ -2346,38 +2355,38 @@ public class SiaProxy {
 			int x = 0; 
 			
 			/********************************** Saving whatever that was found *****************************************/
-			if(isPre == true && false){
+			if(isPre == true){
 				//Add subjectFinalT to the two lists
-				cV.addPrerequisite(subjectFinalT);
-				if(isSpecial == false)
-				{
-					ComplementaryValue cVT = mapSCV.get(subjectFinalT);
-					if(cVT == null)
-					{
-						throw new RuntimeException("Error, the subject " + subjectFinalT.getName() + " is a subject and has no complementary value");
+				cV.addPrerequisites(listOfListsFinal);
+				for(List<Subject> list : listOfListsFinal){
+					for(Subject subject : list){
+						if(subject.isSpecial() == false)
+						{
+							ComplementaryValue cVT = mapSCV.get(subject);
+							if(cVT == null){
+								throw new RuntimeException("Error, the subject " + subject.getName() + " is a subject and has no complementary value");
+							}else{						
+								//FIXME make sure it is not there already
+								cVT.addPrerequisiteOf(s);
+							}
+						}	
 					}
-					else
-					{						
-						//FIXME make sure it is not there already
-						cVT.addPrerequisiteOf(s);
-					}
-				}				
-			}
-			else if(false)
-			{
+				}			
+			}else{
 				//Add subjectFinalT to the two lists
-				cV.addCorequisite(subjectFinalT);
-				if(isSpecial == false)
-				{
-					ComplementaryValue cVT = mapSCV.get(subjectFinalT);
-					if(cVT == null)
-					{
-						throw new RuntimeException("Error, the subject " + subjectFinalT.getName() + " is a subject and has no complementary value");
-					}
-					else
-					{					
-						//FIXME make sure it is not there already
-						cVT.addCorequisiteOf(s);
+				cV.addCorequisites(listOfListsFinal);
+				for(List<Subject> list : listOfListsFinal){
+					for(Subject subject : list){
+						if(subject.isSpecial() == false)
+						{
+							ComplementaryValue cVT = mapSCV.get(subject);
+							if(cVT == null){
+								throw new RuntimeException("Error, the subject " + subject.getName() + " is a subject and has no complementary value");
+							}else{					
+								//FIXME make sure it is not there already
+								cVT.addCorequisiteOf(s);
+							}
+						}
 					}
 				}	
 			}

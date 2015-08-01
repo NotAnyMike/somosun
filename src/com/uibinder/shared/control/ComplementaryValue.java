@@ -9,6 +9,7 @@ import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
+import com.googlecode.objectify.annotation.Serialize;
 
 /**
  * This class holds the complementary information about a subject based on a career
@@ -26,8 +27,8 @@ public class ComplementaryValue implements Serializable {
 	@Index private Career career = null;;
 	@Index private Subject subject = null;
 	
-	private List<List<Subject>> prerequisitesLists = null;
-	private List<List<Subject>> corequisitesLists = null;
+	@Serialize private List<List<Subject>> prerequisitesLists = null;
+	@Serialize private List<List<Subject>> corequisitesLists = null;
 	private List<Subject> listPrerequisitesOf = null;
 	private List<Subject> listCorequisitesOf = null;
 	
@@ -145,6 +146,17 @@ public class ComplementaryValue implements Serializable {
 	}
 	
 	/**
+	 * This method will all the lists in @para lists to the prerequisitesLists
+	 * @param lists
+	 */
+	public void addPrerequisites(List<List<Subject>> lists){
+		if(lists != null){
+			if(prerequisitesLists == null) prerequisitesLists = new ArrayList<List<Subject>>();
+			prerequisitesLists.addAll(lists);
+		}
+	}
+	
+	/**
 	 * This will take the @param subject as an AND prerequisite, therefore will create a new list and add it to the lists
 	 * @param subject
 	 */
@@ -195,6 +207,15 @@ public class ComplementaryValue implements Serializable {
 			list.add(subject);
 			corequisitesLists.add(list);
 		}
+	}
+	
+	/**
+	 * This method will add all the lists in @param lists to the correquisiteLists
+	 * @param lists
+	 */
+	public void addCorequisites(List<List<Subject>> lists){
+		if(corequisitesLists == null) corequisitesLists = new ArrayList<List<Subject>>();
+		corequisitesLists.addAll(lists);
 	}
 	
 	public void removeCorequisite(Subject subject){
