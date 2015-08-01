@@ -1226,7 +1226,7 @@ public class SiaProxy {
 									if(requisites == true)
 										if(textToTest.contains("prerrequisito") == false && textToTest.contains("correquisito") == false
 										&& textToTest.equals("no") == false && textToTest.contains("requisito") == false
-										&& textToTest.equals("") == false)
+										&& textToTest.equals("") == false && textToTest.isEmpty() == false)
 											requisites = false;
 									if(integers == true)
 										if(StringUtils.isNumeric(textToTest) == false && textToTest.contains("credito") == false)
@@ -1432,7 +1432,7 @@ public class SiaProxy {
 													}else{
 														requisiteName = cols2[requisiteSubjectName].text();
 													}
-													if(requisiteName != null && SomosUNUtils.standardizeString(requisiteName, false, false).isEmpty() == false){														
+													if(requisiteName != null && SomosUNUtils.standardizeString(requisiteName, false, true).isEmpty() == false){														
 														if(type.contains("prerrequisit")){
 															if(requisiteSubjectCode != -1){
 																prerrequisites.add(new SubjectDummy(requisiteName, cols2[requisiteSubjectCode].text()));													

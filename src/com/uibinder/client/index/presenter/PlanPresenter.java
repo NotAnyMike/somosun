@@ -87,8 +87,7 @@ DefaultSubjectCreationView.Presenter{
 	private List<SubjectWidget> subjectWidgetList = new ArrayList<SubjectWidget>();
 	private List<SemesterWidget> semesterWidgetList = new ArrayList<SemesterWidget>();
 	
-	private List<SubjectValue> subjectValuesList = new ArrayList<SubjectValue>();
-	//private HashMap<SubjectValues, Subject> valuesAndSubjectMap = new HashMap<SubjectValues, Subject>(); 
+	private List<SubjectValue> subjectValuesList = new ArrayList<SubjectValue>(); 
 	private BiMap<SubjectValue, SubjectWidget> subjectValuesAndWidgetBiMap = HashBiMap.create();
 	
 	private List<Semester> semesterList = new ArrayList<Semester>();
@@ -380,7 +379,16 @@ DefaultSubjectCreationView.Presenter{
 				subjectWidget.setGrade(gradeString);
 			}
 		}
-		
+		String codeTitle = "Agrupación: "+  (subjectValue.getComplementaryValues().getSubjectGroup() != null ? subjectValue.getComplementaryValues().getSubjectGroup().getName() : "Unknown");
+		String prerequisitesString = subjectValue.getComplementaryValues().getPrerequisitesString();
+		String corequisitesString = subjectValue.getComplementaryValues().getCorequisitesString();
+		if(prerequisitesString != null && prerequisitesString.isEmpty() == false){
+			codeTitle = codeTitle.concat("\n, prerrequisitos: " + prerequisitesString);
+		}
+		if(corequisitesString != null && corequisitesString.isEmpty() == false){
+			codeTitle = codeTitle.concat("\n, correquisitos: " + corequisitesString);
+		}
+		subjectWidget.setCodeLabel(codeTitle);
 		
 		subjectWidgetList.add(subjectWidget);
 		makeSubjectWidgetDraggable(subjectWidget);

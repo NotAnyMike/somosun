@@ -5,6 +5,7 @@ import java.io.Serializable;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
+import com.uibinder.shared.SomosUNUtils;
 
 /**
  *
@@ -55,25 +56,6 @@ public class Subject implements Serializable {
     	this.setName(name);
     	this.setLocation(location);
     }
-    
-//    public Subject(int credits, String code, String siaCode, String name, String location) {
-//    	this.setCredits(credits);
-//    	this.setCode(code);
-//    	this.setSiaCode(siaCode);
-//    	this.setName(name);
-//    	this.setLocation(location);
-//    	this.setSpecial(special);
-//    }
-//    
-//    public Subject(int credits, String code, String siaCode, String name, String location) {
-//    	this.setCredits(credits);
-//    	this.setCode(code);
-//    	this.setSiaCode(siaCode);
-//    	this.setName(name);
-//    	this.setLocation(location);
-//    	this.setSpecial(special);
-//    	this.setDummy(isDummy);
-//    }
     
     /**
      * true if everything but he id is equal 
@@ -138,7 +120,7 @@ public class Subject implements Serializable {
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		this.name = SomosUNUtils.removeAccents(name);
 	}
 
 	public String getCode() {

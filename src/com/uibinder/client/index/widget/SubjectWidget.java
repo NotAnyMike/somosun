@@ -382,8 +382,11 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers {
 	    }
 
 	public void setSubjectGroup(String subjectGroup) {
-		// this.subjectGroup = subjectGroup;
-		codeLabel.setTitle("Agrupación: " + subjectGroup);
+		setCodeLabel(subjectGroup);
+	}
+	
+	public void setCodeLabel(String s){
+		codeLabel.setTitle(s);
 	}
 
 	public void setName(String name) {

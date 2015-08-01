@@ -59,7 +59,7 @@ public class SomosUNUtils {
 					.replaceAll(" ", "") //this space is different from the below one, this is un html (the above one) DO NOT DELETE!
 					.replaceAll(" ", "");
 			stringToReturn = removeAccents(stringToReturn);
-			stringToReturn
+			stringToReturn = stringToReturn
 					.replaceAll("-", "")
 					.replaceAll("/", "");
 			if(removeS == true) stringToReturn = stringToReturn.replaceAll("s", "");

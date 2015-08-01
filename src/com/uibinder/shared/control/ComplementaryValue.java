@@ -368,5 +368,43 @@ public class ComplementaryValue implements Serializable {
 	public List<List<Subject>> getPrerequisitesLists() {
 		return prerequisitesLists;
 	}
+	
+	public String getPrerequisitesString(){
+		String toReturn = null;
+		
+		for(List<Subject> list : prerequisitesLists){
+			if(toReturn != null) toReturn = toReturn.concat("; y ");
+			
+			for(Subject subject : list){
+				if(toReturn == null){
+					toReturn = "";
+				}else{
+					toReturn = toReturn.concat("o");					
+				}
+				toReturn = toReturn.concat(subject.getName() + " ");
+			}
+		}
+		
+		return toReturn;
+	}
+	
+	public String getCorequisitesString(){
+		String toReturn = null;
+		
+		for(List<Subject> list : corequisitesLists){
+			if(toReturn != null) toReturn = toReturn.concat("; y ");
+			
+			for(Subject subject : list){
+				if(toReturn == null){
+					toReturn = "";
+				}else{
+					toReturn = toReturn.concat("o");					
+				}
+				toReturn = toReturn.concat(subject.getName() + " ");
+			}
+		}
+		
+		return toReturn;
+	}
 
 }
