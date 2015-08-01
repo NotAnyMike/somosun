@@ -15,17 +15,35 @@ public interface SiaSummaryView {
 	
 	void setPresenter(Presenter presenter);
 	Widget asWidget();
-	void setFoundationCredits(int approved, int necessary);
-	void setDisciplinaryCredits(int approved, int necessary);
-	void setFreeElectionCredits(int approved, int necessary);
-	void setLevelingCredits(int approved, int necessary);
-	void setGPA(double x);
-	void setAvance(int x);
-	void setApprovedCredits(int x);
-	void setAdditionalyCredits(int x);
-	void setTotalApproved(int x);
-	void setTotalNecessary(int x);
-	void setTotalPerCent(int x);
+	
+	void setFoundationCredits(String approved, String necessary, String percentage);
+	void setDisciplinaryCredits(String approved, String necessary, String percentage);
+	void setFreeElectionCredits(String approved, String necessary, String percentage);
+	void setLevelingCredits(String approved, String necessary, String percentage);
+	void setFoundationCredits(String approved, String percentage);
+	void setDisciplinaryCredits(String approved, String percentage);
+	void setFreeElectionCredits(String approved, String percentage);
+	void setLevelingCredits(String approved, String percentage);
+	void setGPA(String x);
+	void setAvance(String x);
+	void setApprovedCredits(String x);
+	void setAdditionalyCredits(String x);
+	void setTotalApproved(String x);
+	void setTotalNecessary(String x);
+	void setTotalPerCent(String x);
+	void setPercentageDisciplinaryCredits(String percentage);
+	void setPercentageFreeElectionCredits(String percentage);
+	void setPercentageFoundationCredits(String percentage);
+	void setPercentageLevelingCredits(String percentage);
+	void setDefaultFreeElectionCredits(String defaultCredits);
+	void setDefaultLevelingCredits(String defaultCredits);
+	void setDefaultFoundationCredits(String defaultCredits);
+	void setDefaultDisciplinaryCredits(String defaultCredits);
+	void setApprovedFreeElectionCredits(String defaultCredits);
+	void setApprovedLevelingCredits(String defaultCredits);
+	void setApprovedFoundationCredits(String defaultCredits);
+	void setApprovedDisciplinaryCredits(String defaultCredits);
+	
 	void deleteAdminButtons();
 	void showWarning();
 	void hideWarning();

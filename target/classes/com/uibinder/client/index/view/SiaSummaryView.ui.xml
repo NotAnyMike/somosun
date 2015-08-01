@@ -56,7 +56,7 @@
 		            <td width="150" align="right" valign="middle">Creditos aprobados:</td>
 		            <td width="50"><g:Label ui:field="approvedLabel">-</g:Label></td>
 		          </tr>
-		          <tr>
+		          <tr title="El número de créditos adicionales puede ser menor debido a que aquí no se tiene en cuenta la cancelación de asignaturas">
 		            <td width="150" align="right" valign="middle">Creditos adicionales:</td>
 		            <td><g:Label ui:field="aditionalLabel">-</g:Label></td>
 		          </tr>
@@ -123,7 +123,9 @@
             <div style="background-color:#9C27B0" class="siaSummaryLine"></div><span aria-hidden="true" style="color:#9C27B0" class="glyphicon glyphicon-chevron-right"></span>
             <div style="background-color:#9C27B0" class="siaSummaryColorContainer"></div>
             <div class="siaSummaryCabelContainer">Correquisito</div>
-          </div><a>Reportar un error</a>
+          </div>
+          <a>Visita la norma de la carrera</a>
+          <a>Reportar un error</a>
         </div>
     </div>
 	</g:HTMLPanel>

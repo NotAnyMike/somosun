@@ -2,6 +2,7 @@ package com.uibinder.shared;
 
 import java.util.Arrays;
 
+import com.google.gwt.i18n.client.NumberFormat;
 import com.uibinder.shared.control.Career;
 
 /**
@@ -142,6 +143,30 @@ public class SomosUNUtils {
 			}
 		}
 		return tToReturn;
+	}
+	
+	/**
+	 * This method will count how many characters as !"·$%&/()=?¿^*¨Ç_:;,.-ç´`+¡'º contains
+	 * 
+	 * @param s
+	 * @return
+	 */
+	public int oddCharacters(String s){
+		return 0;
+	}
+	
+	/**
+	 * This will round @param d and return a string in the form as 12.3
+	 * @param d
+	 * @return
+	 */
+	public static String getOneDecimalPointString(Double d){
+		String toReturn = null;
+		if(d != null){
+			double gradeFixed = (double) Math.round(d * 10) / 10;
+			toReturn = NumberFormat.getFormat("0.0").format(gradeFixed);
+		}
+		return toReturn;
 	}
 
 }

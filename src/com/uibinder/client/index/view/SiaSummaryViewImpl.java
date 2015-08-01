@@ -74,114 +74,137 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 	}
 
 	@Override
-	public void setGPA(double x) {
-		gpaLabel.setText(""+x);
+	public void setGPA(String x) {
+		gpaLabel.setText(x);
 	}
 
 	@Override
-	public void setAvance(int x) {
-		avanceLabel.setText(x*100 + "%");
+	public void setAvance(String x) {
+		avanceLabel.setText(x);
 	}
 
 	@Override
-	public void setApprovedCredits(int x) {
-		approvedLabel.setText(""+x);
+	public void setApprovedCredits(String x) {
+		approvedLabel.setText(x);
 	}
 
 	@Override
-	public void setAdditionalyCredits(int x) {
-		aditionalLabel.setText("" + x);
+	public void setAdditionalyCredits(String x) {
+		aditionalLabel.setText(x);
 	}
 
 	@Override
-	public void setFoundationCredits(int approved, int necessary) {
-		foundationCreditsApprovedLabel.setText(""+approved);
-		foundationCreditsNecessaryLabel.setText(""+necessary);
-		foundationCreditsPerCentLabel.setText(approved/necessary*100+"%");
+	public void setFoundationCredits(String approved, String necessary, String percentage) {
+		foundationCreditsApprovedLabel.setText(approved);
+		foundationCreditsNecessaryLabel.setText(necessary);
+		foundationCreditsPerCentLabel.setText(percentage);
 	}
 
 	@Override
-	public void setDisciplinaryCredits(int approved, int necessary) {
+	public void setDisciplinaryCredits(String approved, String necessary, String percentage) {
 		disciplinaryCreditsApprovedLabel.setText(""+approved);
 		disciplinaryCreditsNecessaryLabel.setText(""+necessary);
-		disciplinaryCreditsPerCentLabel.setText(approved/necessary*100+"%");
+		disciplinaryCreditsPerCentLabel.setText(percentage);
 	}
 
 	@Override
-	public void setFreeElectionCredits(int approved, int necessary) {
-		freeElectionCreditsApprovedLabel.setText(""+approved);
-		freeElectionCreditsNecessaryLabel.setText(""+necessary);
-		freeElectionCreditsPerCentLabel.setText(approved/necessary*100+"%");
+	public void setFreeElectionCredits(String approved, String necessary, String percentage) {
+		freeElectionCreditsApprovedLabel.setText(approved);
+		freeElectionCreditsNecessaryLabel.setText(necessary);
+		freeElectionCreditsPerCentLabel.setText(percentage);
 	}
 
 	@Override
-	public void setLevelingCredits(int approved, int necessary) {
-		levelingCreditsApprovedLabel.setText(""+approved);
-		levelingCreditsNecessaryLabel.setText(""+necessary);
-		levelingCreditsPerCentLabel.setText(approved/necessary*100+"%");
+	public void setLevelingCredits(String approved, String necessary, String percentage) {
+		levelingCreditsApprovedLabel.setText(approved);
+		levelingCreditsNecessaryLabel.setText(necessary);
+		levelingCreditsPerCentLabel.setText(percentage);
+	}
+	@Override
+	public void setFoundationCredits(String approved, String percentage) {
+		foundationCreditsApprovedLabel.setText(approved);
+		foundationCreditsPerCentLabel.setText(percentage);
 	}
 
 	@Override
-	public void setTotalApproved(int x) {
-		totalApprovedLabel.setText("" + x);
+	public void setDisciplinaryCredits(String approved, String percentage) {
+		disciplinaryCreditsApprovedLabel.setText(""+approved);
+		disciplinaryCreditsPerCentLabel.setText(percentage);
 	}
 
 	@Override
-	public void setTotalNecessary(int x) {
-		totalNecessaryLabel.setText(""+ x);
+	public void setFreeElectionCredits(String approved, String percentage) {
+		freeElectionCreditsApprovedLabel.setText(approved);
+		freeElectionCreditsPerCentLabel.setText(percentage);
 	}
 
 	@Override
-	public void setTotalPerCent(int x) {
-		totalPerCentLabel.setText(x + "%");
+	public void setLevelingCredits(String approved, String percentage) {
+		levelingCreditsApprovedLabel.setText(approved);
+		levelingCreditsPerCentLabel.setText(percentage);
 	}
 
-	public void setDefaultFreeElectionCredits(int defaultCredits) {
+	@Override
+	public void setTotalApproved(String x) {
+		totalApprovedLabel.setText(x);
+	}
+
+	@Override
+	public void setTotalNecessary(String x) {
+		totalNecessaryLabel.setText(x);
+	}
+
+	@Override
+	public void setTotalPerCent(String x) {
+		totalPerCentLabel.setText(x);
+	}
+
+	public void setDefaultFreeElectionCredits(String defaultCredits) {
 		freeElectionCreditsNecessaryLabel.setText("" + defaultCredits);
 	}
 	
-	public void setDefaultLevelingCredits(int defaultCredits) {
-		levelingCreditsNecessaryLabel.setText("" + defaultCredits);
+	public void setDefaultLevelingCredits(String defaultCredits) {
+		levelingCreditsNecessaryLabel.setText(defaultCredits);
 	}
 	
-	public void setDefaultFoundationCredits(int defaultCredits) {
-		foundationCreditsNecessaryLabel.setText("" + defaultCredits);
+	public void setDefaultFoundationCredits(String defaultCredits) {
+		foundationCreditsNecessaryLabel.setText(defaultCredits);
 	}
 	
-	public void setDefaultDisciplinaryCredits(int defaultCredits) {
-		disciplinaryCreditsNecessaryLabel.setText("" + defaultCredits);
+	public void setDefaultDisciplinaryCredits(String defaultCredits) {
+		disciplinaryCreditsNecessaryLabel.setText(defaultCredits);
 	}
 	
-	public void setApprovedFreeElectionCredits(int defaultCredits) {
-		freeElectionCreditsApprovedLabel.setText("" + defaultCredits);
+	public void setApprovedFreeElectionCredits(String defaultCredits) {
+		freeElectionCreditsApprovedLabel.setText(defaultCredits);
 	}
 	
-	public void setApprovedLevelingCredits(int defaultCredits) {
-		levelingCreditsApprovedLabel.setText("" + defaultCredits);
+	public void setApprovedLevelingCredits(String defaultCredits) {
+		levelingCreditsApprovedLabel.setText(defaultCredits);
 	}
 	
-	public void setApprovedFoundationCredits(int defaultCredits) {
-		foundationCreditsApprovedLabel.setText("" + defaultCredits);
+	public void setApprovedFoundationCredits(String defaultCredits) {
+		foundationCreditsApprovedLabel.setText(defaultCredits);
 	}
 	
-	public void setApprovedDisciplinaryCredits(int defaultCredits) {
-		disciplinaryCreditsApprovedLabel.setText("" + defaultCredits);
+	public void setApprovedDisciplinaryCredits(String defaultCredits) {
+		disciplinaryCreditsApprovedLabel.setText(defaultCredits);
 	}
 	
-	public void setPercentageDisciplinaryCredits(int percentage) {
-		disciplinaryCreditsPerCentLabel.setText(percentage +"%");
+	public void setPercentageDisciplinaryCredits(String percentage) {
+		disciplinaryCreditsPerCentLabel.setText(percentage);
 	}
 
-	public void setPercentageFreeElectionCredits(int percentage) {
-		freeElectionCreditsPerCentLabel.setText(percentage +"%");
+	public void setPercentageFreeElectionCredits(String percentage) {
+		freeElectionCreditsPerCentLabel.setText(percentage);
 	}
 	
-	public void setPercentageFoundationCredits(int percentage) {
-		foundationCreditsPerCentLabel.setText(percentage +"%");
+	public void setPercentageFoundationCredits(String percentage) {
+		foundationCreditsPerCentLabel.setText(percentage);
 	}
 	
-	public void setPercentageLevelingCredits(int percentage) {
-		levelingCreditsPerCentLabel.setText(percentage +"%");
+	public void setPercentageLevelingCredits(String percentage) {
+		levelingCreditsPerCentLabel.setText(percentage);
 	}
 
 	@Override

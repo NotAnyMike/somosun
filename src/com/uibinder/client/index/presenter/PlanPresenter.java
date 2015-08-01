@@ -58,6 +58,7 @@ import com.uibinder.shared.control.Student;
 import com.uibinder.shared.control.Subject;
 import com.uibinder.shared.control.SubjectGroup;
 import com.uibinder.shared.control.SubjectValue;
+import com.uibinder.shared.values.TypologyCodes;
 
 /**
  * @autor Mike W 
@@ -113,12 +114,12 @@ DefaultSubjectCreationView.Presenter{
 	 */
 	private int[] totalCredits = {0,0,0,0};
 	/**
-	 * Here variable[0] = total, [1] Approved, [2]Necessary to graduate, the [2] item is a default and it is a final value set a the beginning.
+	 * Here variable[0] = total, [1] Approved, [2]Necessary to graduate, the [2] item is a default and it is a final value set a the beginning, [3] approved and needed, i.e. in my case I have aproved more than needed and some are not obligatory, so those don't count.
 	 */
-	private int[] foundationCredits = {0,0,0};
-	private int[] disciplinaryCredits = {0,0,0};
-	private int[] freeElectionCredits = {0,0,0};
-	private int[] levelingCredits = {0,0,0};
+	private int[] foundationCredits = {0,0,0,0};
+	private int[] disciplinaryCredits = {0,0,0,0};
+	private int[] freeElectionCredits = {0,0,0,0};
+	private int[] levelingCredits = {0,0,0,0};
 	
 	//Control classes
 	private Plan plan = new Plan();
@@ -145,7 +146,7 @@ DefaultSubjectCreationView.Presenter{
 	
 	private boolean changeNameAsked = false;
 	
-	/********************** asyncCallbacks varaibles *******************************/
+	/********************** asyncCallbacks variables *******************************/
 	
 	AsyncCallback<List<Career>> asyncGetCareers = new AsyncCallback<List<Career>>() {
 		
@@ -170,7 +171,7 @@ DefaultSubjectCreationView.Presenter{
 		
 	};
 	
-	/********************** asyncCallbacks varaibles *******************************/
+	/********************** asyncCallbacks variables *******************************/
 	
 	
 	/**
@@ -380,14 +381,6 @@ DefaultSubjectCreationView.Presenter{
 			}
 		}
 		String codeTitle = "Agrupación: "+  (subjectValue.getComplementaryValues().getSubjectGroup() != null ? subjectValue.getComplementaryValues().getSubjectGroup().getName() : "Unknown");
-		String prerequisitesString = subjectValue.getComplementaryValues().getPrerequisitesString();
-		String corequisitesString = subjectValue.getComplementaryValues().getCorequisitesString();
-		if(prerequisitesString != null && prerequisitesString.isEmpty() == false){
-			codeTitle = codeTitle.concat("\n, prerrequisitos: " + prerequisitesString);
-		}
-		if(corequisitesString != null && corequisitesString.isEmpty() == false){
-			codeTitle = codeTitle.concat("\n, correquisitos: " + corequisitesString);
-		}
 		subjectWidget.setCodeLabel(codeTitle);
 		
 		subjectWidgetList.add(subjectWidget);
@@ -566,7 +559,7 @@ DefaultSubjectCreationView.Presenter{
 		//OLD if(valuesAndSubjectMap.containsKey(subjectValues2) == true){
 		if(subjectValues2.getComplementaryValues() != null){
 			if(subjectValues2.getComplementaryValues().getSubject() != null){
-		//UNTIL HERE IS THE NEW CODE
+				//UNTIL HERE IS THE NEW CODE
 				
 				//OLD int creditsValue = valuesAndSubjectMap.get(subjectValues2).getCredits();
 				int creditsValue = subjectValues2.getComplementaryValues().getSubject().getCredits();
@@ -584,21 +577,17 @@ DefaultSubjectCreationView.Presenter{
 					if(subjectValues2.isTaken()) totalCredits[2] -= creditsValue;
 					if(subjectValues2.getGrade()>=3) totalCredits[1] -= creditsValue;
 				}
-				switch(subjectValues2.getComplementaryValues().getTypology()){
-				case "N":
-				case "n":
+				switch(SomosUNUtils.getTypology(subjectValues2.getComplementaryValues().getTypology())){
+				case TypologyCodes.NIVELACION:
 					updateCreditsLeveling(subjectValues2, semester2, toAdd);
 					break;
-				case "L":
-				case "l":
+				case TypologyCodes.LIBRE_ELECCION:
 					updateCreditsFreeElection(subjectValues2, semester2, toAdd);
 					break;
-				case "D":
-				case "d":
+				case TypologyCodes.PROFESIONAL:
 					updateCreditsDisciplinary(subjectValues2, semester2, toAdd);
 					break;
-				case "F":
-				case "f":
+				case TypologyCodes.FUNDAMENTACION:
 					updateCreditsFoundation(subjectValues2, semester2, toAdd);
 				}
 				updateSiaSummary();
@@ -620,7 +609,6 @@ DefaultSubjectCreationView.Presenter{
 	}
 
 	private void updateCreditsDisciplinary(SubjectValue subjectValues2,	Semester semester2, boolean toAdd) {
-		//OLD int creditsValue = valuesAndSubjectMap.get(subjectValues2).getCredits();
 		int creditsValue = subjectValues2.getComplementaryValues().getSubject().getCredits();
 		if(toAdd== true){
 			disciplinaryCredits[0]+= creditsValue;
@@ -632,7 +620,6 @@ DefaultSubjectCreationView.Presenter{
 	}
 
 	private void updateCreditsFreeElection(SubjectValue subjectValues2, Semester semester2, boolean toAdd) {
-		//OLD int creditsValue = valuesAndSubjectMap.get(subjectValues2).getCredits();
 		int creditsValue = subjectValues2.getComplementaryValues().getSubject().getCredits();
 		if(toAdd== true){
 			freeElectionCredits[0]+= creditsValue;
@@ -795,51 +782,87 @@ DefaultSubjectCreationView.Presenter{
 		updatePercentageCredits();
 		updateSmallSummary();
 	}
+	
+	private void updateDefaultCredits() {
+		siaSummaryView.setDefaultFoundationCredits("" + foundationCredits[2]);
+		siaSummaryView.setDefaultFreeElectionCredits("" + freeElectionCredits[2]);
+		siaSummaryView.setDefaultDisciplinaryCredits("" + disciplinaryCredits[2]);
+		siaSummaryView.setDefaultLevelingCredits("" + levelingCredits[2]);
+		siaSummaryView.setTotalNecessary("" + (foundationCredits[2]+freeElectionCredits[2]+disciplinaryCredits[2]+levelingCredits[2]));
+	}
+
+	private void updateApprovedCredits() {
+		siaSummaryView.setApprovedFoundationCredits("" + foundationCredits[1]);
+		siaSummaryView.setApprovedFreeElectionCredits("" + freeElectionCredits[1]);
+		siaSummaryView.setApprovedDisciplinaryCredits("" + disciplinaryCredits[1]);
+		siaSummaryView.setApprovedLevelingCredits("" + levelingCredits[1]);
+		siaSummaryView.setTotalApproved("" + (foundationCredits[1]+freeElectionCredits[1]+disciplinaryCredits[1]+levelingCredits[1]));
+	}
 
 	private void updatePercentageCredits() {
-		if(disciplinaryCredits[2]!=0) siaSummaryView.setPercentageDisciplinaryCredits(disciplinaryCredits[1]/disciplinaryCredits[2]*100);
-		else siaSummaryView.setPercentageDisciplinaryCredits(0);
+		double percentageDisciplinaryDouble = (double) disciplinaryCredits[1]/disciplinaryCredits[2]*100;
+		double percentageFoundationDouble = (double) foundationCredits[1]/foundationCredits[2]*100;
+		double percentageFreeDouble = (double) freeElectionCredits[1]/freeElectionCredits[2]*100;
+		double percentageLevelingDouble = (double) levelingCredits[1]/levelingCredits[2]*100;
 		
-		if(foundationCredits[2]!=0) siaSummaryView.setPercentageFoundationCredits(foundationCredits[1]/foundationCredits[2]*100);
-		else siaSummaryView.setPercentageFoundationCredits(0);
+		if(percentageDisciplinaryDouble > 100) percentageDisciplinaryDouble = 100;
+		if(percentageFoundationDouble > 100) percentageFoundationDouble = 100;
+		if(percentageFreeDouble > 100) percentageFreeDouble = 100;
+		if(percentageLevelingDouble > 100) percentageLevelingDouble = 100;
 		
-		if(freeElectionCredits[2]!=0) siaSummaryView.setPercentageFreeElectionCredits(freeElectionCredits[1]/freeElectionCredits[2]*100);
-		else siaSummaryView.setPercentageFreeElectionCredits(0);
-		
-		if(levelingCredits[2]!=0) siaSummaryView.setPercentageLevelingCredits(levelingCredits[1]/levelingCredits[2]*100);
-		else siaSummaryView.setPercentageLevelingCredits(0);
+		siaSummaryView.setPercentageDisciplinaryCredits(SomosUNUtils.getOneDecimalPointString(percentageDisciplinaryDouble) + "%");
+		siaSummaryView.setPercentageFoundationCredits(SomosUNUtils.getOneDecimalPointString(percentageFoundationDouble) + "%");
+		siaSummaryView.setPercentageFreeElectionCredits(SomosUNUtils.getOneDecimalPointString(percentageFreeDouble) + "%");
+		siaSummaryView.setPercentageLevelingCredits(SomosUNUtils.getOneDecimalPointString(percentageLevelingDouble) + "%");
 		
 		if(foundationCredits[2]+freeElectionCredits[2]+disciplinaryCredits[2]+levelingCredits[2]!=0){
-			siaSummaryView.setTotalPerCent((foundationCredits[1]+freeElectionCredits[1]+disciplinaryCredits[1]+levelingCredits[1])/(foundationCredits[2]+freeElectionCredits[2]+disciplinaryCredits[2]+levelingCredits[2])*100);
-			siaSummaryView.setAvance((foundationCredits[1]+freeElectionCredits[1]+disciplinaryCredits[1]+levelingCredits[1])/(foundationCredits[2]+freeElectionCredits[2]+disciplinaryCredits[2]+levelingCredits[2])*100);
+			double totalPercentageDouble = (double) ((double) (foundationCredits[1]+freeElectionCredits[1]+disciplinaryCredits[1]+levelingCredits[1])/(foundationCredits[2]+freeElectionCredits[2]+disciplinaryCredits[2]+levelingCredits[2]))*100;
+			double avanceDouble = (double) ((double)(foundationCredits[1]+freeElectionCredits[1]+disciplinaryCredits[1]+levelingCredits[1])/(foundationCredits[2]+freeElectionCredits[2]+disciplinaryCredits[2]+levelingCredits[2]))*100;
+			
+			if(totalPercentageDouble > 100) totalPercentageDouble = 100;
+			if(avanceDouble > 100) avanceDouble = 100;
+			
+			String totalPercentageString = SomosUNUtils.getOneDecimalPointString(totalPercentageDouble);
+			String avanceString = SomosUNUtils.getOneDecimalPointString(avanceDouble);
+			
+			siaSummaryView.setTotalPerCent(totalPercentageString + "%");
+			siaSummaryView.setAvance(avanceString + "%");
 		} else {
-			siaSummaryView.setTotalPerCent(0);
-			siaSummaryView.setAvance(0);
+			siaSummaryView.setTotalPerCent("0%");
+			siaSummaryView.setAvance("0%");
 		}
 	}
 
 	private void updateSmallSummary() {
-		siaSummaryView.setGPA(plan.getPAPA());
-		siaSummaryView.setApprovedCredits(totalCredits[1]);
-		siaSummaryView.setAdditionalyCredits(0); //TODO 
-	}
-
-	private void updateApprovedCredits() {
-		siaSummaryView.setApprovedFoundationCredits(foundationCredits[1]);
-		siaSummaryView.setApprovedFreeElectionCredits(freeElectionCredits[1]);
-		siaSummaryView.setApprovedDisciplinaryCredits(disciplinaryCredits[1]);
-		siaSummaryView.setApprovedLevelingCredits(levelingCredits[1]);
-		siaSummaryView.setTotalApproved(foundationCredits[1]+freeElectionCredits[1]+disciplinaryCredits[1]+levelingCredits[1]);
-	}
-
-	private void updateDefaultCredits() {
-		siaSummaryView.setDefaultFoundationCredits(foundationCredits[2]);
-		siaSummaryView.setDefaultFreeElectionCredits(freeElectionCredits[2]);
-		siaSummaryView.setDefaultDisciplinaryCredits(disciplinaryCredits[2]);
-		siaSummaryView.setDefaultLevelingCredits(levelingCredits[2]);
-		siaSummaryView.setTotalNecessary(foundationCredits[2]+freeElectionCredits[2]+disciplinaryCredits[2]+levelingCredits[2]);
+		plan.calculateGpa();
+		siaSummaryView.setGPA(SomosUNUtils.getOneDecimalPointString(plan.getGpa()));
+		siaSummaryView.setApprovedCredits("" + totalCredits[1]);
+		siaSummaryView.setAdditionalyCredits("" + getAdditionalCredits());
 	}
 	
+	private int getAdditionalCredits() {
+		int toReturn = 0;
+		int toRemove = 0;
+		
+		for(Semester semester : plan.getSemesters()){
+			for(SubjectValue subjectValue : semester.getSubjects()){
+				if(subjectValue.isTaken()){
+					if(subjectValue.getGrade() >=3){
+						toReturn += subjectValue.getComplementaryValues().getSubject().getCredits();
+					}else{
+						toRemove += subjectValue.getComplementaryValues().getSubject().getCredits();
+					}
+				}
+			}
+		}
+		toReturn *=2;
+		if(toReturn > 80) toReturn = 80;
+		
+		toReturn -=toRemove;
+		
+		return toReturn;
+	}
+
 	public void addLine(LineWidget l){
 		subContainer.add(l);
 	}
@@ -1415,8 +1438,7 @@ DefaultSubjectCreationView.Presenter{
 							sW.setGrade("NA");
 						}
 					}else{						
-						double gradeFixed = (double) Math.round(sV.getGrade() * 10) / 10;
-						String gradeString = NumberFormat.getFormat("0.0").format(gradeFixed);
+						String gradeString = SomosUNUtils.getOneDecimalPointString(sV.getGrade());
 						sW.setGrade(gradeString);
 					}
 				}
