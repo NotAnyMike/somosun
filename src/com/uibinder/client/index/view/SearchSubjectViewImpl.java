@@ -2,25 +2,21 @@ package com.uibinder.client.index.view;
 
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.Pagination;
 import org.gwtbootstrap3.client.ui.PanelGroup;
 import org.gwtbootstrap3.client.ui.Radio;
+import org.gwtbootstrap3.client.ui.RadioButton;
 import org.gwtbootstrap3.client.ui.TextBox;
-import org.gwtbootstrap3.client.ui.constants.IconType;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -72,7 +68,8 @@ public class SearchSubjectViewImpl extends Composite implements SearchSubjectVie
 	public void fill(){
 		
 		radioButton1.getElement().setAttribute("style", "margin-bottom:0px; margin-top:0px");
-		radioButton1.setActive(true);
+//		radioButton1.setActive(true);
+		radioButton1.setValue(true);
 		radioButton2.getElement().setAttribute("style", "margin-bottom:0px");
 		radioButton3.getElement().setAttribute("style", "margin-bottom:0px");
 		radioButton4.getElement().setAttribute("style", "margin-bottom:0px");

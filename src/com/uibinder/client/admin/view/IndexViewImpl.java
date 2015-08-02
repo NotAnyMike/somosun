@@ -1,7 +1,7 @@
 package com.uibinder.client.admin.view;
 
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.InputButton;
+import org.gwtbootstrap3.client.ui.InputGroupButton;
 import org.gwtbootstrap3.client.ui.ListBox;
 
 import com.google.gwt.core.client.GWT;
@@ -13,7 +13,6 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
-
 import com.uibinder.client.admin.presenter.IndexPresenter;
 
 public class IndexViewImpl extends Composite implements IndexView {
@@ -36,10 +35,10 @@ public class IndexViewImpl extends Composite implements IndexView {
 	@UiField Button resetAllHasDefaultButton;
 	@UiField Button deleteAllSemestersButton;
 	@UiField Button deleteAllSubjectValueButton;
-	@UiField InputButton deleteCertainDefaultPlanButton;
-	@UiField InputButton resetCertainHasAnalysisButton;
-	@UiField InputButton deleteCertainComplementaryValuesButton;
-	@UiField InputButton resetCertainHasDefaultButton;
+	@UiField Button deleteCertainDefaultPlanButton;
+	@UiField Button resetCertainHasAnalysisButton;
+	@UiField Button deleteCertainComplementaryValuesButton;
+	@UiField Button resetCertainHasDefaultButton;
 
 	private static IndexViewUiBinder uiBinder = GWT.create(IndexViewUiBinder.class);
 

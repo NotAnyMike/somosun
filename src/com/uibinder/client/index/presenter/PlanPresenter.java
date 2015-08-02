@@ -9,7 +9,6 @@ import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.ListItem;
-import org.gwtbootstrap3.client.ui.constants.IconType;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -1579,6 +1578,17 @@ DefaultSubjectCreationView.Presenter{
 
 		hideAndUpdateTooltips();
 
+	}
+
+	
+	@Override
+	public void onAccordionClicked(String subjectCode, String careerCode) {
+		//Get the complementaryValue
+		//Populate it 
+		GWT.log(subjectCode + " " + careerCode); 
+		
+		//SubjectGroup, pre-co requisites (Of) //TODO
+		//Groups
 	}
 	
 }

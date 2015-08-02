@@ -2,6 +2,7 @@ package com.uibinder.client.index.view;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.shared.event.ShowEvent;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.PanelCollapse;
@@ -11,7 +12,6 @@ import org.gwtbootstrap3.client.ui.constants.IconType;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -37,11 +37,11 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 
 	@UiField PanelHeader header;
 	@UiField PanelCollapse accordionBody;
+	@UiField HorizontalPanel infoHolderSearchSubject;
 	@UiField Panel accordionContainer;
 	@UiField Button addSpecificSubject;
 	@UiField Label codeFieldSearchSubject;
 	@UiField Label nameFieldSearchSubject;
-	@UiField HorizontalPanel infoHolderSearchSubject;
 	@UiField Label creditsFieldSearchSubject;
 	@UiField Label typeFieldSearchSubject;
 	
@@ -285,6 +285,11 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 			presenter.onSpecificSubjectUnselected(name, code, career);
 		}
 
+	}
+	
+	@UiHandler("accordionBody")
+	public void onAccordionClicked(ShowEvent e){
+		presenter.onAccordionClicked(codeFieldSearchSubject.getText(), listBoxCareers.getSelectedValue());
 	}
 
 }

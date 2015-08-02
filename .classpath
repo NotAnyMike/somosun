@@ -10,11 +10,11 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-dnd-3.3.2.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-servlet-2.7.0.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-servlet.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/gwtbootstrap3-0.8.1.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/gwtbootstrap3-extras-0.6.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/json-20141113.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/jsoup-1.8.1.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/objectify-5.1.5.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/gwtbootstrap3-0.9.1.jar"/>
 	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

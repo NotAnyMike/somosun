@@ -17,14 +17,14 @@
 								<b:InputGroup>
 									<b:ListBox ui:field="careerAnalysisListBox"></b:ListBox>
 									<b:InputGroupButton>									
-										<b:InputButton type="WARNING" ui:field="resetCertainHasAnalysisButton">hasAnalysis=0</b:InputButton>
+										<b:Button type="WARNING" ui:field="resetCertainHasAnalysisButton">hasAnalysis=0</b:Button>
 									</b:InputGroupButton>
 								</b:InputGroup>
 								<b:Button type="DANGER" ui:field="resetAllHasDefaultButton" enabled="true">Reset all hasDefault</b:Button>
 								<b:InputGroup>
 									<b:ListBox ui:field="careerDefaultListBox"></b:ListBox>
 									<b:InputGroupButton>									
-										<b:InputButton type="WARNING" ui:field="resetCertainHasDefaultButton" enabled="true">hasDefault=0</b:InputButton>
+										<b:Button type="WARNING" ui:field="resetCertainHasDefaultButton" enabled="true">hasDefault=0</b:Button>
 									</b:InputGroupButton>
 								</b:InputGroup>
 								<b:Button type="DEFAULT" ui:field="resetUpdateCareersButton">Reset (update) careers</b:Button>
@@ -40,7 +40,7 @@
 								<b:Button type="DANGER" ui:field="deleteAllComplementaryValuesButton" enabled="true">- Delete ALL -</b:Button>
 								<b:InputGroup>
 									<b:InputGroupButton>									
-										<b:InputButton type="WARNING" ui:field="deleteCertainComplementaryValuesButton" enabled="true">delete for:</b:InputButton>
+										<b:Button type="WARNING" ui:field="deleteCertainComplementaryValuesButton" enabled="true">delete for:</b:Button>
 									</b:InputGroupButton>
 									<b:ListBox ui:field="complementaryValuesListBox"></b:ListBox>
 								</b:InputGroup>
@@ -56,7 +56,7 @@
 								<b:Button type="DANGER" ui:field="deleteAllDefaultPlansButton">- Delete ALL default plans -</b:Button>
 								<b:InputGroup>
 									<b:InputGroupButton>									
-										<b:InputButton type="WARNING" ui:field="deleteCertainDefaultPlanButton">delete default plan for</b:InputButton>
+										<b:Button type="WARNING" ui:field="deleteCertainDefaultPlanButton">delete default plan for</b:Button>
 									</b:InputGroupButton>
 									<b:ListBox ui:field="planListBox"></b:ListBox>
 								</b:InputGroup>
@@ -64,7 +64,7 @@
 								<b:InputGroup>
 								    <b:TextBox></b:TextBox>
 									<b:InputGroupButton>									
-										<b:InputButton type="DEFAULT" enabled="false">Open plan</b:InputButton>
+										<b:Button type="DEFAULT" enabled="false">Open plan</b:Button>
 									</b:InputGroupButton>
 								</b:InputGroup>
 							</b:VerticalButtonGroup>
@@ -93,7 +93,7 @@
 								<b:InputGroup>
 									<b:TextBox></b:TextBox>
 									<b:InputGroupButton>
-										<b:InputButton type="DEFAULT" enabled="false">Edit</b:InputButton>
+										<b:Button type="DEFAULT" enabled="false">Edit</b:Button>
 									</b:InputGroupButton>
 								</b:InputGroup>
 							</b:VerticalButtonGroup>
@@ -108,7 +108,7 @@
 								<b:Button type="DANGER" ui:field="deleteAllSubjectGroupsButton" enabled="true"> - Delete ALL subjectGroups -</b:Button>
 								<b:InputGroup>
 									<b:InputGroupButton>									
-										<b:InputButton type="WARNING" enabled="false">Delete all for</b:InputButton>
+										<b:Button type="WARNING" enabled="false">Delete all for</b:Button>
 									</b:InputGroupButton>
 									<b:ListBox ui:field="subjectGroupListBox"></b:ListBox>
 								</b:InputGroup>
@@ -144,13 +144,13 @@
 								<b:InputGroup>
 								    <b:TextBox></b:TextBox>
 									<b:InputGroupButton>									
-										<b:InputButton type="WARNING" enabled="false">(Un)Block User</b:InputButton>
+										<b:Button type="WARNING" enabled="false">(Un)Block User</b:Button>
 									</b:InputGroupButton>
 								</b:InputGroup>
 								<b:InputGroup>
 								    <b:TextBox></b:TextBox>
 									<b:InputGroupButton>									
-										<b:InputButton type="DEFAULT" enabled="false">(Un)Make user admin</b:InputButton>
+										<b:Button type="DEFAULT" enabled="false">(Un)Make user admin</b:Button>
 									</b:InputGroupButton>
 								</b:InputGroup>
 							</b:VerticalButtonGroup>
