@@ -1,18 +1,19 @@
 package com.uibinder.client.index.presenter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.Label;
+import org.gwtbootstrap3.client.ui.ListItem;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.gwt.core.shared.GWT;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerManager;
@@ -27,8 +28,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.uibinder.client.index.connection.ConnectionsController;
 import com.uibinder.client.index.dnd.PickUpDragController;
 import com.uibinder.client.index.dnd.SemesterDropController;
-import com.uibinder.client.index.event.GradeChangeEvent;
-import com.uibinder.client.index.event.GradeChangeEventHandler;
 import com.uibinder.client.index.event.SavePlanAsDefaultEvent;
 import com.uibinder.client.index.service.SUNServiceAsync;
 import com.uibinder.client.index.view.DefaultSubjectCreationView;
@@ -834,12 +833,89 @@ DefaultSubjectCreationView.Presenter{
 	}
 
 	private void updateSmallSummary() {
+		//updateAllCredits(); FIXME uncomment when method ready
 		plan.calculateGpa();
 		siaSummaryView.setGPA(SomosUNUtils.getOneDecimalPointString(plan.getGpa()));
 		siaSummaryView.setApprovedCredits("" + totalCredits[1]);
 		siaSummaryView.setAdditionalyCredits("" + getAdditionalCredits());
 	}
 	
+	/**
+	 * This method will update based on the plan and its subjectGroups the four arrays of credits
+	 */
+	private void updateAllCredits() {
+		/*
+		 *  [0] Total
+		 *  [1] Approved
+		 *  [2]Necessary to graduate,the [2] item is a default and it is a final value set a the beginning, 
+		 *  [3] approved and needed, i.e. in my case I have aproved more than needed and some are not obligatory, so those don't count.
+		 */
+		
+		//reset the array
+		Arrays.fill(foundationCredits, 0);
+		Arrays.fill(freeElectionCredits, 0);
+		Arrays.fill(disciplinaryCredits, 0);
+		Arrays.fill(levelingCredits, 0);
+		
+		//Setting the default credits
+		foundationCredits[2] = plan.getCareer().getFoudationCredits();
+		freeElectionCredits[2] = plan.getCareer().getFreeElectionCredits();
+		disciplinaryCredits[2] = plan.getCareer().getDisciplinaryCredits();
+		levelingCredits[2] = 0; //Don't know yet if this number is greater
+		
+		int foundationOptative = 0;
+		int freeElectionOptative = 0;
+		int disciplinaryOptative = 0;
+		int levelingOptative = 0;
+		
+		int[] array = null;
+		int optative = 0;
+		for(Semester semester : plan.getSemesters()){
+			for(SubjectValue subjectValue : semester.getSubjects()){
+				String typology = subjectValue.getComplementaryValues().getTypology();
+				
+				//Assigning the right array to @param array
+				switch(typology){
+					case TypologyCodes.FUNDAMENTACION:
+						optative = foundationOptative;
+						array = foundationCredits;
+						break;
+					case TypologyCodes.LIBRE_ELECCION:
+						optative = freeElectionOptative;
+						array = freeElectionCredits;
+						break;
+					case TypologyCodes.NIVELACION:
+						optative = levelingOptative;
+						array = levelingCredits;
+						break;
+					case TypologyCodes.PROFESIONAL:
+						optative = disciplinaryOptative;
+						array = disciplinaryCredits;
+						break;
+				}
+				
+				int credits = subjectValue.getComplementaryValues().getSubject().getCredits();
+				
+				//Add it to the total 
+				array[0] += credits;
+				
+				if(subjectValue.isTaken() && subjectValue.getGrade() >= 3){
+					array[1] += credits;
+				}
+				if(subjectValue.isTaken() && subjectValue.getGrade() >= 3){						
+					if(subjectValue.getComplementaryValues().isMandatory()){
+						array[3] += credits;
+					}else{
+						optative += credits;
+					}
+				}
+				
+				//TODO finish this method
+				
+			}
+		}
+	}
+
 	private int getAdditionalCredits() {
 		int toReturn = 0;
 		int toRemove = 0;
@@ -940,10 +1016,10 @@ DefaultSubjectCreationView.Presenter{
 		subContainer.add(i);
 	}	
 	
-	protected void loadSubjectsToSearchView(SiaResultSubjects result, String careerCode) {
+	protected void loadSubjectsToSearchView(SiaResultSubjects result, String careerCode, String searchText, String type) {
 		
 		addSubjectsToSearchView(result.getSubjectList(), careerCode);
-		createPagination(result);
+		createPagination(result, searchText, type, careerCode);
 		showToolTip();
 				
 	}
@@ -973,35 +1049,89 @@ DefaultSubjectCreationView.Presenter{
 		
 	}
 
-	private void createPagination(SiaResultSubjects result) {
+	private void createPagination(SiaResultSubjects result, final String searchText, final String type, final String careerCode) {
 		searchSubjectView.clearPagination();
 		
-		AnchorListItem first = new AnchorListItem();
-		first.setIcon(IconType.ANGLE_DOUBLE_LEFT);
 		
-		if(result.getPage() == 1) first.setEnabled(false);
-		else first.setEnabled(true); 
-		first.setActive(false);
-
-		searchSubjectView.addPage(first);
+		int startFrom = result.getPage();
+		if(startFrom + 5 > result.getNumPaginas()){
+			startFrom = result.getNumPaginas()-5;
+		}
+		if(startFrom>6){
+			startFrom -=5;
+		}else{
+			startFrom = 0;
+		}
 		
-		for(int x = 0; x < result.getNumPaginas(); x++){
-			AnchorListItem a = new AnchorListItem(Integer.toString(x+1));
+		int until = result.getNumPaginas()-startFrom;
+		if(until > 10) until = 10;
+		
+		if(startFrom != 0){
 			
-			if(x+1 == result.getPage()) a.setActive(true);
+
+			AnchorListItem a = new AnchorListItem("1");
+			searchSubjectView.addPage(a);
+			
+			a.addClickHandler(new ClickHandler(){
+
+				@Override
+				public void onClick(ClickEvent event) {
+					onSearchButtonClicked(searchText, careerCode, type, 1);
+				}
+				
+			});
+			
+			//Show ... and the first one
+			Label label = new Label("...");
+			ListItem item = new ListItem();
+			item.add(label);
+			label.removeStyleName("label");
+			searchSubjectView.addPage(item);
+		}
+		
+		//OLD for(int x = 0; x < result.getNumPaginas(); x++){
+		for(int x = 0; x < until; x++){
+			final int page = startFrom + x + 1;
+			AnchorListItem a = new AnchorListItem("" + page);
+			
+			a.addClickHandler(new ClickHandler(){
+
+				@Override
+				public void onClick(ClickEvent event) {
+					onSearchButtonClicked(searchText, careerCode, type, page);
+				}
+				
+			});
+			
+			if(startFrom + x + 1 == result.getPage()) a.setActive(true);
 			else a.setActive(false); 
 			
 			a.setEnabled(true);
 			searchSubjectView.addPage(a);
 		}
 		
-		AnchorListItem last = new AnchorListItem();
-		last.setIcon(IconType.ANGLE_DOUBLE_RIGHT);
+		if(result.getNumPaginas() > (startFrom+10)){
+			//Show ... and the last one
+			final int lastPage = result.getNumPaginas();
+			Label label = new Label("...");
+			ListItem item = new ListItem();
+			item.add(label);
+			label.removeStyleName("label");
+			searchSubjectView.addPage(item);
+			
+			AnchorListItem a = new AnchorListItem("" + lastPage);
+			searchSubjectView.addPage(a);
+			
+			a.addClickHandler(new ClickHandler(){
+
+				@Override
+				public void onClick(ClickEvent event) {
+					onSearchButtonClicked(searchText, careerCode, type, lastPage);
+				}
+				
+			});
+		}
 		
-		if(result.getPage() == result.getNumPaginas()) last.setEnabled(false);
-		else last.setEnabled(true); 
-		last.setActive(false);
-		searchSubjectView.addPage(last);
 	}
 
 	/**
@@ -1228,14 +1358,11 @@ DefaultSubjectCreationView.Presenter{
 		}
 	}
 
-	public void onSearchButtonClicked(String s, final String careerCode, String type, int page) {
+	public void onSearchButtonClicked(final String searchText, final String careerCode, final String type, int page) {
 		
 		accordions.clear();
-		
-		if(type == "all") {
-			type = "";
-		}
-		rpcService.getSubjectsFromSia(s, type, careerCode, "bog", page, getStudent(), new AsyncCallback<SiaResultSubjects>(){
+
+		rpcService.getSubjectsFromSia(searchText, type, careerCode, "bog", page, getStudent(), new AsyncCallback<SiaResultSubjects>(){
 			
 			@Override
 			public void onFailure(Throwable caught) {
@@ -1244,7 +1371,7 @@ DefaultSubjectCreationView.Presenter{
 			
 			@Override
 			public void onSuccess(SiaResultSubjects result) {
-				loadSubjectsToSearchView(result, careerCode);
+				loadSubjectsToSearchView(result, careerCode, searchText, type);
 			}
 			
 		});

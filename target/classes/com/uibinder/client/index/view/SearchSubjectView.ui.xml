@@ -40,7 +40,7 @@
 									<div class="panel-body">
 										<b:FormGroup ui:field="checkButtons">
 											<g:VerticalPanel>
-												<b:Radio ui:field="radioButton1" ui:name="typology" formValue="all" text="Todas"/>
+												<b:Radio ui:field="radioButton1" ui:name="typology" formValue="" text="Todas"/>
 												<b:Radio ui:field="radioButton2" ui:name="typology" formValue="L" text="Libre Elección"/>
 												<b:Radio ui:field="radioButton3" ui:name="typology" formValue="B" text="Fundamentación"/>
 												<b:Radio ui:field="radioButton4" ui:name="typology" formValue="C" text="Disciplinar"/>
@@ -58,6 +58,7 @@
 									</div>
 								</div>
 								<b:Button type="SUCCESS" ui:field="finalizarButton">Finalizar</b:Button>
+								<b:Button type="WARNING" ui:field="cancelButton">Cancelar</b:Button>
 							</div>
 						</div>
 					</td>

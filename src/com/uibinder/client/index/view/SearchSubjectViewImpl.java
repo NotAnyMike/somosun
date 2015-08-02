@@ -35,6 +35,7 @@ public class SearchSubjectViewImpl extends Composite implements SearchSubjectVie
 	@UiField ListBox listBoxCareersToSearch;
 	@UiField Button finalizarButton;
 	@UiField Button searchButton;
+	@UiField Button cancelButton;
 	@UiField TextBox searchField;
 	
 	@UiField Radio radioButton1;
@@ -132,7 +133,7 @@ public class SearchSubjectViewImpl extends Composite implements SearchSubjectVie
 		}
 	}
 
-	public void addPage(AnchorListItem page) {
+	public void addPage(Widget page) {
 		pagination.add(page);
 	}
 
@@ -175,6 +176,12 @@ public class SearchSubjectViewImpl extends Composite implements SearchSubjectVie
 	@UiHandler("searchButton")
 	public void onSearchButtonClick(ClickEvent event){
 		presenter.onSearchButtonClicked(searchField.getText(), listBoxCareersToSearch.getSelectedValue(), getCheckBoxesValue(), 1);
+	}
+	
+	@UiHandler("cancelButton")
+	public void onCancelButtonClick(ClickEvent e){
+		hideIt();
+		clear();
 	}
 
 }
