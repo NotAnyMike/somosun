@@ -1113,11 +1113,14 @@ DefaultSubjectCreationView.Presenter{
 		if(result.getNumPaginas() > (startFrom+10)){
 			//Show ... and the last one
 			final int lastPage = result.getNumPaginas();
-			Label label = new Label("...");
-			ListItem item = new ListItem();
-			item.add(label);
-			label.removeStyleName("label");
-			searchSubjectView.addPage(item);
+
+			if(result.getPage()+6 != result.getNumPaginas()){				
+				Label label = new Label("...");
+				ListItem item = new ListItem();
+				item.add(label);
+				label.removeStyleName("label");
+				searchSubjectView.addPage(item);
+			}
 			
 			AnchorListItem a = new AnchorListItem("" + lastPage);
 			searchSubjectView.addPage(a);
