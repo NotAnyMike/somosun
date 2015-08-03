@@ -10,136 +10,47 @@
 	<ui:style field="third" src="styles/bootstrap.css" />
 	<ui:style field="forth" src="styles/bootstrap-theme.min.css" />
 	<g:HTMLPanel> 			    
- 			    <b:Panel ui:field="accordionContainer">
-				    <b:PanelHeader dataParent="#accordion2" dataToggle="COLLAPSE" dataTarget="#collapseOne" ui:field="header">
-				      <b:Heading size="H4">
-					      <g:HorizontalPanel>
-					      	<b:Button b:id="btnAddSpecificSubject" ui:field="addSpecificSubject" type="SUCCESS" icon="PLUS" size="EXTRA_SMALL"/>
-					      	<g:Label ui:field="codeFieldSearchSubject"></g:Label>
-					      	<g:Label ui:field="nameFieldSearchSubject"></g:Label>
-					      	<g:HorizontalPanel ui:field="infoHolderSearchSubject">
-						      	<g:Label ui:field="typeFieldSearchSubject">L</g:Label>
-						      	<g:Label ui:field="creditsFieldSearchSubject"></g:Label>
-					      	</g:HorizontalPanel>
-					      </g:HorizontalPanel>
-				      </b:Heading>
-				    </b:PanelHeader>
-				    <b:PanelCollapse ui:field="accordionBody" b:id="collapseOne">
-				      <b:PanelBody>
-				        <g:HTMLPanel>
-					    
-							<div class="accordionContainer" style="position:relative">
-							  <div style="display:inline-block; width:432px;">
-							    <div class="form-group" style="width:460px">
-									<div class="input-group">
-										<div class="input-group-addon">Mostrar requisitos para</div>
-										<g:ListBox ui:field="listBoxCareers" addStyleNames="{second.textboxCreate} {third.lead} "></g:ListBox>
-									</div>
-								</div>
-							  </div>
-							  <div class="panel panel-default" style="width:300px; display:inline-block; position:absolute; top:0px; margin-left:40px; height:35px">
-								<div class="panel-body text-center" style="padding:6px">
-									<g:Label ui:field="labelSubjectGroup">Agrupacion: Contenido cuantitativo</g:Label>
-								</div>
-							</div>
-							<table border="0" cellspacing="0" cellpadding="0" class="table table-bordered" style="padding:0px">
-								<tr>
-								    <td align="center" valign="middle"><small>pre-requisitos</small></td>
-								    <td align="center" valign="middle"><small>co-requisitos</small></td>
-								</tr>
-								<tr>
-								    <td style="padding:0px; margin-bottom:0px">
-								        <g:VerticalPanel ui:field="preRequisitesPanel">
-								            <b:Icon type="REFRESH" spin="true"/>
-										</g:VerticalPanel>
-									</td>
-									<td style="padding:0px">
-										<g:VerticalPanel ui:field="coRequisitesPanel">
-											<b:Icon type="REFRESH" spin="true"/>
-										</g:VerticalPanel>
-									</td>
-								</tr>
-							  </table>
-							  
-							
-								<div class="panel panel-default text-left" style="">
-									<div class="panel-body" style="padding:6px">
-										<table>
-											<tr>
-												<td style="min-width: 225px" aling="left" valign="top">
-													<div data-toggle="tooltip" data-placement="top" title="Se requiere de la clase seleccionada para ver las siguientes clases">Modelacion estatica es pre-requisito de:</div> 
-												</td>
-												<td width="10px"></td>
-												<td aling="left" valing="top" style="margin:1px">
-													<g:FlowPanel ui:field="antiPreRequisite">
-														<b:Icon type="REFRESH" spin="true"/>
-													</g:FlowPanel>
-												</td>
-											</tr>
-											<tr>
-												<tr colspan="3" height="10"></tr>
-											</tr>
-											<tr>
-												<td style="min-width: 230px" aling="left" valign="top">
-							                        <div data-toggle="tooltip" data-placement="top" title="Si quieres ver las siguientes clases, debes estar cursando o haber cursado la clase seleccionada">Modelación estatica es co-requisito de:</div> 
-												</td>
-												<td width="10px"></td>
-												<td aling="left" valing="top" style="margin:1px">
-													<g:FlowPanel ui:field="antiCoRequisite">
-														<b:Icon type="REFRESH" spin="true"/>
-								                    </g:FlowPanel>
-												</td>
-											</tr>
-										</table>
-									</div>
-								</div>
-								
-								<br></br>
-								
-								<g:VerticalPanel ui:field="groupTableContainer">
-						        	<g:Grid ui:field="groupTableTitles" styleName="table">
-							        	<g:row>
-							        		<g:cell styleName="text-center"># gr</g:cell>
-							        		<g:cell styleName="text-left"><strong>Profesor</strong></g:cell>
-							        		<g:cell styleName="text-center"><div title="Cuan buen profesor es" data-toggle="tooltip" data-placement="left"><small>Nota profesor</small></div></g:cell>
-							        		<g:cell styleName="text-center"><div title="Cual fue la nota definitiva promedio de este grupo en el SIA"  data-toggle="tooltip" data-placement="top"><small>Nota promedio</small></div></g:cell>
-							        		<g:customCell styleName="text-center">
-							        			<g:Grid ui:field="spacesTable">
-							        				<g:row>
-							        					<g:cell styleName="text-center"><small>Cupos</small></g:cell>
-							        				</g:row>
-							        				<g:row>
-							        					<g:customCell  styleName="text-center">
-								        					<g:Grid ui:field="titleSpacesTable">
-									        					<g:row>
-									        						<g:cell styleName="text-center"><small>disp</small></g:cell>
-									        						<g:cell styleName="text-center"><small>total</small></g:cell>
-									        					</g:row>
-								        					</g:Grid>
-							        					</g:customCell>
-							        				</g:row>
-							        			</g:Grid>
-							        		</g:customCell>
-							        		<g:cell styleName="text-center"><strong>L</strong></g:cell>
-							        		<g:cell styleName="text-center"><strong>M</strong></g:cell>
-							        		<g:cell styleName="text-center"><strong>C</strong></g:cell>
-							        		<g:cell styleName="text-center"><strong>J</strong></g:cell>
-							        		<g:cell styleName="text-center"><strong>V</strong></g:cell>
-							        		<g:cell styleName="text-center"><strong>S</strong></g:cell>
-							        		<g:cell styleName="text-center"><strong>D</strong></g:cell>
-							        	</g:row>
-							        </g:Grid>
-								<b:Icon type="REFRESH" spin="true"/>
-						        </g:VerticalPanel>
-								</div>					        
-					        
-					        	<br></br>
-					        	
-								<div class="alert alert-warning" role="alert">Quieres ayudar a completar estas funcionalidades, entonces has click <a>aquí</a></div>
-                                  
-                          </g:HTMLPanel>
-				      </b:PanelBody>
-				    </b:PanelCollapse>
-				</b:Panel>
+		<b:Panel ui:field="accordionContainer">
+		    <b:PanelHeader dataParent="#accordion2" dataToggle="COLLAPSE" dataTarget="#collapseOne" ui:field="header">
+		      <b:Heading size="H4">
+			      <g:HorizontalPanel>
+			      	<b:Button b:id="btnAddSpecificSubject" ui:field="addSpecificSubject" type="SUCCESS" icon="PLUS" size="EXTRA_SMALL"/>
+			      	<g:Label ui:field="codeFieldSearchSubject"></g:Label>
+			      	<g:Label ui:field="nameFieldSearchSubject"></g:Label>
+			      	<g:HorizontalPanel ui:field="infoHolderSearchSubject">
+				      	<g:Label ui:field="typeFieldSearchSubject">L</g:Label>
+				      	<g:Label ui:field="creditsFieldSearchSubject"></g:Label>
+			      	</g:HorizontalPanel>
+			      </g:HorizontalPanel>
+		      </b:Heading>
+		    </b:PanelHeader>
+		    <b:PanelCollapse ui:field="accordionBody" b:id="collapseOne">
+		      <b:PanelBody>
+		        <g:HTMLPanel>
+			        <div class="complementaryValue-subHeader">
+			        	<div class="complementaryValue-nav">
+				        	<b:ButtonGroup>
+				        		<b:Button icon="ANGLE_DOUBLE_LEFT" type="INFO"></b:Button>
+				        		<b:Button icon="ANGLE_LEFT" type="INFO"></b:Button>
+				        		<b:Button icon="ANGLE_RIGHT" type="INFO"></b:Button>
+				        	</b:ButtonGroup>
+				        </div>
+				        <div class="complementaryValue-title">
+				        	<h1 style="margin:0">Modelación dinámica <small>1000005</small></h1>
+				        </div>
+			        </div>
+				    
+					<g:HTMLPanel ui:field="mainContainer">						
+						<div>holas parceros </div>
+					</g:HTMLPanel>
+											        
+					<br></br>
+				        	
+					<div class="alert alert-warning" role="alert">Quieres ayudar a completar estas funcionalidades, entonces has click <a>aquí</a></div>
+					
+				</g:HTMLPanel>
+		      </b:PanelBody>
+		    </b:PanelCollapse>
+		</b:Panel>
 	</g:HTMLPanel>
 </ui:UiBinder> 

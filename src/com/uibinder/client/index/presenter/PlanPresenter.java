@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Icon;
@@ -20,6 +21,7 @@ import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -29,6 +31,8 @@ import com.uibinder.client.index.dnd.PickUpDragController;
 import com.uibinder.client.index.dnd.SemesterDropController;
 import com.uibinder.client.index.event.SavePlanAsDefaultEvent;
 import com.uibinder.client.index.service.SUNServiceAsync;
+import com.uibinder.client.index.view.ComplementaryValueView;
+import com.uibinder.client.index.view.ComplementaryValueViewImpl;
 import com.uibinder.client.index.view.DefaultSubjectCreationView;
 import com.uibinder.client.index.view.DefaultSubjectCreationViewImpl;
 import com.uibinder.client.index.view.PlanView;
@@ -72,7 +76,8 @@ SiaSummaryView.Presenter,
 WarningDeleteSubjectView.Presenter, 
 SubjectAccordionView.Presenter, 
 SelectedSubjectView.Presenter,
-DefaultSubjectCreationView.Presenter{
+DefaultSubjectCreationView.Presenter,
+ComplementaryValueView.Presenter{
 	
 	private final HandlerManager eventBus;
 	private PlanViewImpl view;
@@ -143,6 +148,9 @@ DefaultSubjectCreationView.Presenter{
 	private List<SelectedSubjectViewImpl> selectedSubjects = new ArrayList<SelectedSubjectViewImpl>();
 	
 	private boolean changeNameAsked = false;
+	
+	//in order to control the accordions
+	Map<SubjectAccordionViewImpl, ComplementaryValueViewImpl> mapAccordion = new HashMap<SubjectAccordionViewImpl, ComplementaryValueViewImpl>();
 	
 	/********************** asyncCallbacks variables *******************************/
 	
@@ -480,7 +488,7 @@ DefaultSubjectCreationView.Presenter{
 		if(timesUpdated < LIMIT_TO_REQUISITES_UPDATES){
 			//OLD subjectTimesUpdated.put(valuesAndSubjectMap.get(sV), timesUpdated+1);
 			subjectTimesUpdated.put(sV.getComplementaryValues().getSubject(), timesUpdated+1);
-			rpcService.getComplementaryValuesFromMisPlanes(plan.getCareerCode(), sV.getComplementaryValues().getSubject().getCode(), new AsyncCallback<ComplementaryValue>(){
+			rpcService.getComplementaryValueFromMisPlanes(plan.getCareerCode(), sV.getComplementaryValues().getSubject().getCode(), new AsyncCallback<ComplementaryValue>(){
 			//OLD rpcService.getComplementaryValues(plan.getCareerCode(), valuesAndSubjectMap.get(sV).getCode(), new AsyncCallback<ComplementaryValues>(){
 				
 				@Override
@@ -1031,9 +1039,17 @@ DefaultSubjectCreationView.Presenter{
 		for(Subject s : subjectList){
 			SubjectAccordionViewImpl accordion = new SubjectAccordionViewImpl(searchSubjectView.getSubjectsAmmount());
 			accordion.setPresenter(this);
-			accordion.setCareerList(careers);
 			accordion.setHeader(s.getCode(), s.getName(), "L", Integer.toString(s.getCredits()), careerCode);
-			accordion.setSubjectGroupName("Asignaturas de relleno");
+
+			ComplementaryValueViewImpl complementaryValueView = new ComplementaryValueViewImpl(s.getCode(), accordion);
+			complementaryValueView.setPresenter(this);
+			complementaryValueView.setPresenter(this);
+			complementaryValueView.setCareerList(careers, careerCode);
+			complementaryValueView.setSubjectGroupName("-");
+			
+			//mapAccordion.put(accordion, complementaryValueView);
+			accordion.addMainComplementaryView(complementaryValueView);
+			
 			accordions.add(accordion);
 			
 			SelectedSubjectViewImpl selected = getSelectedSubjectView(s.getCode());
@@ -1285,6 +1301,42 @@ DefaultSubjectCreationView.Presenter{
 	public void deleteSemesterConfirmed(int semester){
 		view.hidePopups();
 		deleteSemester(semester-1);
+	}
+	
+	private void populateAccordionWithComplementaryValue(SubjectAccordionViewImpl accordion, ComplementaryValueViewImpl cVView, ComplementaryValue complementaryValue) {
+		//SubjectGroup, pre-co requisites (Of) TODO
+		
+		String subjectGroupName = null;
+		if(complementaryValue != null && complementaryValue.getSubjectGroup() != null){			
+			subjectGroupName =complementaryValue.getSubjectGroup().getName();
+		}else{
+			subjectGroupName = "Desconocido";
+		}
+		cVView.setSubjectGroupName(subjectGroupName);
+		
+					
+		if(complementaryValue != null && complementaryValue.getPrerequisitesLists() != null && complementaryValue.getPrerequisitesLists().size() > 0){
+			for(List<Subject> list: complementaryValue.getPrerequisitesLists()){
+				for(Subject subject : list){
+					cVView.addRequisite("pre", subject.getName(), subject.getCode());
+				}
+			}
+		}else{
+			cVView.hasNoPrerequisites();
+		}
+
+		if(complementaryValue != null && complementaryValue.getCorequisitesLists() != null && complementaryValue.getCorequisitesLists().size() > 0){
+			for(List<Subject> list: complementaryValue.getCorequisitesLists()){
+				for(Subject subject : list){
+					cVView.addRequisite("co", subject.getName(), subject.getCode());
+				}
+			}
+		}else{
+			cVView.hasNoCorequisites();
+		}
+
+		
+		
 	}
 	
 	/******************** JQUERY FUNCTIONS *********************/
@@ -1582,13 +1634,27 @@ DefaultSubjectCreationView.Presenter{
 
 	
 	@Override
-	public void onAccordionClicked(String subjectCode, String careerCode) {
-		//Get the complementaryValue
-		//Populate it 
-		GWT.log(subjectCode + " " + careerCode); 
+	public void onAccordionClicked(String subjectCode, final SubjectAccordionViewImpl accordion, final ComplementaryValueViewImpl view) {
 		
-		//SubjectGroup, pre-co requisites (Of) //TODO
-		//Groups
+		//Get the complementaryValue
+		rpcService.getComplementaryValueFromDb(plan.getCareerCode(), subjectCode, new AsyncCallback<ComplementaryValue>(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				GWT.log("error getting the information");
+				accordion.showError();
+			}
+
+			@Override
+			public void onSuccess(ComplementaryValue result) {
+				//Populate it  
+				populateAccordionWithComplementaryValue(accordion, view, result);
+			}
+
+			
+		});
+
+		//Get groups TODO
 	}
 	
 }

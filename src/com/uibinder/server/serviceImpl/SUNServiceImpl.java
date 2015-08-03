@@ -195,7 +195,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 	}
 
 	@Override
-	public ComplementaryValue getComplementaryValuesFromMisPlanes(String career, String code) {
+	public ComplementaryValue getComplementaryValueFromMisPlanes(String career, String code) {
 		return (ComplementaryValue) SiaProxy.getRequisitesFromSia(code, career);
 	}
 
@@ -943,6 +943,14 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 			plan = planDao.generatePlanFromAcademicHistory(academicHistory);
 		}
 		return plan;
+	}
+
+	@Override
+	public ComplementaryValue getComplementaryValueFromDb(String careerCode, String subjectCode) {
+		// TODO Auto-generated method stub
+		ComplementaryValueDao cVDao = new ComplementaryValueDao();
+		ComplementaryValue toReturn = cVDao.getComplementaryValues(careerCode, subjectCode);
+		return toReturn;
 	}
 
 	

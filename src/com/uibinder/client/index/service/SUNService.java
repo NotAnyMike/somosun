@@ -37,6 +37,7 @@ public interface SUNService extends RemoteService{
 	
 	public SiaResultGroups getGroupsFromSia(String subjectSiaCode, String sede);
 	public SiaResultGroups getGroupsFromSia(Subject subject, String sede);
+	
 	public SiaResultSubjects getSubjectsFromSia(String nameOrCode, String typology, String career, String sede, int page, Student student);
 	public SiaResultSubjects getSubjectFromSia(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede, Student student);
 	public SiaResultSubjects getSubjectFromSia(String nameOrCode, String typology, String career, String scheduleCP, int page, int ammount, String sede, Student student, List<String> subjectCodeList);
@@ -56,7 +57,8 @@ public interface SUNService extends RemoteService{
 	
 	public void toTest();
 	
-	public ComplementaryValue getComplementaryValuesFromMisPlanes(String career, String code);
+	public ComplementaryValue getComplementaryValueFromMisPlanes(String career, String code);
+	public ComplementaryValue getComplementaryValueFromDb(String careerCode, String subjectCode);
 	public List<ComplementaryValue> getComplementaryValuesFromMisPlanes(String careerCode);
 	public List<ComplementaryValue> getMandatoryComplementaryValues(String careerCode);
 	public ComplementaryValue createDefaultSubject(String subjectGroupName, String credits, String careerCode, Student student);

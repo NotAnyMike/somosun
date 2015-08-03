@@ -57,7 +57,7 @@ public interface SUNServiceAsync {
 
 	void toTest(AsyncCallback<Void> callback);
 
-	void getComplementaryValuesFromMisPlanes(String career, String code,	AsyncCallback<ComplementaryValue> callback);
+	void getComplementaryValueFromMisPlanes(String career, String code,	AsyncCallback<ComplementaryValue> callback);
 
 	void getSubjectsFromSia(String nameOrCode, String typology, String career, String sede, int page, Student student, AsyncCallback<SiaResultSubjects> callback);
 
@@ -93,5 +93,7 @@ public interface SUNServiceAsync {
 	void getPlanByUser(String planId, AsyncCallback<Plan> callback);
 
 	void generatePlanFromAcademicHistory(String academicHistory, AsyncCallback<Plan> callback);
+
+	void getComplementaryValueFromDb(String careerCode, String subjectCode, AsyncCallback<ComplementaryValue> callback);
 
 }
