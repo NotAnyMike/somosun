@@ -1046,7 +1046,7 @@ ComplementaryValueView.Presenter{
 
 			ComplementaryValueViewImpl complementaryValueView = new ComplementaryValueViewImpl(s.getCode(), accordion, searchSubjectView.getSubjectsAmmount());
 			complementaryValueView.setPresenter(this);
-			complementaryValueView.setCareerList(careers, careerCode);
+			complementaryValueView.setCareerList(careers, (careerCode.isEmpty() ? plan.getCareerCode() : careerCode));
 			complementaryValueView.setSubjectGroupName("-");
 			
 			//mapAccordion.put(accordion, complementaryValueView);

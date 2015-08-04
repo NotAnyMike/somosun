@@ -148,7 +148,7 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 		int index = -1;
 		boolean found = false;
 		for(Career career : careers){
-			if(found == false){				
+			if(found == false && careerCodeSelected.isEmpty() == false){				
 				index ++;
 			}
 			if(career.getCode().equals(careerCodeSelected)) found = true;
@@ -156,7 +156,7 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 			listBoxCareers.addItem(career.getName(), career.getCode());
 		}
 		
-		if(index != -1){			
+		if(index != -1 ){			
 			listBoxCareers.setItemSelected(index, true);
 		}
 	}
