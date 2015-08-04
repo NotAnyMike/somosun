@@ -78,42 +78,57 @@
 			</div>
 			
 			<br></br>
+			<b:PanelGroup b:id="accordion">
+			    <b:Panel>
+					<b:PanelHeader dataToggle="COLLAPSE" dataParent="#accordion1" dataTarget="#collapseGroups" ui:field="panelHeaderGroups">
+						<b:Heading size="H4" text="Grupos"/>
+					</b:PanelHeader>
+					<b:PanelCollapse b:id="collapseGroups" ui:field="groupsTableContainer">
+						<b:PanelBody>
+						    <g:HTMLPanel>
+								<g:VerticalPanel ui:field="groupTableContainer">
+						        	<g:Grid ui:field="groupTableTitles" styleName="table">
+							        	<g:row>
+							        		<g:cell styleName="text-center"># gr</g:cell>
+							        		<g:cell styleName="text-left"><strong>Profesor</strong></g:cell>
+							        		<g:cell styleName="text-center"><div title="Cuan buen profesor es" data-toggle="tooltip" data-placement="left"><small>Nota profesor</small></div></g:cell>
+							        		<g:cell styleName="text-center"><div title="Cual fue la nota definitiva promedio de este grupo en el SIA"  data-toggle="tooltip" data-placement="top"><small>Nota promedio</small></div></g:cell>
+							        		<g:customCell styleName="text-center">
+							        			<g:Grid ui:field="spacesTable">
+							        				<g:row>
+							        					<g:cell styleName="text-center"><small>Cupos</small></g:cell>
+							        				</g:row>
+							        				<g:row>
+							        					<g:customCell  styleName="text-center">
+								        					<g:Grid ui:field="titleSpacesTable">
+									        					<g:row>
+									        						<g:cell styleName="text-center"><small>disp</small></g:cell>
+									        						<g:cell styleName="text-center"><small>total</small></g:cell>
+									        					</g:row>
+								        					</g:Grid>
+							        					</g:customCell>
+							        				</g:row>
+							        			</g:Grid>
+							        		</g:customCell>
+							        		<g:cell styleName="text-center"><strong>L</strong></g:cell>
+							        		<g:cell styleName="text-center"><strong>M</strong></g:cell>
+							        		<g:cell styleName="text-center"><strong>C</strong></g:cell>
+							        		<g:cell styleName="text-center"><strong>J</strong></g:cell>
+							        		<g:cell styleName="text-center"><strong>V</strong></g:cell>
+							        		<g:cell styleName="text-center"><strong>S</strong></g:cell>
+							        		<g:cell styleName="text-center"><strong>D</strong></g:cell>
+							        	</g:row>
+							        </g:Grid>
+									<b:Icon type="REFRESH" spin="true"/>
+						    	</g:VerticalPanel>  
+						     	<br></br>
+								<div class="alert alert-warning" role="alert">Quieres ayudar a completar estas funcionalidades, entonces has click <a href="#aboutUs">aquí</a></div>
+							</g:HTMLPanel>
+						</b:PanelBody>
+					</b:PanelCollapse>
+				</b:Panel>
+			</b:PanelGroup>
 			
-			<g:VerticalPanel ui:field="groupTableContainer">
-	        	<g:Grid ui:field="groupTableTitles" styleName="table">
-		        	<g:row>
-		        		<g:cell styleName="text-center"># gr</g:cell>
-		        		<g:cell styleName="text-left"><strong>Profesor</strong></g:cell>
-		        		<g:cell styleName="text-center"><div title="Cuan buen profesor es" data-toggle="tooltip" data-placement="left"><small>Nota profesor</small></div></g:cell>
-		        		<g:cell styleName="text-center"><div title="Cual fue la nota definitiva promedio de este grupo en el SIA"  data-toggle="tooltip" data-placement="top"><small>Nota promedio</small></div></g:cell>
-		        		<g:customCell styleName="text-center">
-		        			<g:Grid ui:field="spacesTable">
-		        				<g:row>
-		        					<g:cell styleName="text-center"><small>Cupos</small></g:cell>
-		        				</g:row>
-		        				<g:row>
-		        					<g:customCell  styleName="text-center">
-			        					<g:Grid ui:field="titleSpacesTable">
-				        					<g:row>
-				        						<g:cell styleName="text-center"><small>disp</small></g:cell>
-				        						<g:cell styleName="text-center"><small>total</small></g:cell>
-				        					</g:row>
-			        					</g:Grid>
-		        					</g:customCell>
-		        				</g:row>
-		        			</g:Grid>
-		        		</g:customCell>
-		        		<g:cell styleName="text-center"><strong>L</strong></g:cell>
-		        		<g:cell styleName="text-center"><strong>M</strong></g:cell>
-		        		<g:cell styleName="text-center"><strong>C</strong></g:cell>
-		        		<g:cell styleName="text-center"><strong>J</strong></g:cell>
-		        		<g:cell styleName="text-center"><strong>V</strong></g:cell>
-		        		<g:cell styleName="text-center"><strong>S</strong></g:cell>
-		        		<g:cell styleName="text-center"><strong>D</strong></g:cell>
-		        	</g:row>
-		        </g:Grid>
-			<b:Icon type="REFRESH" spin="true"/>
-	      </g:VerticalPanel>
 		</div>
 	    
 	</g:HTMLPanel>

@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
+import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
@@ -16,6 +17,7 @@ import com.googlecode.objectify.annotation.Serialize;
  * @author Mike
  *
  */
+@Cache(expirationSeconds=9000)
 @Entity
 public class ComplementaryValue implements Serializable {
 	

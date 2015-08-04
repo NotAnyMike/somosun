@@ -50,10 +50,13 @@ import com.uibinder.client.index.widget.LineWidget;
 import com.uibinder.client.index.widget.PlanWidget;
 import com.uibinder.client.index.widget.SemesterWidget;
 import com.uibinder.client.index.widget.SubjectWidget;
+import com.uibinder.shared.SiaResultGroups;
 import com.uibinder.shared.SiaResultSubjects;
 import com.uibinder.shared.SomosUNUtils;
+import com.uibinder.shared.control.Block;
 import com.uibinder.shared.control.Career;
 import com.uibinder.shared.control.ComplementaryValue;
+import com.uibinder.shared.control.Group;
 import com.uibinder.shared.control.Plan;
 import com.uibinder.shared.control.Semester;
 import com.uibinder.shared.control.Student;
@@ -1041,8 +1044,7 @@ ComplementaryValueView.Presenter{
 			accordion.setPresenter(this);
 			accordion.setHeader(s.getCode(), s.getName(), "L", Integer.toString(s.getCredits()), careerCode);
 
-			ComplementaryValueViewImpl complementaryValueView = new ComplementaryValueViewImpl(s.getCode(), accordion);
-			complementaryValueView.setPresenter(this);
+			ComplementaryValueViewImpl complementaryValueView = new ComplementaryValueViewImpl(s.getCode(), accordion, searchSubjectView.getSubjectsAmmount());
 			complementaryValueView.setPresenter(this);
 			complementaryValueView.setCareerList(careers, careerCode);
 			complementaryValueView.setSubjectGroupName("-");
@@ -1334,8 +1336,47 @@ ComplementaryValueView.Presenter{
 		}else{
 			cVView.hasNoCorequisites();
 		}
-
 		
+		if(complementaryValue != null && complementaryValue.getListCorequisitesOf() != null && complementaryValue.getListCorequisitesOf().size() > 0){
+			for(Subject subject : complementaryValue.getListCorequisitesOf()){
+				cVView.addAntiRequisite("co", subject.getName(), subject.getCode());
+			}
+		}else{
+			cVView.isNoCorequisite();
+		}
+		
+		if(complementaryValue != null && complementaryValue.getListPrerequisitesOf() != null && complementaryValue.getListPrerequisitesOf().size() > 0){
+			for(Subject subject : complementaryValue.getListPrerequisitesOf()){
+				cVView.addAntiRequisite("pre", subject.getName(), subject.getCode());
+			}
+		}else{
+			cVView.isNoPrerequisite();
+		}
+		
+	}
+	
+	private void populateAccordionWithGroups(ComplementaryValueViewImpl view, SiaResultGroups result) {
+		
+		if(result != null && result.getGroups() != null && result.getGroups().size() > 0){
+			for(Group group : result.getGroups()){
+				String teacherName = group.getTeacher().getName();
+				if(teacherName.trim().isEmpty()) teacherName = "Unknown";
+				String[] daysTime = {"","","","","","",""};
+				String[] classRoom = {"","","","","","",""};
+				
+				for(Block block : group.getSchedule()){
+					daysTime[block.getDay()] = daysTime[block.getDay()].concat(block.getStartHour() + "-" + block.getEndHour() + " ");
+					classRoom[block.getDay()] = classRoom[block.getDay()].concat(block.getClassRoom() + " ");
+				}
+				
+				view.addGroup("" + group.getGroupNumber(), teacherName, "-", "-", "-", "" + group.getFreePlaces(), "" + group.getTotalPlaces(), daysTime[0], classRoom[0], daysTime[1], classRoom[1], daysTime[2], classRoom[2], daysTime[3], classRoom[3], daysTime[4], classRoom[4], daysTime[5], classRoom[5], daysTime[6], classRoom[6]);
+				GWT.log(group.getFreePlaces() + " " + group.getTotalPlaces());
+			}
+		}else{
+			view.hasNoGroups();
+		}
+		
+		showToolTip();
 		
 	}
 	
@@ -1631,7 +1672,6 @@ ComplementaryValueView.Presenter{
 		hideAndUpdateTooltips();
 
 	}
-
 	
 	@Override
 	public void onAccordionClicked(String subjectCode, final SubjectAccordionViewImpl accordion, final ComplementaryValueViewImpl view) {
@@ -1653,8 +1693,24 @@ ComplementaryValueView.Presenter{
 
 			
 		});
+		
+	}
+	
+	public void onGroupsAccordionShows(String subjectCode, final ComplementaryValueViewImpl view){
+		rpcService.getGroupsFromSia(subjectCode, "bog", new AsyncCallback<SiaResultGroups>(){
 
-		//Get groups TODO
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showGroupError();
+			}
+
+			@Override
+			public void onSuccess(SiaResultGroups result) {
+				populateAccordionWithGroups(view, result);				
+			}
+			
+		});
+
 	}
 	
 }

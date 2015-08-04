@@ -15,5 +15,9 @@ public class SiaResultGroups extends SiaResult implements Serializable {
 	public void setList(List<Group> groupList) {
 		this.groupList = groupList;
 	}
+	
+	public List<Group> getGroups(){
+		return groupList;
+	}
 
 }

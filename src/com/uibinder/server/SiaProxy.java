@@ -395,12 +395,14 @@ public class SiaProxy {
 	
 	public static SiaResultGroups getGroupsFromSubject(String subjectSiaCode, String sede){
 		SubjectDao subjectDao = new SubjectDao();
-		Subject s = subjectDao.getSubjectBySiaCode(subjectSiaCode);
+		Subject s = subjectDao.getSubjectByCode(subjectSiaCode);
+		SiaResultGroups toReturn;
 		if(s!=null){
-			return getGroupsFromSubject(s, sede);
+			toReturn = getGroupsFromSubject(s, sede);
 		} else {
-			return null;
+			toReturn = null;
 		}
+		return toReturn;
 	}
 	
 	/**
@@ -556,7 +558,6 @@ public class SiaProxy {
 		List<Block> blocks = null;
 		List<Career> careers = null;
 		Career career = null;
-		Block block = null;
 		
 			for(int i = 0; i<jsonArray.length(); i++){
 				
@@ -568,7 +569,7 @@ public class SiaProxy {
 				teacher = new Teacher(j.getString("nombredocente"), j.get("usuariodocente").toString(), j.get("usuariodocente").toString(), sede);
 				teacher = teacherDao.getTeacherByTeacher(teacher, true);
 				cuposDisponibles = j.getInt("cuposdisponibles");
-				cuposTotal = j.getInt("cuposdisponibles");
+				cuposTotal = j.getInt("cupostotal");
 				try {
 					groupNumber = Integer.valueOf(j.getString("codigo")); //be careful here, because it could be some group that has no number and instead a char					
 				} catch(NumberFormatException e){
@@ -588,34 +589,62 @@ public class SiaProxy {
 				//create the blocks
 				for(int days = 0; days<7; days++){
 					
-					String times = j.getString("horario_"+DAY[days]); 
-					String places = j.getString("aula_" + DAY[days]);
+					String timesUgly = j.getString("horario_"+DAY[days]); 
+					String placesUgly = j.getString("aula_" + DAY[days]);
 					
-					if(times != "--"){
-						//creating blocks
-						for(int n = 0; n < StringUtils.countMatches(times, " ")+1; n++){
-							block = new Block(days, StringUtils.substringBefore(times, " "), StringUtils.substringBefore(places, " "));
-							for(Group g : listFromDb){
-								if(g.getGroupNumber() == groupNumber && g.getSemesterValue().isCurrentSemester() == true){
-									for(Block b : g.getSchedule()){
-										if(block.equals(b)==true  || (block.getClassRoom().equals(b.getClassRoom()) && block.getDay() == b.getDay() && block.getEndHour() == b.getEndHour() && block.getStartHour() == b.getStartHour() )){
-											block = b;
-											g.getSchedule().remove(b);
-											break;
-										} 
-									}
-									break;
-								}
+					if(timesUgly.trim().matches("(--)|(\\s+)") == false){						
+						String[] times = timesUgly.split("\\s");
+						String[] places = placesUgly.split("\\s");
+						for(int x = 0; x < times.length; x++){
+							String time = times[x];
+							String place = null;
+							if(places.length != times.length){
+								place = places[0];
+							}else{
+								place = places[x];
 							}
-							if(block.getId() == null){											
-								block = blockDao.getBlockByBlock(block);
-							}
+							
+							String[] hours = time.split("-");
+							
+							int startHour = Integer.valueOf(hours[0]);
+							int endHour = Integer.valueOf(hours[1]);
+							
+							Block block = new Block(startHour, endHour, days, place);
+							block = blockDao.getBlockByBlock(block);
 							blocks.add(block);
-	
-							times = StringUtils.substringAfter(times, " ");
-							places = StringUtils.substringAfter(places, " ");
 						}
 					}
+					
+					
+//					if(times != "--"){
+//						//creating blocks
+//						for(int n = 0; n < StringUtils.countMatches(times, " ")+1; n++){
+//							block = new Block(days, StringUtils.substringBefore(times, " "), StringUtils.substringBefore(places, " "));
+////							for(Group g : listFromDb){
+////								if(g.getGroupNumber() == groupNumber && g.getSemesterValue().isCurrentSemester() == true){
+////									for(Block b : g.getSchedule()){
+////										if(block.equals(b)==true  || (block.getClassRoom().equals(b.getClassRoom()) && block.getDay() == b.getDay() && block.getEndHour() == b.getEndHour() && block.getStartHour() == b.getStartHour() )){
+////											block = b;
+////											g.getSchedule().remove(b);
+////											break;
+////										} 
+////									}
+////									break;
+////								}
+////							}
+//							if(block.getId() == null){
+//								if(block.getStartHour() != 0){									
+//									block = blockDao.getBlockByBlock(block);
+//								}
+//							}
+//							if(block.getStartHour() != 0){								
+//								blocks.add(block);
+//							}
+//	
+//							times = StringUtils.substringAfter(times, " ");
+//							places = StringUtils.substringAfter(places, " ");
+//						}
+//					}
 				}
 				group.setSubject(subject);
 				group.setSchedule(blocks);

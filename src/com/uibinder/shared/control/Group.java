@@ -61,12 +61,16 @@ public class Group implements Serializable {
     public boolean equals(Group group){
     	boolean toReturn = false;
     	boolean blockEquals = false;
-    	if(this.getSubject().equals(group.getSubject()) && this.getTeacher().equals(group.getTeacher()) && 
-    			this.getSemesterValue().equals(group.getSemesterValue()) && this.getFreePlaces() == group.getFreePlaces() &&
-    			this.getGroupNumber() == group.getGroupNumber() && this.getTotalPlaces() == group.getTotalPlaces()
+    	if
+    	((this.getSubject() == null && group.getSubject() == null) || (this.getSubject() != null && group.getSubject() != null && this.getSubject().equals(group.getSubject())) && 
+    			((this.getTeacher() == null && group.getTeacher() == null) || (this.getTeacher() != null && group.getTeacher()!= null && this.getTeacher().equals(group.getTeacher()))) &&
+    			((this.getSemesterValue() == null && group.getSemesterValue() == null) || (this.getSemesterValue() != null && group.getSemesterValue() != null && this.getSemesterValue().equals(group.getSemesterValue()))) && 
+    			this.getFreePlaces() == group.getFreePlaces() &&
+    			this.getGroupNumber() == group.getGroupNumber() && 
+    			this.getTotalPlaces() == group.getTotalPlaces()
     			){
     		
-    		if(this.getSchedule().size() == group.getSchedule().size() && this.getSchedule().size() != 0 && this.getSchedule().size() != -1){
+    		if(this.getSchedule().size() == group.getSchedule().size()){
 				for(Block b : this.getSchedule()){
 					blockEquals = false;
 					for(Block b2 : group.getSchedule()){
@@ -142,6 +146,7 @@ public class Group implements Serializable {
 	}
 
 	public List<Block> getSchedule() {
+		if(schedule == null) schedule = new ArrayList<Block>();
 		return schedule;
 	}
 
@@ -150,6 +155,7 @@ public class Group implements Serializable {
 	}
 
 	public List<Career> getCareers() {
+		if(careers == null) careers = new ArrayList<Career>();
 		return careers;
 	}
 
@@ -159,16 +165,20 @@ public class Group implements Serializable {
 
 	
 	public void addCareer(Career career) {
-		getCareers().add(career);
+		if(career != null){
+			getCareers().add(career);
+		}
 	}
 
 	public boolean containsCareer(String code) {
 		boolean toReturn = false;
 		
-		for(Career c : getCareers()){
-			if(c.getCode().equals(code)){
-				toReturn = true;
-				break;
+		if(getCareers() != null){			
+			for(Career c : getCareers()){
+				if(c != null && code != null && c.getCode().equals(code)){
+					toReturn = true;
+					break;
+				}
 			}
 		}
 		return toReturn;

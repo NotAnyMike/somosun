@@ -2,6 +2,7 @@ package com.uibinder.shared.control;
 
 import java.io.Serializable;
 
+import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
@@ -12,6 +13,7 @@ import com.googlecode.objectify.annotation.Index;
  * @author Mike
  *
  */
+@Cache(expirationSeconds=9000)
 @Entity
 public class SubjectGroup implements Serializable {
 

@@ -2,6 +2,7 @@ package com.uibinder.shared.control;
 
 import java.io.Serializable;
 
+import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Id;
@@ -11,6 +12,7 @@ import com.googlecode.objectify.annotation.Id;
  *  
  * @author Mike
  */
+@Cache(expirationSeconds=9000)
 @Entity
 public class Block implements Serializable {
 	
@@ -26,28 +28,16 @@ public class Block implements Serializable {
 	
 	/**
 	 * 
-	 * @param starHour
+	 * @param startHour
 	 * @param endHour
 	 * @param day: L=0, M=1 ...
 	 * @param classRoom
 	 */
-	public Block(int starHour, int endHour, int day, String classRoom){
-		this.startHour = starHour;
+	public Block(int startHour, int endHour, int day, String classRoom){
+		this.startHour = startHour;
 		this.endHour = endHour;
 		this.day = day;
 		this.classRoom = classRoom;
-	}
-	
-	/**
-	 * 
-	 * @param day
-	 * @param stringFromSiaRpc: with the format of the response of the sia rpc call 
-	 * @param classRoom
-	 */
-	public Block(int day, String stringFromSiaRpc, String classRoom){
-		this.day = day;
-		this.classRoom = classRoom;
-		//TODO the hours
 	}
 	
 	public boolean equals(Block b){

@@ -1,8 +1,10 @@
 package com.uibinder.server.dao;
 
 import com.googlecode.objectify.Key;
+import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 import com.uibinder.shared.control.Block;
+import com.uibinder.shared.control.SubjectValue;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
@@ -19,13 +21,13 @@ public class BlockDao {
 	
 	public Block getBlockByBlock(Block block){
 		Block blockToReturn = null;
-		//blockToReturn = getBlock(block.getClassRoom(), block.getDay(),block.getEndHour(), block.getStartHour());
-		//if(blockToReturn == null){
+		blockToReturn = getBlock(block.getClassRoom(), block.getDay(),block.getEndHour(), block.getStartHour());
+		if(blockToReturn == null){
 			blockToReturn = block;
 			if(blockToReturn.getId()==null){
 				saveBlock(blockToReturn);
 			}
-		//}
+		}
 		return blockToReturn;
 	}
 
@@ -39,17 +41,22 @@ public class BlockDao {
 	 * @return
 	 */
 	private Block getBlock(String classRoom, int day, int endHour, int startHour) {
-		return null;// ofy().load().type(Block.class).filter("classRoom", classRoom).filter("day", day).filter("endHour", endHour).filter("startHour", startHour).first().now();
+		return ofy().load().type(Block.class).filter("classRoom", classRoom).filter("day", day).filter("endHour", endHour).filter("startHour", startHour).first().now();
 	}
-	
-	/*Block does not accept deletion it could create a problem
-	/*private void deleteBlock(Long id) {
-		Key<Block> key = Key.create(Block.class, id);
-		ofy().delete().key(key).now();
-	}*/
 
+	/**
+	 * This method should be used only to create a block, not to update a block, this method will delete any id in order to create and not to save
+	 * @param b
+	 */
 	public void saveBlock(Block b) {
+		if(b.getId() != null) b.setId(generateId());
 		ofy().save().entity(b).now();
+	}
+
+	private Long generateId() {
+		ObjectifyFactory f = new ObjectifyFactory();
+		Key<Block> key = f.allocateId(Block.class);
+		return key.getId();
 	}
 
 	public Block getBlockById(Long id) {

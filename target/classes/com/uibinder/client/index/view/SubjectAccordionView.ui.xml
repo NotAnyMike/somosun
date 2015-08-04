@@ -30,23 +30,20 @@
 			        <div class="complementaryValue-subHeader">
 			        	<div class="complementaryValue-nav">
 				        	<b:ButtonGroup>
-				        		<b:Button icon="ANGLE_DOUBLE_LEFT" type="INFO"></b:Button>
-				        		<b:Button icon="ANGLE_LEFT" type="INFO"></b:Button>
-				        		<b:Button icon="ANGLE_RIGHT" type="INFO"></b:Button>
+				        		<b:Button ui:field="goTo1Button" icon="ANGLE_DOUBLE_LEFT" type="INFO"></b:Button>
+				        		<b:Button ui:field="goLeftButton" icon="ANGLE_LEFT" type="INFO"></b:Button>
+				        		<b:Button ui:field="goRightButton" icon="ANGLE_RIGHT" type="INFO"></b:Button>
 				        	</b:ButtonGroup>
 				        </div>
 				        <div class="complementaryValue-title">
-				        	<h1 style="margin:0">Modelación dinámica <small>1000005</small></h1>
+				        	<h1 style="margin:0"><g:HTML ui:field="h1Name"></g:HTML><small><g:HTML ui:field="h1Code"></g:HTML></small></h1>
 				        </div>
 			        </div>
 				    
 					<g:HTMLPanel ui:field="mainContainer">						
 						<div>holas parceros </div>
 					</g:HTMLPanel>
-											        
-					<br></br>
-				        	
-					<div class="alert alert-warning" role="alert">Quieres ayudar a completar estas funcionalidades, entonces has click <a>aquí</a></div>
+
 					
 				</g:HTMLPanel>
 		      </b:PanelBody>

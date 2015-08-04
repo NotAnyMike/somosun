@@ -16,6 +16,7 @@ import org.gwtbootstrap3.client.ui.constants.IconType;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -48,10 +49,17 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 	@UiField HorizontalPanel infoHolderSearchSubject;
 	@UiField Panel accordionContainer;
 	@UiField Button addSpecificSubject;
+	@UiField Button goTo1Button;
+	@UiField Button goLeftButton;
+	@UiField Button goRightButton;
 	@UiField Label codeFieldSearchSubject;
 	@UiField Label nameFieldSearchSubject;
 	@UiField Label creditsFieldSearchSubject;
 	@UiField Label typeFieldSearchSubject;
+	@UiField HTML h1Name;
+	@UiField HTML h1Code;
+	
+	HandlerRegistration onShowRegister;
 	
 	private static SubjectAccordionViewUiBinder uiBinder = GWT
 			.create(SubjectAccordionViewUiBinder.class);
@@ -91,13 +99,16 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 		codeFieldSearchSubject.setText(code);
 		nameFieldSearchSubject.setText(name);
 		typeFieldSearchSubject.setText(type);
+		
+		h1Name.setText(name);
+		h1Code.setText("(" + code + ")");
+		
 		typeFieldSearchSubject.setTitle("Libre Elección");
-		typeFieldSearchSubject.getElement().setAttribute("data-toggle", "tooltip");
-		typeFieldSearchSubject.getElement().setAttribute("data-placement", "top");
+		
 		creditsFieldSearchSubject.setText("c:" + credits);
 		creditsFieldSearchSubject.setTitle("Créditos: " + credits);
-		creditsFieldSearchSubject.getElement().setAttribute("data-toggle", "tooltip");
-		creditsFieldSearchSubject.getElement().setAttribute("data-placement", "top");
+		
+		
 		addSpecificSubject.getElement().setAttribute("code", code);
 		addSpecificSubject.getElement().setAttribute("career", careerCode);
 		addSpecificSubject.getElement().setAttribute("name", name);
@@ -119,7 +130,21 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 
 	@Override
 	public void init() {
+		this.getElement().setAttribute("position", "1");
+		this.getElement().setAttribute("ammount", "1");
 		
+		h1Name.getElement().setAttribute("style", "display:inline-block");
+		h1Code.getElement().setAttribute("style", "display:inline-block; padding-left:10px");
+		
+		typeFieldSearchSubject.getElement().setAttribute("data-toggle", "tooltip");
+		typeFieldSearchSubject.getElement().setAttribute("data-placement", "top");
+		
+		creditsFieldSearchSubject.getElement().setAttribute("data-toggle", "tooltip");
+		creditsFieldSearchSubject.getElement().setAttribute("data-placement", "top");
+		
+		goTo1Button.getElement().setAttribute("style", "outline:none");
+		goLeftButton.getElement().setAttribute("style", "outline:none");
+		goRightButton.getElement().setAttribute("style", "outline:none");
 	}
 	
 	@Override
@@ -159,11 +184,12 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 	public void addMainComplementaryView(final ComplementaryValueViewImpl view) {
 		final SubjectAccordionViewImpl accordion = this;
 		
-		accordionBody.addShowHandler(new ShowHandler(){
+		onShowRegister = accordionBody.addShowHandler(new ShowHandler(){
 
 			@Override
 			public void onShow(ShowEvent showEvent) {
-				presenter.onAccordionClicked(codeFieldSearchSubject.getText(), accordion, view);	
+				presenter.onAccordionClicked(codeFieldSearchSubject.getText(), accordion, view);
+				onShowRegister.removeHandler();
 			}
 			
 		});

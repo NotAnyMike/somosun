@@ -2,6 +2,7 @@ package com.uibinder.shared.control;
 
 import java.io.Serializable;
 
+import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
@@ -15,6 +16,7 @@ import com.uibinder.shared.SomosUNUtils;
  * and moved it to the shared package cuz the client-side will use it
  *  
  */
+@Cache(expirationSeconds=9000)
 @Entity
 public class Subject implements Serializable {
 
