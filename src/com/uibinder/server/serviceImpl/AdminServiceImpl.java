@@ -1,5 +1,7 @@
 package com.uibinder.server.serviceImpl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -13,6 +15,8 @@ import com.uibinder.server.dao.StudentDao;
 import com.uibinder.server.dao.SubjectDao;
 import com.uibinder.server.dao.SubjectGroupDao;
 import com.uibinder.server.dao.SubjectValueDao;
+import com.uibinder.shared.SiaResultSubjects;
+import com.uibinder.shared.control.Career;
 import com.uibinder.shared.control.Student;
 
 public class AdminServiceImpl extends RemoteServiceServlet implements AdminService{
@@ -187,5 +191,48 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 			}
 		}
 	}
+
+	@Override
+	public void analyseAllCareers(boolean analyseAll) {
+		if(getUserLogged().isAdmin() == true){
+			CareerDao careerDao = new CareerDao();
+			List<Career> careers = careerDao.getCareersBySede("bog");
+			List<String> careersAnalysed = new ArrayList<String>();
+			List<String> careersNotAnalysed = new ArrayList<String>();
+			String sede = "bog";
+			
+			log.info("<------------- STARTING TO ANALYSE ALL CAREERS ------------->");
+			log.info("Getting all results from the sia");
+			
+			SiaResultSubjects allSiaSubjects = SiaProxy.getSubjects("", "", "", "", 1, 10000, sede, null);;
+			
+			for(Career career : careers){
+				
+				log.info("Starting to analyse the career " + career.getCode() + " " + career.getName());
+				if(!career.hasAnalysis() || analyseAll){					
+					boolean error = false;
+					try{
+						SiaProxy.getRequisitesForACareer(career.getCode(), allSiaSubjects);
+					}catch (Exception e){
+						error = true;
+					}
+					
+					if(error){
+						log.info("<------------- ERROR with " + career.getCode() + " " + career.getName() + " --------------->");
+						careersNotAnalysed.add(career.getCode());
+					}
+					careersAnalysed.add(career.getCode());
+					log.info("Analysis for " + career.getCode() + " " + career.getName() + " ended");
+				}else{
+					log.info("Analysis for " + career.getCode() + " " + career.getName() + " canceled because it has been analysed already");
+				}
+				
+			}
+			
+			log.info("Careers not analyzed: " + careersNotAnalysed.toString());
+			log.info("<------------- ANALYSE ALL CAREERS ENDED ------------->");
+		}
+		
+	}	
 
 }

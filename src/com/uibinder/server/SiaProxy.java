@@ -936,7 +936,7 @@ public class SiaProxy {
 	 * <br></br>
 	 * This mehtod will make career.hasAnalysis() true
 	 */
-	public static void getRequisitesForACareer(String careerCode){
+	public static void getRequisitesForACareer(String careerCode, SiaResultSubjects allSiaSubjects){
 		
 		Document docPlan = null;
 		Document docRequisites = null;
@@ -1489,7 +1489,7 @@ public class SiaProxy {
 				/**
 				 * Saving the subjects and getting back a List of Subjects (to add them to the ComplementaryValues) and a ComplementaryValues 
 				 */
-				saveSubjectsAndComplementaryValues(subjects, career, mapSGDSGFinal, subjectGroupDao);
+				saveSubjectsAndComplementaryValues(subjects, career, mapSGDSGFinal, subjectGroupDao, allSiaSubjects);
 				
 				int freeElectionValue = -1;
 				int fundamentalValue = fundamentals.get(0).getObligatoryCredits() + fundamentals.get(0).getOptativeCredits();
@@ -1572,7 +1572,7 @@ public class SiaProxy {
 	 * @param career
 	 * @param mapSGDSG
 	 */
-	private static void saveSubjectsAndComplementaryValues(	List<SubjectDummy> subjectsD, Career career, Map<SubjectGroupDummy, SubjectGroup> mapSGDSG, SubjectGroupDao subjectGroupDao) {
+	private static void saveSubjectsAndComplementaryValues(	List<SubjectDummy> subjectsD, Career career, Map<SubjectGroupDummy, SubjectGroup> mapSGDSG, SubjectGroupDao subjectGroupDao, SiaResultSubjects allSiaResult ) {
 		
 		SubjectDao subjectDao = new SubjectDao();
 		ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
@@ -1585,7 +1585,8 @@ public class SiaProxy {
 		String sede = "bog";
 		//SiaResultSubjects siaResultFundamental = getSubjects("", "B", careerString, "", 1, 200, sede);
 		//SiaResultSubjects siaResultProfessional = getSubjects("", "C", careerString, "", 1, 200, sede);
-		SiaResultSubjects allSiaResult = getSubjects("", "", "", "", 1, 10000, sede, null);
+		
+		if(allSiaResult == null) allSiaResult = getSubjects("", "", "", "", 1, 10000, sede, null);
 		SiaResultSubjects careerSiaResult = getSubjects("", "", careerString, "", 1, 10000, sede, null);
 				
 		for(SubjectDummy sD : subjectsD)

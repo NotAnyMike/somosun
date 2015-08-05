@@ -43,6 +43,8 @@ public class IndexViewImpl extends Composite implements IndexView {
 	@UiField Button resetCertainHasDefaultButton;
 	@UiField Button makeUserAdminButton;
 	@UiField Button unBlockUserButton;
+	@UiField Button analyseAllCareersButton;
+	@UiField Button analyseCareersNotAnalyzedButton;
 	
 	@UiField TextBox userCodeTextBox;
 	@UiField TextBox userToUnBlockTextBox;
@@ -226,6 +228,22 @@ public class IndexViewImpl extends Composite implements IndexView {
 			presenter.onBlockUnblockUser(userToUnBlockTextBox.getValue());
 		}
 		setTimes(unBlockUserButton.getElement());
+	}
+	
+	@UiHandler("analyseAllCareersButton")
+	public void onAnalyseAllCareers(ClickEvent e){
+		if(getTimes(analyseAllCareersButton.getElement()).equals("1")){
+			presenter.onAnalyseAllCareers(true);
+		}
+		setTimes(analyseAllCareersButton.getElement());
+	}
+	
+	@UiHandler("analyseCareersNotAnalyzedButton")
+	public void onAnalyseCareersNotAnalyzed(ClickEvent e){
+		if(getTimes(analyseCareersNotAnalyzedButton.getElement()).equals("1")){
+			presenter.onAnalyseAllCareers(false);
+		}
+		setTimes(analyseCareersNotAnalyzedButton.getElement());
 	}
 
 }

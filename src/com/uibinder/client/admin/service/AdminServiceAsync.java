@@ -35,5 +35,7 @@ public interface AdminServiceAsync {
 	void makeUserAdmin(String userName, AsyncCallback<Void> callback);
 
 	void blockUnblockUser(String userName, AsyncCallback asyncCallback);
+
+	void analyseAllCareers(boolean analyseAll, AsyncCallback<Void> asyncCallback);
 	
 }

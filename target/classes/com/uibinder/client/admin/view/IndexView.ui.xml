@@ -34,7 +34,8 @@
 										<b:Button type="WARNING" ui:field="analyseCertainCareerButton" enabled="true">Analyse</b:Button>
 									</b:InputGroupButton>
 								</b:InputGroup>
-								<b:Button type="INFO" ui:field="analyseAllCareers">- Analyse ALL careers -</b:Button>
+								<b:Button type="WARNING" ui:field="analyseAllCareersButton">- Analyse ALL careers -</b:Button>
+								<b:Button type="INFO" ui:field="analyseCareersNotAnalyzedButton">- Analyse careers not analyzed -</b:Button>
 							</b:VerticalButtonGroup>
 						</div>
 					</div>

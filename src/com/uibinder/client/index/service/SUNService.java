@@ -65,8 +65,6 @@ public interface SUNService extends RemoteService{
 	
 	List<ComplementaryValue> getComplementaryValues(List<String> selectedSubjectCodeStrings, List<String> selectedSubjectCareerStrings);
 	
-	public void analyzeCareer(String careerCode);
-	
 	public List<SubjectGroup> getSubjectGroups(String careerCode);
 	
 }

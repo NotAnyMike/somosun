@@ -324,5 +324,24 @@ public class IndexPresenter implements Presenter, IndexView.Presenter {
 			}
 		});
 	}
+
+	@Override
+	public void onAnalyseAllCareers(boolean analyseAll) {
+		GWT.log("Analysing" + (analyseAll ? "all" : "certain") + "careers - started" );
+		rpcAdminService.analyseAllCareers(analyseAll, new AsyncCallback(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Error analysing all career, some could had been analysed");
+				GWT.log("Error analysing all career, some could had been analysed");
+			}
+			@Override
+			public void onSuccess(Object result) {
+				Window.alert("All (some) careers were analysed, to see which were really analysed and which ones had problems see the log.");
+				GWT.log("All (some) careers were analysed, to see which were really analysed and which ones had problems see the log.");
+			}
+			
+		});
+	}
 	
 }

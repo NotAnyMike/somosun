@@ -283,10 +283,10 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		return p;
 	}
 
-	@Override
-	public void analyzeCareer(String careerCode) {
-		SiaProxy.getRequisitesForACareer(careerCode);
-	}
+//	@Override
+//	public void analyzeCareer(String careerCode) {
+//		SiaProxy.getRequisitesForACareer(careerCode);
+//	}
 
 	public List<ComplementaryValue> getComplementaryValues(List<String> subjectCodeStrings, List<String> subjectCareerStrings){
 		
@@ -310,10 +310,10 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 			
 			if((career == null) ? true : career.getCode().equals(careerCode) == false){
 				career = careerDao.getCareerByCode(careerCode);					
-				if(career.hasAnalysis()  == false){
-					analyzeCareer(career.getCode());
-					//career = careerDao.getCareerByCode(subjectCareerStrings.get(0)); in order to optimize the method
-				}
+//				if(career.hasAnalysis()  == false){
+//					analyzeCareer(career.getCode());
+//					//career = careerDao.getCareerByCode(subjectCareerStrings.get(0)); in order to optimize the method
+//				}
 			}
 			
 			boolean isProblematic = false;
@@ -355,9 +355,9 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 				
 				if((career == null) ? true : career.getCode().equals(currentCareerCode) == false){
 					career = careerDao.getCareerByCode(currentCareerCode);					
-					if(career.hasAnalysis()  == false){
-						analyzeCareer(career.getCode());
-					}
+//					if(career.hasAnalysis()  == false){
+//						analyzeCareer(career.getCode());
+//					}
 					
 						long careerResults0 = System.nanoTime();
 					careerResults = getSubjectFromSia("", "", currentCareerCode, "", 1, 10000, "bog", null, problematicSubjects);			
@@ -509,10 +509,10 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 			
 			if((career == null) ? true : career.getCode().equals(careerCode) == false){
 				career = careerDao.getCareerByCode(careerCode);					
-				if(career.hasAnalysis()  == false){
-					analyzeCareer(career.getCode());
-					career = careerDao.getCareerByCode(subjectCareerStrings.get(0));
-				}
+//				if(career.hasAnalysis()  == false){
+//					analyzeCareer(career.getCode());
+//					career = careerDao.getCareerByCode(subjectCareerStrings.get(0));
+//				}
 			}
 			
 			if(career != null){
@@ -568,10 +568,10 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 				
 				if(oldCareer.equals(careerCodeT) == false){
 					career = careerDao.getCareerByCode(careerCodeT);					
-					if(career.hasAnalysis()  == false){
-						analyzeCareer(career.getCode());
-						career = careerDao.getCareerByCode(subjectCareerStrings.get(0));
-					}
+//					if(career.hasAnalysis()  == false){
+//						analyzeCareer(career.getCode());
+//						career = careerDao.getCareerByCode(subjectCareerStrings.get(0));
+//					}
 					if(subjectCodeT.equals(SomosUNUtils.LIBRE_CODE) == false || subjectCodeT.equals(SomosUNUtils.OPTATIVA_CODE) == false){						
 						levelingResult = getSubjectFromSia("", "p", ""/*career.getCode()*/, "", 1, 10000, "bog", null);
 						levelingList = levelingResult.getSubjectList();
@@ -833,12 +833,12 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 			c = careerDao.getCareerByCode(careerCode);
 		}
 		
-		if(c != null && c.hasAnalysis() == false){
-			analyzeCareer(c.getCode());
-			
-			c = careerDao.getCareerByCode(careerCode);
-			
-		}
+//		if(c != null && c.hasAnalysis() == false){
+//			analyzeCareer(c.getCode());
+//			
+//			c = careerDao.getCareerByCode(careerCode);
+//			
+//		}
 		
 		return c; 
 	}

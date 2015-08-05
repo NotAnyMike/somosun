@@ -435,9 +435,9 @@ public class PlanDao {
 		Career career = careerDao.getCareerByCode(careerCode);
 		
 		if(career != null){
-			if(career.hasAnalysis() == false){
-				SiaProxy.getRequisitesForACareer(career.getCode());
-			}
+//			if(career.hasAnalysis() == false){
+//				SiaProxy.getRequisitesForACareer(career.getCode());
+//			}
 			
 			//getUser
 			LoginServiceImpl login = new LoginServiceImpl();

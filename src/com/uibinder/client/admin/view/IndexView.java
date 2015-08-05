@@ -23,6 +23,7 @@ public interface IndexView {
 		void onDeleteAllSubjectValueButton();
 		void onMakeUserAdminButton(String userName);
 		void onBlockUnblockUser(String userName);
+		void onAnalyseAllCareers(boolean analyseAll);
 	}
 	
 	Widget asWidget();
@@ -43,4 +44,6 @@ public interface IndexView {
 	void onDeleteAllSubjectValueButton(ClickEvent e);
 	void onMakeUserAdminButton(ClickEvent e);
 	void onBlockUnblockUser(ClickEvent e);
+	void onAnalyseAllCareers(ClickEvent e);
+	void onAnalyseCareersNotAnalyzed(ClickEvent e);
 }

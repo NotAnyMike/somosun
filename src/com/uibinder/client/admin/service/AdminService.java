@@ -22,4 +22,5 @@ public interface AdminService extends RemoteService{
 	void deleteAllSubjectValue();
 	void makeUserAdmin(String userName);
 	void blockUnblockUser(String userName);
+	void analyseAllCareers(boolean analyseAll);
 }
