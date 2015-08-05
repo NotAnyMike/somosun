@@ -1044,13 +1044,13 @@ ComplementaryValueView.Presenter{
 			accordion.setPresenter(this);
 			accordion.setHeader(s.getCode(), s.getName(), "L", Integer.toString(s.getCredits()), careerCode);
 
-			ComplementaryValueViewImpl complementaryValueView = new ComplementaryValueViewImpl(s.getCode(), accordion, searchSubjectView.getSubjectsAmmount());
+			ComplementaryValueViewImpl complementaryValueView = new ComplementaryValueViewImpl(s.getName(), s.getCode(), accordion, searchSubjectView.getSubjectsAmmount(), 0);
 			complementaryValueView.setPresenter(this);
 			complementaryValueView.setCareerList(careers, (careerCode.isEmpty() ? plan.getCareerCode() : careerCode));
 			complementaryValueView.setSubjectGroupName("-");
 			
 			//mapAccordion.put(accordion, complementaryValueView);
-			accordion.addMainComplementaryView(complementaryValueView);
+			accordion.addComplementaryView(complementaryValueView);
 			
 			accordions.add(accordion);
 			
@@ -1320,7 +1320,7 @@ ComplementaryValueView.Presenter{
 		if(complementaryValue != null && complementaryValue.getPrerequisitesLists() != null && complementaryValue.getPrerequisitesLists().size() > 0){
 			for(List<Subject> list: complementaryValue.getPrerequisitesLists()){
 				for(Subject subject : list){
-					cVView.addRequisite("pre", subject.getName(), subject.getCode());
+					cVView.addRequisite("pre", subject.getName(), subject.getCode(), accordion);
 				}
 			}
 		}else{
@@ -1330,7 +1330,7 @@ ComplementaryValueView.Presenter{
 		if(complementaryValue != null && complementaryValue.getCorequisitesLists() != null && complementaryValue.getCorequisitesLists().size() > 0){
 			for(List<Subject> list: complementaryValue.getCorequisitesLists()){
 				for(Subject subject : list){
-					cVView.addRequisite("co", subject.getName(), subject.getCode());
+					cVView.addRequisite("co", subject.getName(), subject.getCode(), accordion);
 				}
 			}
 		}else{
@@ -1711,6 +1711,42 @@ ComplementaryValueView.Presenter{
 			
 		});
 
+	}
+
+	@Override
+	public void addComplementaryValueView(final SubjectAccordionViewImpl accordion, final String name, final String code, final String careerCode) {
+		
+		accordion.showCurtain();
+		
+		final ComplementaryValueViewImpl newView = new ComplementaryValueViewImpl(name, code, accordion, accordion.getCounter(), accordion.getAmmountOfCVViews());
+		newView.setPresenter(this);
+		newView.setCareerList(careers, (careerCode.isEmpty() ? plan.getCareerCode() : careerCode));
+		newView.setSubjectGroupName("-");
+		newView.addStyleName("isRight");
+		accordion.addComplementaryView(newView);
+		
+		//Get the complementaryValue
+		rpcService.getComplementaryValueFromDb(plan.getCareerCode(), code, new AsyncCallback<ComplementaryValue>(){
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				accordion.hideCurtain();
+				GWT.log("error getting the information");
+				accordion.showError();
+			}
+			
+			@Override
+			public void onSuccess(ComplementaryValue result) {
+				accordion.hideCurtain();
+				//Populate it  
+				populateAccordionWithComplementaryValue(accordion, newView, result);
+				accordion.goRight();
+			}
+			
+			
+		});
+		
+		
 	}
 	
 }

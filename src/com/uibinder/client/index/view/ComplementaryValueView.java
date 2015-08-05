@@ -10,6 +10,7 @@ public interface ComplementaryValueView {
 
 	interface Presenter{
 		void onGroupsAccordionShows(String subjectCode, final ComplementaryValueViewImpl view);
+		void addComplementaryValueView(SubjectAccordionViewImpl accordion, String name, String code, String careerCode);
 	}
 	
 	void setPresenter(PlanPresenter presenter);
@@ -18,7 +19,7 @@ public interface ComplementaryValueView {
 	void hasNoPrerequisites();
 	void hasNoCorequisites();
 	void setSubjectGroupName(String s);
-	void addRequisite(String type, String name, String code);
+	void addRequisite(String type, String name, String code, SubjectAccordionViewImpl accordion);
 	void addAntiRequisite(String type, String name, String code);
 	void setCareerList(List<Career> c, String careerCode);
 	void isNoCorequisite();

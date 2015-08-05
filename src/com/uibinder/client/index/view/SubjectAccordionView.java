@@ -21,6 +21,6 @@ public interface SubjectAccordionView {
 	void onAddSpecificSubjectClick(ClickEvent event);
 	String getCode();
 	void showError();
-	void addMainComplementaryView(ComplementaryValueViewImpl view);
+	void addComplementaryView(ComplementaryValueViewImpl view);
 	
 }

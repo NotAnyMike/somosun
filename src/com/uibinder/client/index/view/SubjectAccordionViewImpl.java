@@ -1,11 +1,13 @@
 package com.uibinder.client.index.view;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.gwtbootstrap3.client.shared.event.ShowEvent;
 import org.gwtbootstrap3.client.shared.event.ShowHandler;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.PanelCollapse;
 import org.gwtbootstrap3.client.ui.PanelHeader;
@@ -14,6 +16,7 @@ import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -41,9 +44,9 @@ import com.uibinder.shared.control.Career;
 public class SubjectAccordionViewImpl extends Composite implements SubjectAccordionView {
 	
 	PlanPresenter presenter;
-	int counter = 0;
+	private int counter = 0;
 
-	@UiField HTMLPanel mainContainer;
+	@UiField FlowPanel mainContainer;
 	@UiField PanelHeader header;
 	@UiField PanelCollapse accordionBody;
 	@UiField HorizontalPanel infoHolderSearchSubject;
@@ -52,12 +55,14 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 	@UiField Button goTo1Button;
 	@UiField Button goLeftButton;
 	@UiField Button goRightButton;
+	@UiField ButtonGroup navContainer;
 	@UiField Label codeFieldSearchSubject;
 	@UiField Label nameFieldSearchSubject;
 	@UiField Label creditsFieldSearchSubject;
 	@UiField Label typeFieldSearchSubject;
 	@UiField HTML h1Name;
 	@UiField HTML h1Code;
+	@UiField HTMLPanel complementaryValueCurtain;
 	
 	HandlerRegistration onShowRegister;
 	
@@ -71,7 +76,7 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 
 	public SubjectAccordionViewImpl(int counter) {
 		initWidget(uiBinder.createAndBindUi(this));
-		this.counter = counter;
+		this.setCounter(counter);
 		
 		accordionContainer.getElement().setAttribute("style", "margin-bottom:5px");
 		header.getElement().setAttribute("data-target", "#collapse" + counter);
@@ -86,12 +91,20 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 		addSpecificSubject.getElement().setAttribute("onClick", "function(event){event.stopPropagation();}");
 		
 		mainContainer.setStyleName("complementaryValue-mainContainer");
+		
+		hideCurtain();
 	}
 
 	@Override
 	public void setPresenter(PlanPresenter presenter) {
 		this.presenter = presenter;
 		init();
+	}
+	
+	private void setSubheader(String name, String code){
+		h1Name.setText(name);
+		h1Code.setText("(" + code + ")");
+		
 	}
 
 	@Override
@@ -100,8 +113,7 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 		nameFieldSearchSubject.setText(name);
 		typeFieldSearchSubject.setText(type);
 		
-		h1Name.setText(name);
-		h1Code.setText("(" + code + ")");
+		setSubheader(name, code);
 		
 		typeFieldSearchSubject.setTitle("Libre Elección");
 		
@@ -130,8 +142,8 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 
 	@Override
 	public void init() {
-		this.getElement().setAttribute("position", "1");
-		this.getElement().setAttribute("ammount", "1");
+		this.getElement().setAttribute("position", "0");
+		this.getElement().setAttribute("ammount", "0");
 		
 		h1Name.getElement().setAttribute("style", "display:inline-block");
 		h1Code.getElement().setAttribute("style", "display:inline-block; padding-left:10px");
@@ -152,6 +164,195 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 		return addSpecificSubject.getElement().getAttribute("code");
 	}
 	
+	
+	@Override
+	public void showError() {
+		Alert error = new Alert("Ocurrió un error mientras buscabamos la información de esta asignatura, intentalo de nuevo :(");
+		error.setType(AlertType.DANGER);
+		error.getElement().setAttribute("style", "margin:0px 20px 20px 20px");
+		
+		accordionBody.add(error);
+		
+	}
+
+	
+	@Override
+	public void addComplementaryView(final ComplementaryValueViewImpl view) {
+		final SubjectAccordionViewImpl accordion = this;
+		
+		if(this.getElement().getAttribute("ammount").matches("()|(0)")){			
+			onShowRegister = accordionBody.addShowHandler(new ShowHandler(){
+				
+				@Override
+				public void onShow(ShowEvent showEvent) {
+					presenter.onAccordionClicked(codeFieldSearchSubject.getText(), accordion, view);
+					onShowRegister.removeHandler();
+				}
+				
+			});
+		}
+		
+		addComplementaryViewWidget(view.asWidget());
+		
+		
+	}
+	
+	private void addComplementaryViewWidget(Widget w){
+		int position = Integer.valueOf(this.getElement().getAttribute("position"));
+		int ammount = Integer.valueOf(this.getElement().getAttribute("ammount"));
+		
+		validateNavigation();
+		
+		if(position + 2 == mainContainer.getWidgetCount() || ammount == 0){
+			mainContainer.add(w);
+			this.getElement().setAttribute("ammount", "" + (ammount+1));
+		}else{
+			mainContainer.insert(w,position+2);
+			this.getElement().setAttribute("ammount", "" + (position+2));
+			for(int x = position + 2; x <= ammount; x++){
+				mainContainer.remove(x);
+			}
+		}
+	}
+	
+	private void validateNavigation() {
+		
+		int position = Integer.valueOf(this.getElement().getAttribute("position"));
+		int ammount = Integer.valueOf(this.getElement().getAttribute("ammount"));
+		
+		if(ammount == 1 || ammount == 0){
+			navContainer.setVisible(false);
+		}else{
+			navContainer.setVisible(true);
+		
+			if(position+1 == ammount) goRightButton.setEnabled(false);
+			else goRightButton.setEnabled(true);
+			
+			if(position == 0) goLeftButton.setEnabled(false);
+			else goLeftButton.setEnabled(true);
+			
+			if(position > 1) goTo1Button.setEnabled(true);
+			else goTo1Button.setEnabled(false);
+		
+		}
+		
+	}
+	
+	public void goLeft(){
+		int position = Integer.valueOf(this.getElement().getAttribute("position"));
+		if(position - 1 >= 0) {
+			Element currentElement = getNthElementInMainContainer(position+1);
+			currentElement.getPreviousSiblingElement().removeClassName("isLeft");
+			currentElement.addClassName("isRight");
+
+			String name = currentElement.getPreviousSiblingElement().getAttribute("name");
+			String code = currentElement.getPreviousSiblingElement().getAttribute("code");
+			
+			this.getElement().setAttribute("position", "" + (position - 1));
+
+			validateNavigation();
+			
+			setSubheader(name, code);
+			
+		}
+	}
+	
+	public void goRight(){
+		int position = Integer.valueOf(this.getElement().getAttribute("position"));
+		int ammount = Integer.valueOf(this.getElement().getAttribute("ammount"));
+		if(position + 1 < ammount) {
+			Element currentElement = getNthElementInMainContainer(position+1);
+			currentElement.getNextSiblingElement().removeClassName("isRight");
+			currentElement.addClassName("isLeft");
+			
+			String name = currentElement.getNextSiblingElement().getAttribute("name");
+			String code = currentElement.getNextSiblingElement().getAttribute("code");
+			
+			this.getElement().setAttribute("position", "" + (position +1));
+			
+			validateNavigation();
+			
+			setSubheader(name, code);
+		}
+	}
+
+	public void goTo1(){
+		int position = Integer.valueOf(this.getElement().getAttribute("position"));
+		if(position != 0) {
+			Element firstElement = getNthElementInMainContainer(1);
+			firstElement.removeClassName("isLeft");
+			
+			String name = firstElement.getAttribute("name");
+			String code = firstElement.getAttribute("code");
+
+			int currentPosition = 1;
+			while(currentPosition != position){
+				firstElement = firstElement.getNextSiblingElement();
+				firstElement.setAttribute("style", "visibility:hidden");
+				firstElement.removeClassName("isLeft");
+				firstElement.addClassName("isRight");
+				firstElement.removeAttribute("style");
+				currentPosition++;
+			}
+			
+			Element currentElement = getNthElementInMainContainer(position+1);
+			currentElement.addClassName("isRight");
+			
+			this.getElement().setAttribute("position", "0");
+			
+			validateNavigation();
+			
+			setSubheader(name, code);
+		}
+	}
+		
+	private Element getNthElementInMainContainer(int i) {
+		Element toReturn = mainContainer.getElement().getFirstChildElement();
+		
+		for(int x = 1; x <= i; x++){
+			toReturn = toReturn.getNextSiblingElement();
+		}
+		
+		return toReturn;
+	}
+
+	public void showCurtain(){
+		complementaryValueCurtain.setVisible(true);
+	}
+	
+	public void hideCurtain(){
+		complementaryValueCurtain.setVisible(false);
+	}
+	
+//	public boolean showComplementaryValueView(String subjectCode){
+//		boolean toReturn = false;
+//		
+//		if(subjectCode != null){			
+//			Widget widget = null;
+//			Iterator<Widget> widgets = mainContainer.iterator();
+//			while(widgets.hasNext()){
+//				widget = widgets.next();
+//				String codeT = widget.getElement().getAttribute("code");
+//				if(subjectCode.equals(codeT)){
+//					toReturn = true;
+//					break;
+//				}
+//			}
+//			
+//			if(toReturn == true){
+//				if(widget != null){
+//					//Do something with widget
+//					widget.removeFromParent();
+//					widget.addStyleName("isRight");
+//					addComplementaryViewWidget(widget);
+//					goRight();
+//				}
+//			}
+//		}
+//		
+//		return toReturn;
+//	}
+//	
 	/*************************** EVENTS ***************************/
 	@UiHandler("addSpecificSubject")
 	public void onAddSpecificSubjectClick(ClickEvent event){
@@ -169,33 +370,31 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 
 	}
 
-	@Override
-	public void showError() {
-		Alert error = new Alert("Ocurrió un error mientras buscabamos la información de esta asignatura, intentalo de nuevo :(");
-		error.setType(AlertType.DANGER);
-		error.getElement().setAttribute("style", "margin:0px 20px 20px 20px");
-		
-		accordionBody.add(error);
-		
+	@UiHandler("goTo1Button")
+	public void goTo1(ClickEvent event){
+		goTo1();
 	}
 
+	public int getAmmountOfCVViews() {
+		return Integer.valueOf(this.getElement().getAttribute("ammount"));
+	}
+
+	public int getCounter() {
+		return counter;
+	}
+
+	public void setCounter(int counter) {
+		this.counter = counter;
+	}
+
+	@UiHandler("goLeftButton")
+	public void goLeft(ClickEvent event){
+		goLeft();
+	}
 	
-	@Override
-	public void addMainComplementaryView(final ComplementaryValueViewImpl view) {
-		final SubjectAccordionViewImpl accordion = this;
-		
-		onShowRegister = accordionBody.addShowHandler(new ShowHandler(){
-
-			@Override
-			public void onShow(ShowEvent showEvent) {
-				presenter.onAccordionClicked(codeFieldSearchSubject.getText(), accordion, view);
-				onShowRegister.removeHandler();
-			}
-			
-		});
-		
-		mainContainer.add(view.asWidget());
-		
+	@UiHandler("goRightButton")
+	public void goRight(ClickEvent event){
+		goRight();
 	}
-
+	
 }

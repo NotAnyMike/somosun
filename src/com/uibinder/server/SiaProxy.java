@@ -614,37 +614,6 @@ public class SiaProxy {
 							blocks.add(block);
 						}
 					}
-					
-					
-//					if(times != "--"){
-//						//creating blocks
-//						for(int n = 0; n < StringUtils.countMatches(times, " ")+1; n++){
-//							block = new Block(days, StringUtils.substringBefore(times, " "), StringUtils.substringBefore(places, " "));
-////							for(Group g : listFromDb){
-////								if(g.getGroupNumber() == groupNumber && g.getSemesterValue().isCurrentSemester() == true){
-////									for(Block b : g.getSchedule()){
-////										if(block.equals(b)==true  || (block.getClassRoom().equals(b.getClassRoom()) && block.getDay() == b.getDay() && block.getEndHour() == b.getEndHour() && block.getStartHour() == b.getStartHour() )){
-////											block = b;
-////											g.getSchedule().remove(b);
-////											break;
-////										} 
-////									}
-////									break;
-////								}
-////							}
-//							if(block.getId() == null){
-//								if(block.getStartHour() != 0){									
-//									block = blockDao.getBlockByBlock(block);
-//								}
-//							}
-//							if(block.getStartHour() != 0){								
-//								blocks.add(block);
-//							}
-//	
-//							times = StringUtils.substringAfter(times, " ");
-//							places = StringUtils.substringAfter(places, " ");
-//						}
-//					}
 				}
 				group.setSubject(subject);
 				group.setSchedule(blocks);

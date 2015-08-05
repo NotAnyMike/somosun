@@ -14,7 +14,7 @@
 		    <b:PanelHeader dataParent="#accordion2" dataToggle="COLLAPSE" dataTarget="#collapseOne" ui:field="header">
 		      <b:Heading size="H4">
 			      <g:HorizontalPanel>
-			      	<b:Button b:id="btnAddSpecificSubject" ui:field="addSpecificSubject" type="SUCCESS" icon="PLUS" size="EXTRA_SMALL"/>
+			      	<b:Button b:id="btnAddSpecificSubject" ui:field="addSpecificSubject" type="SUCCESS" icon="PLUS" size="EXTRA_SMALL" title="Agregar asignatura"/>
 			      	<g:Label ui:field="codeFieldSearchSubject"></g:Label>
 			      	<g:Label ui:field="nameFieldSearchSubject"></g:Label>
 			      	<g:HorizontalPanel ui:field="infoHolderSearchSubject">
@@ -29,20 +29,26 @@
 		        <g:HTMLPanel>
 			        <div class="complementaryValue-subHeader">
 			        	<div class="complementaryValue-nav">
-				        	<b:ButtonGroup>
+				        	<b:ButtonGroup ui:field="navContainer">
 				        		<b:Button ui:field="goTo1Button" icon="ANGLE_DOUBLE_LEFT" type="INFO"></b:Button>
 				        		<b:Button ui:field="goLeftButton" icon="ANGLE_LEFT" type="INFO"></b:Button>
 				        		<b:Button ui:field="goRightButton" icon="ANGLE_RIGHT" type="INFO"></b:Button>
 				        	</b:ButtonGroup>
+				        	<b:Button b:id="btnAddSpecificSubject" ui:field="addSpecificRequisite" type="SUCCESS" icon="PLUS" />
 				        </div>
 				        <div class="complementaryValue-title">
 				        	<h1 style="margin:0"><g:HTML ui:field="h1Name"></g:HTML><small><g:HTML ui:field="h1Code"></g:HTML></small></h1>
 				        </div>
 			        </div>
 				    
-					<g:HTMLPanel ui:field="mainContainer">						
-						<div>holas parceros </div>
-					</g:HTMLPanel>
+					<g:FlowPanel ui:field="mainContainer">
+						<g:HTMLPanel ui:field="complementaryValueCurtain">
+							<div style="position: absolute; top:0; bottom:0; right: 0; left:0; background: black; opacity:0.3;z-index:3"></div>
+							<div class="progress" style="width: 200px; position:absolute; z-index:4; top:50%; margin-top:-10px; left:50%; margin-left: -100px;">
+			        			<div role="progress-bar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%" class="progress-bar progress-bar-warning progress-bar-striped active"><span class="sr-only">45% complete</span></div>
+			      			</div>		
+		      			</g:HTMLPanel>			
+					</g:FlowPanel>
 
 					
 				</g:HTMLPanel>

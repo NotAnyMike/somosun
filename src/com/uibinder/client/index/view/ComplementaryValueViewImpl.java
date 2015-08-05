@@ -13,6 +13,8 @@ import org.gwtbootstrap3.client.ui.constants.AlertType;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -24,6 +26,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.Label;
@@ -51,6 +54,7 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 	@UiField Grid spacesTable;
 	@UiField Grid titleSpacesTable;
 	@UiField VerticalPanel groupTableContainer;
+	@UiField HTMLPanel mainHtmlPanel;
 	
 	HandlerRegistration onGroupsShows;
 	
@@ -60,19 +64,22 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 	interface ComplementaryValueViewUiBinder extends UiBinder<Widget, ComplementaryValueViewImpl> {
 	}
 
-	public ComplementaryValueViewImpl(String subjectCode, SubjectAccordionViewImpl accordion, int counter) {
+	public ComplementaryValueViewImpl(String name, String subjectCode, SubjectAccordionViewImpl accordion, int counterOfAccordions, int ammountOfThis) {
 		initWidget(uiBinder.createAndBindUi(this));
 		
-		createAccordionFunctionality(counter);
+		createAccordionFunctionality(counterOfAccordions, ammountOfThis);
 		init();		
 		bind(subjectCode, accordion);
+		
+		this.getElement().setAttribute("name", name);
+		this.getElement().setAttribute("code", subjectCode);
 		
 	}
 	
 
-	private void createAccordionFunctionality(int counter) {
-		groupsTableContainer.getElement().setAttribute("id", "collapseGroups" + counter);
-		panelHeaderGroups.getElement().setAttribute("data-target","#collapseGroups" + counter);
+	private void createAccordionFunctionality(int counter, int ammountOfThis) {
+		groupsTableContainer.getElement().setAttribute("id", "collapseGroups" + counter + "-" + ammountOfThis);
+		panelHeaderGroups.getElement().setAttribute("data-target","#collapseGroups" + counter + "-" + ammountOfThis);
 	}
 
 
@@ -108,6 +115,8 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 
 	@Override
 	public void init() {
+		
+		mainHtmlPanel.addStyleName("complementaryValue-accordionContainer");
 		
 		listBoxCareers.addStyleName("form-control");
 		preRequisitesPanel.addStyleName("table table-hover text-center");
@@ -165,7 +174,11 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 		labelSubjectGroup.setText("Agrupación: " + s);
 	}
 	
-	public void addRequisite(String type, String name, String code) {
+	public void addRequisite(String type, final String name, final String code, final SubjectAccordionViewImpl accordion) {
+		
+		final ComplementaryValueViewImpl view = this;
+		final String careerCode = listBoxCareers.getSelectedValue();
+		
 		Anchor a = new Anchor(name);
 		a.getElement().setAttribute("code", code);
 		if(type == "pre"){
@@ -173,6 +186,7 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 			
 			preRequisitesPanel.add(a);
 			preRequisitesPanel.setCellHorizontalAlignment(a, HasHorizontalAlignment.ALIGN_CENTER);
+			
 		}
 		else {
 			if(coRequisitesPanel.getWidget(0).getElement().getClassName()=="fa fa-refresh fa-spin") coRequisitesPanel.remove(0);
@@ -180,6 +194,15 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 			coRequisitesPanel.add(a);
 			coRequisitesPanel.setCellHorizontalAlignment(a, HasHorizontalAlignment.ALIGN_CENTER);
 		}
+		
+		a.addClickHandler(new ClickHandler(){
+
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.addComplementaryValueView(accordion, name, code, careerCode);
+			}
+			
+		});
 	}
 	
 	public void addAntiRequisite(String type, String name, String code) {
