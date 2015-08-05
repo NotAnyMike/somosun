@@ -21,6 +21,8 @@ public interface IndexView {
 		void onResetCertainHasDefaultButton(String careerCode);
 		void onDeleteAllSemestersButton();
 		void onDeleteAllSubjectValueButton();
+		void onMakeUserAdminButton(String userName);
+		void onBlockUnblockUser(String userName);
 	}
 	
 	Widget asWidget();
@@ -39,4 +41,6 @@ public interface IndexView {
 	void onResetCertainHasDefaultButton(ClickEvent e);
 	void onDeleteAllSemestersButton(ClickEvent e);
 	void onDeleteAllSubjectValueButton(ClickEvent e);
+	void onMakeUserAdminButton(ClickEvent e);
+	void onBlockUnblockUser(ClickEvent e);
 }

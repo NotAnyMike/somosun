@@ -9,6 +9,7 @@ import com.uibinder.server.dao.CareerDao;
 import com.uibinder.server.dao.ComplementaryValueDao;
 import com.uibinder.server.dao.PlanDao;
 import com.uibinder.server.dao.SemesterDao;
+import com.uibinder.server.dao.StudentDao;
 import com.uibinder.server.dao.SubjectDao;
 import com.uibinder.server.dao.SubjectGroupDao;
 import com.uibinder.server.dao.SubjectValueDao;
@@ -160,6 +161,30 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 		if(getUserLogged().isAdmin() == true){
 			SubjectValueDao sVDao = new SubjectValueDao();
 			sVDao.deleteAllSubjectValues();
+		}
+	}
+
+	@Override
+	public void makeUserAdmin(String userName) {
+		if(getUserLogged().isAdmin() == true){			
+			StudentDao studentDao = new StudentDao();
+			Student s = studentDao.getStudentByUserName(userName);
+			if(s!= null){			
+				s.setAdmin(true);
+				studentDao.saveStudent(s);
+			}
+		}
+	}
+
+	@Override
+	public void blockUnblockUser(String userName) {
+		if(getUserLogged().isAdmin() == true){			
+			StudentDao studentDao = new StudentDao();
+			Student s = studentDao.getStudentByUserName(userName);
+			if(s!= null){						
+				s.setBlocked(!s.isBlocked());
+				studentDao.saveStudent(s);
+			}
 		}
 	}
 

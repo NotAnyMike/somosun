@@ -292,5 +292,37 @@ public class IndexPresenter implements Presenter, IndexView.Presenter {
 			
 		});
 	}
+
+	@Override
+	public void onMakeUserAdminButton(final String userName) {
+		rpcAdminService.makeUserAdmin(userName, new AsyncCallback(){
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Error making userName: " + userName + " admin");
+				GWT.log("Error making userName: " + userName + " admin");
+			}
+			@Override
+			public void onSuccess(Object result) {
+				Window.alert("UserName: " + userName + " is admin");
+				GWT.log("UserName: " + userName + " is admin");
+			}
+		});
+	}
+
+	@Override
+	public void onBlockUnblockUser(final String userName) {
+		rpcAdminService.blockUnblockUser(userName, new AsyncCallback(){
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Error blocking userName: " + userName);
+				GWT.log("Error blocking userName: " + userName);
+			}
+			@Override
+			public void onSuccess(Object result) {
+				Window.alert("UserName: " + userName + " is (un)blocked");
+				GWT.log("UserName: " + userName + " is (un)blocked");
+			}
+		});
+	}
 	
 }

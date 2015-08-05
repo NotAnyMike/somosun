@@ -19,8 +19,8 @@ public interface ComplementaryValueView {
 	void hasNoPrerequisites();
 	void hasNoCorequisites();
 	void setSubjectGroupName(String s);
-	void addRequisite(String type, String name, String code, SubjectAccordionViewImpl accordion);
-	void addAntiRequisite(String type, String name, String code);
+	void addRequisite(String type, String name, String code, SubjectAccordionViewImpl accordion, boolean makeStatic);
+	void addAntiRequisite(String type, String name, String code, SubjectAccordionViewImpl accordion,  boolean makeStatic);
 	void setCareerList(List<Career> c, String careerCode);
 	void isNoCorequisite();
 	void isNoPrerequisite();

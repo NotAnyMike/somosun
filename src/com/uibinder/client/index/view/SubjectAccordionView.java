@@ -19,6 +19,7 @@ public interface SubjectAccordionView {
 	void init();
 	void setHeader(String code, String name, String type, String credtis, String careerCode);
 	void onAddSpecificSubjectClick(ClickEvent event);
+	void onAddSpecificRequisiteClick(ClickEvent event);
 	String getCode();
 	void showError();
 	void addComplementaryView(ComplementaryValueViewImpl view);

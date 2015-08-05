@@ -20,4 +20,6 @@ public interface AdminService extends RemoteService{
 	void resetCertainHasDefaultField(String careerCode);
 	void deleteAllSemesters();
 	void deleteAllSubjectValue();
+	void makeUserAdmin(String userName);
+	void blockUnblockUser(String userName);
 }

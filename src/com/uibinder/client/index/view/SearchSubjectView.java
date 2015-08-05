@@ -15,6 +15,7 @@ public interface SearchSubjectView {
 	interface Presenter {
 		void onSearchButtonClicked(String text, String career, String checkBoxValue, int x);
 		void onFinalizarButtonClick();
+		void hideSearchBox();
 	}
 	
 	void setPresenter(PlanPresenter presenter);

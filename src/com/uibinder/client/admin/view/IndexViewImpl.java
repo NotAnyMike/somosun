@@ -3,6 +3,7 @@ package com.uibinder.client.admin.view;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.InputGroupButton;
 import org.gwtbootstrap3.client.ui.ListBox;
+import org.gwtbootstrap3.client.ui.TextBox;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
@@ -24,6 +25,7 @@ public class IndexViewImpl extends Composite implements IndexView {
 	@UiField ListBox complementaryValuesListBox;
 	@UiField ListBox planListBox;
 	@UiField ListBox subjectGroupListBox;
+	@UiField ListBox careerAnalyseListBox;
 	
 	@UiField Button resetUpdateCareersButton;
 	@UiField Button deleteAllDefaultPlansButton;
@@ -39,6 +41,11 @@ public class IndexViewImpl extends Composite implements IndexView {
 	@UiField Button resetCertainHasAnalysisButton;
 	@UiField Button deleteCertainComplementaryValuesButton;
 	@UiField Button resetCertainHasDefaultButton;
+	@UiField Button makeUserAdminButton;
+	@UiField Button unBlockUserButton;
+	
+	@UiField TextBox userCodeTextBox;
+	@UiField TextBox userToUnBlockTextBox;
 
 	private static IndexViewUiBinder uiBinder = GWT.create(IndexViewUiBinder.class);
 
@@ -61,6 +68,7 @@ public class IndexViewImpl extends Composite implements IndexView {
 		complementaryValuesListBox.addItem(name, value);
 		planListBox.addItem(name, value);
 		subjectGroupListBox.addItem(name, value);
+		careerAnalyseListBox.addItem(name, value);
 	}
 	
 	public void cleanLists(){
@@ -68,6 +76,7 @@ public class IndexViewImpl extends Composite implements IndexView {
 		careerAnalysisListBox.clear();
 		complementaryValuesListBox.clear();
 		planListBox.clear();
+		careerAnalyseListBox.clear();
 		subjectGroupListBox.clear();
 	}
 	
@@ -201,6 +210,22 @@ public class IndexViewImpl extends Composite implements IndexView {
 			presenter.onDeleteAllSubjectValueButton();
 		}
 		setTimes(deleteAllSubjectValueButton.getElement());
+	}
+	
+	@UiHandler("makeUserAdminButton")
+	public void onMakeUserAdminButton(ClickEvent e){
+		if(getTimes(makeUserAdminButton.getElement()).equals("1")){
+			presenter.onMakeUserAdminButton(userCodeTextBox.getValue());
+		}
+		setTimes(makeUserAdminButton.getElement());
+	}
+	
+	@UiHandler("unBlockUserButton")
+	public void onBlockUnblockUser(ClickEvent e){
+		if(getTimes(unBlockUserButton.getElement()).equals("1")){
+			presenter.onBlockUnblockUser(userToUnBlockTextBox.getValue());
+		}
+		setTimes(unBlockUserButton.getElement());
 	}
 
 }

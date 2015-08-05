@@ -22,12 +22,9 @@ public class StudentDao {
 	 * 
 	 * @param user
 	 */
-	private void saveStudent(Student student){
+	public void saveStudent(Student student){
 		if(student != null){
-			if(getStudentByIdG(student.getIdG())==null){ //looking if there is someone with its id from the google account service
-				//student.setAdmin(true);
 				ofy().save().entity(student).now();			
-			}			
 		}
 	}
 	
@@ -76,6 +73,10 @@ public class StudentDao {
 		Student s = null;
 		s = ofy().load().key(k).now();
 		return s;
+	}
+
+	public Student getStudentByUserName(String userName) {
+		return (Student) ofy().load().type(Student.class).filter("username", userName).first().now();
 	}
 
 }

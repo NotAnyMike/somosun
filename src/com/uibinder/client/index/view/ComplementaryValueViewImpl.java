@@ -174,44 +174,65 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 		labelSubjectGroup.setText("Agrupación: " + s);
 	}
 	
-	public void addRequisite(String type, final String name, final String code, final SubjectAccordionViewImpl accordion) {
+	public void addRequisite(String type, final String name, final String code, final SubjectAccordionViewImpl accordion, boolean makeStatic) {
 		
 		final ComplementaryValueViewImpl view = this;
 		final String careerCode = listBoxCareers.getSelectedValue();
 		
-		Anchor a = new Anchor(name);
-		a.getElement().setAttribute("code", code);
+		Widget w = null;
+		if(makeStatic == false){			
+			Anchor a = new Anchor(name);
+			a.getElement().setAttribute("code", code);
+			a.addClickHandler(new ClickHandler(){
+				@Override
+				public void onClick(ClickEvent event) {
+					presenter.addComplementaryValueView(accordion, name, code, careerCode);
+				}
+			});
+			w = a.asWidget();
+		}else{
+			HTML a = new HTML(name);
+			a.getElement().setAttribute("code", code);
+			a.getElement().setAttribute("style", "cursor: default");
+			w = a.asWidget();
+		}
+		
 		if(type == "pre"){
 			if(preRequisitesPanel.getWidget(0).getElement().getClassName()=="fa fa-refresh fa-spin") preRequisitesPanel.remove(0);
 			
-			preRequisitesPanel.add(a);
-			preRequisitesPanel.setCellHorizontalAlignment(a, HasHorizontalAlignment.ALIGN_CENTER);
+			preRequisitesPanel.add(w);
+			preRequisitesPanel.setCellHorizontalAlignment(w, HasHorizontalAlignment.ALIGN_CENTER);
 			
 		}
 		else {
 			if(coRequisitesPanel.getWidget(0).getElement().getClassName()=="fa fa-refresh fa-spin") coRequisitesPanel.remove(0);
 			
-			coRequisitesPanel.add(a);
-			coRequisitesPanel.setCellHorizontalAlignment(a, HasHorizontalAlignment.ALIGN_CENTER);
+			coRequisitesPanel.add(w);
+			coRequisitesPanel.setCellHorizontalAlignment(w, HasHorizontalAlignment.ALIGN_CENTER);
 		}
 		
-		a.addClickHandler(new ClickHandler(){
-
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.addComplementaryValueView(accordion, name, code, careerCode);
-			}
-			
-		});
+		
 	}
 	
-	public void addAntiRequisite(String type, String name, String code) {
+	public void addAntiRequisite(String type, final String name, final String code, final SubjectAccordionViewImpl accordion, boolean makeStatic) {
 		
+		final ComplementaryValueViewImpl view = this;
+		final String careerCode = listBoxCareers.getSelectedValue();
 		
 		Button b = new Button(name);
 		b.getElement().setAttribute("code", code);
 		b.getElement().setAttribute("style", "outline:none");
 		b.addStyleName("btn btn-default btn-xs");
+		if(makeStatic == false){	
+			b.addClickHandler(new ClickHandler(){
+				@Override
+				public void onClick(ClickEvent event) {
+					presenter.addComplementaryValueView(accordion, name, code, careerCode);
+				}
+			});
+		}else{
+			b.setActive(false);			
+		}
 		
 		if(type=="pre"){			
 			if(antiPreRequisite.getWidget(0).getElement().getClassName()=="fa fa-refresh fa-spin") antiPreRequisite.remove(0);

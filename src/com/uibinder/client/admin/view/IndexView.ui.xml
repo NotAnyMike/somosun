@@ -28,6 +28,13 @@
 									</b:InputGroupButton>
 								</b:InputGroup>
 								<b:Button type="DEFAULT" ui:field="resetUpdateCareersButton">Reset (update) careers</b:Button>
+								<b:InputGroup>
+									<b:ListBox ui:field="careerAnalyseListBox"></b:ListBox>
+									<b:InputGroupButton>									
+										<b:Button type="WARNING" ui:field="analyseCertainCareerButton" enabled="true">Analyse</b:Button>
+									</b:InputGroupButton>
+								</b:InputGroup>
+								<b:Button type="INFO" ui:field="analyseAllCareers">- Analyse ALL careers -</b:Button>
 							</b:VerticalButtonGroup>
 						</div>
 					</div>
@@ -142,15 +149,15 @@
 						<div class="panel-body">
 							<b:VerticalButtonGroup>
 								<b:InputGroup>
-								    <b:TextBox></b:TextBox>
+								    <b:TextBox ui:field="userToUnBlockTextBox"></b:TextBox>
 									<b:InputGroupButton>									
-										<b:Button type="WARNING" enabled="false">(Un)Block User</b:Button>
+										<b:Button type="WARNING" enabled="true" ui:field="unBlockUserButton">(Un)Block User</b:Button>
 									</b:InputGroupButton>
 								</b:InputGroup>
 								<b:InputGroup>
-								    <b:TextBox></b:TextBox>
+								    <b:TextBox ui:field="userCodeTextBox"></b:TextBox>
 									<b:InputGroupButton>									
-										<b:Button type="DEFAULT" enabled="false">(Un)Make user admin</b:Button>
+										<b:Button type="DEFAULT" enabled="true" ui:field="makeUserAdminButton">(Un)Make user admin</b:Button>
 									</b:InputGroupButton>
 								</b:InputGroup>
 							</b:VerticalButtonGroup>

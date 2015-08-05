@@ -31,5 +31,9 @@ public interface AdminServiceAsync {
 	void deleteAllSemesters(AsyncCallback asyncCallback);
 
 	void deleteAllSubjectValue(AsyncCallback<Void> callback);
+
+	void makeUserAdmin(String userName, AsyncCallback<Void> callback);
+
+	void blockUnblockUser(String userName, AsyncCallback asyncCallback);
 	
 }

@@ -68,7 +68,6 @@ public class SearchSubjectViewImpl extends Composite implements SearchSubjectVie
 	public void fill(){
 		
 		radioButton1.getElement().setAttribute("style", "margin-bottom:0px; margin-top:0px");
-//		radioButton1.setActive(true);
 		radioButton1.setValue(true);
 		radioButton2.getElement().setAttribute("style", "margin-bottom:0px");
 		radioButton3.getElement().setAttribute("style", "margin-bottom:0px");
@@ -177,8 +176,7 @@ public class SearchSubjectViewImpl extends Composite implements SearchSubjectVie
 	
 	@UiHandler("cancelButton")
 	public void onCancelButtonClick(ClickEvent e){
-		hideIt();
-		clear();
+		presenter.hideSearchBox();
 	}
 
 }

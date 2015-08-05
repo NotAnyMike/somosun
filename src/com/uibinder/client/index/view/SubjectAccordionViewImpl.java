@@ -3,6 +3,8 @@ package com.uibinder.client.index.view;
 import java.util.Iterator;
 import java.util.List;
 
+import org.gwtbootstrap3.client.shared.event.HideEvent;
+import org.gwtbootstrap3.client.shared.event.HideHandler;
 import org.gwtbootstrap3.client.shared.event.ShowEvent;
 import org.gwtbootstrap3.client.shared.event.ShowHandler;
 import org.gwtbootstrap3.client.ui.Alert;
@@ -55,6 +57,7 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 	@UiField Button goTo1Button;
 	@UiField Button goLeftButton;
 	@UiField Button goRightButton;
+	@UiField Button addSpecificRequisite;
 	@UiField ButtonGroup navContainer;
 	@UiField Label codeFieldSearchSubject;
 	@UiField Label nameFieldSearchSubject;
@@ -100,10 +103,40 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 		this.presenter = presenter;
 		init();
 	}
+
+	@Override
+	public void init() {
+		this.getElement().setAttribute("position", "0");
+		this.getElement().setAttribute("ammount", "0");
+		
+		h1Name.getElement().setAttribute("style", "display:inline-block");
+		h1Code.getElement().setAttribute("style", "display:inline-block");
+		
+		typeFieldSearchSubject.getElement().setAttribute("data-toggle", "tooltip");
+		typeFieldSearchSubject.getElement().setAttribute("data-placement", "top");
+		
+		creditsFieldSearchSubject.getElement().setAttribute("data-toggle", "tooltip");
+		creditsFieldSearchSubject.getElement().setAttribute("data-placement", "top");
+		
+		goTo1Button.getElement().setAttribute("style", "outline:none");
+		goLeftButton.getElement().setAttribute("style", "outline:none");
+		goRightButton.getElement().setAttribute("style", "outline:none");
+		
+		complementaryValueCurtain.setStyleName("complementaryValue-curtainContainer isActive");
+		
+		accordionBody.addHideHandler(new HideHandler(){
+
+			@Override
+			public void onHide(HideEvent hideEvent) {
+				goTo1();
+			}
+			
+		});
+	}
 	
 	private void setSubheader(String name, String code){
 		h1Name.setText(name);
-		h1Code.setText("(" + code + ")");
+		h1Code.setText(code);
 		
 	}
 
@@ -125,6 +158,8 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 		addSpecificSubject.getElement().setAttribute("career", careerCode);
 		addSpecificSubject.getElement().setAttribute("name", name);
 		addSpecificSubject.getElement().setAttribute("state", "add");
+		
+		addSpecificRequisite.getElement().setAttribute("state", "add");
 	}
 	
 	public void changeState() {
@@ -138,25 +173,25 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 			addSpecificSubject.setIcon(IconType.PLUS);
 			addSpecificSubject.getElement().setAttribute("state", "add");
 		}
+		
 	}
+	
 
-	@Override
-	public void init() {
-		this.getElement().setAttribute("position", "0");
-		this.getElement().setAttribute("ammount", "0");
-		
-		h1Name.getElement().setAttribute("style", "display:inline-block");
-		h1Code.getElement().setAttribute("style", "display:inline-block; padding-left:10px");
-		
-		typeFieldSearchSubject.getElement().setAttribute("data-toggle", "tooltip");
-		typeFieldSearchSubject.getElement().setAttribute("data-placement", "top");
-		
-		creditsFieldSearchSubject.getElement().setAttribute("data-toggle", "tooltip");
-		creditsFieldSearchSubject.getElement().setAttribute("data-placement", "top");
-		
-		goTo1Button.getElement().setAttribute("style", "outline:none");
-		goLeftButton.getElement().setAttribute("style", "outline:none");
-		goRightButton.getElement().setAttribute("style", "outline:none");
+	public void changeSubheaderState() {
+		String state = addSpecificRequisite.getElement().getAttribute("state");
+		if(state.equals("add")){
+			addSpecificRequisite.setType(ButtonType.DANGER);
+			addSpecificRequisite.setIcon(IconType.MINUS);
+			addSpecificRequisite.getElement().setAttribute("state", "remove");
+		}else{
+			addSpecificRequisite.setType(ButtonType.SUCCESS);
+			addSpecificRequisite.setIcon(IconType.PLUS);
+			addSpecificRequisite.getElement().setAttribute("state", "add");
+		}
+	}
+	
+	public String getCodeFromSubheader(){
+		return h1Code.getText();
 	}
 	
 	@Override
@@ -209,8 +244,8 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 		}else{
 			mainContainer.insert(w,position+2);
 			this.getElement().setAttribute("ammount", "" + (position+2));
-			for(int x = position + 2; x <= ammount; x++){
-				mainContainer.remove(x);
+			for(int x = position + 3; x <= ammount+1; x++){
+				mainContainer.remove(position + 3);
 			}
 		}
 	}
@@ -233,7 +268,17 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 			
 			if(position > 1) goTo1Button.setEnabled(true);
 			else goTo1Button.setEnabled(false);
+		}
 		
+		boolean isSelected = presenter.isSubjectSelected(h1Code.getText());
+		if(isSelected){
+			if(addSpecificRequisite.getElement().getAttribute("state").equals("add")){				
+				this.changeSubheaderState();
+			}
+		}else{
+			if(addSpecificRequisite.getElement().getAttribute("state").equals("add") == false){				
+				this.changeSubheaderState();
+			}
 		}
 		
 	}
@@ -241,6 +286,7 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 	public void goLeft(){
 		int position = Integer.valueOf(this.getElement().getAttribute("position"));
 		if(position - 1 >= 0) {
+
 			Element currentElement = getNthElementInMainContainer(position+1);
 			currentElement.getPreviousSiblingElement().removeClassName("isLeft");
 			currentElement.addClassName("isRight");
@@ -250,9 +296,9 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 			
 			this.getElement().setAttribute("position", "" + (position - 1));
 
-			validateNavigation();
-			
 			setSubheader(name, code);
+
+			validateNavigation();
 			
 		}
 	}
@@ -261,6 +307,7 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 		int position = Integer.valueOf(this.getElement().getAttribute("position"));
 		int ammount = Integer.valueOf(this.getElement().getAttribute("ammount"));
 		if(position + 1 < ammount) {
+
 			Element currentElement = getNthElementInMainContainer(position+1);
 			currentElement.getNextSiblingElement().removeClassName("isRight");
 			currentElement.addClassName("isLeft");
@@ -269,16 +316,18 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 			String code = currentElement.getNextSiblingElement().getAttribute("code");
 			
 			this.getElement().setAttribute("position", "" + (position +1));
+
+			setSubheader(name, code);
 			
 			validateNavigation();
 			
-			setSubheader(name, code);
 		}
 	}
 
 	public void goTo1(){
 		int position = Integer.valueOf(this.getElement().getAttribute("position"));
 		if(position != 0) {
+
 			Element firstElement = getNthElementInMainContainer(1);
 			firstElement.removeClassName("isLeft");
 			
@@ -300,9 +349,10 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 			
 			this.getElement().setAttribute("position", "0");
 			
+			setSubheader(name, code);
+			
 			validateNavigation();
 			
-			setSubheader(name, code);
 		}
 	}
 		
@@ -317,11 +367,26 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 	}
 
 	public void showCurtain(){
-		complementaryValueCurtain.setVisible(true);
+		complementaryValueCurtain.removeStyleName("isActive");
+		//complementaryValueCurtain.setVisible(true); //FIXME: NOT WORKING - has a horrible effect
+		complementaryValueCurtain.addStyleName("isActive");
 	}
 	
 	public void hideCurtain(){
 		complementaryValueCurtain.setVisible(false);
+	}
+	
+
+	public int getAmmountOfCVViews() {
+		return Integer.valueOf(this.getElement().getAttribute("ammount"));
+	}
+
+	public int getCounter() {
+		return counter;
+	}
+
+	public void setCounter(int counter) {
+		this.counter = counter;
 	}
 	
 //	public boolean showComplementaryValueView(String subjectCode){
@@ -353,6 +418,7 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 //		return toReturn;
 //	}
 //	
+	
 	/*************************** EVENTS ***************************/
 	@UiHandler("addSpecificSubject")
 	public void onAddSpecificSubjectClick(ClickEvent event){
@@ -369,22 +435,26 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 		}
 
 	}
+	
+	@UiHandler("addSpecificRequisite")
+	public void onAddSpecificRequisiteClick(ClickEvent event){
+		
+		String name  = h1Name.getText();
+		String code = h1Code.getText();
+		String state = addSpecificRequisite.getElement().getAttribute("state");
+		String career = addSpecificSubject.getElement().getAttribute("career");
+		
+		if(state.equals("add")){					
+			presenter.onSpecificSubjectSelected(name, code, career);
+		}else{
+			presenter.onSpecificSubjectUnselected(name, code, career);
+		}
+		
+	}
 
 	@UiHandler("goTo1Button")
 	public void goTo1(ClickEvent event){
 		goTo1();
-	}
-
-	public int getAmmountOfCVViews() {
-		return Integer.valueOf(this.getElement().getAttribute("ammount"));
-	}
-
-	public int getCounter() {
-		return counter;
-	}
-
-	public void setCounter(int counter) {
-		this.counter = counter;
 	}
 
 	@UiHandler("goLeftButton")

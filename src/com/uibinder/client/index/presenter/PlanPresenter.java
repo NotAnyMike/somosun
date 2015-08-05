@@ -1185,6 +1185,19 @@ ComplementaryValueView.Presenter{
 		
 		return accordion;
 	}
+	
+	private void changeSubheadersState(String subjectCode){
+		
+		if(accordions != null){
+			if(accordions.size() != 0){
+				for(SubjectAccordionViewImpl aT : accordions){
+					if(aT.getCodeFromSubheader().equals(subjectCode) == true){
+						aT.changeSubheaderState();
+					}
+				}
+			}
+		}
+	}
 
 	private SelectedSubjectViewImpl getSelectedSubjectView(String code) {
 		
@@ -1230,7 +1243,7 @@ ComplementaryValueView.Presenter{
 
 	}
 	
-	private void showDefaultSubectCreationView(String s){
+	private void showDefaultSubjectCreationView(String s){
 		//TODO
 		defaultSubjectCreationView.clear();
 		defaultSubjectCreationView.showIt();
@@ -1320,7 +1333,9 @@ ComplementaryValueView.Presenter{
 		if(complementaryValue != null && complementaryValue.getPrerequisitesLists() != null && complementaryValue.getPrerequisitesLists().size() > 0){
 			for(List<Subject> list: complementaryValue.getPrerequisitesLists()){
 				for(Subject subject : list){
-					cVView.addRequisite("pre", subject.getName(), subject.getCode(), accordion);
+					boolean makeStatic = false;
+					if(subject.isDummy() || subject.isSpecial() || subject.isDefault()) makeStatic = true;
+					cVView.addRequisite("pre", subject.getName(), subject.getCode(), accordion, makeStatic);
 				}
 			}
 		}else{
@@ -1330,7 +1345,9 @@ ComplementaryValueView.Presenter{
 		if(complementaryValue != null && complementaryValue.getCorequisitesLists() != null && complementaryValue.getCorequisitesLists().size() > 0){
 			for(List<Subject> list: complementaryValue.getCorequisitesLists()){
 				for(Subject subject : list){
-					cVView.addRequisite("co", subject.getName(), subject.getCode(), accordion);
+					boolean makeStatic = false;
+					if(subject.isDummy() || subject.isSpecial() || subject.isDefault()) makeStatic = true;
+					cVView.addRequisite("co", subject.getName(), subject.getCode(), accordion, makeStatic);
 				}
 			}
 		}else{
@@ -1339,7 +1356,9 @@ ComplementaryValueView.Presenter{
 		
 		if(complementaryValue != null && complementaryValue.getListCorequisitesOf() != null && complementaryValue.getListCorequisitesOf().size() > 0){
 			for(Subject subject : complementaryValue.getListCorequisitesOf()){
-				cVView.addAntiRequisite("co", subject.getName(), subject.getCode());
+				boolean makeStatic = false;
+				if(subject.isDummy() || subject.isSpecial() || subject.isDefault()) makeStatic = true;
+				cVView.addAntiRequisite("co", subject.getName(), subject.getCode(), accordion, makeStatic);
 			}
 		}else{
 			cVView.isNoCorequisite();
@@ -1347,7 +1366,9 @@ ComplementaryValueView.Presenter{
 		
 		if(complementaryValue != null && complementaryValue.getListPrerequisitesOf() != null && complementaryValue.getListPrerequisitesOf().size() > 0){
 			for(Subject subject : complementaryValue.getListPrerequisitesOf()){
-				cVView.addAntiRequisite("pre", subject.getName(), subject.getCode());
+				boolean makeStatic = false;
+				if(subject.isDummy() || subject.isSpecial() || subject.isDefault()) makeStatic = true;
+				cVView.addAntiRequisite("pre", subject.getName(), subject.getCode(), accordion, makeStatic);
 			}
 		}else{
 			cVView.isNoPrerequisite();
@@ -1427,7 +1448,11 @@ ComplementaryValueView.Presenter{
 		selectedSubjects.add(sSV);
 		
 		SubjectAccordionViewImpl accordion = getAccordion(subjectCode);
-		accordion.changeState();
+		if(accordion != null){			
+			accordion.changeState();
+		}
+		
+		changeSubheadersState(subjectCode);
 		
 		searchSubjectView.addSelectedSubject(sSV.asWidget());
 		
@@ -1442,8 +1467,11 @@ ComplementaryValueView.Presenter{
 		
 		//changeState of the accordion
 		SubjectAccordionViewImpl accordion = getAccordion(subjectCode);
-		accordion.changeState();
-		//accordions.remove(accordion);
+		if(accordion != null){			
+			accordion.changeState();
+		}
+		
+		changeSubheadersState(subjectCode);
 		
 	}
 
@@ -1556,9 +1584,16 @@ ComplementaryValueView.Presenter{
 		
 		//TODO do something with selectedDefaultSubjectCodeStrings and the other list
 		if(selectedDefaultSubjectCodeStrings.size() > 0){			
-			showDefaultSubectCreationView(semesterString);
+			showDefaultSubjectCreationView(semesterString);
 		}
 		
+	}
+	
+	public void hideSearchBox() {
+		searchSubjectView.clear();
+		accordions.clear();
+		selectedSubjects.clear();
+		searchSubjectView.hideIt();
 	}
 	
 	public void onCreateDefaultSubjectButtonClick(String subjectGroupName, String credits, final String semester) {
@@ -1748,5 +1783,17 @@ ComplementaryValueView.Presenter{
 		
 		
 	}
+
+	public boolean isSubjectSelected(String subjectCode) {
+		boolean toReturn = false;
+		if(subjectCode != null){			
+			SelectedSubjectViewImpl selected = getSelectedSubjectView(subjectCode);
+			if(selected != null){
+				toReturn = true;
+			}
+		}
+		return toReturn;
+	}
+
 	
 }
