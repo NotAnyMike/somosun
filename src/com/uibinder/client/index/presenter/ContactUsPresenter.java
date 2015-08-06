@@ -1,12 +1,15 @@
 package com.uibinder.client.index.presenter;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.uibinder.client.index.service.SUNService;
 import com.uibinder.client.index.service.SUNServiceAsync;
 import com.uibinder.client.index.view.ContactUsView;
 import com.uibinder.client.index.view.ContactUsViewImpl;
+import com.uibinder.shared.control.Message;
 
 public class ContactUsPresenter implements Presenter, ContactUsView.Presenter{
 
@@ -41,7 +44,20 @@ public class ContactUsPresenter implements Presenter, ContactUsView.Presenter{
 
 	@Override
 	public void sendMessage(String name, String subject, String type, String message) {
-		
+		rpcService.saveMessage(name, subject, type, message, new AsyncCallback(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				GWT.log("Message could not be sent");
+			}
+
+			@Override
+			public void onSuccess(Object result) {
+				GWT.log("Message sent");
+				view.clean();
+			}
+			
+		});
 	}
 
 }

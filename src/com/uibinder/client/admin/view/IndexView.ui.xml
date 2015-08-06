@@ -136,10 +136,38 @@
 				</div>
 				<div class="col-xs-12 col-sm-4 col-lg-3">
 					<div class="panel panel-default">
-						<div class="panel-heading">Errors</div>
+						<div class="panel-heading">Messages</div>
 						<div class="panel-body">
 							<b:VerticalButtonGroup>
-								<b:Button type="DEFAULT" enabled="false">Clean all</b:Button>
+								<b:Button type="WARNING" enabled="false">Clean all</b:Button>
+								<b:Button type="WARNING" enabled="false">Clean all Error messages</b:Button>
+								<b:Button type="WARNING" enabled="false">Clean all Suggestion messages</b:Button>
+								<b:Button type="WARNING" enabled="false">Clean all other messages</b:Button>
+								<b:InputGroup>
+									<b:TextBox placeholder="Long id"></b:TextBox>
+									<b:InputGroupButton>
+										<b:Button type="DEFAULT" enabled="false">Remove message</b:Button>
+									</b:InputGroupButton>
+								</b:InputGroup>
+							</b:VerticalButtonGroup>
+							<br></br>
+							<b:VerticalButtonGroup>
+								<b:AnchorButton type="DEFAULT" href="#messages?action=showAll">Show all</b:AnchorButton>
+								<b:AnchorButton type="DEFAULT" href="#messages?action=showError">Show all Error messages</b:AnchorButton>
+								<b:AnchorButton type="DEFAULT" href="#messages?action=showSuggestion">Show all Suggestion messages</b:AnchorButton>
+								<b:AnchorButton type="DEFAULT" href="#messages?action=showOther">Show all other messages</b:AnchorButton>
+								<b:InputGroup>
+									<b:TextBox placeholder="Long id" ui:field="messagesIdTextBox"></b:TextBox>
+									<b:InputGroupButton>
+										<b:Button type="DEFAULT" ui:field="showCertainMessageButton">Show this</b:Button>
+									</b:InputGroupButton>
+								</b:InputGroup>
+								<b:InputGroup>
+									<b:TextBox placeholder="username" ui:field="messagesUsernameTextBox"></b:TextBox>
+									<b:InputGroupButton>
+										<b:Button type="DEFAULT" ui:field="showUserMessagesButton">Show user's messages</b:Button>
+									</b:InputGroupButton>
+								</b:InputGroup>
 							</b:VerticalButtonGroup>
 						</div>
 					</div>

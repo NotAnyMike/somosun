@@ -94,4 +94,6 @@ public interface SUNServiceAsync {
 
 	void getComplementaryValueFromDb(String careerCode, String subjectCode, AsyncCallback<ComplementaryValue> callback);
 
+	void saveMessage(String name, String subject, String type, String message, AsyncCallback callback);
+
 }

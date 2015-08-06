@@ -12,6 +12,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.uibinder.client.admin.presenter.IndexPresenter;
@@ -45,9 +46,13 @@ public class IndexViewImpl extends Composite implements IndexView {
 	@UiField Button unBlockUserButton;
 	@UiField Button analyseAllCareersButton;
 	@UiField Button analyseCareersNotAnalyzedButton;
+	@UiField Button showUserMessagesButton;
+	@UiField Button showCertainMessageButton;
 	
 	@UiField TextBox userCodeTextBox;
 	@UiField TextBox userToUnBlockTextBox;
+	@UiField TextBox messagesUsernameTextBox;
+	@UiField TextBox messagesIdTextBox;
 
 	private static IndexViewUiBinder uiBinder = GWT.create(IndexViewUiBinder.class);
 
@@ -244,6 +249,20 @@ public class IndexViewImpl extends Composite implements IndexView {
 			presenter.onAnalyseAllCareers(false);
 		}
 		setTimes(analyseCareersNotAnalyzedButton.getElement());
+	}
+
+	@UiHandler("showCertainMessageButton")
+	public void onShowCertainMessage(ClickEvent e) {
+		if(messagesIdTextBox.getValue() != null || messagesIdTextBox.getValue().isEmpty()==false){
+			Window.Location.assign("#messages?action=showId&id="+messagesIdTextBox.getValue());
+		}
+	}
+
+	@UiHandler("showUserMessagesButton")
+	public void onShowUserMessages(ClickEvent e) {
+		if(messagesUsernameTextBox.getValue() != null || messagesUsernameTextBox.getValue().isEmpty()==false){
+			Window.Location.assign("#messages?action=showUsername&username="+messagesUsernameTextBox.getValue());
+		}
 	}
 
 }

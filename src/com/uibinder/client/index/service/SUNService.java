@@ -66,5 +66,6 @@ public interface SUNService extends RemoteService{
 	List<ComplementaryValue> getComplementaryValues(List<String> selectedSubjectCodeStrings, List<String> selectedSubjectCareerStrings);
 	
 	public List<SubjectGroup> getSubjectGroups(String careerCode);
+	void saveMessage(String name, String subject, String type, String message);
 	
 }

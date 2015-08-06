@@ -1,6 +1,9 @@
 package com.uibinder.client.admin.service;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.uibinder.shared.control.Message;
 
 public interface AdminServiceAsync {
 
@@ -37,5 +40,17 @@ public interface AdminServiceAsync {
 	void blockUnblockUser(String userName, AsyncCallback asyncCallback);
 
 	void analyseAllCareers(boolean analyseAll, AsyncCallback<Void> asyncCallback);
+
+	void getAllMessages(AsyncCallback<List<Message>> asyncCallback);
+
+	void getAllErrorMessages(AsyncCallback<List<Message>> asyncCallback);
+
+	void getAllSuggestionMessages(AsyncCallback<List<Message>> asyncCallback);
+
+	void getAllOtherMessages(AsyncCallback<List<Message>> asyncCallback);
+
+	void getMessageById(Long id, AsyncCallback<Message> asyncCallback);
+
+	void getUserMessages(String username, AsyncCallback<List<Message>> asyncCallback);
 	
 }

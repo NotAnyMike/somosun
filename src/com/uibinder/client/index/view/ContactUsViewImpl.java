@@ -2,11 +2,14 @@ package com.uibinder.client.index.view;
 
 import org.gwtbootstrap3.client.ui.AnchorButton;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.gwtbootstrap3.client.ui.RadioButton;
+import org.gwtbootstrap3.client.ui.SubmitButton;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -17,6 +20,7 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.uibinder.client.index.presenter.ContactUsPresenter;
 import com.uibinder.client.index.presenter.PlanPresenter;
+import com.uibinder.shared.values.MessageTypeCodes;
 
 public class ContactUsViewImpl extends Composite implements ContactUsView{
 
@@ -26,8 +30,8 @@ public class ContactUsViewImpl extends Composite implements ContactUsView{
 	@UiField RadioButton errorRadioButton;
 	@UiField RadioButton otherRadioButton;
 	
-	@UiField AnchorButton clearButton;
-	@UiField AnchorButton sendButton;
+	@UiField Button clearButton;
+	@UiField SubmitButton sendButton;
 	
 	@UiField AnchorButton yourWelcomeButton;
 	@UiField AnchorButton takeMeHomeButton;
@@ -38,6 +42,8 @@ public class ContactUsViewImpl extends Composite implements ContactUsView{
 	
 	@UiField TextBox nameTextBox;
 	@UiField TextBox subjectTextBox;
+	
+	@UiField ButtonGroup radioButtonGroup;
 	
 	private static ContactUsUiBinder uiBinder = GWT.create(ContactUsUiBinder.class);
 
@@ -57,6 +63,16 @@ public class ContactUsViewImpl extends Composite implements ContactUsView{
 
 	public void init(){
 		hideThanks();
+		
+		nameTextBox.setFocus(true);
+		
+		suggestionRadioButton.setFormValue(MessageTypeCodes.SUGGESTION);
+		errorRadioButton.setFormValue(MessageTypeCodes.ERROR);
+		otherRadioButton.setFormValue(MessageTypeCodes.OTHER);
+		
+		nameTextBox.getElement().setAttribute("required", "required");
+		subjectTextBox.getElement().setAttribute("required", "required");
+		messageTextArea.getElement().setAttribute("required", "required");
 	}
 
 	@Override
@@ -83,14 +99,20 @@ public class ContactUsViewImpl extends Composite implements ContactUsView{
 	@Override
 	public void showThanks() {
 		showThanks.setVisible(true);
+		yourWelcomeButton.setFocus(true);
 	}
 	
 	@Override
 	public void hideThanks() {
 		showThanks.setVisible(false);
+		nameTextBox.setFocus(true);
 	}
 
-	
+	private String getCheckBoxesValue() {
+		if(suggestionRadioButton.getValue() == true) return	suggestionRadioButton.getFormValue();
+		else if(errorRadioButton.getValue() == true) return errorRadioButton.getFormValue();
+		else return otherRadioButton.getFormValue();
+	}
 	
 	/*************** HANDLERS **************/
 	
@@ -106,8 +128,13 @@ public class ContactUsViewImpl extends Composite implements ContactUsView{
 	
 	@UiHandler("sendButton")
 	public void onSendButtonClick(ClickEvent e) {
-		clean();
-		showThanks();
+		if(nameTextBox.getValue() != null && nameTextBox.getValue().isEmpty() == false &&
+				subjectTextBox.getValue() != null && subjectTextBox.getValue().isEmpty() == false &&
+				messageTextArea.getValue() != null && messageTextArea.getValue().isEmpty() == false){			
+			e.preventDefault();
+			showThanks();
+			presenter.sendMessage(nameTextBox.getValue(), subjectTextBox.getValue(), getCheckBoxesValue(), messageTextArea.getValue());
+		}
 	}
 
 }

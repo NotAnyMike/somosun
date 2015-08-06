@@ -27,73 +27,76 @@
 	          </div>
 	        </div>
 	    </g:HTMLPanel>
-		<div class="contactUs-mainContainer">
-	      <div class="contactUs-mainTitle"> 
-	        <h1>Contáctanos</h1>
-	      </div>
-	      <div class="contactUs-nameLabel">
-	        <!-- 
-	        <div style="width:100%" class="input-group"><span class="input-group-addon">Nombre</span>
-	          <input placeholder="Escribe tu nombre" class="form-control"/>
-	        </div>
-	         -->
-	         <b:InputGroup>
-	         	<b:InputGroupAddon>Nombre</b:InputGroupAddon>
-	         	<b:TextBox placeholder="Tu nombre / twitter / facebook" ui:field="nameTextBox"></b:TextBox>
-	         </b:InputGroup>
-	      </div>
-	      <div class="contactUs-subjectLabel">
-	        <!-- 
-	        <div style="width:100%" class="input-group"><span class="input-group-addon">Tema</span>
-	          <input placeHolder="Sobre qué quieres hablarnos" class="form-control"/>
-	        </div>
-	         -->
-	        <b:InputGroup>
-	         	<b:InputGroupAddon>Tema</b:InputGroupAddon>
-	         	<b:TextBox placeholder="Sobre qué nos quieres hablar" ui:field="subjectTextBox"></b:TextBox>
-	         </b:InputGroup>
-	      </div>
-	      <div class="contactUs-type">
-	        <!-- 
-	        <div data-toggle="type" style="width:100%" class="btn-group">
-	          <label class="btn btn-default">
-	            <input type="radio" value="1"/>Error
-	          </label>
-	          <label class="btn btn-default">
-	            <input type="radio" value="1"/>Sugerencia
-	          </label>
-	          <label class="btn btn-default">
-	            <input type="radio" value="1"/>Otro
-	          </label>
-	        </div>
-	         -->
-	         <b:ButtonGroup>
-	         	<b:RadioButton name="type" ui:field="suggestionRadioButton">Sugerencia</b:RadioButton>
-	         	<b:RadioButton name="type" ui:field="errorRadioButton">Error</b:RadioButton>
-	         	<b:RadioButton name="type" ui:field="otherRadioButton">Otro</b:RadioButton>
-	         </b:ButtonGroup>
-	      </div>
-	      <div class="contactUs-thanksMessage">Te agradecemos mucho cualquier error que hayas encontrado o cualquier sugerencia que quieras darnos, y te invitamos a que nos contactes para lo que necesites</div>
-	      <div class="contactUs-textMessage">
-	        <!-- <textarea class="form-control"></textarea> -->
-	        <b:TextArea ui:field="messageTextArea"></b:TextArea>
-	      </div>
-	      <div class="contactUs-twitter">
-	        También puedes hablar con #SomosUN en twitter con <a target="_blank" href="https://twitter.com/SomosUnal">@SomosUnal</a> y <a target="_blank" href="https://twitter.com/MikeWoodcockC">@MikeWoodcockC</a>
-	      </div>
-	      <div class="contactUs-buttons">
-	        <!-- 
-	        <div class="btn-group">
-	            <a class="btn btn-info">Enviar</a>
-	            <a class="btn btn-danger">Limpiar</a>
-			</div> 
-			-->
-			<b:ButtonGroup>
-				<b:AnchorButton type="INFO" ui:field="sendButton">Enviar</b:AnchorButton>
-				<b:AnchorButton type="DANGER" ui:field="clearButton">Limpiar</b:AnchorButton>
-			</b:ButtonGroup>
-	      </div>
-	    </div>
-	    
+	      <form>
+			<div class="contactUs-mainContainer">
+		      <div class="contactUs-mainTitle"> 
+		        <h1>Contáctanos</h1>
+		      </div>
+		      <div class="contactUs-nameLabel">
+		        <!-- 
+		        <div style="width:100%" class="input-group"><span class="input-group-addon">Nombre</span>
+		          <input placeholder="Escribe tu nombre" class="form-control"/>
+		        </div>
+		         -->
+		         <b:InputGroup>
+		         	<b:InputGroupAddon>Nombre</b:InputGroupAddon>
+		         	<b:TextBox placeholder="Tu nombre / twitter / facebook" ui:field="nameTextBox"></b:TextBox>
+		         </b:InputGroup>
+		      </div>
+		      <div class="contactUs-subjectLabel">
+		        <!-- 
+		        <div style="width:100%" class="input-group"><span class="input-group-addon">Tema</span>
+		          <input placeHolder="Sobre qué quieres hablarnos" class="form-control"/>
+		        </div>
+		         -->
+		        <b:InputGroup>
+		         	<b:InputGroupAddon>Tema</b:InputGroupAddon>
+		         	<b:TextBox placeholder="Sobre qué nos quieres hablar" ui:field="subjectTextBox"></b:TextBox>
+		         </b:InputGroup>
+		      </div>
+		      <div class="contactUs-type">
+		        <!-- 
+		        <div data-toggle="type" style="width:100%" class="btn-group">
+		          <label class="btn btn-default">
+		            <input type="radio" value="1"/>Error
+		          </label>
+		          <label class="btn btn-default">
+		            <input type="radio" value="1"/>Sugerencia
+		          </label>
+		          <label class="btn btn-default">
+		            <input type="radio" value="1"/>Otro
+		          </label>
+		        </div>
+		         -->
+		         <b:FormGroup ui:field="checkButtons">
+		         <b:ButtonGroup ui:field="radioButtonGroup">
+		         	<b:RadioButton name="type" ui:field="suggestionRadioButton">Sugerencia</b:RadioButton>
+		         	<b:RadioButton name="type" ui:field="errorRadioButton">Error</b:RadioButton>
+		         	<b:RadioButton name="type" ui:field="otherRadioButton">Otro</b:RadioButton>
+		         </b:ButtonGroup>
+		         </b:FormGroup>
+		      </div>
+		      <div class="contactUs-thanksMessage">Te agradecemos mucho cualquier error que hayas encontrado o cualquier sugerencia que quieras darnos, y te invitamos a que nos contactes para lo que necesites</div>
+		      <div class="contactUs-textMessage">
+		        <!-- <textarea class="form-control"></textarea> -->
+		        <b:TextArea ui:field="messageTextArea"></b:TextArea>
+		      </div>
+		      <div class="contactUs-twitter">
+		        También puedes hablar con #SomosUN en twitter con <a target="_blank" href="https://twitter.com/SomosUnal">@SomosUnal</a> y <a target="_blank" href="https://twitter.com/MikeWoodcockC">@MikeWoodcockC</a>
+		      </div>
+		      <div class="contactUs-buttons">
+		        <!-- 
+		        <div class="btn-group">
+		            <a class="btn btn-info">Enviar</a>
+		            <a class="btn btn-danger">Limpiar</a>
+				</div> 
+				-->
+				<b:ButtonGroup>
+					<b:SubmitButton type="INFO" ui:field="sendButton">Enviar</b:SubmitButton>
+					<b:Button type="DANGER" ui:field="clearButton">Limpiar</b:Button>
+				</b:ButtonGroup>
+		      </div>
+		    </div>
+	    </form>
 	</g:HTMLPanel>
 </ui:UiBinder> 

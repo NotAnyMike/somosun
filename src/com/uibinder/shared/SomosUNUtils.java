@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import com.google.gwt.i18n.client.NumberFormat;
 import com.uibinder.shared.control.Career;
+import com.uibinder.shared.values.MessageTypeCodes;
 
 /**
  * This class will contain methods useful to every class in every side of the app
@@ -167,6 +168,24 @@ public class SomosUNUtils {
 			toReturn = NumberFormat.getFormat("0.0").format(gradeFixed);
 		}
 		return toReturn;
+	}
+
+	/**
+	 * If the type is not a MessageTypeCodes then this method will return MessageTypeCodes.SUGGESTION
+	 * @param type
+	 * @return
+	 */
+	public static String setCorrectType(String type) {
+		String toReturn = type;
+		
+		if(type != null){
+			if(type.equals(MessageTypeCodes.ERROR) == false && type.equals(MessageTypeCodes.SUGGESTION) == false && type.equals(MessageTypeCodes.OTHER) == false){
+				type = MessageTypeCodes.SUGGESTION;
+			}
+		}
+		
+		return toReturn;
+		
 	}
 
 }

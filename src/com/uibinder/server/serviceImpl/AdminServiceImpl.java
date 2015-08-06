@@ -9,6 +9,7 @@ import com.uibinder.client.admin.service.AdminService;
 import com.uibinder.server.SiaProxy;
 import com.uibinder.server.dao.CareerDao;
 import com.uibinder.server.dao.ComplementaryValueDao;
+import com.uibinder.server.dao.MessageDao;
 import com.uibinder.server.dao.PlanDao;
 import com.uibinder.server.dao.SemesterDao;
 import com.uibinder.server.dao.StudentDao;
@@ -17,6 +18,7 @@ import com.uibinder.server.dao.SubjectGroupDao;
 import com.uibinder.server.dao.SubjectValueDao;
 import com.uibinder.shared.SiaResultSubjects;
 import com.uibinder.shared.control.Career;
+import com.uibinder.shared.control.Message;
 import com.uibinder.shared.control.Student;
 
 public class AdminServiceImpl extends RemoteServiceServlet implements AdminService{
@@ -168,7 +170,9 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 		}
 	}
 
-	@Override
+	/**
+	 * Admin method
+	 */
 	public void makeUserAdmin(String userName) {
 		if(getUserLogged().isAdmin() == true){			
 			StudentDao studentDao = new StudentDao();
@@ -180,7 +184,9 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 		}
 	}
 
-	@Override
+	/**
+	 * Admin method
+	 */
 	public void blockUnblockUser(String userName) {
 		if(getUserLogged().isAdmin() == true){			
 			StudentDao studentDao = new StudentDao();
@@ -192,7 +198,9 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 		}
 	}
 
-	@Override
+	/**
+	 * Admin method
+	 */
 	public void analyseAllCareers(boolean analyseAll) {
 		if(getUserLogged().isAdmin() == true){
 			CareerDao careerDao = new CareerDao();
@@ -233,6 +241,103 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 			log.info("<------------- ANALYSE ALL CAREERS ENDED ------------->");
 		}
 		
+	}
+
+	/**
+	 * Admin method
+	 */
+	public List<Message> getAllMessages() {
+		List<Message> toReturn = null;
+		
+		if(getUserLogged().isAdmin() == true){			
+			toReturn = new ArrayList<Message>();
+			MessageDao messageDao = new MessageDao();
+			for(Message m : messageDao.getAllMessages()){
+				toReturn.add(m);
+			}
+			
+		}
+		return toReturn;
+	}
+
+	/**
+	 * Admin method
+	 */
+	public List<Message> getAllErrorMessages() {
+		List<Message> toReturn = null;
+		
+		if(getUserLogged().isAdmin() == true){			
+			toReturn = new ArrayList<Message>();
+			MessageDao messageDao = new MessageDao();
+			for(Message m : messageDao.getAllErrorMessages()){
+				toReturn.add(m);
+			}
+			
+		}
+		return toReturn;
+	}
+
+	/**
+	 * Admin method
+	 */
+	public List<Message> getAllSuggestionMessages() {
+		List<Message> toReturn = null;
+		
+		if(getUserLogged().isAdmin() == true){			
+			toReturn = new ArrayList<Message>();
+			MessageDao messageDao = new MessageDao();
+			for(Message m : messageDao.getAllSuggestionMessages()){
+				toReturn.add(m);
+			}
+			
+		}
+		return toReturn;
+	}	
+	
+	/**
+	 * Admin method
+	 */
+	public List<Message> getAllOtherMessages() {
+		List<Message> toReturn = null;
+		
+		if(getUserLogged().isAdmin() == true){			
+			toReturn = new ArrayList<Message>();
+			MessageDao messageDao = new MessageDao();
+			for(Message m : messageDao.getAllOtherMessages()){
+				toReturn.add(m);
+			}
+			
+		}
+		return toReturn;
+	}
+	
+	/**
+	 * Admin method
+	 */
+	public List<Message> getUserMessages(String username) {
+		List<Message> toReturn = null;
+		
+		if(getUserLogged().isAdmin() == true){			
+			toReturn = new ArrayList<Message>();
+			MessageDao messageDao = new MessageDao();
+			for(Message m : messageDao.getUserMessages(username)){
+				toReturn.add(m);
+			}
+			
+		}
+		return toReturn;
+	}
+
+	/**
+	 * Admin method
+	 */
+	public Message getMessageById(Long id) {
+		Message toReturn = null;
+		if(getUserLogged().isAdmin() == true){
+			MessageDao messageDao = new MessageDao();
+			toReturn = messageDao.getMessageById(id);
+		}
+		return toReturn;
 	}	
 
 }

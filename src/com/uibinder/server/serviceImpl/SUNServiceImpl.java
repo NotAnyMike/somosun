@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
+
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
@@ -18,6 +21,7 @@ import com.uibinder.client.index.service.SUNService;
 import com.uibinder.server.SiaProxy;
 import com.uibinder.server.dao.CareerDao;
 import com.uibinder.server.dao.ComplementaryValueDao;
+import com.uibinder.server.dao.MessageDao;
 import com.uibinder.server.dao.PlanDao;
 import com.uibinder.server.dao.StudentDao;
 import com.uibinder.server.dao.SubjectDao;
@@ -30,10 +34,12 @@ import com.uibinder.shared.SiaResultSubjects;
 import com.uibinder.shared.SomosUNUtils;
 import com.uibinder.shared.control.Career;
 import com.uibinder.shared.control.ComplementaryValue;
+import com.uibinder.shared.control.Message;
 import com.uibinder.shared.control.Plan;
 import com.uibinder.shared.control.Student;
 import com.uibinder.shared.control.Subject;
 import com.uibinder.shared.control.SubjectGroup;
+import com.uibinder.shared.control.UserSun;
 import com.uibinder.shared.values.SubjectGroupCodes;
 
 /**
@@ -951,6 +957,23 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		ComplementaryValueDao cVDao = new ComplementaryValueDao();
 		ComplementaryValue toReturn = cVDao.getComplementaryValues(careerCode, subjectCode);
 		return toReturn;
+	}
+
+	@Override
+	public void saveMessage(String name, String subject, String type, String messageString) {
+		
+		LoginServiceImpl loginService = new LoginServiceImpl();
+		Student student = loginService.login("").getStudent();
+		
+		name = Jsoup.clean(name, Whitelist.simpleText());
+		subject = Jsoup.clean(subject, Whitelist.simpleText());
+		type = SomosUNUtils.setCorrectType(type);
+		messageString = Jsoup.clean(messageString, Whitelist.simpleText());
+		
+		Message message = new Message(name, subject, type, messageString, student);
+		
+		MessageDao messageDao = new MessageDao();
+		messageDao.saveMessage(message);
 	}
 
 	

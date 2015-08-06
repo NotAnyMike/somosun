@@ -7,8 +7,10 @@ import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.uibinder.client.admin.presenter.IndexPresenter;
+import com.uibinder.client.admin.presenter.MessagesPresenter;
 import com.uibinder.client.admin.service.AdminServiceAsync;
 import com.uibinder.client.admin.view.IndexViewImpl;
+import com.uibinder.client.admin.view.MessagesViewImpl;
 import com.uibinder.client.index.AppController;
 import com.uibinder.client.index.service.SUNServiceAsync;
 
@@ -19,7 +21,10 @@ public class AdminAppController implements ValueChangeHandler<String> {
 	private AdminServiceAsync rpcAdminService;
 	
 	private IndexPresenter indexPresenter;
+	private MessagesPresenter messagesPresenter;
+	
 	private IndexViewImpl indexView;
+	private MessagesViewImpl messagesView;
 	
 	private String token;
 	
@@ -57,7 +62,22 @@ public class AdminAppController implements ValueChangeHandler<String> {
 				indexPresenter = new IndexPresenter(rpcService, rpcAdminService, indexView);
 			}
 			indexPresenter.go(RootPanel.get("container"));
-		}else{
+		}else if(token.contains("messages")){
+			if(messagesView == null){
+				messagesView = new MessagesViewImpl();
+			}
+			if(messagesPresenter == null){
+				messagesPresenter = new MessagesPresenter(eventBus, rpcService, rpcAdminService, messagesView);
+			}
+			messagesPresenter.go(RootPanel.get("container"));
+			if(token.contains("action=showAll")) messagesPresenter.showAllMessage();
+			else if(token.contains("action=showError")) messagesPresenter.showAllErrors();
+			else if(token.contains("action=showSuggestion")) messagesPresenter.showAllSuggestions();
+			else if(token.contains("action=showOther")) messagesPresenter.showAllOthers();
+			else if(token.contains("action=showId")) messagesPresenter.showId(token.substring(token.indexOf("id=")+3));
+			else if(token.contains("action=showUsername")) messagesPresenter.showUsernameMessages(token.substring(token.indexOf("username=")+9));
+		}
+		else{
 			History.newItem("index");
 		}
 	}

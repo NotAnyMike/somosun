@@ -46,4 +46,6 @@ public interface IndexView {
 	void onBlockUnblockUser(ClickEvent e);
 	void onAnalyseAllCareers(ClickEvent e);
 	void onAnalyseCareersNotAnalyzed(ClickEvent e);
+	void onShowCertainMessage(ClickEvent e);
+	void onShowUserMessages(ClickEvent e);
 }
