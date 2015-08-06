@@ -25,8 +25,8 @@ import com.uibinder.client.index.event.SavePlanAsDefaultEvent;
 import com.uibinder.client.index.event.SavePlanAsDefaultHandler;
 import com.uibinder.client.index.presenter.AboutUsPresenter;
 import com.uibinder.client.index.presenter.AnnouncementPresenter;
+import com.uibinder.client.index.presenter.ContactUsPresenter;
 import com.uibinder.client.index.presenter.CreatePresenter;
-import com.uibinder.client.index.presenter.DndPresenter;
 import com.uibinder.client.index.presenter.IndexPresenter;
 import com.uibinder.client.index.presenter.LoadingPresenter;
 import com.uibinder.client.index.presenter.PlanPresenter;
@@ -37,8 +37,8 @@ import com.uibinder.client.index.service.LoginServiceAsync;
 import com.uibinder.client.index.service.SUNServiceAsync;
 import com.uibinder.client.index.view.AboutUsViewImpl;
 import com.uibinder.client.index.view.AnnouncementViewImpl;
+import com.uibinder.client.index.view.ContactUsViewImpl;
 import com.uibinder.client.index.view.CreateViewImpl;
-import com.uibinder.client.index.view.DndViewImpl;
 import com.uibinder.client.index.view.IndexViewImpl;
 import com.uibinder.client.index.view.LoadingViewImpl;
 import com.uibinder.client.index.view.PlanViewImpl;
@@ -56,22 +56,22 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	// Creating all the views that will exist once for all to save them to let users go back to their view
 	private IndexPresenter indexPresenter;
 	private TopBarPresenter topBarPresenter;
-	private DndPresenter dndPresenter;
 	private CreatePresenter createPresenter;
 	private PlanPresenter planPresenter;
 	private AboutUsPresenter aboutUsPresenter;
 	private AnnouncementPresenter announcementPresenter;
 	private LoadingPresenter loadingPresenter;
+	private ContactUsPresenter contactUsPresenter;
 	
 	private IndexViewImpl indexView;
 	private TopBarViewImpl topBarView;
-	private DndViewImpl dndView;
 	private CreateViewImpl createView;
 	private PlanViewImpl planView;
 	private AboutUsViewImpl aboutUsView;
 	private AnnouncementViewImpl announcementView;
 	private SiaSummaryViewImpl siaSummaryView;
 	private LoadingViewImpl loadingView;
+	private ContactUsViewImpl contactUsView;
 	
 	//Taking care of the random phrase funtionality variables 
 	private List<RandomPhrase> phrases;
@@ -262,15 +262,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 				RootPanel.get("centerArea").getElement().setAttribute("valign","middle");
 			}
 			
-			if(token.equals("dnd")){ //dnd stands for Drag and Drop
-				if(dndView == null){
-					dndView = new DndViewImpl();
-				}
-				if(dndPresenter == null){
-					dndPresenter = new DndPresenter(rpcService, eventBus, dndView);
-				}
-				dndPresenter.go(RootPanel.get("centerArea"));					
-			} else if(token.equals("create")){
+			if(token.equals("create")){
 				if(createView == null){
 					createView = new CreateViewImpl();
 				}
@@ -313,6 +305,18 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 					announcementPresenter = new AnnouncementPresenter(rpcService, eventBus, announcementView);
 				}
 				announcementPresenter.go(RootPanel.get("centerArea"));
+			} else if(token.contains("contactUs")){
+				if(contactUsView == null){
+					contactUsView = new ContactUsViewImpl();
+				}
+				if(contactUsPresenter == null){
+					contactUsPresenter = new ContactUsPresenter(rpcService, eventBus, contactUsView);
+				}
+				String type = "";
+				if(token.contains("type=error")) type = "error";
+				if(token.contains("type=other")) type = "other";
+				contactUsPresenter.setType(type);
+				contactUsPresenter.go(RootPanel.get("centerArea"));
 			} else {
 				if(indexView == null){
 					indexView = new IndexViewImpl();

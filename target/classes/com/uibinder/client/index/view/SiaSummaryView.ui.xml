@@ -125,7 +125,7 @@
             <div class="siaSummaryCabelContainer">Correquisito</div>
           </div>
           <a>Visita la norma de la carrera</a>
-          <a>Reportar un error</a>
+          <a href="#contactUs?type=error" target="_BLANK">Reportar un error</a>
         </div>
     </div>
 	</g:HTMLPanel>
