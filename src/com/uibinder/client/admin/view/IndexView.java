@@ -56,4 +56,7 @@ public interface IndexView {
 	void onDeleteSuggestionMessages(ClickEvent e);
 	void onDeleteErrorMessages(ClickEvent e);
 	void onDeleteOtherMessages(ClickEvent e);
+	void onShowPlansByUserButton(ClickEvent e);
+	void onShowPlanById(ClickEvent e);
+	
 }

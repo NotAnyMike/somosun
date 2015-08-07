@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.uibinder.shared.control.Message;
+import com.uibinder.shared.control.Plan;
 
 @RemoteServiceRelativePath("adminService")
 public interface AdminService extends RemoteService{
@@ -36,4 +37,6 @@ public interface AdminService extends RemoteService{
 	void deleteSuggestionMessages();
 	void deleteErrorMessages();
 	void deleteOtherMessages();
+	List<Plan> getPlansByUser(String username);
+	Plan getPlanById(Long id);
 }

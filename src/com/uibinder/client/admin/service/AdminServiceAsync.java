@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.uibinder.shared.control.Message;
+import com.uibinder.shared.control.Plan;
 
 public interface AdminServiceAsync {
 
@@ -60,5 +61,9 @@ public interface AdminServiceAsync {
 	void deleteErrorMessages(AsyncCallback asyncCallback);
 
 	void deleteOtherMessages(AsyncCallback asyncCallback);
+
+	void getPlansByUser(String username, AsyncCallback<List<Plan>> asyncCallback);
+
+	void getPlanById(Long id, AsyncCallback<Plan> asyncCallback);
 	
 }

@@ -19,6 +19,7 @@ import com.uibinder.server.dao.SubjectValueDao;
 import com.uibinder.shared.SiaResultSubjects;
 import com.uibinder.shared.control.Career;
 import com.uibinder.shared.control.Message;
+import com.uibinder.shared.control.Plan;
 import com.uibinder.shared.control.Student;
 
 public class AdminServiceImpl extends RemoteServiceServlet implements AdminService{
@@ -390,6 +391,32 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 				messageDao.deleteMessage(m.getId());
 			}
 		}
+	}
+
+	/**
+	 * Admin method
+	 */
+	public List<Plan> getPlansByUser(String username) {
+		List<Plan> toReturn = null;
+		
+		if(getUserLogged().isAdmin() == true){
+			toReturn = new ArrayList<Plan>();
+			PlanDao planDao = new PlanDao();
+			for(Plan p : planDao.getPlansByUsername(username)){
+				toReturn.add(p);
+			}
+		}
+		return toReturn;
+	}
+
+	@Override
+	public Plan getPlanById(Long id) {
+		Plan plan = null;
+		if(getUserLogged().isAdmin() == true){			
+			PlanDao planDao = new PlanDao();
+			plan = planDao.getPlanById(Long.valueOf(id));
+		}
+		return plan;
 	}
 	
 }

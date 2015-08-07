@@ -52,11 +52,15 @@ public class IndexViewImpl extends Composite implements IndexView {
 	@UiField Button deleteSuggestionMessagesButton;
 	@UiField Button deleteOtherMessagesButton;
 	@UiField Button deleteErrorMessagesButton;
+	@UiField Button showPlansByUserButton;
+	@UiField Button showPlanByIdButton;
 	
 	@UiField TextBox userCodeTextBox;
 	@UiField TextBox userToUnBlockTextBox;
 	@UiField TextBox messagesUsernameTextBox;
 	@UiField TextBox messagesIdTextBox;
+	@UiField TextBox planUsernameTextBox;
+	@UiField TextBox planIdTextBox;
 
 	private static IndexViewUiBinder uiBinder = GWT.create(IndexViewUiBinder.class);
 
@@ -299,6 +303,20 @@ public class IndexViewImpl extends Composite implements IndexView {
 			presenter.onDeleteOtherMessages();
 		}
 		setTimes(deleteOtherMessagesButton.getElement());
+	}
+	
+	@UiHandler("showPlansByUserButton")
+	public void onShowPlansByUserButton(ClickEvent e){
+		if(planUsernameTextBox.getValue() != null && planUsernameTextBox.getValue().isEmpty() == false){
+			Window.Location.assign("#planAdmin?action=showUsername&username=" + planUsernameTextBox.getValue());
+		}
+	}
+	
+	@UiHandler("showPlanByIdButton")
+	public void onShowPlanById(ClickEvent e){
+		if(planIdTextBox.getValue() != null && planIdTextBox.getValue().isEmpty() == false){
+			Window.Location.assign("#plan?id=" + planIdTextBox.getValue());
+		}
 	}
 
 }

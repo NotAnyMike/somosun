@@ -14,7 +14,7 @@ import com.uibinder.client.index.event.GradeChangeEventHandler;
 
 public class PlanWidget extends HorizontalPanel implements HasChangeHandlers {
 	
-	private Image addSemesterImage = new Image("images/addSemester.png");
+	private Image addSemesterImage = new Image("/images/addSemester.png");
 	private Label label = new Label(" add");
 	private HorizontalPanel addSemesterPanel = new HorizontalPanel();
 	

@@ -878,4 +878,19 @@ public class PlanDao {
 	private List<Plan> getAllPlans() {
 		return ofy().load().type(Plan.class).list();
 	}
+
+	/**
+	 * if @param username == null or isEmpty() then will search for plans with a null user
+	 * @param username
+	 * @return
+	 */
+	public List<Plan> getPlansByUsername(String username) {
+		List<Plan> toReturn = null;
+		if(username == null || username.isEmpty()){
+			toReturn = ofy().load().type(Plan.class).filter("user", null).list();
+		}else{			
+			toReturn = ofy().load().type(Plan.class).filter("user.username", username).list();
+		}
+		return toReturn;
+	}
 }

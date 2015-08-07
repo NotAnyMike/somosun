@@ -70,9 +70,15 @@
 								</b:InputGroup>
 								<b:Button type="DANGER" ui:field="deleteAllPlansButton">- Delete ALL plans -</b:Button>
 								<b:InputGroup>
-								    <b:TextBox></b:TextBox>
+								    <b:TextBox placeholder="plan id" ui:field="planIdTextBox"></b:TextBox>
 									<b:InputGroupButton>									
-										<b:Button type="DEFAULT" enabled="false">Open plan</b:Button>
+										<b:Button type="DEFAULT" enabled="true" ui:field="showPlanByIdButton">Open plan</b:Button>
+									</b:InputGroupButton>
+								</b:InputGroup>
+								<b:InputGroup>
+								    <b:TextBox placeholder="username" ui:field="planUsernameTextBox"></b:TextBox>
+									<b:InputGroupButton>									
+										<b:Button type="INFO" enabled="true" ui:field="showPlansByUserButton">Show plans</b:Button>
 									</b:InputGroupButton>
 								</b:InputGroup>
 							</b:VerticalButtonGroup>
