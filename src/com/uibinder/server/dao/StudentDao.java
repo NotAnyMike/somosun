@@ -24,7 +24,7 @@ public class StudentDao {
 	 */
 	public void saveStudent(Student student){
 		if(student != null){
-				ofy().save().entity(student).now();			
+			ofy().save().entity(student).now();			
 		}
 	}
 	
@@ -35,8 +35,9 @@ public class StudentDao {
 		if(user != null){	
 			if(user.getUserId().equals("0") == false){				
 				student = getStudentByIdG(user.getUserId());
-				if(student == null){
+				if(student == null){				
 					student = new Student(user.getUserId(), user.getNickname(), user.getNickname(), user.getEmail());
+					student.setBlocked(true);
 					student.setIdSun(generateId());
 					saveStudent(student);
 				}

@@ -14,7 +14,7 @@
 		    <br></br><br></br>
            	<span style="font-size:50px;">#SomosUN</span>   
             <br></br>  
-            <span style="font-size:15px;">versión Beta<br></br></span>  
+            <span style="font-size:15px;">versión Beta privada (Tuit si quieres participar)<br></br></span>  
             <span style="font-size:15px; color:#AC000B"></span>    
             <br></br>
             <br></br>
@@ -28,9 +28,19 @@
 	      Al estar #SomosUN en versión Beta, cualquier error, sugerencia o queja que tengas puede ser de mucha utilidad, puedes usar nuestro email (<a href="mailto:somos.un.project@gmail.com" target="_blank">somos.un.project@gmail.com</a>) o nuestro twitter (<a href="https://twitter.com/SomosUNal" target="_blank">@SomosUNal</a>) para contarnos cualquier cosa.
 	
 	      <br></br><br></br>
-	      El proyecto por el momento sólo funciona con la sede Bogotá.
-	
-	      <br></br>
+	      El proyecto por el momento sólo funciona con la sede Bogotá y para la mayoría de las carreras, las carreras con las que presenta algún tipo de problema (working on it) son:
+	      <ul>
+	          <li>(2513) Biología</li>
+              <li>(2539) Derecho</li>
+              <li>(2528/24/25/27) Filología</li>
+              <li>(2551) Fonoaudiología</li>
+              <li>(2531) Geología</li>
+              <li>(2541) Ingeniería Agrícola</li>
+              <li>(2545) Ingeniería Electrónica</li>
+              <li>(2552) Medicina</li>
+              <li>(2555) Medicina Veterinaria</li>
+              <li>(2556) Zootecnia</li>
+	      </ul>
 	      <hr style="display: block; height: 1px; border: 0; border-top: 1px solid #666; margin: 1em 0; padding: 0;" />
 	
 	      Muchas personas han tenido ideas interesantes como:
@@ -47,4 +57,4 @@
 	  </tr>
 	</table>
 	</g:HTMLPanel>
-</ui:UiBinder> 
+</ui:UiBinder>

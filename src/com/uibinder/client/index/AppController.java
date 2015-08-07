@@ -251,6 +251,14 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 				}
 			}
 			
+			/************ Restricting access to just non-blocked users **************/
+			if(loginInfo.isLoggedIn() == false || student.isBlocked()){
+				if(token.equals("plan") ||  token.equals("create")){
+					token = "aboutUs";
+					History.replaceItem("aboutUs");
+				}
+			}
+			
 			/**
 			 * This part will take care of the stability of the plan widget when its height changes due
 			 * to the changes on the number of max subjects on one semester
