@@ -67,5 +67,10 @@
 	<welcome-file-list>
 		<welcome-file>Index.html</welcome-file>
 	</welcome-file-list>
+	
+	<error-page>
+        <error-code>403</error-code>
+        <location>/error/403.html</location>
+    </error-page>
 
 </web-app>
