@@ -24,6 +24,10 @@ public interface IndexView {
 		void onMakeUserAdminButton(String userName);
 		void onBlockUnblockUser(String userName);
 		void onAnalyseAllCareers(boolean analyseAll);
+		void onDeleteAllMessages();
+		void onDeleteSuggestionMessages();
+		void onDeleteErrorMessages();
+		void onDeleteOtherMessages();
 	}
 	
 	Widget asWidget();
@@ -48,4 +52,8 @@ public interface IndexView {
 	void onAnalyseCareersNotAnalyzed(ClickEvent e);
 	void onShowCertainMessage(ClickEvent e);
 	void onShowUserMessages(ClickEvent e);
+	void onDeleteAllMessages(ClickEvent e);
+	void onDeleteSuggestionMessages(ClickEvent e);
+	void onDeleteErrorMessages(ClickEvent e);
+	void onDeleteOtherMessages(ClickEvent e);
 }

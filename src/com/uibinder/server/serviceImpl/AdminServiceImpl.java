@@ -338,6 +338,58 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 			toReturn = messageDao.getMessageById(id);
 		}
 		return toReturn;
+	}
+
+	/**
+	 * Admin method
+	 */
+	public void deleteAllMessages() {
+		if(getUserLogged().isAdmin() == true){
+			MessageDao messageDao = new MessageDao();
+			List<Message> list = messageDao.getAllMessages();
+			for(Message m : list){
+				messageDao.deleteMessage(m.getId());
+			}
+		}
 	}	
 
+	/**
+	 * Admin method
+	 */
+	public void deleteSuggestionMessages() {
+		if(getUserLogged().isAdmin() == true){
+			MessageDao messageDao = new MessageDao();
+			List<Message> list = messageDao.getAllSuggestionMessages();
+			for(Message m : list){
+				messageDao.deleteMessage(m.getId());
+			}
+		}
+	}
+	
+	/**
+	 * Admin method
+	 */
+	public void deleteErrorMessages() {
+		if(getUserLogged().isAdmin() == true){
+			MessageDao messageDao = new MessageDao();
+			List<Message> list = messageDao.getAllErrorMessages();
+			for(Message m : list){
+				messageDao.deleteMessage(m.getId());
+			}
+		}
+	}
+	
+	/**
+	 * Admin method
+	 */
+	public void deleteOtherMessages() {
+		if(getUserLogged().isAdmin() == true){
+			MessageDao messageDao = new MessageDao();
+			List<Message> list = messageDao.getAllOtherMessages();
+			for(Message m : list){
+				messageDao.deleteMessage(m.getId());
+			}
+		}
+	}
+	
 }

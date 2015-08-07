@@ -32,4 +32,8 @@ public interface AdminService extends RemoteService{
 	List<Message> getAllOtherMessages();
 	Message getMessageById(Long id);
 	List<Message> getUserMessages(String username);
+	void deleteAllMessages();
+	void deleteSuggestionMessages();
+	void deleteErrorMessages();
+	void deleteOtherMessages();
 }

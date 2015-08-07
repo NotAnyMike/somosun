@@ -48,6 +48,10 @@ public class IndexViewImpl extends Composite implements IndexView {
 	@UiField Button analyseCareersNotAnalyzedButton;
 	@UiField Button showUserMessagesButton;
 	@UiField Button showCertainMessageButton;
+	@UiField Button deleteAllMessagesButton;
+	@UiField Button deleteSuggestionMessagesButton;
+	@UiField Button deleteOtherMessagesButton;
+	@UiField Button deleteErrorMessagesButton;
 	
 	@UiField TextBox userCodeTextBox;
 	@UiField TextBox userToUnBlockTextBox;
@@ -263,6 +267,38 @@ public class IndexViewImpl extends Composite implements IndexView {
 		if(messagesUsernameTextBox.getValue() != null || messagesUsernameTextBox.getValue().isEmpty()==false){
 			Window.Location.assign("#messages?action=showUsername&username="+messagesUsernameTextBox.getValue());
 		}
+	}
+
+	@UiHandler("deleteAllMessagesButton")
+	public void onDeleteAllMessages(ClickEvent e) {
+		if(getTimes(deleteAllMessagesButton.getElement()).equals("1")){
+			presenter.onDeleteAllMessages();
+		}
+		setTimes(deleteAllMessagesButton.getElement());
+	}
+
+	@UiHandler("deleteSuggestionMessagesButton")
+	public void onDeleteSuggestionMessages(ClickEvent e) {
+		if(getTimes(deleteSuggestionMessagesButton.getElement()).equals("1")){
+			presenter.onDeleteSuggestionMessages();
+		}
+		setTimes(deleteSuggestionMessagesButton.getElement());
+	}
+
+	@UiHandler("deleteErrorMessagesButton")
+	public void onDeleteErrorMessages(ClickEvent e) {
+		if(getTimes(deleteErrorMessagesButton.getElement()).equals("1")){
+			presenter.onDeleteErrorMessages();
+		}
+		setTimes(deleteErrorMessagesButton.getElement());
+	}
+
+	@UiHandler("deleteOtherMessagesButton")
+	public void onDeleteOtherMessages(ClickEvent e) {
+		if(getTimes(deleteOtherMessagesButton.getElement()).equals("1")){
+			presenter.onDeleteOtherMessages();
+		}
+		setTimes(deleteOtherMessagesButton.getElement());
 	}
 
 }

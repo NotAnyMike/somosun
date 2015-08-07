@@ -343,5 +343,73 @@ public class IndexPresenter implements Presenter, IndexView.Presenter {
 			
 		});
 	}
+
+	@Override
+	public void onDeleteAllMessages() {
+		rpcAdminService.deleteAllMessages(new AsyncCallback(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Error deleting all messages, some could be deleted");
+			}
+
+			@Override
+			public void onSuccess(Object result) {
+				Window.alert("All messages deleted");
+			}
+			
+		});
+	}
+
+	@Override
+	public void onDeleteSuggestionMessages() {
+		rpcAdminService.deleteSuggestionMessages(new AsyncCallback(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Error deleting all Suggestion messages, some could be deleted");
+			}
+
+			@Override
+			public void onSuccess(Object result) {
+				Window.alert("All suggestion messages deleted");
+			}
+			
+		});
+	}
+
+	@Override
+	public void onDeleteErrorMessages() {
+		rpcAdminService.deleteErrorMessages(new AsyncCallback(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Error deleting all error messages, some could be deleted");
+			}
+
+			@Override
+			public void onSuccess(Object result) {
+				Window.alert("All error messages deleted");
+			}
+			
+		});
+	}
+
+	@Override
+	public void onDeleteOtherMessages() {
+		rpcAdminService.deleteOtherMessages(new AsyncCallback(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Error deleting all other messages, some could be deleted");
+			}
+
+			@Override
+			public void onSuccess(Object result) {
+				Window.alert("All other messages deleted");
+			}
+			
+		});
+	}
 	
 }

@@ -52,5 +52,13 @@ public interface AdminServiceAsync {
 	void getMessageById(Long id, AsyncCallback<Message> asyncCallback);
 
 	void getUserMessages(String username, AsyncCallback<List<Message>> asyncCallback);
+
+	void deleteAllMessages(AsyncCallback asyncCallback);
+
+	void deleteSuggestionMessages(AsyncCallback asyncCallback);
+
+	void deleteErrorMessages(AsyncCallback asyncCallback);
+
+	void deleteOtherMessages(AsyncCallback asyncCallback);
 	
 }

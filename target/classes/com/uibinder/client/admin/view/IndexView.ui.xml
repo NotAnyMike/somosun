@@ -139,10 +139,10 @@
 						<div class="panel-heading">Messages</div>
 						<div class="panel-body">
 							<b:VerticalButtonGroup>
-								<b:Button type="WARNING" enabled="false">Clean all</b:Button>
-								<b:Button type="WARNING" enabled="false">Clean all Error messages</b:Button>
-								<b:Button type="WARNING" enabled="false">Clean all Suggestion messages</b:Button>
-								<b:Button type="WARNING" enabled="false">Clean all other messages</b:Button>
+								<b:Button type="WARNING" enabled="true" ui:field="deleteAllMessagesButton">Clean all</b:Button>
+								<b:Button type="WARNING" enabled="true" ui:field="deleteErrorMessagesButton">Clean all Error messages</b:Button>
+								<b:Button type="WARNING" enabled="true" ui:field="deleteSuggestionMessagesButton">Clean all Suggestion messages</b:Button>
+								<b:Button type="WARNING" enabled="true" ui:field="deleteOtherMessagesButton">Clean all other messages</b:Button>
 								<b:InputGroup>
 									<b:TextBox placeholder="Long id"></b:TextBox>
 									<b:InputGroupButton>
