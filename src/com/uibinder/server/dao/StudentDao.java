@@ -1,6 +1,8 @@
 package com.uibinder.server.dao;
 
 import com.google.appengine.api.users.User;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
@@ -37,7 +39,14 @@ public class StudentDao {
 				student = getStudentByIdG(user.getUserId());
 				if(student == null){				
 					student = new Student(user.getUserId(), user.getNickname(), user.getNickname(), user.getEmail());
-					student.setBlocked(true);
+					
+					UserService userService = UserServiceFactory.getUserService();
+					if(userService.isUserAdmin()){
+						student.setAdmin(true);
+					}else{						
+						student.setBlocked(true);
+					}
+					
 					student.setIdSun(generateId());
 					saveStudent(student);
 				}

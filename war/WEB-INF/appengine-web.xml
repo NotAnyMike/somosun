@@ -17,6 +17,7 @@
     <include path="**.nocache.*" expiration="0s" />
 
     <include path="**.cache.*" expiration="365d" />
+    <include path="/error/**.*"/>
     <exclude path="**.gwt.rpc" />
   </static-files>
 
