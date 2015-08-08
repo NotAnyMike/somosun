@@ -28,6 +28,7 @@ public interface IndexView {
 		void onDeleteSuggestionMessages();
 		void onDeleteErrorMessages();
 		void onDeleteOtherMessages();
+		void onAnalyseCertainCareerButton(String careerCode);
 	}
 	
 	Widget asWidget();
@@ -58,5 +59,6 @@ public interface IndexView {
 	void onDeleteOtherMessages(ClickEvent e);
 	void onShowPlansByUserButton(ClickEvent e);
 	void onShowPlanById(ClickEvent e);
+	void onAnalyseCertainCareerButton(ClickEvent e);
 	
 }

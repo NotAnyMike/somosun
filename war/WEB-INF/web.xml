@@ -65,7 +65,7 @@
 	
 	<security-constraint>
 		<web-resource-collection>
-			<web-resource-name>admin.html</web-resource-name>
+			<web-resource-name>adminPage</web-resource-name>
 			<url-pattern>/admin.html</url-pattern>
 		</web-resource-collection>
 		<auth-constraint>
@@ -73,14 +73,15 @@
 		</auth-constraint>
 	</security-constraint>
 	
+	<error-page>
+        <error-code>403</error-code>
+        <location>/errors/403.html</location>
+    </error-page>
+	
+	
 	<!-- Default page to serve -->
 	<welcome-file-list>
 		<welcome-file>Index.html</welcome-file>
 	</welcome-file-list>
 	
-	<error-page>
-        <error-code>403</error-code>
-        <location>/error/403.html</location>
-    </error-page>
-
 </web-app>

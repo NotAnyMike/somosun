@@ -128,7 +128,8 @@ public class SubjectDao extends Dao {
 			}
 			//OLD subject.setName(SomosUNUtils.standardizeString(subject.getName(), false));
 			subject.setName(SomosUNUtils.removeAccents(subject.getName()));
-			ofy().save().entity(subject).now();				
+			ofy().cache(false).save().entity(subject).now();
+			ofy().clear();
 		}
 		
 		return subject.getId();

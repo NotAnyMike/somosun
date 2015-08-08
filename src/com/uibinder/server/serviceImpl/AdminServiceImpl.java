@@ -243,6 +243,35 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 		}
 		
 	}
+	
+	@Override
+	public void analyseCareer(String careerCode) {
+		if(getUserLogged().isAdmin() == true){
+			String sede = "bog";
+			
+			log.info("<------------- STARTING TO ANALYSE THE CAREER ------------->");
+			log.info("Getting all results from the sia");
+			
+			SiaResultSubjects allSiaSubjects = SiaProxy.getSubjects("", "", "", "", 1, 10000, sede, null);
+			
+			
+				
+			log.info("Starting to analyse the career " + careerCode);
+								
+			boolean error = false;
+			try{
+				SiaProxy.getRequisitesForACareer(careerCode, allSiaSubjects);
+			}catch (Exception e){
+				error = true;
+			}
+			
+			if(error){
+				log.info("<------------- ERROR with " + careerCode + " --------------->");
+			}	
+
+			log.info("<------------- ANALYSE ENDED ------------->");
+		}
+	}
 
 	/**
 	 * Admin method

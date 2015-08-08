@@ -54,6 +54,7 @@ public class IndexViewImpl extends Composite implements IndexView {
 	@UiField Button deleteErrorMessagesButton;
 	@UiField Button showPlansByUserButton;
 	@UiField Button showPlanByIdButton;
+	@UiField Button analyseCertainCareerButton;
 	
 	@UiField TextBox userCodeTextBox;
 	@UiField TextBox userToUnBlockTextBox;
@@ -317,6 +318,14 @@ public class IndexViewImpl extends Composite implements IndexView {
 		if(planIdTextBox.getValue() != null && planIdTextBox.getValue().isEmpty() == false){
 			Window.Location.assign("#plan?id=" + planIdTextBox.getValue());
 		}
+	}
+	
+	@UiHandler("analyseCertainCareerButton")
+	public void onAnalyseCertainCareerButton(ClickEvent e){
+		if(getTimes(analyseCertainCareerButton.getElement()).equals("1")){
+			presenter.onAnalyseCertainCareerButton(careerAnalyseListBox.getSelectedValue());
+		}
+		setTimes(analyseCertainCareerButton.getElement());
 	}
 
 }

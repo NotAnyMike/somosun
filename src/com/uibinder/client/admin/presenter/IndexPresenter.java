@@ -411,5 +411,22 @@ public class IndexPresenter implements Presenter, IndexView.Presenter {
 			
 		});
 	}
+
+	@Override
+	public void onAnalyseCertainCareerButton(String careerCode) {
+		rpcAdminService.analyseCareer(careerCode, new AsyncCallback(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Error analysing the career");
+			}
+
+			@Override
+			public void onSuccess(Object result) {
+				Window.alert("The career is analyzed");
+			}
+			
+		});
+	}
 	
 }

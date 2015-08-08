@@ -65,5 +65,7 @@ public interface AdminServiceAsync {
 	void getPlansByUser(String username, AsyncCallback<List<Plan>> asyncCallback);
 
 	void getPlanById(Long id, AsyncCallback<Plan> asyncCallback);
+
+	void analyseCareer(String careerCode, AsyncCallback asyncCallback);
 	
 }

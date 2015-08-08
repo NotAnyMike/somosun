@@ -39,4 +39,5 @@ public interface AdminService extends RemoteService{
 	void deleteOtherMessages();
 	List<Plan> getPlansByUser(String username);
 	Plan getPlanById(Long id);
+	void analyseCareer(String careerCode);
 }

@@ -248,6 +248,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 			if(lastToken.equals("plan")){
 				if(planPresenter != null){
 					savePlan();
+					RootPanel.get("mainContainer").removeStyleName("noSelect");
 				}
 			}
 			
@@ -292,6 +293,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 					}else{
 						siaSummaryView.hideWarning();						
 					}
+					RootPanel.get("mainContainer").addStyleName("noSelect");
 					planPresenter.go(RootPanel.get("centerArea"));
 					planPresenter.showToolTip();
 				}else{
