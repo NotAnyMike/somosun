@@ -4,8 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.uibinder.client.admin.service.AdminService;
+import com.uibinder.server.ExpensiveOperation;
 import com.uibinder.server.SiaProxy;
 import com.uibinder.server.dao.CareerDao;
 import com.uibinder.server.dao.ComplementaryValueDao;
@@ -68,6 +72,8 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 		if(getUserLogged().isAdmin() == true){
 			CareerDao careerDao = new CareerDao();
 			careerDao.resetAllHasAnalysis();
+			Queue q = QueueFactory.getQueue("analyseCareer");
+			q.add(TaskOptions.Builder.withPayload(new ExpensiveOperation()));
 		}
 	}
 

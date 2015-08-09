@@ -1,0 +1,11 @@
+<queue-entries>
+<!--Change the refresh rate of the default queue to 1/s-->
+  <queue>
+    <name>analyseCareer</name>
+    <rate>6/h</rate>
+    <max-concurrent-requests>1</max-concurrent-requests>
+    <retry-parameters>        
+    	<task-retry-limit>1</task-retry-limit>
+    </retry-parameters>
+  </queue>
+</queue-entries>
