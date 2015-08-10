@@ -8,4 +8,20 @@
     	<task-retry-limit>1</task-retry-limit>
     </retry-parameters>
   </queue>
+  <queue>
+    <name>analyseAllCareers</name>
+    <rate>2/h</rate>
+    <max-concurrent-requests>1</max-concurrent-requests>
+    <retry-parameters>        
+    	<task-retry-limit>1</task-retry-limit>
+    </retry-parameters>
+  </queue>
+  <queue>
+    <name>adminQueue</name>
+    <rate>1/m</rate>
+    <max-concurrent-requests>1</max-concurrent-requests>
+    <retry-parameters>        
+    	<task-retry-limit>5</task-retry-limit>
+    </retry-parameters>
+  </queue>
 </queue-entries>

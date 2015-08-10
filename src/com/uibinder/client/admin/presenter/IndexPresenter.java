@@ -286,8 +286,8 @@ public class IndexPresenter implements Presenter, IndexView.Presenter {
 				GWT.log("Error deleting all the subjectValues");
 			}
 			public void onSuccess(Object result) {
-				Window.alert("All subjectValues were deleted");
-				GWT.log("All subjectValues were deleted");
+				Window.alert("All subjectValues task added to the queue");
+				Window.alert("All subjectValues task added to the queue");
 			}
 			
 		});

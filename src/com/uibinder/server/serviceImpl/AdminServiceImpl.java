@@ -4,24 +4,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.google.appengine.api.modules.ModulesServiceFactory;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.uibinder.client.admin.service.AdminService;
-import com.uibinder.server.ExpensiveOperation;
 import com.uibinder.server.SiaProxy;
 import com.uibinder.server.dao.CareerDao;
-import com.uibinder.server.dao.ComplementaryValueDao;
 import com.uibinder.server.dao.MessageDao;
 import com.uibinder.server.dao.PlanDao;
 import com.uibinder.server.dao.SemesterDao;
 import com.uibinder.server.dao.StudentDao;
-import com.uibinder.server.dao.SubjectDao;
 import com.uibinder.server.dao.SubjectGroupDao;
-import com.uibinder.server.dao.SubjectValueDao;
-import com.uibinder.shared.SiaResultSubjects;
-import com.uibinder.shared.control.Career;
+import com.uibinder.server.expensiveOperation.AnalyseAllCareersExpensiveOperation;
+import com.uibinder.server.expensiveOperation.AnalyseCareerExpensiveOperation;
+import com.uibinder.server.expensiveOperation.ComplementaryValueExpensiveOperations;
+import com.uibinder.server.expensiveOperation.SubjectExpensiveOperations;
+import com.uibinder.server.expensiveOperation.SubjectValueExpensiveOperations;
+import com.uibinder.server.expensiveOperation.Codes.ComplementaryValueExpensiveOperationsCodes;
+import com.uibinder.server.expensiveOperation.Codes.SubjectExpensiveOperationsCodes;
+import com.uibinder.server.expensiveOperation.Codes.SubjectValueExpensiveOperationsCodes;
 import com.uibinder.shared.control.Message;
 import com.uibinder.shared.control.Plan;
 import com.uibinder.shared.control.Student;
@@ -72,8 +75,6 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 		if(getUserLogged().isAdmin() == true){
 			CareerDao careerDao = new CareerDao();
 			careerDao.resetAllHasAnalysis();
-			Queue q = QueueFactory.getQueue("analyseCareer");
-			q.add(TaskOptions.Builder.withPayload(new ExpensiveOperation()));
 		}
 	}
 
@@ -102,8 +103,8 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 	 */
 	public void deleteAllComplementaryValues() {
 		if(getUserLogged().isAdmin() == true){
-			ComplementaryValueDao cVDao = new ComplementaryValueDao();
-			cVDao.deleteAllComplementeryValues();
+			Queue q = QueueFactory.getQueue("adminQueue");
+			q.add(TaskOptions.Builder.withPayload(new ComplementaryValueExpensiveOperations(ComplementaryValueExpensiveOperationsCodes.DELETE_ALL)));
 		}
 	}
 
@@ -112,8 +113,8 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 	 */
 	public void deleteCertainComplementaryValues(String careerCode) {
 		if(getUserLogged().isAdmin() == true){
-			ComplementaryValueDao cVDao = new ComplementaryValueDao();
-			cVDao.deleteCertainComplementeryValues(careerCode);
+			Queue q = QueueFactory.getQueue("adminQueue");
+			q.add(TaskOptions.Builder.withPayload(new ComplementaryValueExpensiveOperations(ComplementaryValueExpensiveOperationsCodes.DELETE_FOR_CAREER, careerCode)));
 		}
 	}
 
@@ -122,8 +123,8 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 	 */
 	public void deleteAllSubjects() {
 		if(getUserLogged().isAdmin() == true){
-			SubjectDao subjectDao = new SubjectDao();
-			subjectDao.deleteAllSubjects();
+			Queue q = QueueFactory.getQueue("adminQueue");
+			q.add(TaskOptions.Builder.withPayload(new SubjectExpensiveOperations(SubjectExpensiveOperationsCodes.DELETE_ALL)));
 		}
 	}
 
@@ -172,8 +173,8 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 	 */
 	public void deleteAllSubjectValue() {
 		if(getUserLogged().isAdmin() == true){
-			SubjectValueDao sVDao = new SubjectValueDao();
-			sVDao.deleteAllSubjectValues();
+			Queue q = QueueFactory.getQueue("adminQueue");
+			q.add(TaskOptions.Builder.withPayload(new SubjectValueExpensiveOperations(SubjectValueExpensiveOperationsCodes.DELETE_ALL)));
 		}
 	}
 
@@ -210,42 +211,9 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 	 */
 	public void analyseAllCareers(boolean analyseAll) {
 		if(getUserLogged().isAdmin() == true){
-			CareerDao careerDao = new CareerDao();
-			List<Career> careers = careerDao.getCareersBySede("bog");
-			List<String> careersAnalysed = new ArrayList<String>();
-			List<String> careersNotAnalysed = new ArrayList<String>();
-			String sede = "bog";
-			
-			log.info("<------------- STARTING TO ANALYSE ALL CAREERS ------------->");
-			log.info("Getting all results from the sia");
-			
-			SiaResultSubjects allSiaSubjects = SiaProxy.getSubjects("", "", "", "", 1, 10000, sede, null);;
-			
-			for(Career career : careers){
-				
-				log.info("Starting to analyse the career " + career.getCode() + " " + career.getName());
-				if(!career.hasAnalysis() || analyseAll){					
-					boolean error = false;
-					try{
-						SiaProxy.getRequisitesForACareer(career.getCode(), allSiaSubjects);
-					}catch (Exception e){
-						error = true;
-					}
-					
-					if(error){
-						log.info("<------------- ERROR with " + career.getCode() + " " + career.getName() + " --------------->");
-						careersNotAnalysed.add(career.getCode());
-					}
-					careersAnalysed.add(career.getCode());
-					log.info("Analysis for " + career.getCode() + " " + career.getName() + " ended");
-				}else{
-					log.info("Analysis for " + career.getCode() + " " + career.getName() + " canceled because it has been analysed already");
-				}
-				
-			}
-			
-			log.info("Careers not analyzed: " + careersNotAnalysed.toString());
-			log.info("<------------- ANALYSE ALL CAREERS ENDED ------------->");
+			Queue q = QueueFactory.getQueue("analyseAllCareers");
+			q.add(TaskOptions.Builder.withPayload(new AnalyseAllCareersExpensiveOperation(analyseAll)));
+			//q.add(TaskOptions.Builder.withUrl("").param("", "").header("Host", ModulesServiceFactory.getModulesService().getInstanceHostname("admin", null, 1)));
 		}
 		
 	}
@@ -253,29 +221,8 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 	@Override
 	public void analyseCareer(String careerCode) {
 		if(getUserLogged().isAdmin() == true){
-			String sede = "bog";
-			
-			log.info("<------------- STARTING TO ANALYSE THE CAREER ------------->");
-			log.info("Getting all results from the sia");
-			
-			SiaResultSubjects allSiaSubjects = SiaProxy.getSubjects("", "", "", "", 1, 10000, sede, null);
-			
-			
-				
-			log.info("Starting to analyse the career " + careerCode);
-								
-			boolean error = false;
-			try{
-				SiaProxy.getRequisitesForACareer(careerCode, allSiaSubjects);
-			}catch (Exception e){
-				error = true;
-			}
-			
-			if(error){
-				log.info("<------------- ERROR with " + careerCode + " --------------->");
-			}	
-
-			log.info("<------------- ANALYSE ENDED ------------->");
+			Queue q = QueueFactory.getQueue("analyseCareer");
+			q.add(TaskOptions.Builder.withPayload(new AnalyseCareerExpensiveOperation(careerCode)));
 		}
 	}
 
