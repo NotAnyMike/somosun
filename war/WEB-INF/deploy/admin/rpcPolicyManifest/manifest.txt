@@ -1,4 +1,4 @@
 # Module admin
 # RPC service class, partial path of RPC policy file
-com.uibinder.client.admin.service.AdminService, DB839068C8069416DE97D777AD18821A.gwt.rpc
-com.uibinder.client.index.service.SUNService, 7D212F43DD66872DF8CBF32A2E615A92.gwt.rpc
+com.somosun.plan.client.index.service.SUNService, F505B2C796BC0C223DE445F1FEF229DC.gwt.rpc
+com.somosun.plan.client.admin.service.AdminService, 056F6201E99C0B1C22960103C2F4DFF6.gwt.rpc

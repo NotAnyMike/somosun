@@ -1,0 +1,2 @@
+serviceClass: com.somosun.plan.client.index.service.SUNService
+path: F505B2C796BC0C223DE445F1FEF229DC.gwt.rpc

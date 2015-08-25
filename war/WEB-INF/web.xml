@@ -8,7 +8,7 @@
 	<!-- Servlets -->
 	<servlet>
 		<servlet-name>SUNServiceImpl</servlet-name>
-		<servlet-class>com.uibinder.server.serviceImpl.SUNServiceImpl</servlet-class>
+		<servlet-class>com.somosun.plan.server.serviceImpl.SUNServiceImpl</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
@@ -22,7 +22,7 @@
 	
 	<servlet>
 		<servlet-name>LoginServiceImpl</servlet-name>
-		<servlet-class>com.uibinder.server.serviceImpl.LoginServiceImpl</servlet-class>
+		<servlet-class>com.somosun.plan.server.serviceImpl.LoginServiceImpl</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
@@ -36,7 +36,7 @@
 	
 	<servlet>
 		<servlet-name>AdminServiceImpl</servlet-name>
-		<servlet-class>com.uibinder.server.serviceImpl.AdminServiceImpl</servlet-class>
+		<servlet-class>com.somosun.plan.server.serviceImpl.AdminServiceImpl</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
@@ -75,7 +75,7 @@
 	
 	<error-page>
         <error-code>403</error-code>
-        <location>/errors/403.html</location>
+        <location>/error/403.html</location>
     </error-page>
 	
 	

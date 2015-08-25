@@ -1,2 +1,0 @@
-serviceClass: com.uibinder.client.admin.service.AdminService
-path: DB839068C8069416DE97D777AD18821A.gwt.rpc

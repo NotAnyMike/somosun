@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
-  <application>somosun-test</application>
+  <application>somosun-test-ear</application>
   <version>1</version>
   <sessions-enabled>true</sessions-enabled>
+  <module>default</module>
+  
 
   <!--
     Allows App Engine to send multiple requests to one instance in parallel:
@@ -29,7 +31,7 @@
   </system-properties>
   
   <static-error-handlers>
-	<handler file="/errors/default.html" />
+	<handler file="/error/default.html" />
   </static-error-handlers>
 
   <!--

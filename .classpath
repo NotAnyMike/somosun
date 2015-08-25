@@ -8,17 +8,6 @@
 	</classpathentry>
 	<classpathentry including="**/*|**/*.java" kind="src" path="spec"/>
 	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-lang3-3.3.2.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/guava-18.0.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/guava-gwt-18.0.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-dnd-3.3.2.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-servlet-2.7.0.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-servlet.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/gwtbootstrap3-extras-0.6.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/jsoup-1.8.1.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/objectify-5.1.5.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/gwtbootstrap3-0.9.1.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/json-20140107.jar"/>
 	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7">
 		<attributes>
