@@ -178,24 +178,30 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 		labelSubjectGroup.setText("Agrupación: " + s);
 	}
 	
-	public void addRequisite(String type, final String name, final String code, final SubjectAccordionViewImpl accordion, boolean makeStatic) {
+	public void addRequisite(String type, final String name, final String code, final SubjectAccordionViewImpl accordion, boolean makeStatic, boolean makeUnavailable) {
 		
 		final ComplementaryValueViewImpl view = this;
 		final String careerCode = listBoxCareers.getSelectedValue();
 		
 		Widget w = null;		
-		Anchor a = new Anchor(name);
-		a.getElement().setAttribute("code", code);
-		a.addClickHandler(new ClickHandler(){
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.addComplementaryValueView(accordion, name, code, careerCode);
+		if(!makeStatic){			
+			Anchor a = new Anchor(name);
+			a.getElement().setAttribute("code", code);
+			a.addClickHandler(new ClickHandler(){
+				@Override
+				public void onClick(ClickEvent event) {
+					presenter.addComplementaryValueView(accordion, name, code, careerCode);
+				}
+			});
+			if(makeUnavailable){				
+				a.addStyleName("complementaryValue-oldSubject");
 			}
-		});
-		if(makeStatic){				
-			a.addStyleName("complementaryValue-oldSubject");
+			w = a.asWidget();
+		}else{
+			HTML html = new HTML(name);
+			html.setStyleName("complementaryValue-static");
+			w = html.asWidget();
 		}
-		w = a.asWidget();
 		
 		if(type == "pre"){
 			if(preRequisitesPanel.getWidget(0).getElement().getClassName()=="fa fa-refresh fa-spin") preRequisitesPanel.remove(0);

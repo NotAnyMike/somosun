@@ -170,8 +170,9 @@ public class Subject implements Serializable {
 		this.isDummy = false;
 	}
 
-    /**
-     * A dummy subject is a kind of subject that will be shown as a subject in the planPresenter, but still need to be a subject. e.g. "optativa [SubjectGroup.getName()]"
+	/**
+     * A dummy subject is a kind of subject that will be shown as a subject in the planPresenter, but still need to be a subject, and can appears in 
+     * searches only if searching Old/Uncontinued subjects. e.g. Old subjects
      */
 	public boolean isDummy() {
 		return isDummy;

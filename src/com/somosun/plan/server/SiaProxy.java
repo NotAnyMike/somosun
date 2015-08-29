@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -65,15 +66,12 @@ public class SiaProxy {
 	private static final Logger log = Logger.getLogger("SiaProxy");
 
 	//This is the page that shows information about the subject in MIS PLANES, not in the sia buscador
-	// OLD public final static String SIA_SUBJECT_BOG_HTML = "http://www.sia.unal.edu.co/academia/catalogo-programas/info-asignatura.sdo";
 	public final static String SIA_SUBJECT_BOG_HTML ="http://sia.bogota.unal.edu.co/academia/catalogo-programas/info-asignatura.sdo";
 	
 	//This is the page of the MIS PLANES that shows every different plan
-	// Old public final static String SIA_PLAN_BOG_HTML = "http://www.sia.unal.edu.co/academia/catalogo-programas/semaforo.do";
-	public final static String SIA_PLAN_BOG_HTML = "http://sia.bogota.unal.edu.co/academia/catalogo-programas/semaforo.do";
+	public final static String SIA_MIS_PLANES_BOG_HTML = "http://sia.bogota.unal.edu.co/academia/catalogo-programas/semaforo.do";
 	
 	//This is the connection page with the JSON RPC call methods in the sia
-	// OLD public final static String SIA_URL_BOG_RPC = "http://www.sia.unal.edu.co/buscador/JSON-RPC";
 	public final static String SIA_URL_BOG_RPC = "http://sia.bogota.unal.edu.co/buscador/JSON-RPC";
 	public final static String SIA_URL_AMA_RPC = "http://unsia.unal.edu.co/buscador/JSON-RPC";
 	public final static String SIA_URL_CAR_RPC = "http://sia.bogota.unal.edu.co/buscador/JSON-RPC";
@@ -82,8 +80,8 @@ public class SiaProxy {
 	public final static String SIA_URL_ORI_RPC = "http://sia.bogota.unal.edu.co/buscador/JSON-RPC";
 	public final static String SIA_URL_PAL_RPC = "http://sia.bogota.unal.edu.co/buscador/JSON-RPC";
 	public final static String SIA_URL_TUM_RPC = "http://sia.bogota.unal.edu.co/buscador/JSON-RPC";
+	
 	//This is the url of the BUSCADOR, the normal one
-	//OLD public final static String SIA_URL_AMA_BUSCADOR = "http://www.sia.unal.edu.co/buscador/service/action.pub";
 	public final static String SIA_URL_AMA_BUSCADOR = "http://sia.bogota.unal.edu.co/buscador/service/action.pub";
 	public final static String SIA_URL_BOG_BUSCADOR = "http://sia.bogota.unal.edu.co/buscador/service/action.pub";
 	public final static String SIA_URL_CAR_BUSCADOR = "http://sia.bogota.unal.edu.co/buscador/service/action.pub";
@@ -712,7 +710,7 @@ public class SiaProxy {
 		
 			String htmlString = "";
 			try {
-				htmlString = getUrlSource(SIA_PLAN_BOG_HTML + "?plan=" + career + "&tipo=PRE&tipoVista=semaforo&nodo=4&parametro=on");
+				htmlString = getUrlSource(SIA_MIS_PLANES_BOG_HTML + "?plan=" + career + "&tipo=PRE&tipoVista=semaforo&nodo=4&parametro=on");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -833,11 +831,13 @@ public class SiaProxy {
         URL urlString = new URL(url);
         URLConnection yc = urlString.openConnection();
         BufferedReader in = new BufferedReader(new InputStreamReader(
-                yc.getInputStream(), "ISO-8859-1"));
+                yc.getInputStream(), "UTF-8"));//"ISO-8859-1"));
         String inputLine;
         StringBuilder a = new StringBuilder();
-        while ((inputLine = in.readLine()) != null)
-            a.append(inputLine);
+        while ((inputLine = in.readLine()) != null){
+        	inputLine = StringEscapeUtils.unescapeHtml4(inputLine);
+        	a.append(inputLine);
+        }
         in.close();
 
         return a.toString();
@@ -955,6 +955,7 @@ public class SiaProxy {
 		String requisitesCode = "";
 		String htmlPlan = null;
 		String htmlRequisites = null;
+		String htmlMisPlanes = null;
 		Boolean errorComponent = null;
 		
 		boolean isFundamental = true;
@@ -983,6 +984,14 @@ public class SiaProxy {
 			}
 			try {
 				htmlRequisites = getUrlSource("http://127.0.0.1:8888/toDelete/computacion.html");//requisiteURL);
+			} catch (Exception e){
+				e.printStackTrace();
+				log.severe("Error getting the info from the two pages for " + careerCode);
+			}
+			try {
+				//this variable is in order to know if the subject is special or dummy
+				htmlMisPlanes = getUrlSource(SIA_MIS_PLANES_BOG_HTML + "?plan=" + careerCode +  "&tipo=PRE");
+				htmlMisPlanes = SomosUNUtils.standardizeString(htmlMisPlanes.trim(), false, true);
 			} catch (Exception e){
 				e.printStackTrace();
 				log.severe("Error getting the info from the two pages for " + careerCode);
@@ -1227,7 +1236,8 @@ public class SiaProxy {
 										&& textToTest.equals("") == false && textToTest.isEmpty() == false)
 											requisites = false;
 									if(integers == true)
-										if(StringUtils.isNumeric(textToTest) == false && textToTest.contains("credito") == false)
+										//in order to check if it contains crédito, the leftovers cannot be longer than 3 to 5 characters
+										if(StringUtils.isNumeric(textToTest) == false && !(textToTest.contains("credito") == true && textToTest.replaceAll("credito", "").length() < 5))
 											integers = false;
 									
 									if(integers == false && requisites == false && booleans == false)
@@ -1489,7 +1499,7 @@ public class SiaProxy {
 				/**
 				 * Saving the subjects and getting back a List of Subjects (to add them to the ComplementaryValues) and a ComplementaryValues 
 				 */
-				saveSubjectsAndComplementaryValues(subjects, career, mapSGDSGFinal, subjectGroupDao, allSiaSubjects);
+				saveSubjectsAndComplementaryValues(subjects, career, mapSGDSGFinal, subjectGroupDao, allSiaSubjects, htmlMisPlanes);
 				
 				int freeElectionValue = -1;
 				int fundamentalValue = fundamentals.get(0).getObligatoryCredits() + fundamentals.get(0).getOptativeCredits();
@@ -1572,7 +1582,7 @@ public class SiaProxy {
 	 * @param career
 	 * @param mapSGDSG
 	 */
-	private static void saveSubjectsAndComplementaryValues(	List<SubjectDummy> subjectsD, Career career, Map<SubjectGroupDummy, SubjectGroup> mapSGDSG, SubjectGroupDao subjectGroupDao, SiaResultSubjects allSiaResult ) {
+	private static void saveSubjectsAndComplementaryValues(List<SubjectDummy> subjectsD, Career career, Map<SubjectGroupDummy, SubjectGroup> mapSGDSG, SubjectGroupDao subjectGroupDao, SiaResultSubjects allSiaResult, String htmlMisPlanes) {
 		
 		SubjectDao subjectDao = new SubjectDao();
 		ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
@@ -1664,13 +1674,13 @@ public class SiaProxy {
 		
 		for(Subject s : subjectListFinalFromLaw){
 			
-			/************* if s can be found in the sia then it is not a special one **************/
+			/************* if s can be found in the sia then it is not a dummy one **************/
 			// can be moved upwards when we get sFromDb
 			
 			if(getSubjectFromList(s.getName(), allSiaResult.getSubjectList(), true, true) == null){
 				//search now by code
 				if(getSubjectFromListByCode(s.getCode(), allSiaResult.getSubjectList(), true, true) == null){					
-					s.setSpecial(true);
+					s.setDummy(true);
 				}
 			}
 			
@@ -1682,8 +1692,8 @@ public class SiaProxy {
 			ComplementaryValue cV = mapSCV.get(s);
 			
 			//for each pre and co
-			addRequisitesToBothLists(cV, s, preSD, subjectListFinalFromLaw, allSiaResult, careerSiaResult, subjectDao, mapSCV, true, complementaryValueDao, subjectGroupDao);
-			addRequisitesToBothLists(cV, s, coSD, subjectListFinalFromLaw, allSiaResult, careerSiaResult, subjectDao, mapSCV, false, complementaryValueDao, subjectGroupDao);
+			addRequisitesToBothLists(cV, s, preSD, subjectListFinalFromLaw, allSiaResult, careerSiaResult, subjectDao, mapSCV, htmlMisPlanes, true, complementaryValueDao, subjectGroupDao);
+			addRequisitesToBothLists(cV, s, coSD, subjectListFinalFromLaw, allSiaResult, careerSiaResult, subjectDao, mapSCV, htmlMisPlanes, false, complementaryValueDao, subjectGroupDao);
 			
 		}
 		
@@ -2084,7 +2094,7 @@ public class SiaProxy {
 	 * @param complementaryValueDao
 	 * @param subjectGroupDao
 	 */
-	private static void addRequisitesToBothLists(ComplementaryValue cV, Subject s, List<SubjectDummy> listOfRequisitesSD, List<Subject> subjectListFinalFromLaw, SiaResultSubjects allSubjectsSiaResult, SiaResultSubjects careerSubjectsSiaResult, SubjectDao subjectDao, Map<Subject, ComplementaryValue> mapSCV, boolean isPre, ComplementaryValueDao complementaryValueDao, SubjectGroupDao subjectGroupDao)
+	private static void addRequisitesToBothLists(ComplementaryValue cV, Subject s, List<SubjectDummy> listOfRequisitesSD, List<Subject> subjectListFinalFromLaw, SiaResultSubjects allSubjectsSiaResult, SiaResultSubjects careerSubjectsSiaResult, SubjectDao subjectDao, Map<Subject, ComplementaryValue> mapSCV, String htmlMisPlanes, boolean isPre, ComplementaryValueDao complementaryValueDao, SubjectGroupDao subjectGroupDao)
 	{
 		String sede = "bog";
 		for(SubjectDummy sD : listOfRequisitesSD){
@@ -2264,7 +2274,15 @@ public class SiaProxy {
 										/********* that it is a special subject if it's found      **********/ 
 										if(subjectFound == null){
 											subjectFound = getSubjectFromList(group, subjectListFinalFromLaw, true, true);
-											if(subjectFound != null) subjectFound.setSpecial(true);
+											if(subjectFound != null) {
+												//TODO  look for it in the MIS PLANES, if found then it is special, otherwise it is a dummy
+												String toSearch = SomosUNUtils.standardizeString(group.trim(), false, true);
+												if(htmlMisPlanes.contains(toSearch)){
+													subjectFound.setDummy(true);
+												}else{													
+													subjectFound.setSpecial(true);
+												}
+											}
 										}
 										if(subjectFound != null){
 											//add the subject to splittedSubjects list and empty the strings used
@@ -2282,7 +2300,13 @@ public class SiaProxy {
 												finalSplits.add(stringLeft);
 												//create the subject dummy and add it to splittedSubjects
 												String specialName = stringLeft.replaceFirst("^((" + strongAndPatterns + "|" + softAndPatterns + "|" + softOrPatterns + "|" + strongOrPatterns + ")\\s*)", "");
-												Subject subjectNotFound = createAndSaveSpeacialSubject(specialName, sede, subjectDao);
+												Subject subjectNotFound = null;
+												if(SomosUNUtils.standardizeString(htmlMisPlanes, true, true).contains(SomosUNUtils.standardizeString(specialName.trim(), true, true))){
+													subjectNotFound = createAndSaveDummySubject(specialName, sede, subjectDao);
+												}else{
+													subjectNotFound = createAndSaveSpecialSubject(specialName, sede, subjectDao);
+												}
+												
 												splittedSubjects.add(subjectNotFound);
 											}
 											finalSplits.add(stringFound);
@@ -2300,7 +2324,7 @@ public class SiaProxy {
 								if(theLeftOvers.isEmpty() == false){
 									finalSplits.add(theLeftOvers);
 									String specialName = theLeftOvers.replaceFirst("^((" + strongAndPatterns + "|" + softAndPatterns + "|" + softOrPatterns + "|" + strongOrPatterns + ")\\s*)", "");
-									Subject subjectNotFound = createAndSaveSpeacialSubject(specialName, sede, subjectDao);
+									Subject subjectNotFound = createAndSaveSpecialSubject(specialName, sede, subjectDao);
 									splittedSubjects.add(subjectNotFound);
 								}
 								
@@ -2323,7 +2347,7 @@ public class SiaProxy {
 											orName = orName.replaceAll("^(\\s+)", "");
 											orName = orName.replaceAll("&(\\s+)","");
 											if(orName.isEmpty() == false){												
-												Subject subjectWithStrongOr = createAndSaveSpeacialSubject(orName, sede, subjectDao);
+												Subject subjectWithStrongOr = createAndSaveSpecialSubject(orName, sede, subjectDao);
 												list.add(subjectWithStrongOr);
 											}
 										}
@@ -2344,7 +2368,7 @@ public class SiaProxy {
 						/**************************** it must be a speacial subject *******************************/
 						//it means that it is a special subject
 						isSpecial = true;
-						subjectFinalT = createAndSaveSpeacialSubject(sD.getName(), sede, subjectDao);
+						subjectFinalT = createAndSaveSpecialSubject(sD.getName(), sede, subjectDao);
 						List<Subject> list = new ArrayList<Subject>();
 						list.add(subjectFinalT);
 						listOfListsFinal.add(list);
@@ -2444,8 +2468,8 @@ public class SiaProxy {
 				cV.addPrerequisites(listOfListsFinal);
 				for(List<Subject> list : listOfListsFinal){
 					for(Subject subject : list){
-//						if(subject.isSpecial() == false)
-//						{
+						if(subject.isSpecial() == false && subject.isDefault() == false)
+						{
 							ComplementaryValue cVT = mapSCV.get(subject);
 							if(cVT == null){
 								Subject subjectVeryTemporary = getSubjectFromList(subject.getName(), new ArrayList(mapSCV.keySet()), false, false); 
@@ -2461,7 +2485,7 @@ public class SiaProxy {
 								//FIXME make sure it is not there already
 								cVT.addPrerequisiteOf(s);
 							}
-//						}	
+						}	
 					}
 				}			
 			}else{
@@ -2469,16 +2493,23 @@ public class SiaProxy {
 				cV.addCorequisites(listOfListsFinal);
 				for(List<Subject> list : listOfListsFinal){
 					for(Subject subject : list){
-//						if(subject.isSpecial() == false)
-//						{
+						if(subject.isSpecial() == false && subject.isDefault() == false)
+						{
 							ComplementaryValue cVT = mapSCV.get(subject);
+							if(cVT == null){
+								Subject subjectVeryTemporary = getSubjectFromList(subject.getName(), new ArrayList(mapSCV.keySet()), false, false); 
+								if(subjectVeryTemporary != null){										
+									subject = subjectVeryTemporary;
+									cVT = mapSCV.get(subject);
+								}
+							}
 							if(cVT == null){
 								throw new RuntimeException("Error, the subject " + subject.getName() + " is a subject and has no complementary value");
 							}else{					
 								//FIXME make sure it is not there already
 								cVT.addCorequisiteOf(s);
 							}
-//						}
+						}
 					}
 				}	
 			}
@@ -2489,12 +2520,25 @@ public class SiaProxy {
 		return group.replaceAll("(^\\s+)|(\\s*$)", "");
 	}
 
-	private static Subject createAndSaveSpeacialSubject(String name, String sede, SubjectDao subjectDao) {
+	private static Subject createAndSaveSpecialSubject(String name, String sede, SubjectDao subjectDao) {
 		Subject subjectFinalT = null;
 		
 		if(name != null){
 			subjectFinalT = new Subject(0, "", "", name, sede);
 			subjectFinalT.setSpecial(true);
+			Long id = subjectDao.saveSubject(subjectFinalT);
+			subjectFinalT.setId(id);			
+		}
+		
+		return subjectFinalT;
+	}
+	
+	private static Subject createAndSaveDummySubject(String name, String sede, SubjectDao subjectDao) {
+		Subject subjectFinalT = null;
+		
+		if(name != null){
+			subjectFinalT = new Subject(0, "", "", name, sede);
+			subjectFinalT.setDummy(true);
 			Long id = subjectDao.saveSubject(subjectFinalT);
 			subjectFinalT.setId(id);			
 		}

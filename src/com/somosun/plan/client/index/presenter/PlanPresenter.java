@@ -1329,7 +1329,7 @@ ComplementaryValueView.Presenter{
 		}
 		cVView.setSubjectGroupName(subjectGroupName);
 		
-		if(complementaryValue.getSubject().isSpecial()){ //|| complementaryValue.getSubject().isDefault() || complementaryValue.getSubject().isDummy()){
+		if(complementaryValue.getSubject().isDummy()){ //|| complementaryValue.getSubject().isDefault() || complementaryValue.getSubject().isDummy()){
 			cVView.showUnavailableWarning();
 		}
 		
@@ -1338,8 +1338,10 @@ ComplementaryValueView.Presenter{
 			for(List<Subject> list: complementaryValue.getPrerequisitesLists()){
 				for(Subject subject : list){
 					boolean makeStatic = false;
-					if(subject.isDummy() || subject.isSpecial() || subject.isDefault()) makeStatic = true;
-					cVView.addRequisite("pre", subject.getName(), subject.getCode(), accordion, makeStatic);
+					boolean makeUnavailable = false;
+					if(subject.isDummy()) makeUnavailable = true;
+					if(subject.isSpecial() || subject.isDefault()) makeStatic = true;
+					cVView.addRequisite("pre", subject.getName(), subject.getCode(), accordion, makeStatic, makeUnavailable);
 				}
 			}
 		}else{
@@ -1350,8 +1352,10 @@ ComplementaryValueView.Presenter{
 			for(List<Subject> list: complementaryValue.getCorequisitesLists()){
 				for(Subject subject : list){
 					boolean makeStatic = false;
-					if(subject.isDummy() || subject.isSpecial() || subject.isDefault()) makeStatic = true;
-					cVView.addRequisite("co", subject.getName(), subject.getCode(), accordion, makeStatic);
+					boolean makeUnavailable = false;
+					if(subject.isDummy()) makeUnavailable = true;
+					if(subject.isSpecial()|| subject.isDefault()) makeStatic = true;
+					cVView.addRequisite("co", subject.getName(), subject.getCode(), accordion, makeStatic, makeUnavailable);
 				}
 			}
 		}else{
