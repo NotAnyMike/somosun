@@ -976,13 +976,13 @@ public class SiaProxy {
 			String requisiteURL = SIA_BASIC_URL_TO_COMPLEMENTARY_AND_PLAN + requisitesCode;
 			
 			try {
-				htmlPlan = getUrlSource(planURL);
+				htmlPlan = getUrlSource("http://127.0.0.1:8888/toDelete/computacion1.html");//planURL);
 			} catch (Exception e){
 				e.printStackTrace();
 				log.severe("Error getting the info from the two pages for " + careerCode);
 			}
 			try {
-				htmlRequisites = getUrlSource(requisiteURL);
+				htmlRequisites = getUrlSource("http://127.0.0.1:8888/toDelete/computacion.html");//requisiteURL);
 			} catch (Exception e){
 				e.printStackTrace();
 				log.severe("Error getting the info from the two pages for " + careerCode);
@@ -1577,7 +1577,7 @@ public class SiaProxy {
 		SubjectDao subjectDao = new SubjectDao();
 		ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
 		
-		List<Subject> subjectListFinal = new ArrayList<Subject>();
+		List<Subject> subjectListFinalFromLaw = new ArrayList<Subject>();
 		Map<Subject, SubjectDummy> mapSSD = new HashMap<Subject, SubjectDummy>();
 		Map<Subject, ComplementaryValue> mapSCV = new HashMap<Subject, ComplementaryValue>();
 
@@ -1629,7 +1629,7 @@ public class SiaProxy {
 		    		{
 		    			//the sTemporary is more updated thant the sFromDb ... allors udpate it
 		    			sTemporary.setId(sFromDb.getId());
-		    			subjectDao.saveSubject(sTemporary);
+		    			sTemporary.setId(subjectDao.saveSubject(sTemporary));
 		    			sFinal = sTemporary;
 		    		}else{
 		    			//sTemporary is not more uptaded that sFromDb
@@ -1638,13 +1638,13 @@ public class SiaProxy {
 			}else
 			{
 				//Save the sTemporary into the DB and add it to the list
-				subjectDao.saveSubject(sTemporary);
+				sTemporary.setId(subjectDao.saveSubject(sTemporary));
 				sFinal = sTemporary;
 			}
 		    
-		    sFinal = subjectDao.getSubjectByCode(sFinal.getCode());
+		    //sFinal = subjectDao.getSubjectByCode(sFinal.getCode());
 		    if(sFinal != null){
-		    	subjectListFinal.add(sFinal);
+		    	subjectListFinalFromLaw.add(sFinal);
 		    	mapSSD.put(sFinal, sD);		    	
 		    }
 			 
@@ -1662,7 +1662,19 @@ public class SiaProxy {
 			
 		}
 		
-		for(Subject s : subjectListFinal){
+		for(Subject s : subjectListFinalFromLaw){
+			
+			/************* if s can be found in the sia then it is not a special one **************/
+			// can be moved upwards when we get sFromDb
+			
+			if(getSubjectFromList(s.getName(), allSiaResult.getSubjectList(), true, true) == null){
+				//search now by code
+				if(getSubjectFromListByCode(s.getCode(), allSiaResult.getSubjectList(), true, true) == null){					
+					s.setSpecial(true);
+				}
+			}
+			
+			/**************************************************************************************/
 			
 			List<SubjectDummy> preSD = mapSSD.get(s).getPreRequisites();
 			List<SubjectDummy> coSD = mapSSD.get(s).getCoRequisites();
@@ -1670,8 +1682,8 @@ public class SiaProxy {
 			ComplementaryValue cV = mapSCV.get(s);
 			
 			//for each pre and co
-			addRequisitesToBothLists(cV, s, preSD, subjectListFinal, allSiaResult, careerSiaResult, subjectDao, mapSCV, true, complementaryValueDao, subjectGroupDao);
-			addRequisitesToBothLists(cV, s, coSD, subjectListFinal, allSiaResult, careerSiaResult, subjectDao, mapSCV, false, complementaryValueDao, subjectGroupDao);
+			addRequisitesToBothLists(cV, s, preSD, subjectListFinalFromLaw, allSiaResult, careerSiaResult, subjectDao, mapSCV, true, complementaryValueDao, subjectGroupDao);
+			addRequisitesToBothLists(cV, s, coSD, subjectListFinalFromLaw, allSiaResult, careerSiaResult, subjectDao, mapSCV, false, complementaryValueDao, subjectGroupDao);
 			
 		}
 		
@@ -1682,7 +1694,7 @@ public class SiaProxy {
 		 * 3. save, if necessary, the updated one.
 		 */
 		
-		for(Subject s : subjectListFinal)
+		for(Subject s : subjectListFinalFromLaw)
 		{
 			ComplementaryValue cV = mapSCV.get(s);
 			ComplementaryValue cVT = complementaryValueDao.getComplementaryValues(career, s);
@@ -1778,6 +1790,45 @@ public class SiaProxy {
 		return sToReturn;
 		
 	}
+	
+	private static Subject getSubjectFromListByCode(String codeToFilterBy, List<Subject> listToSearchIn, boolean removeS, boolean removePunctuation) {
+		Subject sToReturn = null;
+		String codeStandardized = (codeToFilterBy == null ? "" : SomosUNUtils.standardizeString(codeToFilterBy, removeS, removePunctuation));
+		//choose one subject from the list in siaResult
+		if(listToSearchIn != null)
+		{
+			if(listToSearchIn.size() != 0 || listToSearchIn.isEmpty() == false)
+			{
+				
+				int position = -1;
+				int charactersLeft = 4; //in order to get a subject which is as far as 4 characters more
+
+				for(Subject sFromSiaTemporary : listToSearchIn)
+				{
+					if(sFromSiaTemporary != null && sFromSiaTemporary.getCode() != null){						
+						String codeFromSiaStandardized = SomosUNUtils.standardizeString(sFromSiaTemporary.getCode(), removeS, removePunctuation);
+						String codeWithOut = codeFromSiaStandardized.replace(codeStandardized, "");
+						
+						if(charactersLeft > codeWithOut.length() == true){
+							position = listToSearchIn.indexOf(sFromSiaTemporary);
+							charactersLeft = codeWithOut.length();
+						}
+					}
+							
+				}
+
+				if(position != -1)
+				{	
+					sToReturn = listToSearchIn.get(position);
+				}
+
+			}
+		}else{
+			//the subject does not exist 
+		}
+		return sToReturn;
+	}
+	
 
 	private static Subject getSubjectFromList(String nameToFilterBy, List<Subject> listToSearchIn, boolean removeS, boolean removePunctuation) {
 		Subject sToReturn = null;
@@ -1793,12 +1844,14 @@ public class SiaProxy {
 
 				for(Subject sFromSiaTemporary : listToSearchIn)
 				{
-					String nameFromSiaStandardized = SomosUNUtils.standardizeString(sFromSiaTemporary.getName(), removeS, removePunctuation);
-					String nameWithOut = nameFromSiaStandardized.replace(nameStandardized, "");
-					
-					if(charactersLeft > nameWithOut.length() == true){
-						position = listToSearchIn.indexOf(sFromSiaTemporary);
-						charactersLeft = nameWithOut.length();
+					if(sFromSiaTemporary != null){						
+						String nameFromSiaStandardized = SomosUNUtils.standardizeString(sFromSiaTemporary.getName(), removeS, removePunctuation);
+						String nameWithOut = nameFromSiaStandardized.replace(nameStandardized, "");
+						
+						if(charactersLeft > nameWithOut.length() == true){
+							position = listToSearchIn.indexOf(sFromSiaTemporary);
+							charactersLeft = nameWithOut.length();
+						}
 					}
 							
 				}
@@ -2031,7 +2084,7 @@ public class SiaProxy {
 	 * @param complementaryValueDao
 	 * @param subjectGroupDao
 	 */
-	private static void addRequisitesToBothLists(ComplementaryValue cV, Subject s, List<SubjectDummy> listOfRequisitesSD, List<Subject> subjectListFinal, SiaResultSubjects allSubjectsSiaResult, SiaResultSubjects careerSubjectsSiaResult, SubjectDao subjectDao, Map<Subject, ComplementaryValue> mapSCV, boolean isPre, ComplementaryValueDao complementaryValueDao, SubjectGroupDao subjectGroupDao)
+	private static void addRequisitesToBothLists(ComplementaryValue cV, Subject s, List<SubjectDummy> listOfRequisitesSD, List<Subject> subjectListFinalFromLaw, SiaResultSubjects allSubjectsSiaResult, SiaResultSubjects careerSubjectsSiaResult, SubjectDao subjectDao, Map<Subject, ComplementaryValue> mapSCV, boolean isPre, ComplementaryValueDao complementaryValueDao, SubjectGroupDao subjectGroupDao)
 	{
 		String sede = "bog";
 		for(SubjectDummy sD : listOfRequisitesSD){
@@ -2041,7 +2094,23 @@ public class SiaProxy {
 			 *  2. add it to the list of PreRequisites and PreRequisitesOF
 			 */
 			
+			
+			/******* Standardize string. i.e. remove the And and Or patterns at the beginning and at the end and Standardize it *******/
+			final String strongAndPatterns = "(; y\\s)|(; y ,)|(; y,)|(; e\\s)|(; e,)";
+			final String softAndPatterns = "(\\sy\\s)|(\\se\\s)";
+			final String strongOrPatterns = "(\\/o\\/)";
+			final String softOrPatterns = "(\\so\\s)";
+			final String verySoftOrPatterns = "(\\so)"; 
+			
+			String nameToMatch = sD.getName();//this variable will be use to match everything
+			nameToMatch = nameToMatch.replaceAll("^(" + strongAndPatterns + "|" + softAndPatterns + "|" + strongOrPatterns + "|" + softOrPatterns + "|" + verySoftOrPatterns + ")", "");
+			nameToMatch = nameToMatch.replaceAll("(" + strongAndPatterns + "|" + softAndPatterns + "|" + strongOrPatterns + "|" + softOrPatterns + "|" + verySoftOrPatterns + ")$", "");
+			nameToMatch = nameToMatch.replaceAll("(^(\\s+))|((\\s+)$)", "");
+			sD.setName(nameToMatch);
+			
 			String stringStandardized = (sD.getName() == null ? "" : SomosUNUtils.standardizeString(sD.getName(), false, false)); //could be the name or the code
+			/**************************************************************************************************************************/
+			
 			
 			Subject subjectFinalT = null; // This will be used to save the subject if sD is a only-subject
 			List<List<Subject>> listOfListsFinal = new ArrayList<List<Subject>>(); // this will be used to save the subjects if sD is not a only-subject (in the case of computer science)
@@ -2050,7 +2119,7 @@ public class SiaProxy {
 			boolean isSpecial = false;
 			int charactersLeft = 3; //to make sure that at least the subject selected by name will be 3 chrts far from the original				
 			
-			for(Subject sTemporary : subjectListFinal){
+			for(Subject sTemporary : subjectListFinalFromLaw){
 				
 				String nameStandardizedT = (sTemporary.getName() == null ? "" : SomosUNUtils.standardizeString(sTemporary.getName(), false, false));
 				String codeStandardizedT = (sTemporary.getCode() == null ? "" : SomosUNUtils.standardizeString(sTemporary.getCode(), false, false));
@@ -2138,11 +2207,9 @@ public class SiaProxy {
 					 * " o "
 					 * "/o/" <- in Admon
 					 */
-					String strongAndPatterns = "(; y\\s)|(; y ,)|(; y,)|(; e\\s)|(; e,)";
-					String softAndPatterns = "(\\sy\\s)|(\\se\\s)";
-					String strongOrPatterns = "(\\/o\\/)";
-					String softOrPatterns = "(\\so\\s)";
-					if(sD.getName().matches("(.+)" + "(" + softAndPatterns + "|" + softOrPatterns + "|" + strongOrPatterns + "|" + strongAndPatterns + ")" + "(.+)") == true){
+					
+					//is (.*) at the beginning and at the end because it can have that it devides the string by \n long before here, there fore the sD would have a name similar to "algebra lineal o "
+					if(sD.getName().matches("(.*)" + "(" + softAndPatterns + "|" + softOrPatterns + "|" + strongOrPatterns + "|" + strongAndPatterns + ")" + "(.*)") == true){
 						//Split by those patterns which don't need to analyse
 						List<List<Subject>> subjectsListOfLists = new ArrayList<List<Subject>>();
 						String[] subjectsStringList = sD.getName().split(strongAndPatterns);
@@ -2189,7 +2256,16 @@ public class SiaProxy {
 											beginning++;
 											continue;
 										}
+										group = removeSpacesFromExtremes(group);
 										subjectFound = getSubjectFromList(group, allSubjectsList, true, true);
+										
+										/********* the subject was not found in the sia, therefore **********/
+										/********* let's look for it in the plan, but now we know  **********/
+										/********* that it is a special subject if it's found      **********/ 
+										if(subjectFound == null){
+											subjectFound = getSubjectFromList(group, subjectListFinalFromLaw, true, true);
+											if(subjectFound != null) subjectFound.setSpecial(true);
+										}
 										if(subjectFound != null){
 											//add the subject to splittedSubjects list and empty the strings used
 											String stringLeft = "";
@@ -2251,7 +2327,8 @@ public class SiaProxy {
 												list.add(subjectWithStrongOr);
 											}
 										}
-									}else{										
+									}else{
+										//FIXME here the class with the patterns is added to everything else
 										list.add(splittedSubjects.get(x));
 									}
 								}
@@ -2289,14 +2366,22 @@ public class SiaProxy {
 					// For each one of the subjects found (or not found)
 					for(List<Subject> listTemporary : listOfListsFinal){
 						for(Subject subjectTemporary : listTemporary){
-							
 							//Ignore the not-found subjects
-							if(subjectTemporary.isSpecial() == false){
+							if(subjectTemporary != null){// && (true || subjectTemporary.isSpecial() == false)){
 								
 								//If it has a complementaryValues the next, else create it
 								
 								ComplementaryValue complementaryValueFromMap = null;
 								complementaryValueFromMap = mapSCV.get(subjectTemporary);
+								
+								//this can be another intance of the same object, therefore it could not find the cV, making sure of it
+								if(subjectTemporary != null && complementaryValueFromMap == null){
+									Subject subjectVeryTemporary = getSubjectFromList(subjectTemporary.getName(), new ArrayList(mapSCV.keySet()), false, false); 
+									if(subjectVeryTemporary != null){										
+										subjectTemporary = subjectVeryTemporary;
+										complementaryValueFromMap = mapSCV.get(subjectTemporary);
+									}
+								}
 								if(complementaryValueFromMap == null){
 									/** 
 									 * the emptyness of complementaryValueFromMap means that the subject 
@@ -2359,16 +2444,24 @@ public class SiaProxy {
 				cV.addPrerequisites(listOfListsFinal);
 				for(List<Subject> list : listOfListsFinal){
 					for(Subject subject : list){
-						if(subject.isSpecial() == false)
-						{
+//						if(subject.isSpecial() == false)
+//						{
 							ComplementaryValue cVT = mapSCV.get(subject);
 							if(cVT == null){
+								Subject subjectVeryTemporary = getSubjectFromList(subject.getName(), new ArrayList(mapSCV.keySet()), false, false); 
+								if(subjectVeryTemporary != null){										
+									subject = subjectVeryTemporary;
+									cVT = mapSCV.get(subject);
+								}
+							}
+							if(cVT == null){									
 								throw new RuntimeException("Error, the subject " + subject.getName() + " is a subject and has no complementary value");
-							}else{						
+							}
+							else{						
 								//FIXME make sure it is not there already
 								cVT.addPrerequisiteOf(s);
 							}
-						}	
+//						}	
 					}
 				}			
 			}else{
@@ -2376,8 +2469,8 @@ public class SiaProxy {
 				cV.addCorequisites(listOfListsFinal);
 				for(List<Subject> list : listOfListsFinal){
 					for(Subject subject : list){
-						if(subject.isSpecial() == false)
-						{
+//						if(subject.isSpecial() == false)
+//						{
 							ComplementaryValue cVT = mapSCV.get(subject);
 							if(cVT == null){
 								throw new RuntimeException("Error, the subject " + subject.getName() + " is a subject and has no complementary value");
@@ -2385,11 +2478,15 @@ public class SiaProxy {
 								//FIXME make sure it is not there already
 								cVT.addCorequisiteOf(s);
 							}
-						}
+//						}
 					}
 				}	
 			}
 		}
+	}
+
+	private static String removeSpacesFromExtremes(String group) {
+		return group.replaceAll("(^\\s+)|(\\s*$)", "");
 	}
 
 	private static Subject createAndSaveSpeacialSubject(String name, String sede, SubjectDao subjectDao) {

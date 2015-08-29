@@ -25,6 +25,7 @@ import com.somosun.plan.server.expensiveOperation.SubjectValueExpensiveOperation
 import com.somosun.plan.server.expensiveOperation.Codes.ComplementaryValueExpensiveOperationsCodes;
 import com.somosun.plan.server.expensiveOperation.Codes.SubjectExpensiveOperationsCodes;
 import com.somosun.plan.server.expensiveOperation.Codes.SubjectValueExpensiveOperationsCodes;
+import com.somosun.plan.shared.SiaResultSubjects;
 import com.somosun.plan.shared.control.Message;
 import com.somosun.plan.shared.control.Plan;
 import com.somosun.plan.shared.control.Student;
@@ -222,8 +223,33 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 	@Override
 	public void analyseCareer(String careerCode) {
 		if(getUserLogged().isAdmin() == true){
-			Queue q = QueueFactory.getQueue("analyseCareer");
-			q.add(TaskOptions.Builder.withPayload(new AnalyseCareerExpensiveOperation(careerCode)));
+//			Queue q = QueueFactory.getQueue("analyseCareer");
+//			q.add(TaskOptions.Builder.withPayload(new AnalyseCareerExpensiveOperation(careerCode)));
+			if(careerCode != null || careerCode.isEmpty() == false){
+				String sede = "bog";
+				
+				log.info("<------------- STARTING TO ANALYSE THE CAREER WITH NO DEFERRED WORK ------------->");
+				log.info("Getting all results from the sia");
+				
+				SiaResultSubjects allSiaSubjects = SiaProxy.getSubjects("", "", "", "", 1, 10000, sede, null);
+				
+				
+					
+				log.info("Starting to analyse the career " + careerCode);
+									
+				boolean error = false;
+				try{
+					SiaProxy.getRequisitesForACareer(careerCode, allSiaSubjects);
+				}catch (Exception e){
+					log.info("<------------- ERROR with " + careerCode + " --------------->");
+					log.warning("Message: " + e.getMessage());
+					log.warning("Cause: " + e.getCause());
+					e.printStackTrace();
+				}
+					
+
+				log.info("<------------- ANALYSE ENDED ------------->");
+			}
 		}
 	}
 

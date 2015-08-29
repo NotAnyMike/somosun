@@ -26,5 +26,7 @@ public interface ComplementaryValueView {
 	void isNoPrerequisite();
 	void showGroupError();
 	void hasNoGroups();
+	void showUnavailableWarning();
+	void hideUnavailableWarning();
 
 }

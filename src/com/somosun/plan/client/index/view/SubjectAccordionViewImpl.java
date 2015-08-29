@@ -393,36 +393,6 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 		this.counter = counter;
 	}
 	
-//	public boolean showComplementaryValueView(String subjectCode){
-//		boolean toReturn = false;
-//		
-//		if(subjectCode != null){			
-//			Widget widget = null;
-//			Iterator<Widget> widgets = mainContainer.iterator();
-//			while(widgets.hasNext()){
-//				widget = widgets.next();
-//				String codeT = widget.getElement().getAttribute("code");
-//				if(subjectCode.equals(codeT)){
-//					toReturn = true;
-//					break;
-//				}
-//			}
-//			
-//			if(toReturn == true){
-//				if(widget != null){
-//					//Do something with widget
-//					widget.removeFromParent();
-//					widget.addStyleName("isRight");
-//					addComplementaryViewWidget(widget);
-//					goRight();
-//				}
-//			}
-//		}
-//		
-//		return toReturn;
-//	}
-//	
-	
 	/*************************** EVENTS ***************************/
 	@UiHandler("addSpecificSubject")
 	public void onAddSpecificSubjectClick(ClickEvent event){

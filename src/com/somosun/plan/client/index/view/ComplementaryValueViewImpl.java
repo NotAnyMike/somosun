@@ -46,6 +46,7 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 	@UiField VerticalPanel coRequisitesPanel;
 	@UiField FlowPanel antiPreRequisite;
 	@UiField FlowPanel antiCoRequisite;
+	@UiField HTML unavailableWarning;
 	
 	@UiField PanelCollapse groupsTableContainer;
 	@UiField PanelHeader panelHeaderGroups;
@@ -126,6 +127,9 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 		spacesTable.getElement().setAttribute("style", "width:100%");
 		titleSpacesTable.getElement().setAttribute("style", "width:100%");
 		
+		unavailableWarning.addStyleName("alert alert-danger complementaryValue-unavailable");
+		unavailableWarning.setVisible(false);
+		
 		groupTableContainer.getElement().setAttribute("style", "width:100%");
 		groupTableTitles.getElement().setAttribute("style", "width:100%; margin:0px");
 		groupTableTitles.getColumnFormatter().setWidth(0, "45px");
@@ -179,23 +183,19 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 		final ComplementaryValueViewImpl view = this;
 		final String careerCode = listBoxCareers.getSelectedValue();
 		
-		Widget w = null;
-		if(makeStatic == false){			
-			Anchor a = new Anchor(name);
-			a.getElement().setAttribute("code", code);
-			a.addClickHandler(new ClickHandler(){
-				@Override
-				public void onClick(ClickEvent event) {
-					presenter.addComplementaryValueView(accordion, name, code, careerCode);
-				}
-			});
-			w = a.asWidget();
-		}else{
-			HTML a = new HTML(name);
-			a.getElement().setAttribute("code", code);
-			a.getElement().setAttribute("style", "cursor: default");
-			w = a.asWidget();
+		Widget w = null;		
+		Anchor a = new Anchor(name);
+		a.getElement().setAttribute("code", code);
+		a.addClickHandler(new ClickHandler(){
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.addComplementaryValueView(accordion, name, code, careerCode);
+			}
+		});
+		if(makeStatic){				
+			a.addStyleName("complementaryValue-oldSubject");
 		}
+		w = a.asWidget();
 		
 		if(type == "pre"){
 			if(preRequisitesPanel.getWidget(0).getElement().getClassName()=="fa fa-refresh fa-spin") preRequisitesPanel.remove(0);
@@ -222,18 +222,17 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 		Button b = new Button(name);
 		b.getElement().setAttribute("code", code);
 		b.getElement().setAttribute("style", "outline:none");
-		b.addStyleName("btn btn-default btn-xs");
-		if(makeStatic == false){	
-			b.addClickHandler(new ClickHandler(){
-				@Override
-				public void onClick(ClickEvent event) {
-					presenter.addComplementaryValueView(accordion, name, code, careerCode);
-				}
-			});
-		}else{
-			b.setActive(false);			
+		b.addStyleName("btn btn-default btn-xs");	
+		b.addClickHandler(new ClickHandler(){
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.addComplementaryValueView(accordion, name, code, careerCode);
+			}
+		});
+		if(makeStatic){
+			b.addStyleName("complementaryValue-oldSubject");
 		}
-		
+			
 		if(type=="pre"){			
 			if(antiPreRequisite.getWidget(0).getElement().getClassName()=="fa fa-refresh fa-spin") antiPreRequisite.remove(0);
 			
@@ -371,6 +370,18 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 		groupTableContainer.getWidget(1).removeFromParent();
 		HTML html = new HTML("-");
 		groupTableContainer.add(html);
+	}
+
+
+	@Override
+	public void showUnavailableWarning() {
+		unavailableWarning.setVisible(true);
+	}
+
+
+	@Override
+	public void hideUnavailableWarning() {
+		unavailableWarning.setVisible(false);
 	}
 
 }

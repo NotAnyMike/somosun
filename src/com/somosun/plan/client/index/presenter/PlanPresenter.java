@@ -1329,6 +1329,10 @@ ComplementaryValueView.Presenter{
 		}
 		cVView.setSubjectGroupName(subjectGroupName);
 		
+		if(complementaryValue.getSubject().isSpecial()){ //|| complementaryValue.getSubject().isDefault() || complementaryValue.getSubject().isDummy()){
+			cVView.showUnavailableWarning();
+		}
+		
 					
 		if(complementaryValue != null && complementaryValue.getPrerequisitesLists() != null && complementaryValue.getPrerequisitesLists().size() > 0){
 			for(List<Subject> list: complementaryValue.getPrerequisitesLists()){
@@ -1568,9 +1572,9 @@ ComplementaryValueView.Presenter{
 		
 		selectedSubjects.clear();
 		
-		view.showLoadingSubjects();
 
 		if(selectedSubjectCodeStrings.size() > 0){			
+			view.showLoadingSubjects();
 			rpcService.getComplementaryValues(selectedSubjectCodeStrings, selectedSubjectCareerStrings, new AsyncCallback<List<ComplementaryValue>>(){
 				
 				public void onFailure(Throwable caught) {

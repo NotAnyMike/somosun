@@ -36,12 +36,12 @@ public class AnalyseCareerExpensiveOperation implements DeferredTask {
 			try{
 				SiaProxy.getRequisitesForACareer(careerCode, allSiaSubjects);
 			}catch (Exception e){
-				error = true;
-			}
-			
-			if(error){
 				log.info("<------------- ERROR with " + careerCode + " --------------->");
-			}	
+				log.warning("Message: " + e.getMessage());
+				log.warning("Cause: " + e.getCause());
+				e.printStackTrace();
+			}
+				
 
 			log.info("<------------- ANALYSE ENDED ------------->");
 		}

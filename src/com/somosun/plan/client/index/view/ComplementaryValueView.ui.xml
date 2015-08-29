@@ -11,16 +11,16 @@
 	<ui:style field="forth" src="styles/bootstrap-theme.min.css" />
 	<g:HTMLPanel ui:field="mainHtmlPanel">
 	    
-		
-		  <div class="complementaryValue-careersContainer">
+		<g:HTML ui:field="unavailableWarning">Advertencia: La clase no existe en el SIA</g:HTML>
+		<div class="complementaryValue-careersContainer">
 		    <div class="form-group" style="width:460px">
 				<div class="input-group">
 					<div class="input-group-addon">Mostrar requisitos para</div>
 					<g:ListBox ui:field="listBoxCareers" addStyleNames="{second.textboxCreate} {third.lead} "></g:ListBox>
 				</div>
 			</div>
-		  </div>
-		  <div class="panel panel-default complementaryValue-subjectGroupContainer">
+		</div>
+		<div class="panel panel-default complementaryValue-subjectGroupContainer">
 			<div class="panel-body text-center" style="padding:6px">
 				<g:Label ui:field="labelSubjectGroup">Agrupacion: Contenido cuantitativo</g:Label>
 			</div>
