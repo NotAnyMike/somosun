@@ -978,13 +978,13 @@ public class SiaProxy {
 			String requisiteURL = SIA_BASIC_URL_TO_COMPLEMENTARY_AND_PLAN + requisitesCode;
 			
 			try {
-				htmlPlan = getUrlSource("http://127.0.0.1:8888/toDelete/computacion1.html", false);//planURL, false);
+				htmlPlan = getUrlSource(planURL, false); // to test locally and if the url has any problem use "http://127.0.0.1:8888/toDelete/computacion1.html"
 			} catch (Exception e){
 				e.printStackTrace();
 				log.severe("Error getting the info from the two pages for " + careerCode);
 			}
 			try {
-				htmlRequisites = getUrlSource("http://127.0.0.1:8888/toDelete/computacion.html", false);//requisiteURL);
+				htmlRequisites = getUrlSource(requisiteURL, false);// to test locally and if the url has any problem use "http://127.0.0.1:8888/toDelete/computacion.html"
 			} catch (Exception e){
 				e.printStackTrace();
 				log.severe("Error getting the info from the two pages for " + careerCode);
@@ -2302,6 +2302,8 @@ public class SiaProxy {
 												//create the subject dummy and add it to splittedSubjects
 												String specialName = stringLeft.replaceFirst("^((" + strongAndPatterns + "|" + softAndPatterns + "|" + softOrPatterns + "|" + strongOrPatterns + ")\\s*)", "");
 												Subject subjectNotFound = null;
+												
+												//in the case that the string was realSubject or aReallyLongSubjectWithSeveralOrAndPatterns then the algorithm will find the long one and the stringLeft will be the realSubject name, that does not mean that the real subject is a special or dummy, I have to search if it exits in the sia, if not then it will be a special or dummy
 												subjectNotFound = getSubjectFromList(removeSpacesFromExtremes(specialName), allSubjectsList, true, true);
 												if(subjectNotFound == null){
 													if(SomosUNUtils.standardizeString(htmlMisPlanes, true, true).contains(SomosUNUtils.standardizeString(specialName.trim(), true, true))){
