@@ -710,7 +710,8 @@ public class SiaProxy {
 		
 			String htmlString = "";
 			try {
-				htmlString = getUrlSource(SIA_MIS_PLANES_BOG_HTML + "?plan=" + career + "&tipo=PRE&tipoVista=semaforo&nodo=4&parametro=on");
+				//If there is a "?" sign in the string set true to false
+				htmlString = getUrlSource(SIA_MIS_PLANES_BOG_HTML + "?plan=" + career + "&tipo=PRE&tipoVista=semaforo&nodo=4&parametro=on", false); 
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -743,7 +744,7 @@ public class SiaProxy {
 			//connect to see if it's co or pre-requisite
 			htmlString = "";
 			try {
-				htmlString = getUrlSource(SIA_SUBJECT_BOG_HTML + "?plan=" + career + "&asignatura=" + code);
+				htmlString = getUrlSource(SIA_SUBJECT_BOG_HTML + "?plan=" + career + "&asignatura=" + code, false);
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -827,15 +828,15 @@ public class SiaProxy {
 		return complementaryValue;
 	}
 	
-	private static String getUrlSource(String url) throws IOException {
+	private static String getUrlSource(String url, boolean readAccents) throws IOException {
         URL urlString = new URL(url);
         URLConnection yc = urlString.openConnection();
         BufferedReader in = new BufferedReader(new InputStreamReader(
-                yc.getInputStream(), "UTF-8"));//"ISO-8859-1"));
+                yc.getInputStream(), "ISO-8859-1"));
         String inputLine;
         StringBuilder a = new StringBuilder();
         while ((inputLine = in.readLine()) != null){
-        	inputLine = StringEscapeUtils.unescapeHtml4(inputLine);
+        	if(readAccents == true) inputLine = StringEscapeUtils.unescapeHtml4(inputLine);
         	a.append(inputLine);
         }
         in.close();
@@ -961,7 +962,7 @@ public class SiaProxy {
 		boolean isFundamental = true;
 		
 		try {
-			htmlPlanURL = getUrlSource(SIA_COMPLEMENTARY_VALUES_AND_PLAN_BOG + careerCode);
+			htmlPlanURL = getUrlSource(SIA_COMPLEMENTARY_VALUES_AND_PLAN_BOG + careerCode, false);
 		} catch (Exception e){
 			e.printStackTrace();
 			log.severe("Error getting the info for analyse the career " + careerCode);
@@ -977,20 +978,20 @@ public class SiaProxy {
 			String requisiteURL = SIA_BASIC_URL_TO_COMPLEMENTARY_AND_PLAN + requisitesCode;
 			
 			try {
-				htmlPlan = getUrlSource("http://127.0.0.1:8888/toDelete/computacion1.html");//planURL);
+				htmlPlan = getUrlSource("http://127.0.0.1:8888/toDelete/computacion1.html", false);//planURL, false);
 			} catch (Exception e){
 				e.printStackTrace();
 				log.severe("Error getting the info from the two pages for " + careerCode);
 			}
 			try {
-				htmlRequisites = getUrlSource("http://127.0.0.1:8888/toDelete/computacion.html");//requisiteURL);
+				htmlRequisites = getUrlSource("http://127.0.0.1:8888/toDelete/computacion.html", false);//requisiteURL);
 			} catch (Exception e){
 				e.printStackTrace();
 				log.severe("Error getting the info from the two pages for " + careerCode);
 			}
 			try {
 				//this variable is in order to know if the subject is special or dummy
-				htmlMisPlanes = getUrlSource(SIA_MIS_PLANES_BOG_HTML + "?plan=" + careerCode +  "&tipo=PRE");
+				htmlMisPlanes = getUrlSource(SIA_MIS_PLANES_BOG_HTML + "?plan=" + careerCode +  "&tipo=PRE", true);
 				htmlMisPlanes = SomosUNUtils.standardizeString(htmlMisPlanes.trim(), false, true);
 			} catch (Exception e){
 				e.printStackTrace();
@@ -2301,10 +2302,13 @@ public class SiaProxy {
 												//create the subject dummy and add it to splittedSubjects
 												String specialName = stringLeft.replaceFirst("^((" + strongAndPatterns + "|" + softAndPatterns + "|" + softOrPatterns + "|" + strongOrPatterns + ")\\s*)", "");
 												Subject subjectNotFound = null;
-												if(SomosUNUtils.standardizeString(htmlMisPlanes, true, true).contains(SomosUNUtils.standardizeString(specialName.trim(), true, true))){
-													subjectNotFound = createAndSaveDummySubject(specialName, sede, subjectDao);
-												}else{
-													subjectNotFound = createAndSaveSpecialSubject(specialName, sede, subjectDao);
+												subjectNotFound = getSubjectFromList(removeSpacesFromExtremes(specialName), allSubjectsList, true, true);
+												if(subjectNotFound == null){
+													if(SomosUNUtils.standardizeString(htmlMisPlanes, true, true).contains(SomosUNUtils.standardizeString(specialName.trim(), true, true))){
+														subjectNotFound = createAndSaveDummySubject(specialName, sede, subjectDao);
+													}else{
+														subjectNotFound = createAndSaveSpecialSubject(specialName, sede, subjectDao);
+													}													
 												}
 												
 												splittedSubjects.add(subjectNotFound);
