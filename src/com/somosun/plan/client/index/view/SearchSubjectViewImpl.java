@@ -161,6 +161,10 @@ public class SearchSubjectViewImpl extends Composite implements SearchSubjectVie
 		finalizarButton.getElement().setAttribute("semester", semester);
 	}
 	
+	public String getCareerCodeSelected(){
+		return listBoxCareersToSearch.getSelectedValue();
+	}
+	
 	/********************* EVENTS *********************/
 	
 	@UiHandler("finalizarButton")

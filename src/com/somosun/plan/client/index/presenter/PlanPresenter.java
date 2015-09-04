@@ -1729,7 +1729,7 @@ ComplementaryValueView.Presenter{
 	public void onAccordionClicked(String subjectCode, final SubjectAccordionViewImpl accordion, final ComplementaryValueViewImpl view) {
 		
 		//Get the complementaryValue
-		rpcService.getComplementaryValueFromDb(plan.getCareerCode(), subjectCode, new AsyncCallback<ComplementaryValue>(){
+		rpcService.getComplementaryValueFromDb(searchSubjectView.getCareerCodeSelected(), subjectCode, new AsyncCallback<ComplementaryValue>(){
 
 			@Override
 			public void onFailure(Throwable caught) {
