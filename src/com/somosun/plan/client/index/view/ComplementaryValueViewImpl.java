@@ -40,7 +40,6 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 
 	PlanPresenter presenter;
 	
-	@UiField ListBox listBoxCareers;
 	@UiField Label labelSubjectGroup;
 	@UiField VerticalPanel preRequisitesPanel;
 	@UiField VerticalPanel coRequisitesPanel;
@@ -89,14 +88,6 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 		
 		final ComplementaryValueViewImpl view = this;
 		
-		listBoxCareers.addChangeHandler(new ChangeHandler(){
-			@Override
-			public void onChange(ChangeEvent event) {
-				presenter.onAccordionClicked(subjectCode, accordion, view);
-			}
-			
-		});
-		
 		onGroupsShows = groupsTableContainer.addShowHandler(new ShowHandler(){
 
 			@Override
@@ -120,7 +111,6 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 		
 		mainHtmlPanel.addStyleName("complementaryValue-accordionContainer");
 		
-		listBoxCareers.addStyleName("form-control");
 		preRequisitesPanel.addStyleName("table table-hover text-center");
 		coRequisitesPanel.addStyleName("table table-hover text-center");
 		preRequisitesPanel.getElement().setAttribute("style", "margin-bottom:0px");
@@ -160,31 +150,13 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 		
 	}
 	
-	public void setCareerList(List<Career> careers, String careerCodeSelected) {
-		int index = -1;
-		boolean found = false;
-		for(Career career : careers){
-			if(found == false && careerCodeSelected.isEmpty() == false){				
-				index ++;
-			}
-			if(career.getCode().equals(careerCodeSelected)) found = true;
-			
-			listBoxCareers.addItem(career.getName(), career.getCode());
-		}
-		
-		if(index != -1 ){			
-			listBoxCareers.setItemSelected(index, true);
-		}
-	}
-	
 	public void setSubjectGroupName(String s) {
 		labelSubjectGroup.setText("Agrupación: " + s);
 	}
 	
-	public void addRequisite(String type, final String name, final String code, final SubjectAccordionViewImpl accordion, boolean makeStatic, boolean makeUnavailable) {
+	public void addRequisite(String type, final String name, final String code, final String careerCode, final SubjectAccordionViewImpl accordion, boolean makeStatic, boolean makeUnavailable) {
 		
 		final ComplementaryValueViewImpl view = this;
-		final String careerCode = listBoxCareers.getSelectedValue();
 		
 		Widget w = null;		
 		if(!makeStatic){			
@@ -223,10 +195,9 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 		
 	}
 	
-	public void addAntiRequisite(String type, final String name, final String code, final SubjectAccordionViewImpl accordion, boolean makeStatic) {
+	public void addAntiRequisite(String type, final String name, final String code, final String careerCode, final SubjectAccordionViewImpl accordion, boolean makeStatic) {
 		
 		final ComplementaryValueViewImpl view = this;
-		final String careerCode = listBoxCareers.getSelectedValue();
 		
 		Button b = new Button(name);
 		b.getElement().setAttribute("code", code);
@@ -330,7 +301,6 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 		groupTable.getCellFormatter().getElement(0, 10).setAttribute("data-container", "body");
 		groupTable.getCellFormatter().getElement(0, 11).setAttribute("data-container", "body");
 		groupTable.getCellFormatter().getElement(0, 12).setAttribute("data-container", "body");
-//		data-toggle="tooltip" data-placement="top"
 		
 		groupTable.getElement().setAttribute("style", "margin:0px; vertical-aling:bottom");
 		

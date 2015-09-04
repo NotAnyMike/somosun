@@ -1046,7 +1046,6 @@ ComplementaryValueView.Presenter{
 
 			ComplementaryValueViewImpl complementaryValueView = new ComplementaryValueViewImpl(s.getName(), s.getCode(), accordion, searchSubjectView.getSubjectsAmmount(), 0);
 			complementaryValueView.setPresenter(this);
-			complementaryValueView.setCareerList(careers, (careerCode.isEmpty() ? plan.getCareerCode() : careerCode));
 			complementaryValueView.setSubjectGroupName("-");
 			
 			//mapAccordion.put(accordion, complementaryValueView);
@@ -1343,7 +1342,7 @@ ComplementaryValueView.Presenter{
 						boolean makeUnavailable = false;
 						if(subject.isDummy()) makeUnavailable = true;
 						if(subject.isSpecial() || subject.isDefault()) makeStatic = true;
-						cVView.addRequisite("pre", subject.getName(), subject.getCode(), accordion, makeStatic, makeUnavailable);
+						cVView.addRequisite("pre", subject.getName(), subject.getCode(), complementaryValue.getCareer().getCode(), accordion, makeStatic, makeUnavailable);
 					}
 				}
 			}else{
@@ -1357,7 +1356,7 @@ ComplementaryValueView.Presenter{
 						boolean makeUnavailable = false;
 						if(subject.isDummy()) makeUnavailable = true;
 						if(subject.isSpecial()|| subject.isDefault()) makeStatic = true;
-						cVView.addRequisite("co", subject.getName(), subject.getCode(), accordion, makeStatic, makeUnavailable);
+						cVView.addRequisite("co", subject.getName(), subject.getCode(), complementaryValue.getCareer().getCode(), accordion, makeStatic, makeUnavailable);
 					}
 				}
 			}else{
@@ -1368,7 +1367,7 @@ ComplementaryValueView.Presenter{
 				for(Subject subject : complementaryValue.getListCorequisitesOf()){
 					boolean makeStatic = false;
 					if(subject.isDummy() || subject.isSpecial() || subject.isDefault()) makeStatic = true;
-					cVView.addAntiRequisite("co", subject.getName(), subject.getCode(), accordion, makeStatic);
+					cVView.addAntiRequisite("co", subject.getName(), subject.getCode(), complementaryValue.getCareer().getCode(), accordion, makeStatic);
 				}
 			}else{
 				cVView.isNoCorequisite();
@@ -1378,13 +1377,17 @@ ComplementaryValueView.Presenter{
 				for(Subject subject : complementaryValue.getListPrerequisitesOf()){
 					boolean makeStatic = false;
 					if(subject.isDummy() || subject.isSpecial() || subject.isDefault()) makeStatic = true;
-					cVView.addAntiRequisite("pre", subject.getName(), subject.getCode(), accordion, makeStatic);
+					cVView.addAntiRequisite("pre", subject.getName(), subject.getCode(), complementaryValue.getCareer().getCode(), accordion, makeStatic);
 				}
 			}else{
 				cVView.isNoPrerequisite();
 			}
 		}else{
-			cVView.showErrorWarning();
+//			cVView.showErrorWarning();
+			cVView.hasNoPrerequisites();
+			cVView.hasNoCorequisites();
+			cVView.isNoCorequisite();
+			cVView.isNoPrerequisite();
 		}
 		
 	}
@@ -1772,7 +1775,6 @@ ComplementaryValueView.Presenter{
 		
 		final ComplementaryValueViewImpl newView = new ComplementaryValueViewImpl(name, code, accordion, accordion.getCounter(), accordion.getAmmountOfCVViews());
 		newView.setPresenter(this);
-		newView.setCareerList(careers, (careerCode.isEmpty() ? plan.getCareerCode() : careerCode));
 		newView.setSubjectGroupName("-");
 		newView.addStyleName("isRight");
 		accordion.addComplementaryView(newView);

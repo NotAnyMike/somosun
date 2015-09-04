@@ -13,17 +13,9 @@
 	    
 		<g:HTML ui:field="unavailableWarning">Advertencia: La clase no existe en el SIA</g:HTML>
 		<g:HTML ui:field="errorWarning">Error: Algún error ocurrió mientras descargabamos la información</g:HTML>
-		<div class="complementaryValue-careersContainer">
-		    <div class="form-group" style="width:460px">
-				<div class="input-group">
-					<div class="input-group-addon">Mostrar requisitos para</div>
-					<g:ListBox ui:field="listBoxCareers" addStyleNames="{second.textboxCreate} {third.lead} "></g:ListBox>
-				</div>
-			</div>
-		</div>
 		<div class="panel panel-default complementaryValue-subjectGroupContainer">
 			<div class="panel-body text-center" style="padding:6px">
-				<g:Label ui:field="labelSubjectGroup">Agrupacion: Contenido cuantitativo</g:Label>
+				<g:Label ui:field="labelSubjectGroup">Agrupacion:</g:Label>
 			</div>
 		</div>
 		<table border="0" cellspacing="0" cellpadding="0" class="table table-bordered" style="padding:0px">
