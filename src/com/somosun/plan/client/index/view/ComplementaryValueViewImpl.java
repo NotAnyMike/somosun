@@ -47,6 +47,7 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 	@UiField FlowPanel antiPreRequisite;
 	@UiField FlowPanel antiCoRequisite;
 	@UiField HTML unavailableWarning;
+	@UiField HTML errorWarning;
 	
 	@UiField PanelCollapse groupsTableContainer;
 	@UiField PanelHeader panelHeaderGroups;
@@ -129,6 +130,8 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 		
 		unavailableWarning.addStyleName("alert alert-danger complementaryValue-unavailable");
 		unavailableWarning.setVisible(false);
+		errorWarning.addStyleName("alert alert-danger complementaryValue-unavailable");
+		errorWarning.setVisible(false);
 		
 		groupTableContainer.getElement().setAttribute("style", "width:100%");
 		groupTableTitles.getElement().setAttribute("style", "width:100%; margin:0px");
@@ -388,6 +391,17 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 	@Override
 	public void hideUnavailableWarning() {
 		unavailableWarning.setVisible(false);
+	}
+	
+	@Override
+	public void showErrorWarning() {
+		errorWarning.setVisible(true);
+	}
+
+
+	@Override
+	public void hideErrorWarning() {
+		errorWarning.setVisible(false);
 	}
 
 }

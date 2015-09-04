@@ -12,6 +12,7 @@
 	<g:HTMLPanel ui:field="mainHtmlPanel">
 	    
 		<g:HTML ui:field="unavailableWarning">Advertencia: La clase no existe en el SIA</g:HTML>
+		<g:HTML ui:field="errorWarning">Error: Algún error ocurrió mientras descargabamos la información</g:HTML>
 		<div class="complementaryValue-careersContainer">
 		    <div class="form-group" style="width:460px">
 				<div class="input-group">

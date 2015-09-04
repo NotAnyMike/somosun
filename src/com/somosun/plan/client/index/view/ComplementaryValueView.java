@@ -28,5 +28,7 @@ public interface ComplementaryValueView {
 	void hasNoGroups();
 	void showUnavailableWarning();
 	void hideUnavailableWarning();
+	void showErrorWarning();
+	void hideErrorWarning();
 
 }

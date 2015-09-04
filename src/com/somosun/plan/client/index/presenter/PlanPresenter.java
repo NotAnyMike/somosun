@@ -1321,65 +1321,70 @@ ComplementaryValueView.Presenter{
 	private void populateAccordionWithComplementaryValue(SubjectAccordionViewImpl accordion, ComplementaryValueViewImpl cVView, ComplementaryValue complementaryValue) {
 		//SubjectGroup, pre-co requisites (Of) TODO
 		
-		String subjectGroupName = null;
-		if(complementaryValue != null && complementaryValue.getSubjectGroup() != null){			
-			subjectGroupName =complementaryValue.getSubjectGroup().getName();
-		}else{
-			subjectGroupName = "Desconocido";
-		}
-		cVView.setSubjectGroupName(subjectGroupName);
-		
-		if(complementaryValue.getSubject().isDummy()){ //|| complementaryValue.getSubject().isDefault() || complementaryValue.getSubject().isDummy()){
-			cVView.showUnavailableWarning();
-		}
-		
-					
-		if(complementaryValue != null && complementaryValue.getPrerequisitesLists() != null && complementaryValue.getPrerequisitesLists().size() > 0){
-			for(List<Subject> list: complementaryValue.getPrerequisitesLists()){
-				for(Subject subject : list){
-					boolean makeStatic = false;
-					boolean makeUnavailable = false;
-					if(subject.isDummy()) makeUnavailable = true;
-					if(subject.isSpecial() || subject.isDefault()) makeStatic = true;
-					cVView.addRequisite("pre", subject.getName(), subject.getCode(), accordion, makeStatic, makeUnavailable);
+		if(complementaryValue != null && complementaryValue.getSubject() != null){
+			
+			String subjectGroupName = null;
+			if(complementaryValue != null && complementaryValue.getSubjectGroup() != null){			
+				subjectGroupName =complementaryValue.getSubjectGroup().getName();
+			}else{
+				subjectGroupName = "Desconocido";
+			}
+			cVView.setSubjectGroupName(subjectGroupName);
+			
+			if(complementaryValue.getSubject().isDummy()){ //|| complementaryValue.getSubject().isDefault() || complementaryValue.getSubject().isDummy()){
+				cVView.showUnavailableWarning();
+			}
+			
+			
+			if(complementaryValue != null && complementaryValue.getPrerequisitesLists() != null && complementaryValue.getPrerequisitesLists().size() > 0){
+				for(List<Subject> list: complementaryValue.getPrerequisitesLists()){
+					for(Subject subject : list){
+						boolean makeStatic = false;
+						boolean makeUnavailable = false;
+						if(subject.isDummy()) makeUnavailable = true;
+						if(subject.isSpecial() || subject.isDefault()) makeStatic = true;
+						cVView.addRequisite("pre", subject.getName(), subject.getCode(), accordion, makeStatic, makeUnavailable);
+					}
 				}
+			}else{
+				cVView.hasNoPrerequisites();
 			}
-		}else{
-			cVView.hasNoPrerequisites();
-		}
-
-		if(complementaryValue != null && complementaryValue.getCorequisitesLists() != null && complementaryValue.getCorequisitesLists().size() > 0){
-			for(List<Subject> list: complementaryValue.getCorequisitesLists()){
-				for(Subject subject : list){
-					boolean makeStatic = false;
-					boolean makeUnavailable = false;
-					if(subject.isDummy()) makeUnavailable = true;
-					if(subject.isSpecial()|| subject.isDefault()) makeStatic = true;
-					cVView.addRequisite("co", subject.getName(), subject.getCode(), accordion, makeStatic, makeUnavailable);
+			
+			if(complementaryValue != null && complementaryValue.getCorequisitesLists() != null && complementaryValue.getCorequisitesLists().size() > 0){
+				for(List<Subject> list: complementaryValue.getCorequisitesLists()){
+					for(Subject subject : list){
+						boolean makeStatic = false;
+						boolean makeUnavailable = false;
+						if(subject.isDummy()) makeUnavailable = true;
+						if(subject.isSpecial()|| subject.isDefault()) makeStatic = true;
+						cVView.addRequisite("co", subject.getName(), subject.getCode(), accordion, makeStatic, makeUnavailable);
+					}
 				}
+			}else{
+				cVView.hasNoCorequisites();
+			}
+			
+			if(complementaryValue != null && complementaryValue.getListCorequisitesOf() != null && complementaryValue.getListCorequisitesOf().size() > 0){
+				for(Subject subject : complementaryValue.getListCorequisitesOf()){
+					boolean makeStatic = false;
+					if(subject.isDummy() || subject.isSpecial() || subject.isDefault()) makeStatic = true;
+					cVView.addAntiRequisite("co", subject.getName(), subject.getCode(), accordion, makeStatic);
+				}
+			}else{
+				cVView.isNoCorequisite();
+			}
+			
+			if(complementaryValue != null && complementaryValue.getListPrerequisitesOf() != null && complementaryValue.getListPrerequisitesOf().size() > 0){
+				for(Subject subject : complementaryValue.getListPrerequisitesOf()){
+					boolean makeStatic = false;
+					if(subject.isDummy() || subject.isSpecial() || subject.isDefault()) makeStatic = true;
+					cVView.addAntiRequisite("pre", subject.getName(), subject.getCode(), accordion, makeStatic);
+				}
+			}else{
+				cVView.isNoPrerequisite();
 			}
 		}else{
-			cVView.hasNoCorequisites();
-		}
-		
-		if(complementaryValue != null && complementaryValue.getListCorequisitesOf() != null && complementaryValue.getListCorequisitesOf().size() > 0){
-			for(Subject subject : complementaryValue.getListCorequisitesOf()){
-				boolean makeStatic = false;
-				if(subject.isDummy() || subject.isSpecial() || subject.isDefault()) makeStatic = true;
-				cVView.addAntiRequisite("co", subject.getName(), subject.getCode(), accordion, makeStatic);
-			}
-		}else{
-			cVView.isNoCorequisite();
-		}
-		
-		if(complementaryValue != null && complementaryValue.getListPrerequisitesOf() != null && complementaryValue.getListPrerequisitesOf().size() > 0){
-			for(Subject subject : complementaryValue.getListPrerequisitesOf()){
-				boolean makeStatic = false;
-				if(subject.isDummy() || subject.isSpecial() || subject.isDefault()) makeStatic = true;
-				cVView.addAntiRequisite("pre", subject.getName(), subject.getCode(), accordion, makeStatic);
-			}
-		}else{
-			cVView.isNoPrerequisite();
+			cVView.showErrorWarning();
 		}
 		
 	}
