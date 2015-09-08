@@ -11,7 +11,9 @@ import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.somosun.plan.client.admin.service.AdminService;
 import com.somosun.plan.server.SiaProxy;
+import com.somosun.plan.server.dao.BlockDao;
 import com.somosun.plan.server.dao.CareerDao;
+import com.somosun.plan.server.dao.GroupDao;
 import com.somosun.plan.server.dao.MessageDao;
 import com.somosun.plan.server.dao.PlanDao;
 import com.somosun.plan.server.dao.SemesterDao;
@@ -431,6 +433,24 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 			plan = planDao.getPlanById(Long.valueOf(id));
 		}
 		return plan;
+	}
+
+	@Override
+	public void deleteAllBlocks() {
+		if(getUserLogged().isAdmin() == true){			
+			BlockDao blockDao = new BlockDao();
+			blockDao.deleteAll();
+		}
+	}
+
+	@Override
+	public void deleteAllGroups() {
+		log.warning("Starting to delete all groups");
+		if(getUserLogged().isAdmin() == true){			
+			GroupDao groupDao = new GroupDao();
+			groupDao.deleteAll();
+		}
+		log.warning("All groups were deleted");
 	}
 	
 }

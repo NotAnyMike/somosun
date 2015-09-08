@@ -1,5 +1,8 @@
 package com.somosun.plan.server.dao;
 
+import java.util.List;
+import java.util.logging.Logger;
+
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
@@ -9,6 +12,8 @@ import com.somosun.plan.shared.control.SubjectValue;
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
 public class BlockDao {
+	
+	final static Logger log = Logger.getLogger("BlockDao");
 
 	static{
 		ObjectifyService.register(Block.class);
@@ -65,6 +70,22 @@ public class BlockDao {
 		return ofy().load().key(key).now();
 		} else {
 			return null;
+		}
+	}
+
+	public void deleteAll() {
+		log.warning("Starting to delete all blocks");
+		List<Block> list = ofy().load().type(Block.class).list();
+		for(Block b : list){
+			deleteBlock(b.getId());
+		}
+		log.warning("All blocks deleted");
+	}
+
+	private void deleteBlock(Long id) {
+		if(id != null){			
+			Key<Block> key = Key.create(Block.class, id);
+			ofy().delete().key(key).now();
 		}
 	}
 	

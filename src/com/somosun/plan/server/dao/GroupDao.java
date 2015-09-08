@@ -92,5 +92,12 @@ public class GroupDao {
 		return group;
 	}
 
+	public void deleteAll() {
+		List<Group> list = ofy().load().type(Group.class).list();
+		for(Group g : list){
+			deleteGroup(g);
+		}
+	}
+
 	
 }

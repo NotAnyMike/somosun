@@ -55,6 +55,8 @@ public class IndexViewImpl extends Composite implements IndexView {
 	@UiField Button showPlansByUserButton;
 	@UiField Button showPlanByIdButton;
 	@UiField Button analyseCertainCareerButton;
+	@UiField Button deleteAllBlockButton;
+	@UiField Button deleteAllGroupsButton;
 	
 	@UiField TextBox userCodeTextBox;
 	@UiField TextBox userToUnBlockTextBox;
@@ -326,6 +328,22 @@ public class IndexViewImpl extends Composite implements IndexView {
 			presenter.onAnalyseCertainCareerButton(careerAnalyseListBox.getSelectedValue());
 		}
 		setTimes(analyseCertainCareerButton.getElement());
+	}
+	
+	@UiHandler("deleteAllBlockButton")
+	public void onDeleteAllBlockButton(ClickEvent e){
+		if(getTimes(deleteAllBlockButton.getElement()).equals("1")){
+			presenter.onDeleteAllBlockButton();
+		}
+		setTimes(deleteAllBlockButton.getElement());
+	}
+	
+	@UiHandler("deleteAllGroupsButton")
+	public void onDeleteAllGroupsButton(ClickEvent e){
+		if(getTimes(deleteAllGroupsButton.getElement()).equals("1")){
+			presenter.onDeleteAllGroupsButton();
+		}
+		setTimes(deleteAllGroupsButton.getElement());
 	}
 
 }

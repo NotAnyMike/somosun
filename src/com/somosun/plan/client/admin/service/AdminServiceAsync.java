@@ -67,5 +67,9 @@ public interface AdminServiceAsync {
 	void getPlanById(Long id, AsyncCallback<Plan> asyncCallback);
 
 	void analyseCareer(String careerCode, AsyncCallback asyncCallback);
+
+	void deleteAllBlocks(AsyncCallback<Void> callback);
+
+	void deleteAllGroups(AsyncCallback<Void> callback);
 	
 }

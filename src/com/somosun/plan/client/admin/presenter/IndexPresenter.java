@@ -2,6 +2,8 @@ package com.somosun.plan.client.admin.presenter;
 
 import java.util.List;
 
+import org.eclipse.jetty.util.log.Log;
+
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -424,6 +426,40 @@ public class IndexPresenter implements Presenter, IndexView.Presenter {
 			@Override
 			public void onSuccess(Object result) {
 				Window.alert("The was added to the queue");
+			}
+			
+		});
+	}
+
+	@Override
+	public void onDeleteAllBlockButton() {
+		rpcAdminService.deleteAllBlocks(new AsyncCallback(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Error deleting all block, see log for more info");
+			}
+
+			@Override
+			public void onSuccess(Object result) {
+				Window.alert("All blocks deleted");
+			}
+			
+		});
+	}
+
+	@Override
+	public void onDeleteAllGroupsButton() {
+		rpcAdminService.deleteAllGroups(new AsyncCallback(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Error deleting all groups, see log for more info");
+			}
+
+			@Override
+			public void onSuccess(Object result) {
+				Window.alert("All groups deleted");
 			}
 			
 		});
