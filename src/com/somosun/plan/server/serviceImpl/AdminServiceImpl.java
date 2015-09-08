@@ -105,7 +105,8 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 	public void deleteAllComplementaryValues() {
 		if(getUserLogged().isAdmin() == true){
 			Queue q = QueueFactory.getQueue("adminQueue");
-			q.add(TaskOptions.Builder.withPayload(new ComplementaryValueExpensiveOperations(ComplementaryValueExpensiveOperationsCodes.DELETE_ALL)));
+			String hostName = ModulesServiceFactory.getModulesService().getVersionHostname("admin-module", "1");
+			q.add(TaskOptions.Builder.withPayload(new ComplementaryValueExpensiveOperations(ComplementaryValueExpensiveOperationsCodes.DELETE_ALL)).header("Host",hostName));
 		}
 	}
 
@@ -115,7 +116,8 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 	public void deleteCertainComplementaryValues(String careerCode) {
 		if(getUserLogged().isAdmin() == true){
 			Queue q = QueueFactory.getQueue("adminQueue");
-			q.add(TaskOptions.Builder.withPayload(new ComplementaryValueExpensiveOperations(ComplementaryValueExpensiveOperationsCodes.DELETE_FOR_CAREER, careerCode)));
+			String hostName = ModulesServiceFactory.getModulesService().getVersionHostname("admin-module", "1");
+			q.add(TaskOptions.Builder.withPayload(new ComplementaryValueExpensiveOperations(ComplementaryValueExpensiveOperationsCodes.DELETE_FOR_CAREER, careerCode)).header("Host",hostName));
 		}
 	}
 
@@ -125,7 +127,8 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 	public void deleteAllSubjects() {
 		if(getUserLogged().isAdmin() == true){
 			Queue q = QueueFactory.getQueue("adminQueue");
-			q.add(TaskOptions.Builder.withPayload(new SubjectExpensiveOperations(SubjectExpensiveOperationsCodes.DELETE_ALL)));
+			String hostName = ModulesServiceFactory.getModulesService().getVersionHostname("admin-module", "1");
+			q.add(TaskOptions.Builder.withPayload(new SubjectExpensiveOperations(SubjectExpensiveOperationsCodes.DELETE_ALL)).header("Host",hostName));
 		}
 	}
 
