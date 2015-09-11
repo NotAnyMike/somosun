@@ -91,7 +91,7 @@ public class SiaProxy {
 	public final static String SIA_URL_PAL_BUSCADOR = "http://sia.bogota.unal.edu.co/buscador/service/action.pub";
 	public final static String SIA_URL_TUM_BUSCADOR = "http://sia.bogota.unal.edu.co/buscador/service/action.pub";
 	
-	public final static String SIA_COMPLEMENTARY_VALUES_AND_PLAN_BOG = "http://www.pregrado.unal.edu.co/index.php?option=com_content&view=article&id=2&Itemid=102&cod=";
+	public final static String SIA_COMPLEMENTARY_VALUES_AND_PLAN_BOG = "http://www.pregrado.unal.edu.co/programas/plantilla.php?cod=";//"http://www.pregrado.unal.edu.co/index.php?option=com_content&view=article&id=2&Itemid=102&cod=";
 	public final static String SIA_BASIC_URL_TO_COMPLEMENTARY_AND_PLAN = "http://www.legal.unal.edu.co/sisjurun/normas/Norma1.jsp?i=";
 	
 	public final static String VALOR_NIVELACADEMICO_TIPOLOGIA_PRE = "PRE";
@@ -965,7 +965,7 @@ public class SiaProxy {
 			htmlPlanURL = getUrlSource(SIA_COMPLEMENTARY_VALUES_AND_PLAN_BOG + careerCode, false);
 		} catch (Exception e){
 			e.printStackTrace();
-			log.severe("Error getting the info for analyse the career " + careerCode);
+			log.severe("Error getting the info to analyse the career " + careerCode);
 		}
 		if(htmlPlanURL != null)
 		{

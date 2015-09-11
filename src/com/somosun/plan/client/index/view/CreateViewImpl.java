@@ -102,12 +102,17 @@ public class CreateViewImpl extends Composite implements CreateView {
 	public void addPlans(List<PlanValuesResult> planValuesList) {
 		listBoxSelectPlanSaved.clear();
 		if(planValuesList != null && planValuesList.size() > 0){
+			listBoxSelectPlanSaved.setEnabled(true);
+			selectPlanButton.setEnabled(true);
+			deletePlanButton.setEnabled(true);
 			for(PlanValuesResult values : planValuesList){
 				listBoxSelectPlanSaved.addItem(values.getName(), values.getValue());
 			}
 		}else{
 			listBoxSelectPlanSaved.addItem("No tienes planes guardados", "");
 			listBoxSelectPlanSaved.setEnabled(false);
+			selectPlanButton.setEnabled(false);
+			deletePlanButton.setEnabled(false);
 		}
 		
 	}

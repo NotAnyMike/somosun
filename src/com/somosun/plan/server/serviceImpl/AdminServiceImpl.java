@@ -230,7 +230,7 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 		if(getUserLogged().isAdmin() == true){
 			Queue q = QueueFactory.getQueue("analyseCareer");
 			q.add(TaskOptions.Builder.withPayload(new AnalyseCareerExpensiveOperation(careerCode)));
-			/************ uncomment this to test locally if there is any error with the time out, this taks queue has a 10min limit  ************/
+			/************ uncomment this to test locally if there is any error with the time out, this task queue has a 10min limit  ************/
 			/******* if the server has the same error (10 min limit reached) then it has to apply the same solution as AnalayseAllCareers *******/
 //			if(careerCode != null || careerCode.isEmpty() == false){
 //				String sede = "bog";
