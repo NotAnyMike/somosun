@@ -21,7 +21,7 @@
 							</div>
 							<div class="panel-body">
 								<b:InputGroup>
-									<b:TextBox ui:id="searchField" placeholder="nombre de la clase" ui:field="searchField"/>
+									<b:TextBox ui:id="searchField" placeholder="nombre de la asignatura" ui:field="searchField"/>
 									<b:InputGroupButton>
 										<b:Button  ui:id="searchButton" icon="SEARCH" type="DEFAULT" ui:field="searchButton"/>
 									</b:InputGroupButton>

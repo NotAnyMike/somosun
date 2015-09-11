@@ -14,7 +14,7 @@
 	    <div class="secondContainerCreatePlan">
 	      <div class="secondContainerCreatePlan-saved"> 
 	        <p style="font-size:30px; margin-right: inherit; text-align: end;" class="lead main-text">Cargar un plan guardado</p>
-	        <p style="margin: 0px" class="lead main-text">selecciona tu plan</p>
+	        <!--  p style="margin: 0px" class="lead main-text">selecciona tu plan</p -->
 	        <b:ListBox ui:field="listBoxSelectPlanSaved" addStyleNames="{third.lead} {second.textboxCreate}">
 	        </b:ListBox>
 	        <div>
@@ -32,13 +32,13 @@
 	      <div class="verticalLineCreatePlan"></div>
 	    </div>
 	    <div class="mainContainerCreatePlan-upload lead main-text">
-	      <p style="font-size: 30px; margin-left: inherit" class="lead main-text">Cargar mi plan de estudios</p>
-	      <p>cargar un programa desde el sia</p>
+	      <p style="font-size: 30px; margin-left: inherit" class="lead main-text">Carga tu plan de estudios</p>
+	      <p>Cargar plan de estudios desde el sia</p>
 	      <ol style="white-space: nowrap">
 	        <li>Ve al SIA y luego a <strong>Historia Académica</strong></li>
-	        <li><kbd>ctrl + A</kbd> o <kbd>ctrl + E</kbd>*</li>
-	        <li><kbd>ctrl + C</kbd></li>
-	        <li>Pégalo aquí <kbd>ctrl + V</kbd></li>
+	        <li><kbd>Ctrl + A</kbd> o <kbd>Ctrl + E</kbd>*</li>
+	        <li><kbd>Ctrl + C</kbd></li>
+	        <li>Pégalo aquí <kbd>Ctrl + V</kbd></li>
 	      </ol>
 	      <b:TextArea ui:field="textBoxCreate"></b:TextArea>
 	      <div><b:Button ui:field="continueButton" addStyleNames="{third.btn} {third.btn-default}">Continuar</b:Button>  <b:Button ui:field="resetButton" addStyleNames="{third.btn} {third.btn-default}">Limpiar</b:Button></div>

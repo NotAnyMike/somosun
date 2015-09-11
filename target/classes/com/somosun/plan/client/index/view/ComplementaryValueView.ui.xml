@@ -74,7 +74,10 @@
 			<b:PanelGroup b:id="groupsAccordion">
 			    <b:Panel>
 					<b:PanelHeader dataToggle="COLLAPSE" dataParent="#groupsAccordion" dataTarget="#collapseGroups" ui:field="panelHeaderGroups">
-						<b:Heading size="H4" text="Grupos"/>
+						<!-- OLD CODE, has the same when-close-returns-to-the-first-cVView error b:Heading size="H4" text="Grupos"/ -->
+						<b:Heading size="H4">
+						    <b:Anchor dataToggle="COLLAPSE" dataParent="#accordion" dataTarget="#collapseOne" text="Grupos" icon="CHEVRON_DOWN"/>
+						</b:Heading>
 					</b:PanelHeader>
 					<b:PanelCollapse b:id="collapseGroups" ui:field="groupsTableContainer">
 						<b:PanelBody>

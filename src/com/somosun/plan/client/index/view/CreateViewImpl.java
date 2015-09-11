@@ -46,6 +46,14 @@ public class CreateViewImpl extends Composite implements CreateView {
 
 	public CreateViewImpl() {
 		initWidget(uiBinder.createAndBindUi(this));
+		init();
+	}
+
+	private void init() {
+		listBoxSelectPlanSaved.setEnabled(false);
+		listBoxSelectPlanSaved.addItem("Cargando ... ", "");
+		deletePlanButton.setEnabled(false);
+		selectPlanButton.setEnabled(false);
 	}
 
 	@Override
