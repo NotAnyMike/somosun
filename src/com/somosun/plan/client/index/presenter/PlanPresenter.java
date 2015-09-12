@@ -212,6 +212,7 @@ ComplementaryValueView.Presenter{
 	public void go(HasWidgets container) {
 		container.clear();
 		addWidgets(container);
+		addFunctionsToSecondaryMenu();
 		makeDropdownButtonsWork();
 	}
 	
@@ -248,10 +249,7 @@ ComplementaryValueView.Presenter{
 		container.add(subContainer);
 		
 		addEventListenerOnChangeToSiaSummary();
-		
 		addClickSearchField();
-		
-		addFunctionsToSecondaryMenu();
 		
 	}
 	
@@ -1456,7 +1454,7 @@ ComplementaryValueView.Presenter{
 	}-*/;
 	
 	public static native void makeDropdownButtonsWork() /*-{
-		$(".dropdown-toggle").dropdown();
+		$wnd.makeDropdownButtonsWork();
 	}-*/;
 	
 	public static native void addFunctionsToSecondaryMenu() /*-{

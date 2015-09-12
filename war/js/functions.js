@@ -74,5 +74,8 @@ function addFunctionsToSecondaryMenu(){
 	$('.siaSummaryButtonsContainer').on('mouseover', function(){
 		$('.siaSummaryButtonsContainer').addClass('active');
 	});
-	alert("hoas");
+};
+
+function makeDropdownButtonsWork(){
+	$(".dropdown-toggle").dropdown();
 };
