@@ -49,6 +49,7 @@ public class CreatePresenter implements Presenter, CreateView.Presenter {
 
 	private void addCareersToListBox(List<Career> careers) {
 		this.careers = careers;
+		view.clearListBox();
 		if(careers == null){
 			view.addCareerToListBox("No se pudieron cargar las careeras","-1");			
 		} else {

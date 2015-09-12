@@ -54,6 +54,8 @@ public class CreateViewImpl extends Composite implements CreateView {
 		listBoxSelectPlanSaved.addItem("Cargando ... ", "");
 		deletePlanButton.setEnabled(false);
 		selectPlanButton.setEnabled(false);
+		
+		listBoxCreate.addItem("Cargando ...", "");
 	}
 
 	@Override

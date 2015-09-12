@@ -212,6 +212,7 @@ ComplementaryValueView.Presenter{
 	public void go(HasWidgets container) {
 		container.clear();
 		addWidgets(container);
+		makeDropdownButtonsWork();
 	}
 	
 	private void init() {
@@ -1450,6 +1451,10 @@ ComplementaryValueView.Presenter{
 	
 	public static native void hideAndUpdateTooltips() /*-{
 		$wnd.hideAndUpdateTooltips()
+	}-*/;
+	
+	public static native void makeDropdownButtonsWork() /*-{
+		$(".dropdown-toggle").dropdown();
 	}-*/;
 	
 	/************************************************************/
