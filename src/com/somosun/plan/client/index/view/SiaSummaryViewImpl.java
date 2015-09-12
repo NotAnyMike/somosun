@@ -42,7 +42,7 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 	
 	@UiField HTMLPanel htmlPanelWarning;
 	
-	@UiField VerticalButtonGroup verticalButtonGroupMenu;
+	@UiField ButtonGroup verticalButtonGroupMenu;
 	@UiField ButtonGroup adminButtonsButtonGroup;
 	
 	@UiField AnchorListItem savePlanAsDefaultButton;

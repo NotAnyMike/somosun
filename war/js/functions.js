@@ -34,11 +34,11 @@ function showTooltip(){
 
 function addClickSearchField(){
 	$("#searchField").keyup(function(event){
-	    if(event.keyCode == 13){
+		if(event.keyCode == 13){
 			var click_ev = document.createEvent("MouseEvents");
 			click_ev.initEvent("click", true /* bubble */, true /* cancelable */);
 			document.getElementById("searchButton").dispatchEvent(click_ev);
-	    }
+		}
 	});
 }
 
@@ -52,7 +52,7 @@ function addEventListenerOnScroll(){
 function stopPropagationOfClickOnSelectSubject(){
 	var els = document.getElementById("accordionContainer").getElementsByTagName("button");
 		Array.prototype.forEach.call(els, function(el) {
-    		el.addEventListener('click', function(event){event.stopPropagation();});
+			el.addEventListener('click', function(event){event.stopPropagation();});
 		});
 }
 
@@ -60,3 +60,19 @@ function hideAndUpdateTooltips(){
 	$('[data-toggle="tooltip"]').tooltip('hide')
           .tooltip('fixTitle')
 }
+
+function addFunctionsToSecondaryMenu(){
+	$('#titlePageNavBar').on('mouseover', function(){
+		$('.siaSummaryButtonsContainer').addClass('active');
+	});
+	$('#titlePageNavBar').on('mouseout', function(){
+		$('.siaSummaryButtonsContainer').removeClass('active');
+	});
+	$('.siaSummaryButtonsContainer').on('mouseout', function(){
+		$('.siaSummaryButtonsContainer').removeClass('active');
+	});
+	$('.siaSummaryButtonsContainer').on('mouseover', function(){
+		$('.siaSummaryButtonsContainer').addClass('active');
+	});
+	alert("hoas");
+};

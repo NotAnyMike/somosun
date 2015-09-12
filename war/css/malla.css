@@ -270,8 +270,9 @@ h1 {
 	 alignment-baseline:central;
 	 margin-left:-275px;
 	 color:#CACACA;
-	 margin-top:14px;
+	 margin-top:0px;
 	 cursor:default;
+	 padding-top:14px;
 }
 
 

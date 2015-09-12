@@ -251,6 +251,8 @@ ComplementaryValueView.Presenter{
 		
 		addClickSearchField();
 		
+		addFunctionsToSecondaryMenu();
+		
 	}
 	
 	private void makeSubjectWidgetDraggable(SubjectWidget subject){
@@ -1457,10 +1459,17 @@ ComplementaryValueView.Presenter{
 		$(".dropdown-toggle").dropdown();
 	}-*/;
 	
+	public static native void addFunctionsToSecondaryMenu() /*-{
+		$wnd.addFunctionsToSecondaryMenu();
+	}-*/;
+	
 	/************************************************************/
 
 	/*********************** Behaviors **************************/
 
+	
+	/******************** JQUERY FUNCTIONS *********************/
+	
 	public void onSpecificSubjectSelected(String subjectName, String subjectCode, String careerCode) {
 		
 		SelectedSubjectViewImpl sSV = new SelectedSubjectViewImpl();

@@ -28,6 +28,11 @@ public class TopBarViewImpl extends Composite implements TopBarView {
 
 	public TopBarViewImpl() {
 		initWidget(uiBinder.createAndBindUi(this));
+		init();
+	}
+
+	private void init() {
+		pageNameLabel.getElement().setAttribute("id","titlePageNavBar");
 	}
 
 	@Override

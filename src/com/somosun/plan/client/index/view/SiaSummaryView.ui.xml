@@ -18,7 +18,7 @@
       <g:HTMLPanel ui:field="htmlPanelWarning">
 	  	<div class="alert alert-danger" role="alert" style="width:150px">No ingresaste con tu cuenta, tus cambios no serán guardados</div>
 	  </g:HTMLPanel>
-      <b:VerticalButtonGroup ui:field="verticalButtonGroupMenu">
+      <b:ButtonGroup ui:field="verticalButtonGroupMenu">
 		<b:ButtonGroup ui:field="adminButtonsButtonGroup">
 			<b:Button dataToggle="DROPDOWN">Admin Options</b:Button>
 			<b:DropDownMenu>
@@ -29,7 +29,7 @@
         <b:AnchorButton ui:field="newPlanButton" href="#create">Nuevo/Cargar plan</b:AnchorButton>
         <b:AnchorButton type="SUCCESS" ui:field="savePlanNameButton">Guardar plan</b:AnchorButton>
         <b:AnchorButton type="WARNING" ui:field="deletePlanButton">Eliminar plan</b:AnchorButton>
-      </b:VerticalButtonGroup>
+      </b:ButtonGroup>
       </div>
       <table width="" border="0" cellspacing="0" cellpadding="0" style="margin:5px">
 		  <tr>
