@@ -12,6 +12,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -46,7 +47,7 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 	@UiField ButtonGroup adminButtonsButtonGroup;
 	
 	@UiField AnchorListItem savePlanAsDefaultButton;
-	@UiField AnchorListItem addMandatorySubjectsButton;
+	@UiField AnchorListItem addMandatorySubjectsAdminButton;
 	
 	@UiField AnchorButton savePlanNameButton;
 	@UiField AnchorButton newPlanButton;
@@ -65,9 +66,25 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 	public SiaSummaryViewImpl(){
 		initWidget(uiBinder.createAndBindUi(this));
 		
-		newPlanButton.getElement().setAttribute("style", "color:#000;");
+		init();
+		
 	}
 	
+	private void init() {
+		newPlanButton.getElement().setAttribute("style", "color:#000;");
+		
+		addTooltip(newPlanButton.asWidget());
+		addTooltip(deletePlanButton.asWidget());
+		addTooltip(savePlanNameButton.asWidget());
+	}
+
+	private void addTooltip(Widget w) {
+		// TODO Auto-generated method stub
+		w.getElement().setAttribute("data-toggle", "tooltip");
+		w.getElement().setAttribute("data-placement", "bottom");
+		w.getElement().setAttribute("data-container", "body");
+	}
+
 	@Override
 	public Widget asWidget(){
 		return this;
@@ -231,7 +248,7 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 		presenter.onSavePlanAsDefaultClicked();
 	}
 	
-	@UiHandler("addMandatorySubjectsButton")
+	@UiHandler("addMandatorySubjectsAdminButton")
 	public void onAddMandatorySubjectsButton(ClickEvent event){
 		presenter.onAddMandatorySubjectsButton();
 	}

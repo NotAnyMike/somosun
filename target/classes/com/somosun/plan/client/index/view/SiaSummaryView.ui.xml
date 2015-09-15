@@ -22,13 +22,15 @@
 		<b:ButtonGroup ui:field="adminButtonsButtonGroup">
 			<b:Button dataToggle="DROPDOWN">Admin Options</b:Button>
 			<b:DropDownMenu>
-				<b:AnchorListItem ui:field="addMandatorySubjectsButton">Add mandatory Subjects</b:AnchorListItem>
+				<b:AnchorListItem ui:field="addMandatorySubjectsAdminButton">Add mandatory Subjects</b:AnchorListItem>
 				<b:AnchorListItem ui:field="savePlanAsDefaultButton">Save as default</b:AnchorListItem>
 			</b:DropDownMenu>
 		</b:ButtonGroup>
-        <b:AnchorButton ui:field="newPlanButton" href="#create">Nuevo/Cargar plan</b:AnchorButton>
-        <b:AnchorButton type="SUCCESS" ui:field="savePlanNameButton">Guardar plan</b:AnchorButton>
-        <b:AnchorButton type="WARNING" ui:field="deletePlanButton">Eliminar plan</b:AnchorButton>
+        <b:AnchorButton ui:field="newPlanButton" href="#create" icon="ARROW_LEFT" title="Go back"></b:AnchorButton>
+        <b:AnchorButton type="INFO" ui:field="savePlanNameButton" icon="FLOPPY_O" title="Guardar / Cambiar nombre"></b:AnchorButton>
+        <b:AnchorButton type="DANGER" ui:field="deletePlanButton" icon="TRASH" title="Eliminar plan"></b:AnchorButton>
+        <b:AnchorButton type="DEFAULT" ui:field="selectSemesterButton">Selectionar semestre actual</b:AnchorButton>
+        <b:AnchorButton type="DEFAULT" ui:field="addMandatorySubjectsButton">Añadir clases obligatorias</b:AnchorButton>
       </b:ButtonGroup>
       </div>
       <table width="" border="0" cellspacing="0" cellpadding="0" style="margin:5px">

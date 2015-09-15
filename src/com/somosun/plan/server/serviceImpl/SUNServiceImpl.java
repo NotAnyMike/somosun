@@ -41,6 +41,7 @@ import com.somosun.plan.shared.control.Subject;
 import com.somosun.plan.shared.control.SubjectGroup;
 import com.somosun.plan.shared.control.UserSun;
 import com.somosun.plan.shared.values.SubjectGroupCodes;
+import com.somosun.plan.shared.values.TypologyCodes;
 
 /**
  * 
@@ -294,15 +295,21 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 //		SiaProxy.getRequisitesForACareer(careerCode);
 //	}
 
-	public List<ComplementaryValue> getComplementaryValues(List<String> subjectCodeStrings, List<String> subjectCareerStrings, String mainCareer){
+	public List<ComplementaryValue> getComplementaryValues(List<String> subjectCodeStrings, List<String> subjectCareerStrings, String mainCareerCode){
 		
 		CareerDao careerDao = new CareerDao();
 		SubjectDao subjectDao = new SubjectDao();
 		ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
+		SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
 		
 		List<ComplementaryValue> cVListToReturn = new ArrayList<ComplementaryValue>();
 		List<String> problematicSubjects = new ArrayList<String>();
 		Career career = null;
+		Career mainCareer = null;
+		
+		if(mainCareerCode != null && mainCareerCode.equals("") == false){			
+			mainCareer = careerDao.getCareerByCode(mainCareerCode);
+		}
 		
 		/***** Arrange the subjectsCodes to be group together by the same career to minimize the search to the sia *****/
 		Map<String,String> subjectCareerCodeStringMap = arrangeLists(subjectCodeStrings, subjectCareerStrings);
@@ -319,14 +326,24 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 			}
 			
 			boolean isProblematic = false;
-			if(career != null){ //it will be almost all of the times true
+			if(career != null || careerCode.equals("") == true){ //it will be almost all of the times true
 				Subject subject = subjectDao.getSubjectByCode(subjectCode);
 				if(subject != null){
-					ComplementaryValue complementaryValue = complementaryValueDao.getComplementaryValues(career.getCode(), subject.getCode());
+					ComplementaryValue complementaryValue = complementaryValueDao.getComplementaryValues(mainCareer.getCode(), subject.getCode());
 					if(complementaryValue != null){
 						cVListToReturn.add(complementaryValue);
 					}else{
-						isProblematic = true;
+						String typology = TypologyCodes.LIBRE_ELECCION;
+						boolean mandatory = false;
+						SubjectGroup subjectGroup = subjectGroupDao.getSubjectGroupFromTypology(mainCareer, typology); 
+						if(subjectGroup != null && subjectGroup.getName() != null && subjectGroup.getName().isEmpty() == false){
+							//Look create an complementaryVALUE as a free election to mainCareer
+							complementaryValue = new ComplementaryValue(mainCareer, subject,  typology, mandatory, subjectGroup);
+							cVListToReturn.add(complementaryValue);
+						}else{
+							//if there is no code or name or credits then it is problematic
+							isProblematic = true;							
+						}
 					}
 				}else{
 					isProblematic = true;
@@ -368,7 +385,6 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 				
 				//search the subject
 				Subject subjectFound  = null;
-				SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
 				for(Subject subjectT : allResultsList){
 					assert subjectT.getId() != null;
 					
