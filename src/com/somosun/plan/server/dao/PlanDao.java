@@ -549,7 +549,7 @@ public class PlanDao {
 
 					siaSearchStartTime = System.nanoTime();
 				SUNServiceImpl service = new SUNServiceImpl();
-				complementaryValuesProblematics = service.getComplementaryValues(subjectCodes, careerCodes);
+				complementaryValuesProblematics = service.getComplementaryValues(subjectCodes, careerCodes, careerCode);
 					siaSearchEndTime = System.nanoTime();
 				
 				//Add the cV to the subjectValue 

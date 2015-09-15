@@ -1464,9 +1464,6 @@ ComplementaryValueView.Presenter{
 	/************************************************************/
 
 	/*********************** Behaviors **************************/
-
-	
-	/******************** JQUERY FUNCTIONS *********************/
 	
 	public void onSpecificSubjectSelected(String subjectName, String subjectCode, String careerCode) {
 		
@@ -1599,7 +1596,7 @@ ComplementaryValueView.Presenter{
 
 		if(selectedSubjectCodeStrings.size() > 0){			
 			view.showLoadingSubjects();
-			rpcService.getComplementaryValues(selectedSubjectCodeStrings, selectedSubjectCareerStrings, new AsyncCallback<List<ComplementaryValue>>(){
+			rpcService.getComplementaryValues(selectedSubjectCodeStrings, selectedSubjectCareerStrings, plan.getCareerCode(), new AsyncCallback<List<ComplementaryValue>>(){
 				
 				public void onFailure(Throwable caught) {
 					Window.alert("Sorry, we were unable to add the selected subjects, please try again");

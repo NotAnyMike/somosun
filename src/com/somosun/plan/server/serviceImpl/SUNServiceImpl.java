@@ -294,7 +294,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 //		SiaProxy.getRequisitesForACareer(careerCode);
 //	}
 
-	public List<ComplementaryValue> getComplementaryValues(List<String> subjectCodeStrings, List<String> subjectCareerStrings){
+	public List<ComplementaryValue> getComplementaryValues(List<String> subjectCodeStrings, List<String> subjectCareerStrings, String mainCareer){
 		
 		CareerDao careerDao = new CareerDao();
 		SubjectDao subjectDao = new SubjectDao();
@@ -304,7 +304,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		List<String> problematicSubjects = new ArrayList<String>();
 		Career career = null;
 		
-		/*** Arrange the subjectsCodes to be group together by the same career to minimize the search to the sia *******/
+		/***** Arrange the subjectsCodes to be group together by the same career to minimize the search to the sia *****/
 		Map<String,String> subjectCareerCodeStringMap = arrangeLists(subjectCodeStrings, subjectCareerStrings);
 		subjectCodeStrings = new ArrayList<String>(subjectCareerCodeStringMap.keySet());
 		subjectCareerStrings = new ArrayList<String>(subjectCareerCodeStringMap.values());
@@ -316,10 +316,6 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 			
 			if((career == null) ? true : career.getCode().equals(careerCode) == false){
 				career = careerDao.getCareerByCode(careerCode);					
-//				if(career.hasAnalysis()  == false){
-//					analyzeCareer(career.getCode());
-//					//career = careerDao.getCareerByCode(subjectCareerStrings.get(0)); in order to optimize the method
-//				}
 			}
 			
 			boolean isProblematic = false;
@@ -361,10 +357,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 				
 				if((career == null) ? true : career.getCode().equals(currentCareerCode) == false){
 					career = careerDao.getCareerByCode(currentCareerCode);					
-//					if(career.hasAnalysis()  == false){
-//						analyzeCareer(career.getCode());
-//					}
-					
+
 						long careerResults0 = System.nanoTime();
 					careerResults = getSubjectFromSia("", "", currentCareerCode, "", 1, 10000, "bog", null, problematicSubjects);			
 					careerSubjectList = careerResults.getSubjectList();
