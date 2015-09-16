@@ -459,9 +459,10 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		List<String> temporaryList = null;
 		List<String> fullListCareer = new ArrayList<String>();
 		Map<String,List<String>> listMap = new HashMap<String, List<String>>();
-
+		
+//		temporaryList = new ArrayList<String>();
 		for(String careerCode : subjectCareerStrings){
-			if(careerCode.equals(careerCodeTemporary) == false){
+			if(careerCode.equals(careerCodeTemporary) == false || temporaryList == null){
 				//the new code is different, so
 				//1. see it there is already a list with that code, if not then create it and add the code to that list
 				
@@ -474,6 +475,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 					listMap.put(nameOfTheNewList, temporaryList);
 				}				
 			}
+			
 			temporaryList.add(careerCode);
 		}
 		for(List<String> list : listMap.values()){
@@ -483,7 +485,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		for(String careerCode : fullListCareer){
 			int index = subjectCareerStrings.indexOf(careerCode);
 			mapToReturn.put(subjectCodeStrings.get(index), careerCode);
-			subjectCareerStrings.set(index, "");
+			subjectCareerStrings.set(index, null);
 		}
 		
 		return mapToReturn;

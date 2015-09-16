@@ -84,6 +84,10 @@ public class PlanViewImpl extends Composite implements PlanView {
 		deleteGeneralButton.getElement().setAttribute("plan", "");
 	}
 	
+	/**
+	 * Sets the name of the plan as a attribute in the deleteGeneralButton 
+	 * @param name
+	 */
 	public void setPlan(String name){
 		deleteGeneralButton.getElement().setAttribute("semester", "");
 		deleteGeneralButton.getElement().setAttribute("plan", name);

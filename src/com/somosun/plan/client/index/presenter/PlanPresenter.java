@@ -288,35 +288,38 @@ ComplementaryValueView.Presenter{
 		//this.plan = new Plan();
 		
 		//rpcService.getComplementaryValuesFromMisPlanes(plan.getCareerCode(), asyncGetComplementaryValuesByCareer);
-		
-		setCareer(plan.getCareer());
-		
-		if(plan2.getSemesters() != null) {
-			List<Semester> semesterListPlan = plan2.getSemesters();
-			//Map<SubjectValues, Subject> subjectMapPlan = plan2.getValuesAndSubjectMap();
-			//List<SubjectValues> subjectValuesListPlan = null;
+		if(plan != null){
 			
-			//List<Semester> semesterList2 = new ArrayList<Semester>();
-			//List<SubjectValues> subjectValuesList2 = new ArrayList<SubjectValues>();
-			//Map<SubjectValues, Subject> subjectMap2 = new HashMap<SubjectValues, Subject>();
+			setCareer(plan.getCareer());
 			
-			for(Semester semester2 : semesterListPlan){
-				createSemester(semester2, false);
-				for(SubjectValue subjectValues2 : semester2.getSubjects()){
-					if(subjectValues2 != null){
-						if(subjectValues2.getComplementaryValues() != null){
-							if(subjectValues2.getComplementaryValues().getSubject() != null ){
-								createSubject(subjectValues2.getComplementaryValues().getSubject() ,subjectValues2, semester2);								
+			if(plan2.getSemesters() != null) {
+				List<Semester> semesterListPlan = plan2.getSemesters();
+				//Map<SubjectValues, Subject> subjectMapPlan = plan2.getValuesAndSubjectMap();
+				//List<SubjectValues> subjectValuesListPlan = null;
+				
+				//List<Semester> semesterList2 = new ArrayList<Semester>();
+				//List<SubjectValues> subjectValuesList2 = new ArrayList<SubjectValues>();
+				//Map<SubjectValues, Subject> subjectMap2 = new HashMap<SubjectValues, Subject>();
+				
+				for(Semester semester2 : semesterListPlan){
+					createSemester(semester2, false);
+					for(SubjectValue subjectValues2 : semester2.getSubjects()){
+						if(subjectValues2 != null){
+							if(subjectValues2.getComplementaryValues() != null){
+								if(subjectValues2.getComplementaryValues().getSubject() != null ){
+									createSubject(subjectValues2.getComplementaryValues().getSubject() ,subjectValues2, semester2);								
+								}
 							}
 						}
 					}
 				}
+				
+				plan.setSemesters(semesterList);
+				
+				getCareers("bog");
+				
 			}
-			
-			plan.setSemesters(semesterList);
-			
-			getCareers("bog");
-			
+		
 		}
 	}
 
@@ -1304,6 +1307,7 @@ ComplementaryValueView.Presenter{
 				
 				@Override
 				public void onSuccess(Object result) {
+					setPlan(null); //important... because when it returns to the create and if the last token was plan it automatically saves the plan, but if the plan is null then it does not save anything
 					Window.alert("Plan deleted");
 					Window.Location.assign("#create");
 				}
@@ -1586,8 +1590,17 @@ ComplementaryValueView.Presenter{
 				selectedDefaultSubjectCodeStrings.add(selectedSubjectsViewImpl.getCode());
 				selectedDefaultSubjectCareerStrings.add(selectedSubjectsViewImpl.getCareer());
 			}else{				
-				selectedSubjectCodeStrings.add(selectedSubjectsViewImpl.getCode());
-				selectedSubjectCareerStrings.add(selectedSubjectsViewImpl.getCareer());
+				String code = selectedSubjectsViewImpl.getCode();
+				String careerCode = selectedSubjectsViewImpl.getCareer();
+				if(code != null && code.isEmpty() == false){ //in case the "All Careers" are selected
+					
+					if(careerCode == null || careerCode.isEmpty()){
+						careerCode = "";
+					}
+					
+					selectedSubjectCodeStrings.add(code);
+					selectedSubjectCareerStrings.add(selectedSubjectsViewImpl.getCareer());
+				}
 			}
 		}
 		
@@ -1684,13 +1697,12 @@ ComplementaryValueView.Presenter{
 	
 	public void onDeletePlanButtonClicked() {
 		
-		String s = "";
+		String s = null;
 		if(plan.getName() != null && plan.getName().isEmpty() == false){
 			s = plan.getName();
 		}else{
 			s = plan.getCareer().getName();
 		}
-		
 		view.setPlan(s);
 		view.showGeneralPopup();
 		
