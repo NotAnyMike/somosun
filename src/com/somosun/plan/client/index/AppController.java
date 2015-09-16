@@ -470,7 +470,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 		plan.setCareer(result);
 		List<Semester> semesters = new ArrayList<Semester>();
 		for(int x = 0; x < 10; x++){
-			Semester s = new Semester(Integer.toString(x));
+			Semester s = new Semester(/*Integer.toString(x)*/);
 			semesters.add(s);
 		}
 		plan.setSemesters(semesters);

@@ -1422,6 +1422,10 @@ ComplementaryValueView.Presenter{
 		
 	}
 	
+	private void setCurrentSemester(){
+		
+	}
+	
 	/******************** JQUERY FUNCTIONS *********************/
 
 	/**

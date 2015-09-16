@@ -20,15 +20,15 @@ public class Semester implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id private Long id = null;
 	private List<SubjectValue> subjectValuesList;
-	private String date;
+	private SemesterValue semesterValue;
 	
 	public Semester(){
 		subjectValuesList= new ArrayList<>();
 	}
     
-    public Semester(String date){
+    public Semester(SemesterValue semesterValue){
         subjectValuesList= new ArrayList<>();
-        this.date=date;
+        this.semesterValue=semesterValue;
     }
     
     public List<SubjectValue> getSubjects(){
@@ -39,12 +39,12 @@ public class Semester implements Serializable {
 		return id;
 	}
 
-	public String getDate() {
-		return date;
+	public SemesterValue getSemesterValue() {
+		return semesterValue;
 	}
 
-	public void setDate(String date) {
-		this.date = date;
+	public void setSemesterValue(SemesterValue semesterValue) {
+		this.semesterValue = semesterValue;
 	}
 
 	public void setSubjects(List<SubjectValue> subjects) {

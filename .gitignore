@@ -6,7 +6,7 @@
 *.exe
 *.o
 *.so
-*/compilation-mappings.txt
+**/compilation-mappings.txt
  
 # Packages #
 ############

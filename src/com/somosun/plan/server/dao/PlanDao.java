@@ -79,7 +79,7 @@ public class PlanDao {
 		name = jsonPlan.getString("name");
 		
 		for(int i = 0; i < jsonSemesters.length(); i++){
-			semester = new Semester(Integer.toString(i));
+			semester = new Semester(/*Integer.toString(i)*/);
 			jsonSubjects = jsonSemesters.getJSONObject(i).getJSONArray("courses");
 			subjects = new ArrayList<SubjectValue>();
 			
@@ -466,7 +466,7 @@ public class PlanDao {
 				semesters.add(semester);
 				
 				//Add the info to the semester
-				semester.setDate(semesterD.getYear() + "-" + semesterD.getSemester());
+//				semester.setSemesterValue(/*semesterD.getYear() + "-" + semesterD.getSemester()*/);
 				
 				//for subjects
 				List<SubjectValue> subjects = new ArrayList<SubjectValue>();
