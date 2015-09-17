@@ -337,6 +337,7 @@ ComplementaryValueView.Presenter{
 	
 	private void createSemester(Semester semester, boolean save) {
 		
+		
 		semesterList.add(semester);
 		credits.put(semester, 0);
 		SemesterWidget semesterW = new SemesterWidget(semesterList.indexOf(semester), this);
@@ -358,6 +359,8 @@ ComplementaryValueView.Presenter{
 		if(save == true){			
 			planChanged("NewSemester");
 		}
+
+		siaSummaryView.setMaxSemesterInForm(plan.getSemesters().size());
 		
 	}
 	
@@ -682,6 +685,8 @@ ComplementaryValueView.Presenter{
 		updateSemestersNumber();
 		
 		planChanged("SemesterDelete");
+		
+		siaSummaryView.setMaxSemesterInForm(plan.getSemesters().size());
 		
 	}
 

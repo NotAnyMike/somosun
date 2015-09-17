@@ -93,6 +93,7 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 		currentSemesterTextBox.getElement().setAttribute("placeholder", "ej. 3");
 		currentSemesterTextBox.getElement().setAttribute("type", "number");
 		currentSemesterTextBox.getElement().setAttribute("required", "");
+		currentSemesterTextBox.getElement().setAttribute("min", "1");
 		
 		addTooltip(newPlanButton.asWidget());
 		addTooltip(deletePlanButton.asWidget());
@@ -261,6 +262,14 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 	public void hideWarning() {
 		htmlPanelWarning.asWidget().setVisible(false);
 		verticalButtonGroupMenu.asWidget().setVisible(true);
+	}
+	
+	public void setMaxSemesterInForm(int x){
+		currentSemesterTextBox.getElement().setAttribute("max", "" + x);
+	}
+	
+	public void removeMaxSemesterFromForm(){
+		currentSemesterTextBox.getElement().removeAttribute("max");
 	}
 	
 	/***************** Handlers *********************/

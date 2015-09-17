@@ -44,6 +44,9 @@ public interface SiaSummaryView {
 	void setApprovedFoundationCredits(String defaultCredits);
 	void setApprovedDisciplinaryCredits(String defaultCredits);
 	
+	void setMaxSemesterInForm(int x);
+	void removeMaxSemesterFromForm();
+	
 	void deleteAdminButtons();
 	void showWarning();
 	void hideWarning();
