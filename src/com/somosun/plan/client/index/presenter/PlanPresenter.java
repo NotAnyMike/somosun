@@ -250,6 +250,7 @@ ComplementaryValueView.Presenter{
 		
 		addEventListenerOnChangeToSiaSummary();
 		addClickSearchField();
+		selectCurrentSemesterActions();
 		
 	}
 	
@@ -1423,7 +1424,7 @@ ComplementaryValueView.Presenter{
 	}
 	
 	private void setCurrentSemester(){
-		
+		//TODO
 	}
 	
 	/******************** JQUERY FUNCTIONS *********************/
@@ -1467,6 +1468,13 @@ ComplementaryValueView.Presenter{
 	
 	public static native void addFunctionsToSecondaryMenu() /*-{
 		$wnd.addFunctionsToSecondaryMenu();
+	}-*/;
+	
+	/**
+	 * This method will create the events make the part about selecting the current semester work
+	 */
+	public static native void selectCurrentSemesterActions() /*-{
+		$wnd.selectCurrentSemesterActions();
 	}-*/;
 	
 	/************************************************************/

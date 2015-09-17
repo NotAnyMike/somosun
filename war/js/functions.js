@@ -79,3 +79,12 @@ function addFunctionsToSecondaryMenu(){
 function makeDropdownButtonsWork(){
 	$(".dropdown-toggle").dropdown();
 };
+
+function selectCurrentSemesterActions(){
+	$('#currentSemesterChooser').on('click',function(e){
+		e.stopPropagation();
+	});
+	$('#doneChoosingCurrentSemester').on('click', function(){
+		$('#currentSemesterContainer').removeClass('open');
+	});
+};

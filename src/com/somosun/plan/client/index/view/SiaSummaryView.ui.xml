@@ -29,7 +29,14 @@
         <b:AnchorButton ui:field="newPlanButton" href="#create" icon="ARROW_LEFT" title="Go back"></b:AnchorButton>
         <b:AnchorButton type="INFO" ui:field="savePlanNameButton" icon="FLOPPY_O" title="Guardar / Cambiar nombre"></b:AnchorButton>
         <b:AnchorButton type="DANGER" ui:field="deletePlanButton" icon="TRASH" title="Eliminar plan"></b:AnchorButton>
-        <b:AnchorButton type="DEFAULT" ui:field="selectSemesterButton">Selectionar semestre actual</b:AnchorButton>
+        <b:ButtonGroup ui:id="currentSemesterContainer">
+        	<b:Button dataToggle="DROPDOWN">Seleccionar semestre actual</b:Button>
+        	<b:DropDownMenu>
+        		<g:HTML>
+        			<div style="background: white;top: 40px;left: 0;right: 0;padding: 10px" id="currentSemesterChooser" class="active">Qué semestre es el 2015-II?<div class="input-group"><input type="text" class="form-control" placeholder="e.j. 4"/><span class="input-group-btn"><button class="btn btn-default" type="button" id="doneChoosingCurrentSemester">Listo</button></span></div></div>
+        		</g:HTML>
+        	</b:DropDownMenu>
+        </b:ButtonGroup>
         <b:AnchorButton type="DEFAULT" ui:field="addMandatorySubjectsButton">Añadir clases obligatorias</b:AnchorButton>
       </b:ButtonGroup>
       </div>
