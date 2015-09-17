@@ -29,7 +29,7 @@
         <b:AnchorButton ui:field="newPlanButton" href="#create" icon="ARROW_LEFT" title="Go back"></b:AnchorButton>
         <b:AnchorButton type="INFO" ui:field="savePlanNameButton" icon="FLOPPY_O" title="Guardar / Cambiar nombre"></b:AnchorButton>
         <b:AnchorButton type="DANGER" ui:field="deletePlanButton" icon="TRASH" title="Eliminar plan"></b:AnchorButton>
-        <b:ButtonGroup ui:id="currentSemesterContainer">
+        <b:ButtonGroup ui:field="currentSemesterContainer" ui:id="currentSemesterContainer">
         	<b:Button dataToggle="DROPDOWN">Seleccionar semestre actual</b:Button>
         	<b:DropDownMenu>
         		<g:HTML>

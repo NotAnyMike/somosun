@@ -45,6 +45,7 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 	
 	@UiField ButtonGroup verticalButtonGroupMenu;
 	@UiField ButtonGroup adminButtonsButtonGroup;
+	@UiField ButtonGroup currentSemesterContainer;
 	
 	@UiField AnchorListItem savePlanAsDefaultButton;
 	@UiField AnchorListItem addMandatorySubjectsAdminButton;
@@ -72,10 +73,12 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 	
 	private void init() {
 		newPlanButton.getElement().setAttribute("style", "color:#000;");
+		currentSemesterContainer.addStyleName("currentSemesterContainer");
 		
 		addTooltip(newPlanButton.asWidget());
 		addTooltip(deletePlanButton.asWidget());
 		addTooltip(savePlanNameButton.asWidget());
+
 	}
 
 	private void addTooltip(Widget w) {
