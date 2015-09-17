@@ -4,7 +4,6 @@ import org.gwtbootstrap3.client.ui.AnchorButton;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonGroup;
-import org.gwtbootstrap3.client.ui.VerticalButtonGroup;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -14,8 +13,12 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
+import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
@@ -53,7 +56,13 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 	@UiField AnchorButton savePlanNameButton;
 	@UiField AnchorButton newPlanButton;
 	@UiField AnchorButton deletePlanButton;
+	
+	@UiField Button doneChoosingCurrentSemester;
 
+	@UiField TextBox currentSemesterTextBox;
+	
+	@UiField FormPanel currentSemesterFrom;
+	
 	@UiTemplate("SiaSummaryView.ui.xml")
 	interface SiaSummaryViewUiBinder extends UiBinder<Widget, SiaSummaryViewImpl> {}
 	private static SiaSummaryViewUiBinder uiBinder = GWT
@@ -66,14 +75,24 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 	
 	public SiaSummaryViewImpl(){
 		initWidget(uiBinder.createAndBindUi(this));
-		
+
 		init();
 		
 	}
 	
 	private void init() {
+		
+		currentSemesterFrom.getElement().setAttribute("id", "currentSemesterFrom");
+		
+		doneChoosingCurrentSemester.getElement().setAttribute("type", "submit");
+		
 		newPlanButton.getElement().setAttribute("style", "color:#000;");
+		
 		currentSemesterContainer.addStyleName("currentSemesterContainer");
+		
+		currentSemesterTextBox.getElement().setAttribute("placeholder", "ej. 3");
+		currentSemesterTextBox.getElement().setAttribute("type", "number");
+		currentSemesterTextBox.getElement().setAttribute("required", "");
 		
 		addTooltip(newPlanButton.asWidget());
 		addTooltip(deletePlanButton.asWidget());
@@ -264,6 +283,11 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 	@UiHandler("deletePlanButton")
 	public void onDeletePlanButtonClicked(ClickEvent e){
 		presenter.onDeletePlanButtonClicked();
+	}
+	
+	@UiHandler("currentSemesterFrom")
+	public void onCurrentSemesterFromSubmited(SubmitEvent e){
+		GWT.log("oo");
 	}
 
 }

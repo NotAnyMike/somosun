@@ -32,9 +32,18 @@
         <b:ButtonGroup ui:field="currentSemesterContainer" ui:id="currentSemesterContainer">
         	<b:Button dataToggle="DROPDOWN">Seleccionar semestre actual</b:Button>
         	<b:DropDownMenu>
-        		<g:HTML>
-        			<div style="background: white;top: 40px;left: 0;right: 0;padding: 10px" id="currentSemesterChooser" class="active">Qué semestre es el 2015-II?<div class="input-group"><input type="text" class="form-control" placeholder="e.j. 4"/><span class="input-group-btn"><button class="btn btn-default" type="button" id="doneChoosingCurrentSemester">Listo</button></span></div></div>
-        		</g:HTML>
+        		<g:HTMLPanel>
+        			<div style="background: white;top: 40px;left: 0;right: 0;padding: 10px" id="currentSemesterChooser" class="active">Qué semestre es el 2015-II?<div class="input-group">
+	        			<g:FormPanel ui:field="currentSemesterFrom">
+	        				<g:HTMLPanel>
+		        				<g:TextBox ui:field="currentSemesterTextBox" styleName="form-control"/>
+		        				<g:HTMLPanel styleName="input-group-btn">
+		        					<b:Button ui:field="doneChoosingCurrentSemester" ui:id="doneChoosingCurrentSemester">Listo</b:Button>
+		        				</g:HTMLPanel>
+		        			</g:HTMLPanel>
+        				</g:FormPanel>	
+        			</div></div>
+        		</g:HTMLPanel>
         	</b:DropDownMenu>
         </b:ButtonGroup>
         <b:AnchorButton type="DEFAULT" ui:field="addMandatorySubjectsButton">Añadir clases obligatorias</b:AnchorButton>

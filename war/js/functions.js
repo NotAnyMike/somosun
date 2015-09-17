@@ -84,7 +84,7 @@ function selectCurrentSemesterActions(){
 	$('#currentSemesterChooser').on('click',function(e){
 		e.stopPropagation();
 	});
-	$('#doneChoosingCurrentSemester').on('click', function(){
+	$('#currentSemesterFrom').submit(function(){
 		$('#currentSemesterContainer').removeClass('open');
 	});
 };
