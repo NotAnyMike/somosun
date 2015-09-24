@@ -358,7 +358,7 @@ ComplementaryValueView.Presenter{
 		
 		addClickHandlerAddSubject(semesterW);
 		
-		if(currentSemesterValue != null && semesterList.get(0).getSemesterValue() != null){	
+		if(getCurrentSemesterValue() != null && semesterList.get(0).getSemesterValue() != null){	
 			GWT.log("---Create semester: " + getPositionOfCurrentSemester());
 			setSemesterValuesForSemesters(getPositionOfCurrentSemester(), save);
 			setSemesterValuesForWidgets(getPositionOfCurrentSemester());
@@ -709,13 +709,13 @@ ComplementaryValueView.Presenter{
 	 */
 	private void updateSemesterValues() {
 		//Get current semester
-		if(currentSemesterValue != null){
+		if(getCurrentSemesterValue() != null){
 			if(semesterList.size() > 0 && semesterList.get(0).getSemesterValue() != null){
 				//Be careful, the semester deleted could be the current semester
 				Integer position = null;
 				for(int pos = 0; pos < semesterList.size(); pos ++){
 					Semester semester = semesterList.get(pos);
-					if(semester.getSemesterValue().equals(currentSemesterValue) == true){
+					if(semester.getSemesterValue().equals(getCurrentSemesterValue()) == true){
 						position = pos;
 						break;
 					}
@@ -725,9 +725,9 @@ ComplementaryValueView.Presenter{
 					for(int pos = 0; pos < semesterList.size(); pos++){
 						Semester semester = semesterList.get(pos);
 						if(pos == position){
-							semester.setSemesterValue(currentSemesterValue);
+							semester.setSemesterValue(getCurrentSemesterValue());
 						}else{							
-							semester.setSemesterValue(new SemesterValue(currentSemesterValue, pos-position));
+							semester.setSemesterValue(new SemesterValue(getCurrentSemesterValue(), pos-position));
 						}
 					}
 				}else{
@@ -1907,33 +1907,20 @@ ComplementaryValueView.Presenter{
 	}
 	
 	/**
-	 * This method set the currentSemesterValue and if the first semester has a semesterValue updates all the semesters
-	 * @param semesterValue
-	 */
-	public void setCurrentSemester(SemesterValue semesterValue){
-		if(semesterValue != null) {
-			this.currentSemesterValue = semesterValue;
-			if(semesterList != null && semesterList.get(0) != null && semesterList.get(0).getSemesterValue() != null){
-				setPlanCurrentSemester();
-			}
-		}
-	}
-	
-	/**
 	 * This method will work if there currentSemesterValue is not empty and if the first semester has not a semesterValue null;
 	 */
 	public void setPlanCurrentSemester(){
-		if(currentSemesterValue != null && semesterList != null && semesterList.get(0) != null && semesterList.get(0).getSemesterValue() != null){
+		if(getCurrentSemesterValue() != null && semesterList != null && semesterList.get(0) != null && semesterList.get(0).getSemesterValue() != null){
 			setPlanCurrentSemester(getPositionOfCurrentSemester());
 		}
 	}
 	
 	private Integer getPositionOfCurrentSemester(){
 		Integer position = null;
-		if(currentSemesterValue != null){
+		if(getCurrentSemesterValue() != null){
 			position = 0;
 			for(Semester s : semesterList){
-				if(s.getSemesterValue().equals(currentSemesterValue) == true){
+				if(s.getSemesterValue().equals(getCurrentSemesterValue()) == true){
 					break;
 				}
 				position++;
@@ -1947,7 +1934,7 @@ ComplementaryValueView.Presenter{
 	 * @param currentSemesterNumber
 	 */
 	public void setPlanCurrentSemester(int currentSemesterNumber){
-		if(semesters >= currentSemesterNumber && currentSemesterNumber != 0){
+		if(semesters >= currentSemesterNumber && currentSemesterNumber >= 0){
 			GWT.log("---setPlanCurrentSemester(int): " + currentSemesterNumber);
 			setSemesterValuesForWidgets(currentSemesterNumber);
 			setSemesterValuesForSemesters(currentSemesterNumber, true);
@@ -1961,7 +1948,7 @@ ComplementaryValueView.Presenter{
 	 */
 	private void setSemesterValuesForSemesters(final int currentSemesterNumber, final boolean save){
 		
-		if(currentSemesterValue == null){
+		if(getCurrentSemesterValue() == null){
 			rpcService.getCurrentSemesterValue(new AsyncCallback<SemesterValue>(){
 
 				@Override
@@ -1971,7 +1958,7 @@ ComplementaryValueView.Presenter{
 
 				@Override
 				public void onSuccess(SemesterValue result) {
-					currentSemesterValue = result;
+					setCurrentSemesterValue(result);
 					if(result != null){						
 						setSemesterValuesForSemesters(currentSemesterNumber, save);
 					}
@@ -1980,13 +1967,13 @@ ComplementaryValueView.Presenter{
 			});
 		}else{
 			
-			if(currentSemesterValue != null){
+			if(getCurrentSemesterValue() != null){
 				for(int pos = 0; pos < semesters; pos++){
 					Semester semester = semesterList.get(pos);
 					if(pos == currentSemesterNumber) {
-						semester.setSemesterValue(currentSemesterValue);
+						semester.setSemesterValue(getCurrentSemesterValue());
 					}else {
-						SemesterValue notCurrentSemesterValue = new SemesterValue(currentSemesterValue, pos - (currentSemesterNumber));
+						SemesterValue notCurrentSemesterValue = new SemesterValue(getCurrentSemesterValue(), pos - (currentSemesterNumber));
 						semester.setSemesterValue(notCurrentSemesterValue);
 					}
 				}
@@ -2018,6 +2005,26 @@ ComplementaryValueView.Presenter{
 			}
 		}
 		
+	}
+
+	public SemesterValue getCurrentSemesterValue() {
+		return currentSemesterValue;
+	}
+
+	/**
+	 * This method set the currentSemesterValue and if the first semester has a semesterValue updates all the semesters
+	 * @param semesterValue
+	 */
+	public void setCurrentSemesterValue(SemesterValue currentSemesterValue) {
+		if(currentSemesterValue != null) {
+			this.currentSemesterValue = currentSemesterValue;
+			if(siaSummaryView != null){
+				siaSummaryView.setLabelCurrentSemesterLabel(currentSemesterValue.toString());
+			}
+			if(semesterList != null && semesterList.get(0) != null && semesterList.get(0).getSemesterValue() != null){
+				setPlanCurrentSemester();
+			}
+		}
 	}
 	
 }

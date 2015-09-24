@@ -6,6 +6,7 @@ encoding//src/com/somosun/plan/client/index/presenter/PlanPresenter.java=UTF-8
 encoding//src/com/somosun/plan/client/index/view/ComplementaryValueViewImpl.java=UTF-8
 encoding//src/com/somosun/plan/client/index/view/CreateViewImpl.java=UTF-8
 encoding//src/com/somosun/plan/client/index/view/SearchSubjectViewImpl.java=UTF-8
+encoding//src/com/somosun/plan/client/index/view/SiaSummaryViewImpl.java=UTF-8
 encoding//src/com/somosun/plan/client/index/view/SubjectAccordionViewImpl.java=UTF-8
 encoding//src/com/somosun/plan/client/index/widget/PlanWidget.java=UTF-8
 encoding//src/com/somosun/plan/client/index/widget/SemesterWidget.java=UTF-8

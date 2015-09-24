@@ -33,7 +33,7 @@
         	<b:Button dataToggle="DROPDOWN">Seleccionar semestre actual</b:Button>
         	<b:DropDownMenu>
         		<g:HTMLPanel>
-        			<div style="background: white;top: 40px;left: 0;right: 0;padding: 10px" id="currentSemesterChooser" class="active">Qué semestre es el 2015-II?<div class="input-group">
+        			<div style="background: white;top: 40px;left: 0;right: 0;padding: 10px" id="currentSemesterChooser" class="active"><g:Label ui:field="labelCurrentSemesterLabel"></g:Label><div class="input-group">
 	        			<g:FormPanel ui:field="currentSemesterFrom">
 	        				<g:HTMLPanel>
 		        				<g:TextBox ui:field="currentSemesterTextBox" styleName="form-control"/>

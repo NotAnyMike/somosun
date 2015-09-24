@@ -192,6 +192,7 @@ h1 {
 	min-height:200px;
 	width:200px;
 	vertical-align: top;
+	transition: 300ms;
 }
 .semesterPanel.current {
 	background: #999;

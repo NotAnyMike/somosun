@@ -60,10 +60,9 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 	@UiField AnchorButton deletePlanButton;
 	
 	@UiField Button doneChoosingCurrentSemester;
-
 	@UiField TextBox currentSemesterTextBox;
-	
 	@UiField FormPanel currentSemesterFrom;
+	@UiField Label labelCurrentSemesterLabel;
 	
 	@UiTemplate("SiaSummaryView.ui.xml")
 	interface SiaSummaryViewUiBinder extends UiBinder<Widget, SiaSummaryViewImpl> {}
@@ -83,6 +82,9 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 	}
 	
 	private void init() {
+		
+		labelCurrentSemesterLabel.setStyleName("");
+		labelCurrentSemesterLabel.setText("Cual es tú semestre actual?");
 		
 		currentSemesterFrom.getElement().setAttribute("id", "currentSemesterFrom");
 		
@@ -272,6 +274,13 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 	
 	public void removeMaxSemesterFromForm(){
 		currentSemesterTextBox.getElement().removeAttribute("max");
+	}
+	
+	/**
+	 * Send the semesterValue using the method toString()
+	 */
+	public void setLabelCurrentSemesterLabel(String semesterValueToString) {
+		labelCurrentSemesterLabel.setText("Cual es el semestre " + semesterValueToString + "?");
 	}
 	
 	/***************** Handlers *********************/

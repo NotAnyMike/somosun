@@ -492,7 +492,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 			@Override
 			public void onSuccess(SemesterValue result) {
 				if(planPresenter != null && planPresenter.getPlan() != null){					
-					planPresenter.setCurrentSemester(result);
+					planPresenter.setCurrentSemesterValue(result);
 				}
 			}
 			

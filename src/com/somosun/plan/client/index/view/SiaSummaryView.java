@@ -54,5 +54,7 @@ public interface SiaSummaryView {
 	void onAddMandatorySubjectsButton(ClickEvent e);
 	void onSavePlanClick(ClickEvent e);
 	void onDeletePlanButtonClicked(ClickEvent e);
+	
+	void setLabelCurrentSemesterLabel(String s);
 
 }
