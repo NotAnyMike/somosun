@@ -11,7 +11,7 @@ h1 {
 }
 
 .sendButton {
-  display: block;
+  display: block;x
   font-size: 16pt;
 }
 
@@ -192,6 +192,9 @@ h1 {
 	min-height:200px;
 	width:200px;
 	vertical-align: top;
+}
+.semesterPanel.current {
+	background: #999;
 }
 .semesterLabelSemesterPanel {
 	text-align:center;

@@ -124,7 +124,14 @@ public class SemesterWidget extends VerticalPanel implements HasChangeHandlers {
 	public Button getAddButton(){
 		return addButton;
 	}
-
+	
+	public void setAsCurrent(){
+		this.getElement().addClassName("current");
+	}
+	
+	public void unsetAsCurrent(){
+		this.getElement().removeClassName("current");
+	}
 
 	@Override
 	public HandlerRegistration addChangeHandler(ChangeHandler handler) {

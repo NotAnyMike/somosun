@@ -23,6 +23,7 @@ import com.somosun.plan.server.dao.CareerDao;
 import com.somosun.plan.server.dao.ComplementaryValueDao;
 import com.somosun.plan.server.dao.MessageDao;
 import com.somosun.plan.server.dao.PlanDao;
+import com.somosun.plan.server.dao.SemesterValueDao;
 import com.somosun.plan.server.dao.StudentDao;
 import com.somosun.plan.server.dao.SubjectDao;
 import com.somosun.plan.server.dao.SubjectGroupDao;
@@ -36,6 +37,7 @@ import com.somosun.plan.shared.control.Career;
 import com.somosun.plan.shared.control.ComplementaryValue;
 import com.somosun.plan.shared.control.Message;
 import com.somosun.plan.shared.control.Plan;
+import com.somosun.plan.shared.control.SemesterValue;
 import com.somosun.plan.shared.control.Student;
 import com.somosun.plan.shared.control.Subject;
 import com.somosun.plan.shared.control.SubjectGroup;
@@ -985,6 +987,13 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		
 		MessageDao messageDao = new MessageDao();
 		messageDao.saveMessage(message);
+	}
+
+	@Override
+	public SemesterValue getCurrentSemesterValue() {
+	
+		SemesterValueDao semesterValueDao = new SemesterValueDao();
+		return (SemesterValue) semesterValueDao.getCurrentSemester();
 	}
 
 	

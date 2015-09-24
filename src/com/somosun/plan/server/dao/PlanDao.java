@@ -218,15 +218,16 @@ public class PlanDao {
 								}
 							}
 						}
+						
 						if(s.getId() == null){
 							s.setId(semesterDao.generateId());
 						}
 						semesterDao.saveSemester(s);
 					
 					
-					for(SubjectValue sVT : sVToRemoveList){						
-						s.getSubjects().remove(sVT);
-					}
+						for(SubjectValue sVT : sVToRemoveList){						
+							s.getSubjects().remove(sVT);
+						}
 					
 				}
 				

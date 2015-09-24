@@ -1,5 +1,6 @@
 package com.somosun.plan.client.index.view;
 
+import org.apache.commons.lang3.StringUtils;
 import org.gwtbootstrap3.client.ui.AnchorButton;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
@@ -12,6 +13,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
@@ -296,7 +298,13 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 	
 	@UiHandler("currentSemesterFrom")
 	public void onCurrentSemesterFromSubmited(SubmitEvent e){
-		GWT.log("oo");
+		String semesterNumberString = currentSemesterTextBox.getValue().trim();
+		if(semesterNumberString != null && semesterNumberString.isEmpty() == false){
+			if(semesterNumberString.matches("\\s*\\d\\s*") == true){
+				int semesterNumber = Integer.valueOf(semesterNumberString); 
+				presenter.onSelecteCurrentSemester(semesterNumber);
+			}
+		}
 	}
 
 }

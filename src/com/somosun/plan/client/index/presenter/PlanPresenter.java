@@ -59,6 +59,7 @@ import com.somosun.plan.shared.control.ComplementaryValue;
 import com.somosun.plan.shared.control.Group;
 import com.somosun.plan.shared.control.Plan;
 import com.somosun.plan.shared.control.Semester;
+import com.somosun.plan.shared.control.SemesterValue;
 import com.somosun.plan.shared.control.Student;
 import com.somosun.plan.shared.control.Subject;
 import com.somosun.plan.shared.control.SubjectGroup;
@@ -151,6 +152,8 @@ ComplementaryValueView.Presenter{
 	private List<SelectedSubjectViewImpl> selectedSubjects = new ArrayList<SelectedSubjectViewImpl>();
 	
 	private boolean changeNameAsked = false;
+	
+	private SemesterValue currentSemesterValue = null;
 	
 	//in order to control the accordions
 	Map<SubjectAccordionViewImpl, ComplementaryValueViewImpl> mapAccordion = new HashMap<SubjectAccordionViewImpl, ComplementaryValueViewImpl>();
@@ -337,7 +340,6 @@ ComplementaryValueView.Presenter{
 	
 	private void createSemester(Semester semester, boolean save) {
 		
-		
 		semesterList.add(semester);
 		credits.put(semester, 0);
 		SemesterWidget semesterW = new SemesterWidget(semesterList.indexOf(semester), this);
@@ -355,6 +357,12 @@ ComplementaryValueView.Presenter{
 		controllersBySemester.put(semesterW, dropController);
 		
 		addClickHandlerAddSubject(semesterW);
+		
+		if(currentSemesterValue != null && semesterList.get(0).getSemesterValue() != null){	
+			GWT.log("---Create semester: " + getPositionOfCurrentSemester());
+			setSemesterValuesForSemesters(getPositionOfCurrentSemester(), save);
+			setSemesterValuesForWidgets(getPositionOfCurrentSemester());
+		}
 		
 		if(save == true){			
 			planChanged("NewSemester");
@@ -683,10 +691,53 @@ ComplementaryValueView.Presenter{
 		}
 		
 		updateSemestersNumber();
+		updateSemesterValues();
+		
+		semesters--;
+		if(semesters != semesterList.size()){
+			GWT.log("The number of semesters do not match");
+		}
 		
 		planChanged("SemesterDelete");
 		
 		siaSummaryView.setMaxSemesterInForm(plan.getSemesters().size());
+		
+	}
+
+	/**
+	 * Will adjust every semesterValue to the current SemesterValue, if there is no semester with the currentSemesterValue values, then deletes all the semesterValue
+	 */
+	private void updateSemesterValues() {
+		//Get current semester
+		if(currentSemesterValue != null){
+			if(semesterList.size() > 0 && semesterList.get(0).getSemesterValue() != null){
+				//Be careful, the semester deleted could be the current semester
+				Integer position = null;
+				for(int pos = 0; pos < semesterList.size(); pos ++){
+					Semester semester = semesterList.get(pos);
+					if(semester.getSemesterValue().equals(currentSemesterValue) == true){
+						position = pos;
+						break;
+					}
+				}
+				
+				if(position != null){
+					for(int pos = 0; pos < semesterList.size(); pos++){
+						Semester semester = semesterList.get(pos);
+						if(pos == position){
+							semester.setSemesterValue(currentSemesterValue);
+						}else{							
+							semester.setSemesterValue(new SemesterValue(currentSemesterValue, pos-position));
+						}
+					}
+				}else{
+					for(int pos = 0; pos < semesterList.size(); pos++){
+						Semester semester = semesterList.get(pos);
+						semester.setSemesterValue(null);
+					}
+				}
+			}
+		}
 		
 	}
 
@@ -1428,10 +1479,6 @@ ComplementaryValueView.Presenter{
 		
 	}
 	
-	private void setCurrentSemester(){
-		//TODO
-	}
-	
 	/******************** JQUERY FUNCTIONS *********************/
 
 	/**
@@ -1852,5 +1899,125 @@ ComplementaryValueView.Presenter{
 		return toReturn;
 	}
 
+	/**
+	 * This method will be called by a click event
+	 */
+	public void onSelecteCurrentSemester(int currentSemesterNumber) {
+		setPlanCurrentSemester(currentSemesterNumber-1);
+	}
+	
+	/**
+	 * This method set the currentSemesterValue and if the first semester has a semesterValue updates all the semesters
+	 * @param semesterValue
+	 */
+	public void setCurrentSemester(SemesterValue semesterValue){
+		if(semesterValue != null) {
+			this.currentSemesterValue = semesterValue;
+			if(semesterList != null && semesterList.get(0) != null && semesterList.get(0).getSemesterValue() != null){
+				setPlanCurrentSemester();
+			}
+		}
+	}
+	
+	/**
+	 * This method will work if there currentSemesterValue is not empty and if the first semester has not a semesterValue null;
+	 */
+	public void setPlanCurrentSemester(){
+		if(currentSemesterValue != null && semesterList != null && semesterList.get(0) != null && semesterList.get(0).getSemesterValue() != null){
+			setPlanCurrentSemester(getPositionOfCurrentSemester());
+		}
+	}
+	
+	private Integer getPositionOfCurrentSemester(){
+		Integer position = null;
+		if(currentSemesterValue != null){
+			position = 0;
+			for(Semester s : semesterList){
+				if(s.getSemesterValue().equals(currentSemesterValue) == true){
+					break;
+				}
+				position++;
+			}
+		}
+		return position;
+	}
+	
+	/**
+	 * This method will add to every semester its corresponding semesterValue
+	 * @param currentSemesterNumber
+	 */
+	public void setPlanCurrentSemester(int currentSemesterNumber){
+		if(semesters >= currentSemesterNumber && currentSemesterNumber != 0){
+			GWT.log("---setPlanCurrentSemester(int): " + currentSemesterNumber);
+			setSemesterValuesForWidgets(currentSemesterNumber);
+			setSemesterValuesForSemesters(currentSemesterNumber, true);
+			
+		}
+	}
+	
+	/**
+	 * This method takes care of adding the semesterValue attribute to the Semesters objects
+	 * @param currentSemesterNumber
+	 */
+	private void setSemesterValuesForSemesters(final int currentSemesterNumber, final boolean save){
+		
+		if(currentSemesterValue == null){
+			rpcService.getCurrentSemesterValue(new AsyncCallback<SemesterValue>(){
+
+				@Override
+				public void onFailure(Throwable caught) {
+					GWT.log("Error getting the current semesterValue");
+				}
+
+				@Override
+				public void onSuccess(SemesterValue result) {
+					currentSemesterValue = result;
+					if(result != null){						
+						setSemesterValuesForSemesters(currentSemesterNumber, save);
+					}
+				}
+				
+			});
+		}else{
+			
+			if(currentSemesterValue != null){
+				for(int pos = 0; pos < semesters; pos++){
+					Semester semester = semesterList.get(pos);
+					if(pos == currentSemesterNumber) {
+						semester.setSemesterValue(currentSemesterValue);
+					}else {
+						SemesterValue notCurrentSemesterValue = new SemesterValue(currentSemesterValue, pos - (currentSemesterNumber));
+						semester.setSemesterValue(notCurrentSemesterValue);
+					}
+				}
+				if(save){					
+					planChanged("SemesterValues updated");
+				}
+			}
+			
+		}
+		
+	}
+	
+	/**
+	 * This method takes care of adding/removing the style "current" to the semesters widgets
+	 * @param currentSemesterNumber
+	 */
+	private void setSemesterValuesForWidgets(int currentSemesterNumber){
+		GWT.log("CURRENT SEMESTER: " + currentSemesterNumber);
+		if(currentSemesterNumber < 0){ 
+			currentSemesterNumber = currentSemesterNumber*(-1);
+		}
+		for(int pos = 0; pos < semesters; pos++){
+			Semester semester = semesterList.get(pos);
+			SemesterWidget semesterWidget = semesterAndWidgetBiMap.get(semester);
+			if(pos == currentSemesterNumber) {
+				semesterWidget.setAsCurrent();
+			}else {
+				semesterWidget.unsetAsCurrent();
+			}
+		}
+		
+	}
 	
 }

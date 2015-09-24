@@ -34,18 +34,47 @@ public class SemesterValue implements Serializable {
 		this.numberSemester = numberSemester;
 	}
 	
+	/**
+	 * Will create a semesterValue @param addSemester in the future/past(if negative) of the @semesterValueFrom
+	 * @param semesterValueFrom
+	 * @param addSemesters
+	 */
+	public SemesterValue(SemesterValue semesterValueFrom, int addSemesters){
+		int year = semesterValueFrom.getYear();
+		int numberSemester = semesterValueFrom.getNumberSemester();
+		
+		if(addSemesters != 0){
+			int sign = 1;
+			int toAdd = 0;
+			if(addSemesters<0) sign = -1;
+			numberSemester = ((numberSemester - 1) + sign*(addSemesters%2))%2 + 1;
+			if(numberSemester == 1 && sign > 0){
+				toAdd = 1;
+			}
+			year = year + (addSemesters/2) + toAdd;
+		}
+		
+		this.year = year;
+		this.numberSemester = numberSemester;
+		
+	}
+	
 	public int getYear() {
 		return year;
 	}
+	
 	public void setYear(int year) {
 		this.year = year;
 	}
+	
 	public int getNumberSemester() {
 		return numberSemester;
 	}
+	
 	public void setNumberSemester(int numberSemester) {
 		this.numberSemester = numberSemester;
 	}
+	
 	public Long getId() {
 		return id;
 	}
@@ -62,6 +91,27 @@ public class SemesterValue implements Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+	
+	/**
+	 * This method will return the amount of semesters between the two semesterValues, negative if the @param semesterValue is higher than this semesterValue
+	 * 
+	 * @param semesterValue
+	 * @return
+	 */
+	public int minus(SemesterValue semesterValue){
+		
+		int toReturn = 0;
+		
+		if(semesterValue != null){
+			toReturn = (year - semesterValue.getYear())*2 + (numberSemester - semesterValue.getNumberSemester());
+		}
+		
+		return toReturn;
+	}
+	
+	public String toString(){
+		return year + "-" + numberSemester;
 	}
 
 }

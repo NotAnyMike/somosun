@@ -11,6 +11,7 @@ public interface SiaSummaryView {
 		void onAddMandatorySubjectsButton();
 		void showSavePlanPopup();
 		void onDeletePlanButtonClicked();
+		void onSelecteCurrentSemester(int semesterNumber);
 	}
 	
 	void setPresenter(Presenter presenter);

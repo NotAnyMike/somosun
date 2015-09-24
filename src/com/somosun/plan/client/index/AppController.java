@@ -49,6 +49,7 @@ import com.somosun.plan.shared.RandomPhrase;
 import com.somosun.plan.shared.control.Career;
 import com.somosun.plan.shared.control.Plan;
 import com.somosun.plan.shared.control.Semester;
+import com.somosun.plan.shared.control.SemesterValue;
 import com.somosun.plan.shared.control.Student;
 
 public class AppController implements Presenter, ValueChangeHandler<String> {
@@ -480,6 +481,22 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	}
 	
 	private void setPlanPresenter(Plan plan){
+		
+		rpcService.getCurrentSemesterValue(new AsyncCallback<SemesterValue>(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				GWT.log("Error getting the current semesterValue");
+			}
+
+			@Override
+			public void onSuccess(SemesterValue result) {
+				if(planPresenter != null && planPresenter.getPlan() != null){					
+					planPresenter.setCurrentSemester(result);
+				}
+			}
+			
+		});
 		
 		planView = new PlanViewImpl();
 		siaSummaryView = new SiaSummaryViewImpl();

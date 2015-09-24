@@ -6,6 +6,7 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 import com.somosun.plan.shared.control.Semester;
+import com.somosun.plan.shared.control.SemesterValue;
 import com.somosun.plan.shared.control.SubjectValue;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
@@ -20,6 +21,7 @@ public class SemesterDao {
 		if(s != null) {
 			List<SubjectValue> subjectValuesList = s.getSubjects();
 			SubjectValueDao sVDao = new SubjectValueDao();
+			SemesterValueDao semesterValueDao = new SemesterValueDao();
 			GroupDao gDao = new GroupDao();
 			ComplementaryValueDao cVDao = new ComplementaryValueDao();
 			for(SubjectValue sV : subjectValuesList){
@@ -36,6 +38,10 @@ public class SemesterDao {
 					}
 					sVDao.saveSubjectValue(sV);
 				}
+			}
+			if(s.getSemesterValue() != null && s.getSemesterValue().getId() == null){
+				SemesterValue semesterValue = semesterValueDao.getOrCreateSemester(s.getSemesterValue().getYear(), s.getSemesterValue().getNumberSemester());
+				s.setSemesterValue(semesterValue);
 			}
 			ofy().save().entity(s).now();
 		}

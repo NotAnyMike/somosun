@@ -11,6 +11,7 @@ import com.somosun.plan.shared.SiaResultSubjects;
 import com.somosun.plan.shared.control.Career;
 import com.somosun.plan.shared.control.ComplementaryValue;
 import com.somosun.plan.shared.control.Plan;
+import com.somosun.plan.shared.control.SemesterValue;
 import com.somosun.plan.shared.control.Student;
 import com.somosun.plan.shared.control.Subject;
 import com.somosun.plan.shared.control.SubjectGroup;
@@ -95,5 +96,7 @@ public interface SUNServiceAsync {
 	void getComplementaryValueFromDb(String careerCode, String subjectCode, AsyncCallback<ComplementaryValue> callback);
 
 	void saveMessage(String name, String subject, String type, String message, AsyncCallback callback);
+
+	void getCurrentSemesterValue(AsyncCallback<SemesterValue> callback);
 
 }
