@@ -12,6 +12,9 @@ public interface SiaSummaryView {
 		void showSavePlanPopup();
 		void onDeletePlanButtonClicked();
 		void onSelecteCurrentSemester(int semesterNumber);
+		void onCompletePlanClicked();
+		void showCurtain();
+		void hideCurtain();
 	}
 	
 	void setPresenter(Presenter presenter);
@@ -58,5 +61,10 @@ public interface SiaSummaryView {
 	void setLabelCurrentSemesterLabel(String s);
 	void removeCompletePlanButton();
 	void onCompletePlanButtonClicked(ClickEvent e);
+	void showCompletePlanInstructions();
+	void hideCompletePlanInstructions();
+	
+	void onContinueCompletePlan(ClickEvent e);
+	void onCancelCompletePlan(ClickEvent e);
 
 }

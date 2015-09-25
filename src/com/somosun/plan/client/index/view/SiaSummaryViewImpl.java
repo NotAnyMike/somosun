@@ -11,6 +11,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
@@ -56,10 +57,13 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 	@UiField AnchorButton deletePlanButton;
 	
 	@UiField Button doneChoosingCurrentSemester;
+	@UiField Button continueCompletePlanButton;
+	@UiField Button cancelCompletePlanButton;
 	@UiField AnchorButton completePlanButton;
 	@UiField TextBox currentSemesterTextBox;
 	@UiField FormPanel currentSemesterFrom;
 	@UiField Label labelCurrentSemesterLabel;
+	@UiField HTMLPanel completeInstructionsHtmlPanel;
 	
 	@UiTemplate("SiaSummaryView.ui.xml")
 	interface SiaSummaryViewUiBinder extends UiBinder<Widget, SiaSummaryViewImpl> {}
@@ -79,6 +83,8 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 	}
 	
 	private void init() {
+		
+		completeInstructionsHtmlPanel.setVisible(false);
 		
 		completePlanButton.setTitle("Añadir clases obligatorias y lo que falte para graduarme");
 		
@@ -288,6 +294,16 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 		completePlanButton.removeFromParent();
 	}
 	
+	public void showCompletePlanInstructions(){
+		presenter.showCurtain();
+		completeInstructionsHtmlPanel.setVisible(true);
+	}
+	
+	public void hideCompletePlanInstructions(){
+		presenter.hideCurtain();
+		completeInstructionsHtmlPanel.setVisible(false);
+	}
+	
 	/***************** Handlers *********************/
 	
 	@UiHandler("savePlanAsDefaultButton")
@@ -321,10 +337,20 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 		}
 	}
 
-	@Override
 	@UiHandler("completePlanButton")
 	public void onCompletePlanButtonClicked(ClickEvent e) {
-		//check if the current semester exits
+		showCompletePlanInstructions();
+	}
+
+	@UiHandler("continueCompletePlanButton")
+	public void onContinueCompletePlan(ClickEvent e) {
+		hideCompletePlanInstructions();
+		presenter.onCompletePlanClicked();
+	}
+
+	@UiHandler("cancelCompletePlanButton")
+	public void onCancelCompletePlan(ClickEvent e) {
+		hideCompletePlanInstructions();
 	}
 
 }
