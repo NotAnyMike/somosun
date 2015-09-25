@@ -1,6 +1,5 @@
 package com.somosun.plan.client.index.view;
 
-import org.apache.commons.lang3.StringUtils;
 import org.gwtbootstrap3.client.ui.AnchorButton;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
@@ -12,11 +11,8 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.uibinder.client.UiTemplate;
-import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FormPanel;
-import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -60,6 +56,7 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 	@UiField AnchorButton deletePlanButton;
 	
 	@UiField Button doneChoosingCurrentSemester;
+	@UiField AnchorButton completePlanButton;
 	@UiField TextBox currentSemesterTextBox;
 	@UiField FormPanel currentSemesterFrom;
 	@UiField Label labelCurrentSemesterLabel;
@@ -83,6 +80,8 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 	
 	private void init() {
 		
+		completePlanButton.setTitle("Añadir clases obligatorias y lo que falte para graduarme");
+		
 		labelCurrentSemesterLabel.setStyleName("");
 		labelCurrentSemesterLabel.setText("Cual es tú semestre actual?");
 		
@@ -102,6 +101,7 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 		addTooltip(newPlanButton.asWidget());
 		addTooltip(deletePlanButton.asWidget());
 		addTooltip(savePlanNameButton.asWidget());
+		addTooltip(completePlanButton.asWidget());
 
 	}
 
@@ -283,6 +283,11 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 		labelCurrentSemesterLabel.setText("Cual es el semestre " + semesterValueToString + "?");
 	}
 	
+	@Override
+	public void removeCompletePlanButton() {
+		completePlanButton.removeFromParent();
+	}
+	
 	/***************** Handlers *********************/
 	
 	@UiHandler("savePlanAsDefaultButton")
@@ -314,6 +319,12 @@ public class SiaSummaryViewImpl extends Composite implements SiaSummaryView {
 				presenter.onSelecteCurrentSemester(semesterNumber);
 			}
 		}
+	}
+
+	@Override
+	@UiHandler("completePlanButton")
+	public void onCompletePlanButtonClicked(ClickEvent e) {
+		//check if the current semester exits
 	}
 
 }

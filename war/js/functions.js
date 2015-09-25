@@ -88,3 +88,13 @@ function selectCurrentSemesterActions(){
 		$('#currentSemesterContainer').removeClass('open');
 	});
 };
+
+function selectCurrentSemesterPanel(){
+	$.map($('.semesterPanel'), function(elem){
+		if($(elem).hasClass('current')){
+			$(elem).parent().addClass('current');
+		}else{
+			$(elem).parent().removeClass('current');
+		}
+	});
+};

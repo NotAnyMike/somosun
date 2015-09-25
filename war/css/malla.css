@@ -195,7 +195,7 @@ h1 {
 	transition: 300ms;
 }
 .semesterPanel.current {
-	background: #999;
+	/*background: #999;*/
 }
 .semesterLabelSemesterPanel {
 	text-align:center;
@@ -209,6 +209,13 @@ h1 {
 }
 .planPanel {
 	/*background-color:#CCC;*/
+}
+.planPanel td{
+	background: transparent;
+	transition: 300ms;
+}
+.planPanel td.current{
+	background: #999;
 }
 .bottomPartSemesterPanel{
 	opacity: 0.6;

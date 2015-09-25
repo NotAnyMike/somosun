@@ -296,6 +296,14 @@ ComplementaryValueView.Presenter{
 			
 			setCareer(plan.getCareer());
 			
+			/********* taking care of the complete-plan button **********/
+			if(plan.getCareer().hasAnalysis() == false && plan.getCareer().hasDefault() == false){
+				if(siaSummaryView != null){
+					siaSummaryView.removeCompletePlanButton();
+				}
+			}
+			/************************************************************/
+			
 			if(plan2.getSemesters() != null) {
 				List<Semester> semesterListPlan = plan2.getSemesters();
 				//Map<SubjectValues, Subject> subjectMapPlan = plan2.getValuesAndSubjectMap();
@@ -359,7 +367,6 @@ ComplementaryValueView.Presenter{
 		addClickHandlerAddSubject(semesterW);
 		
 		if(getCurrentSemesterValue() != null && semesterList.get(0).getSemesterValue() != null){	
-			GWT.log("---Create semester: " + getPositionOfCurrentSemester());
 			setSemesterValuesForSemesters(getPositionOfCurrentSemester(), save);
 			setSemesterValuesForWidgets(getPositionOfCurrentSemester());
 		}
@@ -1529,6 +1536,10 @@ ComplementaryValueView.Presenter{
 		$wnd.selectCurrentSemesterActions();
 	}-*/;
 	
+	public static native void selectCurrentSemesterPanel() /*-{
+		$wnd.selectCurrentSemesterPanel();
+	}-*/;
+	
 	/************************************************************/
 
 	/*********************** Behaviors **************************/
@@ -1935,7 +1946,6 @@ ComplementaryValueView.Presenter{
 	 */
 	public void setPlanCurrentSemester(int currentSemesterNumber){
 		if(semesters >= currentSemesterNumber && currentSemesterNumber >= 0){
-			GWT.log("---setPlanCurrentSemester(int): " + currentSemesterNumber);
 			setSemesterValuesForWidgets(currentSemesterNumber);
 			setSemesterValuesForSemesters(currentSemesterNumber, true);
 			
@@ -1991,25 +2001,28 @@ ComplementaryValueView.Presenter{
 	 * @param currentSemesterNumber
 	 */
 	private void setSemesterValuesForWidgets(int currentSemesterNumber){
-		GWT.log("CURRENT SEMESTER: " + currentSemesterNumber);
 		if(currentSemesterNumber < 0){ 
 			currentSemesterNumber = currentSemesterNumber*(-1);
 		}
 		for(int pos = 0; pos < semesters; pos++){
 			Semester semester = semesterList.get(pos);
 			SemesterWidget semesterWidget = semesterAndWidgetBiMap.get(semester);
+			SemesterDropController s = controllersBySemester.get(semesterWidget);
 			if(pos == currentSemesterNumber) {
 				semesterWidget.setAsCurrent();
 			}else {
 				semesterWidget.unsetAsCurrent();
 			}
 		}
+		selectCurrentSemesterPanel();
 		
 	}
+	
 
 	public SemesterValue getCurrentSemesterValue() {
 		return currentSemesterValue;
 	}
+	
 
 	/**
 	 * This method set the currentSemesterValue and if the first semester has a semesterValue updates all the semesters
