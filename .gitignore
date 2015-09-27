@@ -7,6 +7,7 @@
 *.o
 *.so
 **/compilation-mappings.txt
+war/WEB-INF/deploy/index/rpcPolicyManifest/**/*.*
  
 # Packages #
 ############
