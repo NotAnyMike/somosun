@@ -27,6 +27,7 @@ import com.somosun.plan.server.dao.SemesterValueDao;
 import com.somosun.plan.server.dao.StudentDao;
 import com.somosun.plan.server.dao.SubjectDao;
 import com.somosun.plan.server.dao.SubjectGroupDao;
+import com.somosun.plan.shared.CompletePlanInfo;
 import com.somosun.plan.shared.LoginInfo;
 import com.somosun.plan.shared.PlanValuesResult;
 import com.somosun.plan.shared.RandomPhrase;
@@ -994,6 +995,59 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 	
 		SemesterValueDao semesterValueDao = new SemesterValueDao();
 		return (SemesterValue) semesterValueDao.getCurrentSemester();
+	}
+
+	@Override
+	public CompletePlanInfo getCompletePlanInfo(String careerCode) {
+		CareerDao careerDao = new CareerDao();
+		Career career = careerDao.getCareerByCode(careerCode);
+		CompletePlanInfo toReturn = null;
+		
+		if(career != null){
+			
+			
+			if(career.hasDefault() || career.hasAnalysis()){
+				toReturn  = new CompletePlanInfo();
+				toReturn.setCareer(career);
+
+				SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
+				List<SubjectGroup> subjectGroups = subjectGroupDao.getSubjectGroups(career.getCode());
+				List<SubjectGroup> subjectGroupsToReturn = new ArrayList<SubjectGroup>();
+				
+				for(SubjectGroup sG : subjectGroups){
+					subjectGroupsToReturn.add(sG);
+				}
+				
+				toReturn.setSubjectGroups(subjectGroupsToReturn);
+						
+				if(career.hasDefault() == true){
+					
+					Plan defaultPlan = null;
+					PlanDao planDao = new PlanDao();
+					defaultPlan = planDao.getPlanDefault(career.getCode());
+					
+					toReturn.setPlanDefautl(defaultPlan);
+					
+					
+				}else if(career.hasAnalysis() == true){
+					
+					ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
+					List<ComplementaryValue> mandatoryComplementaryValues = complementaryValueDao.getMandatoryComplementaryValues(career.getCode());
+					List<ComplementaryValue> mandatoryComplementaryValuesToReturn = new ArrayList<ComplementaryValue>();
+					
+					for(ComplementaryValue cV : mandatoryComplementaryValues){
+						mandatoryComplementaryValuesToReturn.add(cV);
+					}
+					
+					toReturn.setMandatoryComplementaryValues(mandatoryComplementaryValuesToReturn);
+					
+				}
+			}
+			
+			
+		}
+		
+		return toReturn;
 	}
 
 	

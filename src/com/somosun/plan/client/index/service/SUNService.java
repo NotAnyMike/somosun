@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import com.somosun.plan.shared.CompletePlanInfo;
 import com.somosun.plan.shared.PlanValuesResult;
 import com.somosun.plan.shared.RandomPhrase;
 import com.somosun.plan.shared.SiaResultGroups;
@@ -70,5 +71,7 @@ public interface SUNService extends RemoteService{
 	public void saveMessage(String name, String subject, String type, String message);
 	
 	public SemesterValue getCurrentSemesterValue();
+	
+	public CompletePlanInfo getCompletePlanInfo(String careerCode);
 	
 }

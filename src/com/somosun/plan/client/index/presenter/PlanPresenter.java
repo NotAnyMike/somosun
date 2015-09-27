@@ -50,6 +50,7 @@ import com.somosun.plan.client.index.widget.LineWidget;
 import com.somosun.plan.client.index.widget.PlanWidget;
 import com.somosun.plan.client.index.widget.SemesterWidget;
 import com.somosun.plan.client.index.widget.SubjectWidget;
+import com.somosun.plan.shared.CompletePlanInfo;
 import com.somosun.plan.shared.SiaResultGroups;
 import com.somosun.plan.shared.SiaResultSubjects;
 import com.somosun.plan.shared.SomosUNUtils;
@@ -1615,12 +1616,153 @@ ComplementaryValueView.Presenter{
 	 */
 	public void completePlan(){
 		
+		/**
+		 * 1. Get the info to work with
+		 * 
+		 * 1.A There is a plan default
+		 * 1.A.1 Get default career
+		 * 1.A.2 Get SubjectGroups
+		 * 
+		 * 1.B There is not planDefault
+		 * 1.B.1 Get mandatory subjects
+		 * 1.B.2 Get SubjectGroups
+		 * 
+		 * 
+		 * 2. Figure out in which case are we in (Select_Semester)
+		 * 2.A There is currentSemester, therefore subjects will be added in the next semester (currentSemester + 1semester)
+		 * 2.B There is no currentSemester, therefore subjects will be added in the first semester after the last non-empty semester
+		 * 
+		 * 
+		 * 3. Start adding the subjects
+		 * 3.1 Add mandatory subjects in the order of the default plan if exits
+		 * 3.1.1 Check for requisites
+		 * 3.2 Add default subjects(left <- if there was a default plan) [optativas]
+		 * 3.2.1 Add default subjects in the closest semester to the Select_Semester which has less than 6 subjects until a maximum of 6 subjects per semester
+		 */
+		
+		if(plan.getCareer() != null && (plan.getCareer().hasAnalysis() || plan.getCareer().hasDefault())){
+			/************ 1. Getting the info ************/
+			GWT.log("--Getting the completePlanInfo");
+			rpcService.getCompletePlanInfo(plan.getCareerCode(), new AsyncCallback<CompletePlanInfo>(){
+
+				@Override
+				public void onFailure(Throwable caught) {
+					GWT.log("Error getting the completePlanInfo");
+					Window.alert("Sorry, something happening while we were retrieving the infomation");
+				}
+
+				@Override
+				public void onSuccess(CompletePlanInfo result) {
+					GWT.log("--Successful retreaving completePlanInfo");
+					completePlan_2(result);
+				}
+				
+			});
+		}
 	}
 	
+	/**
+	 * 2. Figure out in which case are we in (selectedSemester)
+	 * 2.A There is currentSemester, therefore subjects will be added in the next semester (currentSemester + 1semester)
+	 * 2.B There is no currentSemester, therefore subjects will be added in the first semester after the last non-empty semester
+	 * 
+	 * 
+	 * 3. Start adding the subjects
+	 * 3.1 Add mandatory subjects in the order of the default plan if exits
+	 * 3.1.1 Check for requisites
+	 * 3.2 Add default subjects(left <- if there was a default plan) [optativas]
+	 * 3.2.1 Add default subjects in the closest semester to the Select_Semester which has less than 6 subjects until a maximum of 6 subjects per semester
+	 * 
+	 * @param completePlanInfo
+	 */
+	private void completePlan_2(final CompletePlanInfo completePlanInfo) {
+		/****** 2. Figure out in which case are we in ******/
+		
+		GWT.log("--In completePlan_2");
+	
+		if(completePlanInfo.getCareer() != null){
+			if(semesterList.get(0).getSemesterValue() != null){
+				/****** 2.A There is current Semester ******/
+				GWT.log("--There is currentSemester");
+				if(currentSemesterValue != null){
+					completePlan_3(getPositionOfCurrentSemester()+1, completePlanInfo);
+				}else{
+					//get Current semester, once finished with it run competePlan_2A
+					rpcService.getCurrentSemesterValue(new AsyncCallback<SemesterValue>(){
+
+						@Override
+						public void onFailure(Throwable caught) {
+							GWT.log("Error getting the current semesterValue");
+						}
+
+						@Override
+						public void onSuccess(SemesterValue result) {
+							if(result != null){						
+								setCurrentSemesterValue(result);
+								setSemesterValuesForSemesters(getPositionOfCurrentSemester(), false);
+								completePlan_3(getPositionOfCurrentSemester()+1, completePlanInfo);
+							}
+						}
+						
+					});
+				}
+				/*******************************************/
+			}else{
+				/****** 2.B There is no current Semester ******/
+				
+				//get the closest empty semester to the last non-empty semester
+				int firstEmptySemesterPosition = semesterList.size();
+				for(int semesterPosition = semesterList.size()-1; semesterPosition >=0; semesterPosition--){
+					Semester semester = semesterList.get(semesterPosition);
+					if(semester.getSubjects().size() == 0){
+						firstEmptySemesterPosition = semesterPosition;
+						break;
+					}
+				}
+				//Create semesters if none is empty
+				if(firstEmptySemesterPosition == semesterList.size()){
+					createSemester(new Semester());
+				}
+				//use completPlan_3(, result);
+				completePlan_3(firstEmptySemesterPosition, completePlanInfo);
+				
+				/**********************************************/
+			}
+		}
+		/***************************************************/
+	}
+	
+	/**
+	 * 3. Start adding the subjects
+	 * 3.1 Add mandatory subjects in the order of the default plan if exits
+	 * 3.1.1 Check for requisites
+	 * 3.2 Add default subjects(left <- if there was a default plan) [optativas]
+	 * 3.2.1 Add default subjects in the closest semester to the Select_Semester which has less than 6 subjects until a maximum of 6 subjects per semester
+	 * 
+	 * @param positionSemesterToStart
+	 * @param completePlanInfo
+	 */
+	private void completePlan_3(int positionSemesterToStart, CompletePlanInfo completePlanInfo) {
+		if((completePlanInfo.getPlanDefautl() != null || completePlanInfo.getMandatoryComplementaryValues() != null) && completePlanInfo.getSubjectGroups() != null){
+			if(completePlanInfo.getPlanDefautl() != null){				
+				GWT.log("Default plan has found");
+			}else if(completePlanInfo.getMandatoryComplementaryValues() != null){
+				GWT.log("No default plan found");
+				addSubjectsToPlan(completePlanInfo.getMandatoryComplementaryValues(), "" + positionSemesterToStart);				
+			}
+		}
+	}
+
+	/**
+	 * Will show the curtain from view
+	 */
 	public void showCurtain(){
 		view.showCurtain();
 	}
 	
+	/**
+	 * Will hide the curtain from view
+	 */
 	public void hideCurtain(){
 		view.hideCurtain();
 	}

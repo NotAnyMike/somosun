@@ -1,0 +1,2 @@
+serviceClass: com.somosun.plan.client.admin.service.AdminService
+path: 82C79767035A4ABEA8AD99368F0B9AB9.gwt.rpc
