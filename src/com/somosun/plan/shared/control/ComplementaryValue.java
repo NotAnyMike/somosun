@@ -148,7 +148,7 @@ public class ComplementaryValue implements Serializable {
 	}
 	
 	/**
-	 * This method will all the lists in @para lists to the prerequisitesLists
+	 * This method will all the lists in @param lists to the prerequisitesLists
 	 * @param lists
 	 */
 	public void addPrerequisites(List<List<Subject>> lists){
