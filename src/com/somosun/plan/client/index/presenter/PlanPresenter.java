@@ -1964,13 +1964,13 @@ ComplementaryValueView.Presenter{
 	 * 
 	 * @param mandatoryComplementaryValues_copy
 	 * @param cV
-	 * @param currentSemesterNumber
+	 * @param firstAvailableSemesterNumber
 	 * @param specialLap
 	 * @param isPrerequisite
 	 * @return
 	 */
-	private int getMinSemesterNumber(List<ComplementaryValue> mandatoryComplementaryValues_copy, Map<Subject, Integer> variables, ComplementaryValue cV, int currentSemesterNumber, boolean specialLap, boolean isPrerequisite) {
-		int maxNumberSemesterForRequisite = -1;
+	private int getMinSemesterNumber(List<ComplementaryValue> mandatoryComplementaryValues_copy, Map<Subject, Integer> variables, ComplementaryValue cV, int firstAvailableSemesterNumber, boolean specialLap, boolean isPrerequisite) {
+		int maxOfMinsNumberSemesterForRequisite = -1;
 		
 		List<List<Subject>> list = null;
 		if(isPrerequisite) list = cV.getPrerequisitesLists();
@@ -1989,7 +1989,7 @@ ComplementaryValueView.Presenter{
 					
 					if(specialLap == true && currentRequisiteSemesterNumber == -1){
 						if(getCvBySubjectInCVList(sRequisite.getCode(), mandatoryComplementaryValues_copy) == null){
-							currentRequisiteSemesterNumber = currentSemesterNumber;
+							currentRequisiteSemesterNumber = firstAvailableSemesterNumber;
 						}
 					}
 					//This is an OR requisite
@@ -2000,16 +2000,18 @@ ComplementaryValueView.Presenter{
 				}
 				//Because the result in minNumberSemesterForOrRequisite is the lowest semester number between the OR requisite, and it will represent a AND requsitie
 				if(minNumberSemesterForOrRequisite == -1) {
-					maxNumberSemesterForRequisite = -1;
+					maxOfMinsNumberSemesterForRequisite = -1;
 					break;
 				}
-				if(maxNumberSemesterForRequisite < minNumberSemesterForOrRequisite){
-					maxNumberSemesterForRequisite = minNumberSemesterForOrRequisite;
+				if(maxOfMinsNumberSemesterForRequisite < minNumberSemesterForOrRequisite){
+					maxOfMinsNumberSemesterForRequisite = minNumberSemesterForOrRequisite;
 				}
 			}
+			
+			if(maxOfMinsNumberSemesterForRequisite != -1 && maxOfMinsNumberSemesterForRequisite < firstAvailableSemesterNumber) maxOfMinsNumberSemesterForRequisite = firstAvailableSemesterNumber;
 		}
 		
-		return maxNumberSemesterForRequisite;
+		return maxOfMinsNumberSemesterForRequisite;
 	}
 
 	/**
