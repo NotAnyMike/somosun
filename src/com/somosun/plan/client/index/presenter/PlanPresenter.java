@@ -1761,8 +1761,18 @@ ComplementaryValueView.Presenter{
 		
 		if((completePlanInfo.getPlanDefautl() != null || completePlanInfo.getMandatoryComplementaryValues() != null) && completePlanInfo.getSubjectGroups() != null){
 			
-			//TODO calcular el semestre desde donde comenzar
-			int currentSemesterNumber = getCurrentSemesterNumber() + 1;
+			/***** find the first semester to start from *****/
+			int currentSemesterNumber = getCurrentSemesterNumber();
+			if(currentSemesterNumber != -1) currentSemesterNumber ++;
+			else{
+				GWT.debugger();
+				currentSemesterNumber = getFirstEmptySemesterAfterLastNonEmpty();
+				if(currentSemesterNumber == -1){
+					createSemester(new Semester(), false);
+					currentSemesterNumber = semesterList.size()-1;
+				}
+			}
+			/*************************************************/
 			
 			if(completePlanInfo.getPlanDefautl() != null){				
 				GWT.log("Default plan has found");
@@ -1884,6 +1894,32 @@ ComplementaryValueView.Presenter{
 		}
 	}
 
+	/**
+	 * Returns -1 if there is no empty semester after the last non-empty semester 
+	 * 
+	 * @return
+	 */
+	private int getFirstEmptySemesterAfterLastNonEmpty() {
+		int toReturn = -1;
+		
+		int semesterNumber = -1;
+		for(int x = semesterList.size()-1; x >= 0; x--){
+			if(semesterList.get(x).getSubjects().size() > 0) {
+				semesterNumber = x;
+				break;
+			}
+		}
+		
+		for(int x = semesterNumber+1; x < semesterList.size(); x++){
+			if(semesterList.get(x).getSubjects().size() == 0){
+				toReturn = x;
+				break;
+			}
+		}
+		
+		return toReturn;
+	}
+
 	private void arrangeBySemesterMaxNumberOfSubjectAllowed(Subject s, ComplementaryValue cV, List<ComplementaryValue> mandatoryComplementaryValues_copy, Map<Subject, Integer> variables,List<Subject> variablesList , int currentSemesterNumber) {
 		int x = getLastSemesterForASubject(s.getCode());
 		if(x == -1){
@@ -1918,6 +1954,10 @@ ComplementaryValueView.Presenter{
 				variables.put(s, x);
 				
 				/****** Add them to the plan ******/
+				while(semesterList.size() <= x ){
+					createSemester(new Semester(), false);
+				}
+				
 				List<ComplementaryValue> temporaryList = new ArrayList<ComplementaryValue>();
 				temporaryList.add(cV);
 				addSubjectsToPlan(temporaryList, "" + x, false);						
@@ -2034,17 +2074,21 @@ ComplementaryValueView.Presenter{
 		
 		return toReturn;
 	}
-
 	
+	/**
+	 * Returns -1 is there is no current semester
+	 * @return
+	 */
 	private int getCurrentSemesterNumber() {
 		int toReturn = -1;
 		
 		if(currentSemesterValue != null){
 			for(Semester s : semesterList){
-				if(s.getSemesterValue().equals(currentSemesterValue)){
-					toReturn = semesterList.indexOf(s);
-					break;
-				}
+				if(s.getSemesterValue() != null)
+					if(s.getSemesterValue().equals(currentSemesterValue)){
+						toReturn = semesterList.indexOf(s);
+						break;
+					}
 			}
 		}
 		
