@@ -1709,7 +1709,7 @@ ComplementaryValueView.Presenter{
 				/*******************************************/
 			}else{
 				/****** 2.B There is no current Semester ******/
-				
+
 				//get the closest empty semester to the last non-empty semester
 				int firstEmptySemesterPosition = semesterList.size();
 				for(int semesterPosition = semesterList.size()-1; semesterPosition >=0; semesterPosition--){
@@ -1723,7 +1723,7 @@ ComplementaryValueView.Presenter{
 				if(firstEmptySemesterPosition == semesterList.size()){
 					createSemester(new Semester());
 				}
-				//use completPlan_3(, result);
+				
 				completePlan_3(firstEmptySemesterPosition, completePlanInfo);
 				
 				/**********************************************/
@@ -1735,37 +1735,27 @@ ComplementaryValueView.Presenter{
 	/**
 	 * 3. Start adding the subjects
 	 * 
-	 * BULLSHIT!!!! TAKE INTO ACCOUNT THE CO-REQUISITES
-	 * 
-	 * 3.1.A: There is not DefautlPlan
-	 * 3.1.A.1 Generate the simultaneous equations
-	 * 3.1.A.1.1 Create the singles equations
-	 * 3.1.A.1.1.1 Create the variables and add them to a map [ComplementaryValue, variable]
-	 * 3.1.A.1.1.1.1 Take the subjects already in the plan as given (constants and no variables) and set them into the map (min semester will be the current semester)
-	 * 3.1.A.1.1.1.2 If not given then create the equation, if there is no such complementaryValue download it
-	 * 3.1.A.2 Solve the simultaneous equations 
-	 * 3.1.A.3 Add the subjects to the plan
-	 * 3.1.A.3.1 If the subject is already in the plan take it as given 
-	 * 
-	 * 3.1.B: There is DefaultPlan
-	 * 3.1.A.1 Delete the complementaryValues already in the plan from the DefaultPlan
-	 * 3.1.A.2 Get the Simultaneous equations and solve them 
-	 * 
-	 * 3.3 Add default subjects (subject left <- if there was a default plan) [optativas]
-	 * 3.3.1 Add default subjects in the closest semester to the Select_Semester which has less than 6 subjects
+	 * 3.1. Get the semester to start with (the next to the current semester or the first empty semester after the last non empty)
+	 * 3.2. Start adding the subjects, start from the the one that have no requisite or all its requisite subjects have a variable defined
+	 * 3.2. Once all subjects have a variable defined, re-run the last part taking into account the number of subjects per semester and correct their variables using that info
+	 * 3.3. If there is a default plan take it into account to correct the variables (ALWAYS TAKING INTO ACCOUNT THAT THE SEMESTER SUGGESTED MUST BE GREATER THAN ITS VARIABLE)
+	 * 3.3.1. If the suggested semester is possible use it
+	 * 3.3.2. If the suggested semester is not possible check if the previous semester to the suggested Semester has less than 6 subjects
+	 * 3.3.3. If not then check the previous semester to the semester previous to the suggested semester
+	 * 3.3.4. If not then check the next semester to the semester previous semester
+	 * 3.3.5. Repeat it for the next round
 	 * 
 	 * @param positionSemesterToStart
 	 * @param completePlanInfo
 	 */
 	private void completePlan_3(int positionSemesterToStart, CompletePlanInfo completePlanInfo) {
-		
-		if((completePlanInfo.getPlanDefautl() != null || completePlanInfo.getMandatoryComplementaryValues() != null) && completePlanInfo.getSubjectGroups() != null){
+
+		if(completePlanInfo.getMandatoryComplementaryValues() != null && completePlanInfo.getSubjectGroups() != null){
 			
 			/***** find the first semester to start from *****/
 			int currentSemesterNumber = getCurrentSemesterNumber();
 			if(currentSemesterNumber != -1) currentSemesterNumber ++;
 			else{
-				GWT.debugger();
 				currentSemesterNumber = getFirstEmptySemesterAfterLastNonEmpty();
 				if(currentSemesterNumber == -1){
 					createSemester(new Semester(), false);
@@ -1774,122 +1764,125 @@ ComplementaryValueView.Presenter{
 			}
 			/*************************************************/
 			
-			if(completePlanInfo.getPlanDefautl() != null){				
-				GWT.log("Default plan has found");
-			}else if(completePlanInfo.getMandatoryComplementaryValues() != null){
-				GWT.log("No default plan found");
-				/************ Create the simultaneous equations ************/
-				/***************** 3.1.A.1.1.1 ******************/
 
-				Map<Subject, Integer> variables = new HashMap<Subject, Integer>();
-				//Copy the list in order to delete the ones done
-				List<ComplementaryValue> mandatoryComplementaryValues_copy = new ArrayList<ComplementaryValue>(completePlanInfo.getMandatoryComplementaryValues());
+			/************ Create the simultaneous equations ************/
+			/***************** 3.1.A.1.1.1 ******************/
+
+			Map<Subject, Integer> variables = new HashMap<Subject, Integer>();
+			//Copy the list in order to delete the ones done
+			List<ComplementaryValue> mandatoryComplementaryValues_copy = new ArrayList<ComplementaryValue>(completePlanInfo.getMandatoryComplementaryValues());
+			
+			int position = 0;
+			boolean noneAdded = true;
+			boolean specialLap = false; //this is when a cV has no
+			while(mandatoryComplementaryValues_copy.size() > 0){
 				
-				//Change this to an ITERABLE
-				int position = 0;
-				boolean noneAdded = true;
-				boolean specialLap = false; //this is when a cV has no 
-				while(mandatoryComplementaryValues_copy.size() > 0){
-					if(position >= mandatoryComplementaryValues_copy.size()) {
-						position = 0;
-						//In order to avoid infinite loops
-						if(noneAdded == true && specialLap == true) break;
-						if(noneAdded == true) specialLap = true;
-						noneAdded = true;
-					}
-					ComplementaryValue cV = mandatoryComplementaryValues_copy.get(position);
-					//Search if it has already a variable
-					int x = getVariableForSimultaneousEquationsMap(variables, cV.getSubject().getCode());
-					if(x == -1){
-						//search if it is already in the plan, and make it a constant
-						int lastSemester = getLastSemesterForASubject(cV.getSubject().getCode()); 
-						if(lastSemester != -1){
-							//create the constant
-							x = lastSemester;
+				
+				if(position >= mandatoryComplementaryValues_copy.size()) {
+					position = 0;
+					//In order to avoid infinite loops
+					if(noneAdded == true && specialLap == true) break;
+					if(noneAdded == true) specialLap = true;
+					noneAdded = true;
+				}
+				ComplementaryValue cV = mandatoryComplementaryValues_copy.get(position);
+				//Search if it has already a variable
+				int x = getVariableForSimultaneousEquationsMap(variables, cV.getSubject().getId());
+				if(x == -1){
+					//search if it is already in the plan, and make it a constant
+					int lastSemester = getLastSemesterForASubject(cV.getSubject().getId()); 
+					if(lastSemester != -1){
+						//create the constant
+						x = lastSemester;
+						variables.put(cV.getSubject(),x);
+						
+						//delete the cV from the mandatoryComplementaryValues_copy
+						mandatoryComplementaryValues_copy.remove(cV);
+					}else{
+						//if not, and if every requisite is a constant, calculate the constant
+						int minNumberSemesterForPrerequisite = getMinSemesterNumber(mandatoryComplementaryValues_copy, variables, cV, currentSemesterNumber, specialLap, true);
+						int minNumberSemesterForCorequisite = getMinSemesterNumber(mandatoryComplementaryValues_copy, variables, cV, currentSemesterNumber, specialLap, false);
+						
+						int minNumberSemesterForRequisite = -1;
+						if(minNumberSemesterForCorequisite > minNumberSemesterForPrerequisite) minNumberSemesterForRequisite = minNumberSemesterForCorequisite;
+						else minNumberSemesterForRequisite = minNumberSemesterForPrerequisite;  
+						
+						if(minNumberSemesterForRequisite == -1 && cV.getListPrerequisites().size() == 0 && cV.getListCorequisites().size() == 0) 
+							minNumberSemesterForRequisite = currentSemesterNumber;
+						if(minNumberSemesterForRequisite != -1){								
+							/******** Adding the variable to the list of variables *******/
+							x = minNumberSemesterForRequisite;
 							variables.put(cV.getSubject(),x);
+							/*************************************************************/
 							
 							//delete the cV from the mandatoryComplementaryValues_copy
 							mandatoryComplementaryValues_copy.remove(cV);
+							
+							/*** In order to take care of the infinite loop and the non-existence of the requisite ****/
+							noneAdded = false;
+							specialLap = false;
+							/******************************************************************************************/
 						}else{
-							//if not, and if every requisite is a constant, calculate the constant
-							int minNumberSemesterForPrerequisite = getMinSemesterNumber(mandatoryComplementaryValues_copy, variables, cV, currentSemesterNumber, specialLap, true);
-							int minNumberSemesterForCorequisite = getMinSemesterNumber(mandatoryComplementaryValues_copy, variables, cV, currentSemesterNumber, specialLap, false);
-							
-							int minNumberSemesterForRequisite = -1;
-							if(minNumberSemesterForCorequisite > minNumberSemesterForPrerequisite) minNumberSemesterForRequisite = minNumberSemesterForCorequisite;
-							else minNumberSemesterForRequisite = minNumberSemesterForPrerequisite;  
-							
-							if(minNumberSemesterForRequisite == -1 && cV.getListPrerequisites().size() == 0 && cV.getListCorequisites().size() == 0) 
-								minNumberSemesterForRequisite = currentSemesterNumber;
-							if(minNumberSemesterForRequisite != -1){								
-								/******** Adding the variable to the list of variables *******/
-								x = minNumberSemesterForRequisite;
-								variables.put(cV.getSubject(),x);
-								/*************************************************************/
-								
-								//delete the cV from the mandatoryComplementaryValues_copy
-								mandatoryComplementaryValues_copy.remove(cV);
-								
-								/*** In order to take care of the infinite loop and the non-existence of the requisite ****/
-								noneAdded = false;
-								specialLap = false;
-								/******************************************************************************************/
-							}else{
-								position++;
-								continue;
-							}
+							position++;
+							continue;
 						}
 					}
+				}else{
+					mandatoryComplementaryValues_copy.remove(cV);
 				}
-				
-				
-				/***** Order them in descending order ******/
-				//The first subject will be the one of the farthest semester
-				int greaterNumber = -1;
-				
-				/**** Recognition round *****/
-				for(int y : variables.values()){
-					if(y > greaterNumber) greaterNumber = y;
-				}
-				/****************************/
-				/*******************************************/
-				
-				/****** Re-order taking into account the variable ******/
-				boolean passed = true;
-				mandatoryComplementaryValues_copy = new ArrayList<ComplementaryValue>(completePlanInfo.getMandatoryComplementaryValues());
-				List<Subject> variablesList = new ArrayList<Subject>(variables.keySet());
-				while(greaterNumber != -1){
-					passed = true;
-					int pos = 0;
-					Subject s = null;
-					while(pos < variablesList.size()){
-						if(s == null) s = variablesList.get(pos);
-						else s = variablesList.get(pos);
-						
-						//Do stuff
-						int x = variables.get(s);
-						if(x == greaterNumber){
-							passed = false;
-							//do stuff in a in-loop
-							ComplementaryValue cV = getCvBySubjectInCVList(s.getCode(), mandatoryComplementaryValues_copy);
-							if(cV != null){
-								arrangeBySemesterMaxNumberOfSubjectAllowed(s, cV, mandatoryComplementaryValues_copy, variables, variablesList, currentSemesterNumber);
-							}
-						}
-						pos = variablesList.indexOf(s) +1;
-					}
-					
-					if(passed == true){						
-						greaterNumber--;
-						passed = true;
-					}
-				}
-				/*******************************************************/
-				
-				
-				/************************************************/
-				/***********************************************************/				
 			}
+			
+			
+			/***** Order them in descending order ******/
+			//The first subject will be the one of the farthest semester
+			int greaterNumber = -1;
+			
+			/**** Recognition round *****/
+			for(int y : variables.values()){
+				if(y > greaterNumber) greaterNumber = y;
+			}
+			/****************************/
+			/*******************************************/
+			
+			/****** Re-order taking into account the variable ******/
+			boolean passed = true;
+			mandatoryComplementaryValues_copy = new ArrayList<ComplementaryValue>(completePlanInfo.getMandatoryComplementaryValues());
+			List<Subject> variablesList = new ArrayList<Subject>(variables.keySet());
+			while(greaterNumber != -1){
+				passed = true;
+				int pos = 0;
+				Subject s = null;
+				while(pos < variablesList.size()){
+					if(s == null) s = variablesList.get(pos);
+					else s = variablesList.get(pos);
+					
+					//Do stuff
+					int x = variables.get(s);
+					if(x == greaterNumber){
+						passed = false;
+						//do stuff in a in-loop
+						ComplementaryValue cV = getCvBySubjectInCVList(s.getId(), mandatoryComplementaryValues_copy);
+						if(cV != null){
+							arrangeBySemesterMaxNumberOfSubjectAllowed(s, cV, mandatoryComplementaryValues_copy, variables, completePlanInfo, variablesList, currentSemesterNumber);
+						}
+					}
+					pos = variablesList.indexOf(s) +1;
+				}
+				
+				if(passed == true){						
+					greaterNumber--;
+					passed = true;
+				}
+			}
+			/*******************************************************/
+			
+			
+			/************************************************/
+			/***********************************************************/				
+			
+			//Take care of the subjectsGroups
+			
+			//save the plan TODO
 			
 		}
 	}
@@ -1920,19 +1913,19 @@ ComplementaryValueView.Presenter{
 		return toReturn;
 	}
 
-	private void arrangeBySemesterMaxNumberOfSubjectAllowed(Subject s, ComplementaryValue cV, List<ComplementaryValue> mandatoryComplementaryValues_copy, Map<Subject, Integer> variables,List<Subject> variablesList , int currentSemesterNumber) {
-		int x = getLastSemesterForASubject(s.getCode());
+	private void arrangeBySemesterMaxNumberOfSubjectAllowed(Subject s, ComplementaryValue cV, List<ComplementaryValue> mandatoryComplementaryValues_copy, Map<Subject, Integer> variables, CompletePlanInfo completePlanInfo,List<Subject> variablesList , int currentSemesterNumber) {
+		int x = getLastSemesterForASubject(s.getId());
 		if(x == -1){
-			x = getVariableForSimultaneousEquationsMap(variables, s.getCode());
+			x = getVariableForSimultaneousEquationsMap(variables, s.getId());
 			if(x != -1){
 				
 				for(Subject sRequisite : cV.getListPrerequisites()){
-					ComplementaryValue cVRequisite = getCvBySubjectInCVList(sRequisite.getCode(), mandatoryComplementaryValues_copy);
+					ComplementaryValue cVRequisite = getCvBySubjectInCVList(sRequisite.getId(), mandatoryComplementaryValues_copy);
 					if(cVRequisite != null){		
 						//Get sRequisite from the variables
-						sRequisite = getSubjectFromVariables(sRequisite.getCode(), variablesList);
+						sRequisite = getSubjectFromVariables(sRequisite.getId(), variablesList);
 						if(sRequisite != null){					
-							arrangeBySemesterMaxNumberOfSubjectAllowed(sRequisite, cVRequisite, mandatoryComplementaryValues_copy, variables, variablesList, currentSemesterNumber);
+							arrangeBySemesterMaxNumberOfSubjectAllowed(sRequisite, cVRequisite, mandatoryComplementaryValues_copy, variables, completePlanInfo, variablesList, currentSemesterNumber);
 						}
 					}
 				}
@@ -1950,8 +1943,64 @@ ComplementaryValueView.Presenter{
 					x++;
 					subjectsInSemester = getNumberOfSubjectsInSemester(x);
 				}
-				
 				variables.put(s, x);
+
+				if(completePlanInfo.getPlanDefautl() != null){
+					/****** Use the advice to arranging the subjects ******/
+					//Get the position suggested
+					int suggestedPosition = -1;
+					suggestedPosition = getSemesterForSubjectById(cV.getSubject().getId(), completePlanInfo.getPlanDefautl());
+					
+					if(suggestedPosition != -1){
+						//If it's possible to use it, else start oscillating between (-1)^n
+						subjectsInSemester = -1;
+						if(suggestedPosition >= x && getNumberOfSubjectsInSemester(suggestedPosition) < 6) x = suggestedPosition;
+						else{
+							int bestSuggestedPosition = -1;
+							boolean toContinue = true;
+							while(bestSuggestedPosition == -1 && toContinue){
+								int counter = 0;
+								for(int inCase = 0; inCase < 3; inCase ++){
+									int semesterPositionToTryNext = suggestedPosition + counter +1;
+									int semesterPositionToTryPrevious = suggestedPosition - ((counter*2) + counter+1);
+
+									if(semesterPositionToTryPrevious < x && semesterPositionToTryNext >= semesterList.size() && semesterPositionToTryPrevious >= semesterList.size()) {
+										toContinue = false;
+										break;
+									}
+
+									if(inCase < 2){
+										//the previous semesters
+										if(semesterPositionToTryPrevious < semesterList.size() &&  semesterPositionToTryPrevious >= x && getNumberOfSubjectsInSemester(semesterPositionToTryPrevious) < 6){
+											bestSuggestedPosition = suggestedPosition + counter;
+											break;
+										}
+									}else{
+										//the next semester
+										if(semesterPositionToTryNext < semesterList.size() && semesterPositionToTryNext >= x && getNumberOfSubjectsInSemester(semesterPositionToTryNext) < 6){
+											bestSuggestedPosition = suggestedPosition + counter;
+											break;
+										}
+									}
+									
+								}
+								if(bestSuggestedPosition != -1)	break;
+								counter ++;
+							}
+							//If there is no option use the original value
+							if(bestSuggestedPosition != -1){
+								x = bestSuggestedPosition;
+							}
+						}
+						
+					}
+					
+					
+					//TODO do something with the subject from the planDefault not added
+
+					
+					/******************************************************/
+				}
 				
 				/****** Add them to the plan ******/
 				while(semesterList.size() <= x ){
@@ -1970,11 +2019,33 @@ ComplementaryValueView.Presenter{
 		
 	}
 
-	private Subject getSubjectFromVariables(String subjectCode, List<Subject> variablesList) {
+	/**
+	 * Will return the number of the semester where the subject with a code equals to @param subjectCode appears first in the plan, eg. 0 if is in the first, and -1 if it does not exist
+	 * @param subjectCode
+	 * @param planDefautl
+	 * @return
+	 */
+	private int getSemesterForSubjectById(long subjectId, Plan planDefautl) {
+		//private int getSemesterForSubjectByCode(String subjectCode, Plan planDefautl) {
+		int toReturn = -1;
+		
+		for(Semester semester : planDefautl.getSemesters()){
+			for(SubjectValue sV : semester.getSubjects()){
+				if(sV.getComplementaryValues().getSubject().getId().equals(subjectId)){
+					toReturn = planDefautl.getSemesters().indexOf(semester);
+					break;
+				}
+			}
+		}
+		
+		return toReturn;
+	}
+
+	private Subject getSubjectFromVariables(long subjectId, List<Subject> variablesList) {
 		Subject toReturn = null;
 		
 		for(Subject s : variablesList){
-			if(s.getCode().equals(subjectCode)){
+			if(s.getId().equals(subjectId)){
 				toReturn = s;
 				break;
 			}
@@ -2022,13 +2093,13 @@ ComplementaryValueView.Presenter{
 				int minNumberSemesterForOrRequisite = -1;
 				for(Subject sRequisite : sRequisites){
 					//Get the current semester 
-					int currentRequisiteSemesterNumber = getVariableForSimultaneousEquationsMap(variables, sRequisite.getCode());//getLastSemesterForASubject(sRequisite.getCode());
+					int currentRequisiteSemesterNumber = getVariableForSimultaneousEquationsMap(variables, sRequisite.getId());//getLastSemesterForASubject(sRequisite.getCode());
 					
 					//because these are pre-requisites
 					if(currentRequisiteSemesterNumber != -1 && isPrerequisite == true) currentRequisiteSemesterNumber++; 
 					
 					if(specialLap == true && currentRequisiteSemesterNumber == -1){
-						if(getCvBySubjectInCVList(sRequisite.getCode(), mandatoryComplementaryValues_copy) == null){
+						if(getCvBySubjectInCVList(sRequisite.getId(), mandatoryComplementaryValues_copy) == null){
 							currentRequisiteSemesterNumber = firstAvailableSemesterNumber;
 						}
 					}
@@ -2061,12 +2132,12 @@ ComplementaryValueView.Presenter{
 	 * @param listCV
 	 * @return
 	 */
-	private ComplementaryValue getCvBySubjectInCVList(String subjectCode,	List<ComplementaryValue> listCV) {
+	private ComplementaryValue getCvBySubjectInCVList(long subjectId,	List<ComplementaryValue> listCV) {
 		ComplementaryValue toReturn = null;
 		
-		if(subjectCode != null)
+		//if(subjectCode != null)
 		for(ComplementaryValue cV : listCV){
-			if(cV.getSubject().getCode().equals(subjectCode) == true){
+			if(cV.getSubject().getId().equals(subjectId) == true){
 				toReturn = cV;
 				break;
 			}
@@ -2101,11 +2172,11 @@ ComplementaryValueView.Presenter{
 	 * @param subjectCode
 	 * @return
 	 */
-	private int getLastSemesterForASubject(String subjectCode) {
+	private int getLastSemesterForASubject(long subjectId) {
 		int semesterNumber = -1;
 		//Check if the subject Exists and is approved
 		for(SubjectValue sV : subjectValuesList){
-			if(sV.getComplementaryValues().getSubject().getCode().trim().equals(subjectCode) == true){
+			if(sV.getComplementaryValues().getSubject().getId().equals(subjectId) == true){
 				if(sV.getGrade() >= 3 || sV.isTaken() == false){
 					int semesterNumber_T = semesterList.indexOf(subjectValuesAndSemesterMap.get(sV));
 					if(semesterNumber_T > semesterNumber){
@@ -2127,11 +2198,11 @@ ComplementaryValueView.Presenter{
 	 * @param subjectCode
 	 * @return
 	 */
-	private Integer getVariableForSimultaneousEquationsMap(Map<Subject, Integer> mapSI, String subjectCode) {
+	private Integer getVariableForSimultaneousEquationsMap(Map<Subject, Integer> mapSI, long subjectId) {
 		Integer toReturn = -1;
 		
 		for(Subject s: mapSI.keySet()){
-			if(s.getCode().equals(subjectCode) == true){
+			if(s.getId().equals(subjectId) == true){
 				toReturn = mapSI.get(s);
 				break;
 			}

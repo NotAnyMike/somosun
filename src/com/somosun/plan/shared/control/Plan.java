@@ -70,7 +70,11 @@ public class Plan implements Serializable {
 	}
 
 	public void setUser(Student user) {
-		this.user = user;
+		if(user == null){
+			this.user = null;
+		}else{			
+			this.user = user;
+		}
 	}
 
 	public boolean isDefault() {

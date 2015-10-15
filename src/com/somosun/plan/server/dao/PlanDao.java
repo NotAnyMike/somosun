@@ -252,13 +252,16 @@ public class PlanDao {
 
 	public Plan getPlanDefault(String careerCode) {
 		Plan p = (Plan) ofy().load().type(Plan.class).filter("isDefault", true).filter("career.code", careerCode).first().now();
-		p.setUser(null);
-		p.setDefault(false);
-		if(p != null){
-			for(Semester s : p.getSemesters()){
-				s.setId(null);
-				for(SubjectValue sV : s.getSubjects()){
-					sV.setId(null);
+		if(p != null){			
+			p.setUser(null);
+			p.setDefault(false);
+			p.setId(null);
+			if(p != null){
+				for(Semester s : p.getSemesters()){
+					s.setId(null);
+					for(SubjectValue sV : s.getSubjects()){
+						sV.setId(null);
+					}
 				}
 			}
 		}

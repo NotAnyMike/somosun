@@ -245,6 +245,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		CareerDao cDao = new CareerDao();
 		if(s != null){
 			if(s.isAdmin() == true){
+				plan.setId(null);
 				plan.setUser(null);
 				plan.setDefault(true);
 				c = cDao.getCareerByCode(plan.getCareerCode());
@@ -1006,7 +1007,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		if(career != null){
 			
 			
-			if(career.hasDefault() || career.hasAnalysis()){
+			if(career.hasAnalysis() == true){
 				toReturn  = new CompletePlanInfo();
 				toReturn.setCareer(career);
 
@@ -1020,6 +1021,16 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 				
 				toReturn.setSubjectGroups(subjectGroupsToReturn);
 						
+				ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
+				List<ComplementaryValue> mandatoryComplementaryValues = complementaryValueDao.getMandatoryComplementaryValues(career.getCode());
+				List<ComplementaryValue> mandatoryComplementaryValuesToReturn = new ArrayList<ComplementaryValue>();
+				
+				for(ComplementaryValue cV : mandatoryComplementaryValues){
+					mandatoryComplementaryValuesToReturn.add(cV);
+				}
+				
+				toReturn.setMandatoryComplementaryValues(mandatoryComplementaryValuesToReturn);
+				
 				if(career.hasDefault() == true){
 					
 					Plan defaultPlan = null;
@@ -1028,20 +1039,9 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 					
 					toReturn.setPlanDefautl(defaultPlan);
 					
-					
-				}else if(career.hasAnalysis() == true){
-					
-					ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
-					List<ComplementaryValue> mandatoryComplementaryValues = complementaryValueDao.getMandatoryComplementaryValues(career.getCode());
-					List<ComplementaryValue> mandatoryComplementaryValuesToReturn = new ArrayList<ComplementaryValue>();
-					
-					for(ComplementaryValue cV : mandatoryComplementaryValues){
-						mandatoryComplementaryValuesToReturn.add(cV);
-					}
-					
-					toReturn.setMandatoryComplementaryValues(mandatoryComplementaryValuesToReturn);
-					
 				}
+			
+					
 			}
 			
 			
