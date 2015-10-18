@@ -1888,6 +1888,34 @@ ComplementaryValueView.Presenter{
 			}
 			/*******************************************************/
 			
+			/***** Adding the subjects left (i.e. not added) ******/
+			//In order to test this comment the two big while previous to this part in this method 
+			if(mandatoryComplementaryValues_copy.size() != 0){
+				GWT.debugger();
+				//start from the last semester and add them
+				int usefulSemesterNumber = currentSemesterNumber;
+				Integer numberOfSubjects = null;
+				for(ComplementaryValue cVLeft : mandatoryComplementaryValues_copy){
+					
+					numberOfSubjects = getNumberOfSubjectsInSemester(usefulSemesterNumber);
+					
+					//if it is -1 means that the semester does not exist so it should continue in order to get to addComplementaryValueToASemester and create the semester
+					while(numberOfSubjects != null && numberOfSubjects >= 6){
+						numberOfSubjects = getNumberOfSubjectsInSemester(usefulSemesterNumber);
+						if(numberOfSubjects >= 6){
+							usefulSemesterNumber++;
+						}
+					}
+					
+					//Add the cV to the usefulSemesterNumber
+					addComplementaryValueToASemester(cVLeft, usefulSemesterNumber);
+					
+				}
+				
+				mandatoryComplementaryValues_copy.clear();
+			}
+			/*************************************/
+			
 			
 			/************************************************/
 			/***********************************************************/				
@@ -1961,6 +1989,16 @@ ComplementaryValueView.Presenter{
 		return toReturn;
 	}
 
+	/**
+	 * This method will take care into account the number of subjects in the semester to select the semi-final value for the variable. It will add the subjects to the plan too.
+	 * @param s
+	 * @param cV
+	 * @param mandatoryComplementaryValues_copy
+	 * @param variables
+	 * @param completePlanInfo
+	 * @param variablesList
+	 * @param currentSemesterNumber
+	 */
 	private void arrangeBySemesterMaxNumberOfSubjectAllowed(Subject s, ComplementaryValue cV, List<ComplementaryValue> mandatoryComplementaryValues_copy, Map<Subject, Integer> variables, CompletePlanInfo completePlanInfo,List<Subject> variablesList , int currentSemesterNumber) {
 		int x = getLastSemesterForASubject(s.getId());
 		if(x == -1){
@@ -2035,7 +2073,6 @@ ComplementaryValueView.Presenter{
 								}
 								if(bestSuggestedPosition != -1)	break;
 								counter ++;
-								GWT.log("@@@@@@@@@@@@@@@@@@@@" + s.getName());
 							}
 							//If there is no option use the original value
 							if(bestSuggestedPosition != -1){
@@ -2047,21 +2084,12 @@ ComplementaryValueView.Presenter{
 					
 					variables.put(s, x);
 					
-					//TODO do something with the subject from the planDefault not added
-
-					
 					/******************************************************/
 				}
 				
-				/****** Add them to the plan ******/
-				while(semesterList.size() <= x ){
-					createSemester(new Semester(), false);
-				}
-				
-				List<ComplementaryValue> temporaryList = new ArrayList<ComplementaryValue>();
-				temporaryList.add(cV);
-				addSubjectsToPlan(temporaryList, "" + x, false);						
-				/**********************************/
+				// Add them to the plan
+				addComplementaryValueToASemester(cV, x);	
+				mandatoryComplementaryValues_copy.remove(cV);
 			}
 		}
 		//set the variable to that semester
@@ -2069,6 +2097,22 @@ ComplementaryValueView.Presenter{
 		
 		
 	}
+
+	/**
+	 * This method will add the cV to the @param x-th semester, if the semester does not exist, this method will create the necessary semesters
+	 * @param cV
+	 * @param semesterNumber
+	 */
+	private void addComplementaryValueToASemester(ComplementaryValue cV, int semesterNumber) {
+		while(semesterList.size() <= semesterNumber ){
+			createSemester(new Semester(), false);
+		}
+		
+		List<ComplementaryValue> temporaryList = new ArrayList<ComplementaryValue>();
+		temporaryList.add(cV);
+		addSubjectsToPlan(temporaryList, "" + semesterNumber, false);
+	}
+	
 
 	/**
 	 * Will return the number of the semester where the subject with a code equals to @param subjectCode appears first in the plan, eg. 0 if is in the first, and -1 if it does not exist
