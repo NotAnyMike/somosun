@@ -37,6 +37,7 @@ war/WEB-INF/deploy/index/rpcPolicyManifest/**/*.*
 .Trashes
 ehthumbs.db
 Thumbs.db
+**/Icon\r
 
 # Folders #
 ###########
