@@ -1764,10 +1764,23 @@ ComplementaryValueView.Presenter{
 			}
 			/*************************************************/
 			
+			
+			/****** Copy all the subject from defaultPlan to mandatory subjects ******/
+//			if(completePlanInfo.getPlanDefautl() != null){
+//				for(Semester semester : completePlanInfo.getPlanDefautl().getSemesters()){
+//					for(SubjectValue subjectValue : semester.getSubjects()){
+//						//Check if it is in the list
+//						if(getSubjectFromListByCode(subjectValue.getComplementaryValues().getSubject().getCode(), subjectValue.getComplementaryValues().getSubject().getId(), subjectValue.getComplementaryValues().getSubject().getName(), completePlanInfo.getMandatoryComplementaryValues()) == null){
+//							//add it
+//							completePlanInfo.getMandatoryComplementaryValues().add(subjectValue.getComplementaryValues());
+//						}						
+//					}
+//				}
+//			}
+			/*************************************************************************/
 
+			
 			/************ Create the simultaneous equations ************/
-			/***************** 3.1.A.1.1.1 ******************/
-
 			Map<Subject, Integer> variables = new HashMap<Subject, Integer>();
 			//Copy the list in order to delete the ones done
 			List<ComplementaryValue> mandatoryComplementaryValues_copy = new ArrayList<ComplementaryValue>(completePlanInfo.getMandatoryComplementaryValues());
@@ -1841,7 +1854,6 @@ ComplementaryValueView.Presenter{
 			for(int y : variables.values()){
 				if(y > greaterNumber) greaterNumber = y;
 			}
-			/****************************/
 			/*******************************************/
 			
 			/****** Re-order taking into account the variable ******/
@@ -1885,6 +1897,40 @@ ComplementaryValueView.Presenter{
 			//save the plan TODO
 			
 		}
+	}
+
+	/**
+	 * This method will return the subject which match the subject code, if the subjectCode is Optativa or FreeElection (generic codes) or has an empty code it will use the id and the name to compare, if the ids match then it returns that subject, null if there is nothing else
+	 * <br></br>
+	 * This method will use SomosUNUtils.standardizeString(@param subjectName, true, true) to compare the two names 
+	 * @param subject
+	 * @param subjectId
+	 * @param subjectName
+	 * @param mandatoryComplementaryValues
+	 */
+	private Subject getSubjectFromListByCode(String subjectCode, Long subjectId, String subjectName, List<ComplementaryValue> list) {
+		Subject toReturn = null;
+		
+		for(ComplementaryValue cV : list){
+			if(cV.getSubject().isDefault() == false && cV.getSubject().getCode().trim().equals("") == false && subjectCode != null && subjectCode.isEmpty() == false){
+				if(cV.getSubject().getCode().equals(subjectCode)){
+					toReturn = cV.getSubject();
+					break;
+				}				
+			}else{
+				//if could be a free election or an opative (the code is empty or idDefault = true
+				if(SomosUNUtils.standardizeString(cV.getSubject().getName(),true,true).equals(SomosUNUtils.standardizeString(subjectName, true, true)) == true && cV.getSubject().getCode().trim().equals(subjectCode.trim()) == true){
+					toReturn = cV.getSubject();
+					break;
+				}
+				else if(cV.getSubject().getId().equals(subjectId) == true && cV.getSubject().getCode().trim().equals(subjectCode.trim()) == true){
+					toReturn = cV.getSubject();
+					break;
+				}
+			}
+		}
+		
+		return toReturn;
 	}
 
 	/**
@@ -2041,10 +2087,10 @@ ComplementaryValueView.Presenter{
 		return toReturn;
 	}
 
-	private Subject getSubjectFromVariables(long subjectId, List<Subject> variablesList) {
+	private Subject getSubjectFromVariables(long subjectId, List<Subject> list) {
 		Subject toReturn = null;
 		
-		for(Subject s : variablesList){
+		for(Subject s : list){
 			if(s.getId().equals(subjectId)){
 				toReturn = s;
 				break;
