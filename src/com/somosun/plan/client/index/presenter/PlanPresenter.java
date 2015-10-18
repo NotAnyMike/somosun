@@ -1766,17 +1766,17 @@ ComplementaryValueView.Presenter{
 			
 			
 			/****** Copy all the subject from defaultPlan to mandatory subjects ******/
-//			if(completePlanInfo.getPlanDefautl() != null){
-//				for(Semester semester : completePlanInfo.getPlanDefautl().getSemesters()){
-//					for(SubjectValue subjectValue : semester.getSubjects()){
-//						//Check if it is in the list
-//						if(getSubjectFromListByCode(subjectValue.getComplementaryValues().getSubject().getCode(), subjectValue.getComplementaryValues().getSubject().getId(), subjectValue.getComplementaryValues().getSubject().getName(), completePlanInfo.getMandatoryComplementaryValues()) == null){
-//							//add it
-//							completePlanInfo.getMandatoryComplementaryValues().add(subjectValue.getComplementaryValues());
-//						}						
-//					}
-//				}
-//			}
+			if(completePlanInfo.getPlanDefautl() != null){
+				for(Semester semester : completePlanInfo.getPlanDefautl().getSemesters()){
+					for(SubjectValue subjectValue : semester.getSubjects()){
+						//Check if it is in the list
+						if(getSubjectFromListByCode(subjectValue.getComplementaryValues().getSubject().getCode(), subjectValue.getComplementaryValues().getSubject().getId(), subjectValue.getComplementaryValues().getSubject().getName(), completePlanInfo.getMandatoryComplementaryValues()) == null){
+							//add it
+							completePlanInfo.getMandatoryComplementaryValues().add(subjectValue.getComplementaryValues());
+						}						
+					}
+				}
+			}
 			/*************************************************************************/
 
 			
@@ -1900,7 +1900,9 @@ ComplementaryValueView.Presenter{
 	}
 
 	/**
-	 * This method will return the subject which match the subject code, if the subjectCode is Optativa or FreeElection (generic codes) or has an empty code it will use the id and the name to compare, if the ids match then it returns that subject, null if there is nothing else
+	 * This method will return the subject which match the subject code, if the subjectCode is Optativa 
+	 * or FreeElection (generic codes) or has an empty code it will use the id and the name 
+	 * (if it's not a default subject) to compare, if the ids match then it returns that subject, null if there is nothing else
 	 * <br></br>
 	 * This method will use SomosUNUtils.standardizeString(@param subjectName, true, true) to compare the two names 
 	 * @param subject
@@ -1919,7 +1921,7 @@ ComplementaryValueView.Presenter{
 				}				
 			}else{
 				//if could be a free election or an opative (the code is empty or idDefault = true
-				if(SomosUNUtils.standardizeString(cV.getSubject().getName(),true,true).equals(SomosUNUtils.standardizeString(subjectName, true, true)) == true && cV.getSubject().getCode().trim().equals(subjectCode.trim()) == true){
+				if(cV.getSubject().isDefault() == false && SomosUNUtils.standardizeString(cV.getSubject().getName(),true,true).equals(SomosUNUtils.standardizeString(subjectName, true, true)) == true && cV.getSubject().getCode().trim().equals(subjectCode.trim()) == true){
 					toReturn = cV.getSubject();
 					break;
 				}
@@ -1989,7 +1991,6 @@ ComplementaryValueView.Presenter{
 					x++;
 					subjectsInSemester = getNumberOfSubjectsInSemester(x);
 				}
-				variables.put(s, x);
 
 				if(completePlanInfo.getPlanDefautl() != null){
 					/****** Use the advice to arranging the subjects ******/
@@ -2004,13 +2005,14 @@ ComplementaryValueView.Presenter{
 						else{
 							int bestSuggestedPosition = -1;
 							boolean toContinue = true;
+							int counter = 0;
 							while(bestSuggestedPosition == -1 && toContinue){
-								int counter = 0;
+								if(s.getName().equals("libre eleccion")) GWT.debugger();
 								for(int inCase = 0; inCase < 3; inCase ++){
 									int semesterPositionToTryNext = suggestedPosition + counter +1;
 									int semesterPositionToTryPrevious = suggestedPosition - ((counter*2) + counter+1);
 
-									if(semesterPositionToTryPrevious < x && semesterPositionToTryNext >= semesterList.size() && semesterPositionToTryPrevious >= semesterList.size()) {
+									if((semesterPositionToTryPrevious < x || semesterPositionToTryPrevious >= semesterList.size()) && semesterPositionToTryNext >= semesterList.size()) {
 										toContinue = false;
 										break;
 									}
@@ -2018,13 +2020,14 @@ ComplementaryValueView.Presenter{
 									if(inCase < 2){
 										//the previous semesters
 										if(semesterPositionToTryPrevious < semesterList.size() &&  semesterPositionToTryPrevious >= x && getNumberOfSubjectsInSemester(semesterPositionToTryPrevious) < 6){
-											bestSuggestedPosition = suggestedPosition + counter;
+											bestSuggestedPosition = semesterPositionToTryPrevious;
 											break;
 										}
 									}else{
 										//the next semester
 										if(semesterPositionToTryNext < semesterList.size() && semesterPositionToTryNext >= x && getNumberOfSubjectsInSemester(semesterPositionToTryNext) < 6){
-											bestSuggestedPosition = suggestedPosition + counter;
+											//bestSuggestedPosition = suggestedPosition + counter;
+											bestSuggestedPosition = semesterPositionToTryNext;
 											break;
 										}
 									}
@@ -2032,6 +2035,7 @@ ComplementaryValueView.Presenter{
 								}
 								if(bestSuggestedPosition != -1)	break;
 								counter ++;
+								GWT.log("@@@@@@@@@@@@@@@@@@@@" + s.getName());
 							}
 							//If there is no option use the original value
 							if(bestSuggestedPosition != -1){
@@ -2041,6 +2045,7 @@ ComplementaryValueView.Presenter{
 						
 					}
 					
+					variables.put(s, x);
 					
 					//TODO do something with the subject from the planDefault not added
 
@@ -2111,7 +2116,7 @@ ComplementaryValueView.Presenter{
 	private int getNumberOfSubjectsInSemester(int semesterNumber) {
 		int toReturn = -1;
 
-		if(semesterNumber < semesterList.size())
+		if(semesterNumber < semesterList.size() && semesterNumber >= 0)
 			toReturn = semesterList.get(semesterNumber).getSubjects().size();
 		
 		return toReturn;
