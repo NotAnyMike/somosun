@@ -1880,7 +1880,7 @@ ComplementaryValueView.Presenter{
 			/************************************************/
 			/***********************************************************/				
 			
-			//Take care of the subjectsGroups
+			//TODO Take care of the subjectsGroups
 			
 			//save the plan TODO
 			
