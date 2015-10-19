@@ -38,10 +38,12 @@ import com.somosun.plan.shared.control.Career;
 import com.somosun.plan.shared.control.ComplementaryValue;
 import com.somosun.plan.shared.control.Message;
 import com.somosun.plan.shared.control.Plan;
+import com.somosun.plan.shared.control.Semester;
 import com.somosun.plan.shared.control.SemesterValue;
 import com.somosun.plan.shared.control.Student;
 import com.somosun.plan.shared.control.Subject;
 import com.somosun.plan.shared.control.SubjectGroup;
+import com.somosun.plan.shared.control.SubjectValue;
 import com.somosun.plan.shared.control.UserSun;
 import com.somosun.plan.shared.values.SubjectGroupCodes;
 import com.somosun.plan.shared.values.TypologyCodes;
@@ -813,10 +815,6 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 							
 						}
 						
-						
-						
-						
-						
 					}
 					
 				}
@@ -1041,6 +1039,60 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 					
 				}
 			
+				/****** Copy all the subject from defaultPlan to mandatory subjects ******/
+				if(toReturn.getPlanDefautl() != null){
+					for(Semester semester : toReturn.getPlanDefautl().getSemesters()){
+						for(SubjectValue subjectValue : semester.getSubjects()){
+							//Check if it is in the list
+							if(SomosUNUtils.getSubjectFromListByCode(subjectValue.getComplementaryValues().getSubject().getCode(), subjectValue.getComplementaryValues().getSubject().getId(), subjectValue.getComplementaryValues().getSubject().getName(), toReturn.getMandatoryComplementaryValues()) == null){
+								//add it
+								toReturn.getMandatoryComplementaryValues().add(subjectValue.getComplementaryValues());
+							}						
+						}
+					}
+				}
+				/*************************************************************************/
+
+				/******** <taking care of the subjects groups> *********/
+				// Count the number of the no-mandatory subjects for a given subjectGroup and find the credits number left to complete that subjectGroup
+				// For every subject, if not mandatory find the subjectGroup in the map and add the number of credits
+				Map<SubjectGroup, Integer> amountOfCredits = new HashMap<SubjectGroup, Integer>();
+				for(ComplementaryValue cVToSG : toReturn.getMandatoryComplementaryValues()){
+					if(cVToSG.isMandatory() == false){
+						SubjectGroup sG_temporary = SomosUNUtils.getSubjectGroupInSetByName(cVToSG.getSubjectGroup().getName(), amountOfCredits.keySet());
+						int x = -1;
+						
+						if(sG_temporary != null) {
+							x = amountOfCredits.get(sG_temporary);
+						} else {
+							x = 0;
+							sG_temporary = cVToSG.getSubjectGroup();
+						}
+						
+						x += cVToSG.getSubject().getCredits();
+						
+						amountOfCredits.put(sG_temporary, x);
+						
+					}
+				}
+				//Add to the mandatorySubjectList an optative subject with that amount of credits left
+				for(SubjectGroup sG : toReturn.getSubjectGroups()){
+					
+					int creditsToAdd = 0;
+					SubjectGroup sG_temporary = SomosUNUtils.getSubjectGroupInSetByName(sG.getName(), amountOfCredits.keySet());
+					
+					if(sG_temporary == null){					
+						creditsToAdd = sG.getOptativeCredits();
+					}else{
+						int creditsAdded = amountOfCredits.get(sG_temporary);
+						creditsToAdd = sG.getOptativeCredits() - creditsAdded;
+					}
+					
+					if(creditsToAdd > 0){
+						//TODO create a default subject (cV) for sG with creditsToAdd credits and add it to the mandatorySubjectList
+					}
+				}
+				/******** </taking care of the subjects groups> ********/
 					
 			}
 			

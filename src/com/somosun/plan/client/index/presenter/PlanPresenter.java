@@ -1764,62 +1764,6 @@ ComplementaryValueView.Presenter{
 			}
 			/*************************************************/
 			
-			
-			/****** Copy all the subject from defaultPlan to mandatory subjects ******/
-			if(completePlanInfo.getPlanDefautl() != null){
-				for(Semester semester : completePlanInfo.getPlanDefautl().getSemesters()){
-					for(SubjectValue subjectValue : semester.getSubjects()){
-						//Check if it is in the list
-						if(getSubjectFromListByCode(subjectValue.getComplementaryValues().getSubject().getCode(), subjectValue.getComplementaryValues().getSubject().getId(), subjectValue.getComplementaryValues().getSubject().getName(), completePlanInfo.getMandatoryComplementaryValues()) == null){
-							//add it
-							completePlanInfo.getMandatoryComplementaryValues().add(subjectValue.getComplementaryValues());
-						}						
-					}
-				}
-			}
-			/*************************************************************************/
-
-			/******** <taking care of the subjects groups> *********/
-			// Count the number of the no-mandatory subjects for a given subjectGroup and find the credits number left to complete that subjectGroup
-			// For every subject, if not mandatory find the subjectGroup in the map and add the number of credits
-			Map<SubjectGroup, Integer> amountOfCredits = new HashMap<SubjectGroup, Integer>();
-			for(ComplementaryValue cVToSG : completePlanInfo.getMandatoryComplementaryValues()){
-				if(cVToSG.isMandatory() == false){
-					SubjectGroup sG_temporary = getSubjectGroupInSetByName(cVToSG.getSubjectGroup().getName(), amountOfCredits.keySet());
-					int x = -1;
-					
-					if(sG_temporary != null) {
-						x = amountOfCredits.get(sG_temporary);
-					} else {
-						x = 0;
-						sG_temporary = cVToSG.getSubjectGroup();
-					}
-					
-					x += cVToSG.getSubject().getCredits();
-					
-					amountOfCredits.put(sG_temporary, x);
-					
-				}
-			}
-			//Add to the mandatorySubjectList an optative subject with that amount of credits left
-			for(SubjectGroup sG : completePlanInfo.getSubjectGroups()){
-				
-				int creditsToAdd = 0;
-				SubjectGroup sG_temporary = getSubjectGroupInSetByName(sG.getName(), amountOfCredits.keySet());
-				
-				if(sG_temporary == null){					
-					creditsToAdd = sG.getOptativeCredits();
-				}else{
-					int creditsAdded = amountOfCredits.get(sG_temporary);
-					creditsToAdd = sG.getOptativeCredits() - creditsAdded;
-				}
-				
-				if(creditsToAdd > 0){
-					//TODO create a default subject for sG with creditsToAdd credits and add it to the mandatorySubjectList
-				}
-			}
-			/******** </taking care of the subjects groups> ********/
-			
 			/************ Create the simultaneous equations ************/
 			Map<Subject, Integer> variables = new HashMap<Subject, Integer>();
 			//Copy the list in order to delete the ones done
@@ -1929,7 +1873,7 @@ ComplementaryValueView.Presenter{
 			/*******************************************************/
 			
 			/***** Adding the subjects left (i.e. not added) ******/
-			//In order to test this comment the two big while previous to this part in this method 
+			//In order to test this comment the two big while previous to this part in this method
 			if(mandatoryComplementaryValues_copy.size() != 0){
 				GWT.debugger();
 				//start from the last semester and add them
@@ -1948,7 +1892,9 @@ ComplementaryValueView.Presenter{
 					}
 					
 					//Add the cV to the usefulSemesterNumber
-					addComplementaryValueToASemester(cVLeft, usefulSemesterNumber);
+					if(getLastSemesterForASubject(cVLeft.getSubject().getId()) == -1){						
+						addComplementaryValueToASemester(cVLeft, usefulSemesterNumber);
+					}
 					
 				}
 				
@@ -1961,65 +1907,7 @@ ComplementaryValueView.Presenter{
 			
 		}
 	}
-
-	/**
-	 * Returns null if there is no subjectGroup in @param set which has the same @param name
-	 * 
-	 * @param name
-	 * @param keySet
-	 * @return
-	 */
-	private SubjectGroup getSubjectGroupInSetByName(String name, Set<SubjectGroup> set) {
-		SubjectGroup toReturn = null;
-		
-		for(SubjectGroup sG : set){
-			if(sG.getName().equals(name)){
-				toReturn = sG;
-				break;
-			}
-		}
-		
-		return toReturn;
-	}
 	
-
-	/**
-	 * This method will return the subject which match the subject code, if the subjectCode is Optativa 
-	 * or FreeElection (generic codes) or has an empty code it will use the id and the name 
-	 * (if it's not a default subject) to compare, if the ids match then it returns that subject, null if there is nothing else
-	 * <br></br>
-	 * This method will use SomosUNUtils.standardizeString(@param subjectName, true, true) to compare the two names 
-	 * @param subject
-	 * @param subjectId
-	 * @param subjectName
-	 * @param mandatoryComplementaryValues
-	 */
-	private Subject getSubjectFromListByCode(String subjectCode, Long subjectId, String subjectName, List<ComplementaryValue> list) {
-		Subject toReturn = null;
-		
-		for(ComplementaryValue cV : list){
-			if(cV.getSubject().isDefault() == false && cV.getSubject().getCode().trim().equals("") == false && subjectCode != null && subjectCode.isEmpty() == false){
-				if(cV.getSubject().getCode().equals(subjectCode)){
-					toReturn = cV.getSubject();
-					break;
-				}				
-			}else{
-				//if could be a free election or an opative (the code is empty or idDefault = true
-				if(cV.getSubject().isDefault() == false && SomosUNUtils.standardizeString(cV.getSubject().getName(),true,true).equals(SomosUNUtils.standardizeString(subjectName, true, true)) == true && cV.getSubject().getCode().trim().equals(subjectCode.trim()) == true){
-					toReturn = cV.getSubject();
-					break;
-				}
-				else if(cV.getSubject().getId().equals(subjectId) == true && cV.getSubject().getCode().trim().equals(subjectCode.trim()) == true){
-					toReturn = cV.getSubject();
-					break;
-				}
-			}
-		}
-		
-		return toReturn;
-	}
-	
-
 	/**
 	 * Returns -1 if there is no empty semester after the last non-empty semester 
 	 * 
@@ -2045,7 +1933,6 @@ ComplementaryValueView.Presenter{
 		
 		return toReturn;
 	}
-
 	
 	/**
 	 * This method will take care into account the number of subjects in the semester to select the semi-final value for the variable. It will add the subjects to the plan too.
@@ -2155,7 +2042,6 @@ ComplementaryValueView.Presenter{
 		
 		
 	}
-
 	
 	/**
 	 * This method will add the cV to the @param x-th semester, if the semester does not exist, this method will create the necessary semesters
@@ -2171,9 +2057,7 @@ ComplementaryValueView.Presenter{
 		temporaryList.add(cV);
 		addSubjectsToPlan(temporaryList, "" + semesterNumber, false);
 	}
-	
-
-	
+		
 	/**
 	 * Will return the number of the semester where the subject with a code equals to @param subjectCode appears first in the plan, eg. 0 if is in the first, and -1 if it does not exist
 	 * @param subjectCode
@@ -2208,7 +2092,6 @@ ComplementaryValueView.Presenter{
 		
 		return toReturn;
 	}
-
 	
 	/**
 	 * This method will return the number of subjects for the @param semesterNumber-th semester, e.g. semesterNumber = 0, will return the number of subjects for the first semester
@@ -2226,7 +2109,6 @@ ComplementaryValueView.Presenter{
 		
 		return toReturn;
 	}
-
 	
 	/**
 	 * 
@@ -2281,7 +2163,6 @@ ComplementaryValueView.Presenter{
 		
 		return maxOfMinsNumberSemesterForRequisite;
 	}
-
 	
 	/**
 	 * This method will return true if in @param listCV is any subject with the same code as @param subjectCode
@@ -2304,7 +2185,6 @@ ComplementaryValueView.Presenter{
 		return toReturn;
 	}
 	
-	
 	/**
 	 * Returns -1 is there is no current semester
 	 * @return
@@ -2325,7 +2205,6 @@ ComplementaryValueView.Presenter{
 		return toReturn;
 	}
 
-	
 	/**
 	 * Will return the number of the last approved subject found in the plan, if there is no such subject approved return -1
 	 * 
@@ -2349,7 +2228,6 @@ ComplementaryValueView.Presenter{
 		//Get the semester number
 		return semesterNumber ;
 	}
-
 	
 	/**
 	 * This method will return the integer or variable corresponding to the complementary value from the simultaneous equations
@@ -2372,15 +2250,12 @@ ComplementaryValueView.Presenter{
 		return toReturn;
 	}
 	
-
-	
 	/**
 	 * Will show the curtain from view
 	 */
 	public void showCurtain(){
 		view.showCurtain();
 	}
-	
 	
 	/**
 	 * Will hide the curtain from view
@@ -2391,7 +2266,6 @@ ComplementaryValueView.Presenter{
 	
 	/******************** JQUERY FUNCTIONS *********************/
 
-	
 	/**
 	 * This method makes that the SearchSubjectView appears right where it was clicked
 	 */
@@ -2399,14 +2273,12 @@ ComplementaryValueView.Presenter{
 		$wnd.arrangeTopOfSearchBox();
 	}-*/;
 	
-	
 	/**
 	 * This method takes care of showing the property "title" in a better way
 	 */
 	public static native void showToolTip() /*-{
 		$wnd.showTooltip();
 	}-*/;
-	
 	
 	/**
 	 * This method takes care of making the searchBox work with enter
@@ -2434,7 +2306,6 @@ ComplementaryValueView.Presenter{
 	public static native void addFunctionsToSecondaryMenu() /*-{
 		$wnd.addFunctionsToSecondaryMenu();
 	}-*/;
-	
 	
 	/**
 	 * This method will create the events make the part about selecting the current semester work
@@ -2550,7 +2421,6 @@ ComplementaryValueView.Presenter{
 		arrangeTopOfSearchSubjectView();
 	}
 	
-	
 	@Override
 	public void onSavePlanAsDefaultClicked() {
 		eventBus.fireEvent(new SavePlanAsDefaultEvent(this.getPlan()));
@@ -2661,7 +2531,6 @@ ComplementaryValueView.Presenter{
 		});
 	}
 
-	
 	@Override
 	public void showSavePlanPopup() {
 		showCurtain();
@@ -2672,7 +2541,6 @@ ComplementaryValueView.Presenter{
 		}
 		view.showChangeName();
 	}
-
 	
 	@Override
 	public void planNameChanged(String s) {
@@ -2735,7 +2603,6 @@ ComplementaryValueView.Presenter{
 
 	}
 	
-	
 	@Override
 	public void onAccordionClicked(String subjectCode, final SubjectAccordionViewImpl accordion, final ComplementaryValueViewImpl view) {
 		
@@ -2776,8 +2643,6 @@ ComplementaryValueView.Presenter{
 
 	}
 
-	
-	
 	@Override
 	public void addComplementaryValueView(final SubjectAccordionViewImpl accordion, final String name, final String code, final String careerCode) {
 		
@@ -2823,8 +2688,6 @@ ComplementaryValueView.Presenter{
 		}
 		return toReturn;
 	}
-
-	
 	
 	/**
 	 * This method will be called by a click event
@@ -2832,7 +2695,6 @@ ComplementaryValueView.Presenter{
 	public void onSelecteCurrentSemester(int currentSemesterNumber) {
 		setPlanCurrentSemester(currentSemesterNumber-1);
 	}
-	
 	
 	/**
 	 * This method will be used only when continue has been confirmed

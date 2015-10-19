@@ -1,9 +1,14 @@
 package com.somosun.plan.shared;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 import com.google.gwt.i18n.client.NumberFormat;
 import com.somosun.plan.shared.control.Career;
+import com.somosun.plan.shared.control.ComplementaryValue;
+import com.somosun.plan.shared.control.Subject;
+import com.somosun.plan.shared.control.SubjectGroup;
 import com.somosun.plan.shared.values.MessageTypeCodes;
 
 /**
@@ -186,6 +191,62 @@ public class SomosUNUtils {
 		
 		return toReturn;
 		
+	}
+	
+	/**
+	 * This method will return the subject which match the subject code, if the subjectCode is Optativa 
+	 * or FreeElection (generic codes) or has an empty code it will use the id and the name 
+	 * (if it's not a default subject) to compare, if the ids match then it returns that subject, null if there is nothing else
+	 * <br></br>
+	 * This method will use SomosUNUtils.standardizeString(@param subjectName, true, true) to compare the two names 
+	 * @param subject
+	 * @param subjectId
+	 * @param subjectName
+	 * @param mandatoryComplementaryValues
+	 */
+	public static Subject getSubjectFromListByCode(String subjectCode, Long subjectId, String subjectName, List<ComplementaryValue> list) {
+		Subject toReturn = null;
+		
+		for(ComplementaryValue cV : list){
+			if(cV.getSubject().isDefault() == false && cV.getSubject().getCode().trim().equals("") == false && subjectCode != null && subjectCode.isEmpty() == false){
+				if(cV.getSubject().getCode().equals(subjectCode)){
+					toReturn = cV.getSubject();
+					break;
+				}				
+			}else{
+				//if could be a free election or an opative (the code is empty or idDefault = true
+				if(cV.getSubject().isDefault() == false && SomosUNUtils.standardizeString(cV.getSubject().getName(),true,true).equals(SomosUNUtils.standardizeString(subjectName, true, true)) == true && cV.getSubject().getCode().trim().equals(subjectCode.trim()) == true){
+					toReturn = cV.getSubject();
+					break;
+				}
+				else if(cV.getSubject().getId().equals(subjectId) == true && cV.getSubject().getCode().trim().equals(subjectCode.trim()) == true){
+					toReturn = cV.getSubject();
+					break;
+				}
+			}
+		}
+		
+		return toReturn;
+	}
+	
+	/**
+	 * Returns null if there is no subjectGroup in @param set which has the same @param name
+	 * 
+	 * @param name
+	 * @param keySet
+	 * @return
+	 */
+	public static SubjectGroup getSubjectGroupInSetByName(String name, Set<SubjectGroup> set) {
+		SubjectGroup toReturn = null;
+		
+		for(SubjectGroup sG : set){
+			if(sG.getName().equals(name)){
+				toReturn = sG;
+				break;
+			}
+		}
+		
+		return toReturn;
 	}
 
 }
