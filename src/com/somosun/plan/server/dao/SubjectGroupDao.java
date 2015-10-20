@@ -83,11 +83,11 @@ public class SubjectGroupDao extends Dao {
 
 	public SubjectGroup getUnkownSubjectGroup(String careerCode, boolean isFundamental) {
 		SubjectGroup sG = null;
-		sG = this.getSubjectGroup(SubjectGroupCodes.UKNOWN_NAME, isFundamental, careerCode);
+		sG = this.getSubjectGroup(SubjectGroupCodes.UNKNOWN_NAME, isFundamental, careerCode);
 		if(sG == null){
 			CareerDao cDao = new CareerDao();
 			Career career = cDao.getCareerByCode(careerCode);
-			sG = new SubjectGroup(SubjectGroupCodes.UKNOWN_NAME, career, isFundamental, 0, 0, true);
+			sG = new SubjectGroup(SubjectGroupCodes.UNKNOWN_NAME, career, isFundamental, 0, 0, true);
 			sG.setId(generateId());
 			saveSubjectGroup(sG);
 		}
@@ -95,8 +95,10 @@ public class SubjectGroupDao extends Dao {
 	}
 
 	/**
-	 * This method will return a subjectGroup based on the typology, in case of @param typology fundamental or profesional 
-	 * it will return a subjectGroup unknown with isFudamental appropriete in any case
+	 * This method will return a subjectGroup based on the typology, in case of @param typology fundamental, professional, nivelación or free election base on the values on TypologyCodes 
+	 * it will return a subjectGroup unknown with isFudamental appropriate in any case
+	 * <br/>
+	 * If @param typology is TypologyCodes.LIBRE_ELECCION or NIVELACION and the subject group does not exist it will create one, if the @param typology one of the others values will return an SubjectGroupCodes.UNKNOWN_NAME 
 	 * @param career
 	 * @param typology
 	 * @return
@@ -122,16 +124,16 @@ public class SubjectGroupDao extends Dao {
 				subjectGroupDao.saveSubjectGroup(subjectGroup);
 			}
 		}else if(typology.equals(TypologyCodes.FUNDAMENTACION) == true){
-			subjectGroup = subjectGroupDao.getSubjectGroup(SubjectGroupCodes.UKNOWN_NAME, true, careerCode);
+			subjectGroup = subjectGroupDao.getSubjectGroup(SubjectGroupCodes.UNKNOWN_NAME, true, careerCode);
 			if(subjectGroup == null){
-				subjectGroup = new SubjectGroup(SubjectGroupCodes.UKNOWN_NAME, career, true, 0, 0, true);
+				subjectGroup = new SubjectGroup(SubjectGroupCodes.UNKNOWN_NAME, career, true, 0, 0, true);
 				subjectGroup.setId(subjectGroupDao.generateId());
 				subjectGroupDao.saveSubjectGroup(subjectGroup);
 			}
 		}else if(typology.equals(TypologyCodes.PROFESIONAL) == true){
-			subjectGroup = subjectGroupDao.getSubjectGroup(SubjectGroupCodes.UKNOWN_NAME, false, careerCode);
+			subjectGroup = subjectGroupDao.getSubjectGroup(SubjectGroupCodes.UNKNOWN_NAME, false, careerCode);
 			if(subjectGroup == null){
-				subjectGroup = new SubjectGroup(SubjectGroupCodes.UKNOWN_NAME, career, false, 0, 0, true);
+				subjectGroup = new SubjectGroup(SubjectGroupCodes.UNKNOWN_NAME, career, false, 0, 0, true);
 				subjectGroup.setId(subjectGroupDao.generateId());
 				subjectGroupDao.saveSubjectGroup(subjectGroup);
 			}

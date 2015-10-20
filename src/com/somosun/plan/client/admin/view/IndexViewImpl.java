@@ -22,6 +22,7 @@ public class IndexViewImpl extends Composite implements IndexView {
 	private IndexPresenter presenter;
 	
 	@UiField ListBox careerDefaultListBox;
+	@UiField ListBox careerResetDefaultListBox;
 	@UiField ListBox careerAnalysisListBox;
 	@UiField ListBox complementaryValuesListBox;
 	@UiField ListBox planListBox;
@@ -42,6 +43,7 @@ public class IndexViewImpl extends Composite implements IndexView {
 	@UiField Button resetCertainHasAnalysisButton;
 	@UiField Button deleteCertainComplementaryValuesButton;
 	@UiField Button resetCertainHasDefaultButton;
+	@UiField Button certainHasDefaultButton;
 	@UiField Button makeUserAdminButton;
 	@UiField Button unBlockUserButton;
 	@UiField Button analyseAllCareersButton;
@@ -82,6 +84,7 @@ public class IndexViewImpl extends Composite implements IndexView {
 
 	public void addCareerToListBox(String name, String value) {
 		careerDefaultListBox.addItem(name, value);
+		careerResetDefaultListBox.addItem(name, value);
 		careerAnalysisListBox.addItem(name, value);
 		complementaryValuesListBox.addItem(name, value);
 		planListBox.addItem(name, value);
@@ -208,10 +211,19 @@ public class IndexViewImpl extends Composite implements IndexView {
 	@UiHandler("resetCertainHasDefaultButton")
 	public void onResetCertainHasDefaultButton(ClickEvent e){
 		if(getTimes(resetCertainHasDefaultButton.getElement()).equals("1")){
-			String careerCode = careerDefaultListBox.getSelectedValue();
+			String careerCode = careerResetDefaultListBox.getSelectedValue();
 			presenter.onResetCertainHasDefaultButton(careerCode);
 		}
 		setTimes(resetCertainHasDefaultButton.getElement());
+	}
+	
+	@UiHandler("certainHasDefaultButton")
+	public void onCertainHasDefaultButton(ClickEvent e){
+		if(getTimes(certainHasDefaultButton.getElement()).equals("1")){
+			String careerCode = careerDefaultListBox.getSelectedValue();
+			presenter.onCertainHasDefaultButton(careerCode);
+		}
+		setTimes(certainHasDefaultButton.getElement());
 	}
 	
 	@UiHandler("deleteAllSemestersButton")

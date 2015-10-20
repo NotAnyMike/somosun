@@ -28,6 +28,7 @@ import com.somosun.plan.server.expensiveOperation.Codes.ComplementaryValueExpens
 import com.somosun.plan.server.expensiveOperation.Codes.SubjectExpensiveOperationsCodes;
 import com.somosun.plan.server.expensiveOperation.Codes.SubjectValueExpensiveOperationsCodes;
 import com.somosun.plan.shared.SiaResultSubjects;
+import com.somosun.plan.shared.control.Career;
 import com.somosun.plan.shared.control.Message;
 import com.somosun.plan.shared.control.Plan;
 import com.somosun.plan.shared.control.Student;
@@ -161,6 +162,18 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 		if(getUserLogged().isAdmin() == true){
 			CareerDao careerDao = new CareerDao();
 			careerDao.resetHasDefaultForCareer(careerCode);
+		}
+	}
+	
+	/**
+	 * Admin method
+	 */
+	public void certainHasDefaultField(String careerCode) {
+		if(getUserLogged().isAdmin() == true){
+			CareerDao careerDao = new CareerDao();
+			Career c = careerDao.getCareerByCode(careerCode);
+			c.setHasDefault(true);
+			careerDao.saveCareer(c);
 		}
 	}
 

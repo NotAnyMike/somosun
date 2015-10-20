@@ -14,6 +14,7 @@ encoding//src/com/somosun/plan/client/index/widget/SubjectWidget.java=UTF-8
 encoding//src/com/somosun/plan/server/SiaProxy.java=UTF-8
 encoding//src/com/somosun/plan/server/dao/Dao.java=UTF-8
 encoding//src/com/somosun/plan/server/dao/PlanDao.java=UTF-8
+encoding//src/com/somosun/plan/server/dao/SubjectGroupDao.java=UTF-8
 encoding//src/com/somosun/plan/server/dummy/SubjectDummy.java=UTF-8
 encoding//src/com/somosun/plan/server/serviceImpl/SUNServiceImpl.java=UTF-8
 encoding//src/com/somosun/plan/shared/SomosUNUtils.java=UTF-8

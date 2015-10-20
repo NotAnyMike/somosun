@@ -22,9 +22,15 @@
 								</b:InputGroup>
 								<b:Button type="DANGER" ui:field="resetAllHasDefaultButton" enabled="true">Reset all hasDefault</b:Button>
 								<b:InputGroup>
-									<b:ListBox ui:field="careerDefaultListBox"></b:ListBox>
+									<b:ListBox ui:field="careerResetDefaultListBox"></b:ListBox>
 									<b:InputGroupButton>									
 										<b:Button type="WARNING" ui:field="resetCertainHasDefaultButton" enabled="true">hasDefault=0</b:Button>
+									</b:InputGroupButton>
+								</b:InputGroup>
+								<b:InputGroup>
+									<b:ListBox ui:field="careerDefaultListBox"></b:ListBox>
+									<b:InputGroupButton>									
+										<b:Button type="WARNING" ui:field="certainHasDefaultButton" enabled="true">hasDefault=true</b:Button>
 									</b:InputGroupButton>
 								</b:InputGroup>
 								<b:Button type="DEFAULT" ui:field="resetUpdateCareersButton">Reset (update) careers</b:Button>

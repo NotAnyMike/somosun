@@ -51,6 +51,7 @@ import com.somosun.plan.shared.control.Subject;
 import com.somosun.plan.shared.control.SubjectGroup;
 import com.somosun.plan.shared.control.Teacher;
 import com.somosun.plan.shared.values.SubjectGroupCodes;
+import com.somosun.plan.shared.values.TypologyCodes;
 
 /**
  * 
@@ -1513,6 +1514,11 @@ public class SiaProxy {
 				career.setFoudationCredits(fundamentalValue);
 				career.setDisciplinaryCredits(professionalValue);
 				career.setFreeElectionCredits(freeElectionValue);
+				
+				//Take the subjectGroup of freeElection and add the optative value This is done outside the saveSubjectGroupsAndReturnThem because it needs the freeElectionValue value
+				SubjectGroup subjectGroupFreeElection = subjectGroupDao.getSubjectGroupFromTypology(career, TypologyCodes.LIBRE_ELECCION);
+				subjectGroupFreeElection.setOptativeCredits(freeElectionValue);
+				subjectGroupDao.saveSubjectGroup(subjectGroupFreeElection);
 				
 				career.setHasAnalysis(true);
 				

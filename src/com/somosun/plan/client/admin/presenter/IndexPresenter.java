@@ -464,5 +464,21 @@ public class IndexPresenter implements Presenter, IndexView.Presenter {
 			
 		});
 	}
+
+	public void onCertainHasDefaultButton(final String careerCode) {
+		rpcAdminService.certainHasDefaultField(careerCode, new AsyncCallback(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Error while trying to set the hasDefault field to true of " + careerCode);
+			}
+
+			@Override
+			public void onSuccess(Object result) {
+				Window.alert(careerCode + " has default now (only in the value, there must be a real defaultPlan otherwise this will throw an error, be careful)");
+			}
+			
+		});
+	}
 	
 }

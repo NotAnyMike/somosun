@@ -16,6 +16,7 @@ import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Transaction;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.somosun.plan.client.index.service.SUNService;
 import com.somosun.plan.server.SiaProxy;
@@ -210,7 +211,6 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 	public ComplementaryValue getComplementaryValueFromMisPlanes(String career, String code) {
 		return (ComplementaryValue) SiaProxy.getRequisitesFromSia(code, career);
 	}
-
 	
 	/**
 	 * @param nameOrCode the name or the code as a String
@@ -295,11 +295,6 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		}
 		return p;
 	}
-
-//	@Override
-//	public void analyzeCareer(String careerCode) {
-//		SiaProxy.getRequisitesForACareer(careerCode);
-//	}
 
 	public List<ComplementaryValue> getComplementaryValues(List<String> subjectCodeStrings, List<String> subjectCareerStrings, String mainCareerCode){
 		
@@ -767,58 +762,81 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		return cVList;
 	}
 
-	@Override
+	/**
+	 * Be really careful because here to send the code it is used the SomosUNUtils.LIBRE_CODE and the SubjetGroupCodes.LIBRE_NAME 
+	 */
 	public ComplementaryValue createDefaultSubject(String subjectGroupName, String credits, String careerCode, Student student) {
+		
+		SubjectGroupDao subjectGroupDao = new SubjectGroupDao(); 
+		
+		SubjectGroup subjectGroup = null;
+		if(subjectGroupName.equals(SomosUNUtils.LIBRE_CODE) == true || subjectGroupName.equals(SubjectGroupCodes.LIBRE_NAME) == true){
+			subjectGroup = subjectGroupDao.getSubjectGroup(SubjectGroupCodes.LIBRE_NAME, careerCode);
+		}else{						
+			subjectGroup = subjectGroupDao.getSubjectGroup(subjectGroupName, careerCode);
+		}
+		
+		return createDefaultSubject(subjectGroup, credits, careerCode, student);
+		
+	}
+	
+	/**
+	 * This method will create acomplementaryValue (the old version it was just if you're logged as an admin, cuz the option 
+	 * to add default subjects were only for admins when they're creating the default plans) [The old code is commented]
+	 * 
+	 * @param subjectGroupName -> please use the values from SomosUNUtils
+	 * @param student -> can be null (for retro-compatibility)
+	 */
+	public ComplementaryValue createDefaultSubject(SubjectGroup subjectGroup, String credits, String careerCode, Student student) {
 		
 		ComplementaryValue complementaryValue = null;
 		
-		if(subjectGroupName.isEmpty() == false && credits.isEmpty() == false && careerCode.isEmpty() == false && student != null){
-			StudentDao studentDao = new StudentDao();
+		if(subjectGroup != null && credits.isEmpty() == false && careerCode.isEmpty() == false /*&& student != null*/){
+			/*StudentDao studentDao = new StudentDao();
 			student = studentDao.getStudentByIdSun(student.getIdSun());
 			if(student != null){
-				if(student.isAdmin() == true){
-					
-					CareerDao careerDao = new CareerDao();
-					SubjectDao subjectDao = new SubjectDao();
-					ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
-					SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
-					
-					Career career = careerDao.getCareerByCode(careerCode);
+				if(student.isAdmin() == true){*/
+			
+			CareerDao careerDao = new CareerDao();
+			SubjectDao subjectDao = new SubjectDao();
+			ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
+			SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
+			
+			Career career = careerDao.getCareerByCode(careerCode);
 
-					if(career!= null){
-						
-						Subject subjectDefault = null;
-						SubjectGroup subjectGroup = null;
-						
-						if(subjectGroupName.equals(SomosUNUtils.LIBRE_CODE) == true){
-							subjectDefault = new Subject(Integer.valueOf(credits), SomosUNUtils.LIBRE_CODE, SomosUNUtils.LIBRE_CODE, SomosUNUtils.LIBRE_NAME, "bog");
-							subjectGroup = subjectGroupDao.getSubjectGroup(SubjectGroupCodes.LIBRE_NAME, careerCode);
-						}else{						
-							subjectDefault = new Subject(Integer.valueOf(credits), SomosUNUtils.OPTATIVA_CODE, SomosUNUtils.OPTATIVA_CODE, SomosUNUtils.OPTATIVA_NAME, "bog");
-							subjectGroup = subjectGroupDao.getSubjectGroup(subjectGroupName, careerCode);
-						}
-						
-						if(subjectGroup != null){
-							
-							subjectDefault.setDefault(true);
-							subjectDefault.setId(subjectDao.generateId());
-							//prehasp this is duplicating the subjects in the db, if not then delete this comment later on
-							subjectDao.saveSubject(subjectDefault);
-							
-							String t = null;
-							if(subjectGroupName.equals(SomosUNUtils.LIBRE_CODE) == true) t = SomosUNUtils.getTypology("l");
-							else t = (subjectGroup.isFundamental()== true ? SomosUNUtils.getTypology("f") : SomosUNUtils.getTypology("c"));
-							
-							complementaryValue = new ComplementaryValue(career, subjectDefault, t, false, subjectGroup);
-							complementaryValue.setId(complementaryValueDao.generateId());
-							complementaryValueDao.saveComplementaryValues(complementaryValue);
-							
-						}
-						
-					}
+			if(career!= null){
+				
+				Subject subjectDefault = null;
+				
+				if(subjectGroup.getName().equals(SomosUNUtils.LIBRE_CODE) == true){
+					subjectDefault = new Subject(Integer.valueOf(credits), SomosUNUtils.LIBRE_CODE, SomosUNUtils.LIBRE_CODE, SomosUNUtils.LIBRE_NAME, "bog");
+					subjectGroup = subjectGroupDao.getSubjectGroup(SubjectGroupCodes.LIBRE_NAME, careerCode);
+				}else{						
+					subjectDefault = new Subject(Integer.valueOf(credits), SomosUNUtils.OPTATIVA_CODE, SomosUNUtils.OPTATIVA_CODE, SomosUNUtils.OPTATIVA_NAME, "bog");
+					subjectGroup = subjectGroupDao.getSubjectGroup(subjectGroup.getName(), careerCode);
+				}
+				
+				if(subjectGroup != null){
+					
+					subjectDefault.setDefault(true);
+					subjectDefault.setId(subjectDao.generateId());
+					//prehasp this is duplicating the subjects in the db, if not then delete this comment later on
+					subjectDao.saveSubject(subjectDefault);
+					
+					String t = null;
+					if(subjectGroup.getName().equals(SomosUNUtils.LIBRE_CODE) == true) t = SomosUNUtils.getTypology("l");
+					else t = (subjectGroup.isFundamental()== true ? SomosUNUtils.getTypology("f") : SomosUNUtils.getTypology("c"));
+					
+					complementaryValue = new ComplementaryValue(career, subjectDefault, t, false, subjectGroup);
+					complementaryValue.setId(complementaryValueDao.generateId());
+					complementaryValueDao.saveComplementaryValues(complementaryValue);
 					
 				}
+				
 			}
+			
+					/*}
+				}*/
 		}
 		
 		return complementaryValue;
@@ -951,7 +969,6 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		return planToReturn;
 	}
 
-	
 	@Override
 	public Plan generatePlanFromAcademicHistory(String academicHistory) {
 		
@@ -1089,7 +1106,18 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 					}
 					
 					if(creditsToAdd > 0){
-						//TODO create a default subject (cV) for sG with creditsToAdd credits and add it to the mandatorySubjectList
+						
+						String credits = "" + creditsToAdd;
+						
+						//Create a default subject (cV) for sG with creditsToAdd credits and add it to the mandatorySubjectList
+						ComplementaryValue cVDefault = null;
+						if(sG.getName().equals(SubjectGroupCodes.LIBRE_NAME)){
+							cVDefault = createDefaultSubject(SubjectGroupCodes.LIBRE_NAME, credits, careerCode, null);
+							log.info("There is one libre elección");
+						}else{							
+							cVDefault =	createDefaultSubject(sG, credits, careerCode, null);
+						}
+						toReturn.getMandatoryComplementaryValues().add(cVDefault);
 					}
 				}
 				/******** </taking care of the subjects groups> ********/
