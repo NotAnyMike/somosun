@@ -102,5 +102,4 @@ public interface SUNServiceAsync {
 
 	void getCompletePlanInfo(String careerCode,
 			AsyncCallback<CompletePlanInfo> callback);
-
 }

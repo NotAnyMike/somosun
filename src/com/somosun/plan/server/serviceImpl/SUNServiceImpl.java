@@ -808,8 +808,9 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 				
 				Subject subjectDefault = null;
 				
-				if(subjectGroup.getName().equals(SomosUNUtils.LIBRE_CODE) == true){
-					subjectDefault = new Subject(Integer.valueOf(credits), SomosUNUtils.LIBRE_CODE, SomosUNUtils.LIBRE_CODE, SomosUNUtils.LIBRE_NAME, "bog");
+				//if(subjectGroup.getName().equals(SomosUNUtils.LIBRE_CODE) == true){
+				if(subjectGroup.getName().equals(SubjectGroupCodes.LIBRE_NAME) == true){
+					subjectDefault = new Subject(Integer.valueOf(credits), SomosUNUtils.LIBRE_CODE, SomosUNUtils.LIBRE_CODE, SubjectGroupCodes.LIBRE_NAME, "bog");
 					subjectGroup = subjectGroupDao.getSubjectGroup(SubjectGroupCodes.LIBRE_NAME, careerCode);
 				}else{						
 					subjectDefault = new Subject(Integer.valueOf(credits), SomosUNUtils.OPTATIVA_CODE, SomosUNUtils.OPTATIVA_CODE, SomosUNUtils.OPTATIVA_NAME, "bog");
@@ -824,7 +825,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 					subjectDao.saveSubject(subjectDefault);
 					
 					String t = null;
-					if(subjectGroup.getName().equals(SomosUNUtils.LIBRE_CODE) == true) t = SomosUNUtils.getTypology("l");
+					if(subjectGroup.getName().equals(SubjectGroupCodes.LIBRE_NAME) == true) t = SomosUNUtils.getTypology("l");
 					else t = (subjectGroup.isFundamental()== true ? SomosUNUtils.getTypology("f") : SomosUNUtils.getTypology("c"));
 					
 					complementaryValue = new ComplementaryValue(career, subjectDefault, t, false, subjectGroup);
