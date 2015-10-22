@@ -1,2 +1,0 @@
-serviceClass: com.uibinder.client.index.service.LoginService
-path: 9A53AD7FDB796F09AC8999CB10D0E947.gwt.rpc

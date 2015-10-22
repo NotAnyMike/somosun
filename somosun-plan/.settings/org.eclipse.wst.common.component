@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="somosun">
+        <wb-resource deploy-path="/" source-path="/somosun-plan/src"/>
+        <wb-resource deploy-path="/" source-path="/somosun-plan/spec"/>
+        <wb-resource deploy-path="/" source-path="/src"/>
+        <wb-resource deploy-path="/" source-path="/spec"/>
+        <property name="context-root" value="somosun"/>
+        <property name="java-output-path" value="/somosun/war/WEB-INF/classes"/>
+    </wb-module>
+</project-modules>

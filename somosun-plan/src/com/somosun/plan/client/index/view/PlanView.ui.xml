@@ -1,0 +1,34 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+	xmlns:b.html="urn:import:org.gwtbootstrap3.client.ui.html">
+	<ui:style field="first">
+
+	</ui:style>
+	<ui:style field="second" src="styles/styles.css"/>
+	<ui:style field="third" src="styles/bootstrap.css"/>
+	<ui:style field="forth" src="styles/bootstrap-theme.min.css"/>
+	<g:HTMLPanel>
+	    <g:HTMLPanel ui:field="loadingSubjectsHTMLPanel">
+			<div class="mainContainerLoadPlan-barContainer"><div class="progress"><div class="progress-bar progress-bar-info progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 100%; color:#444865">Descargando clases</div></div></div>
+	    </g:HTMLPanel>
+	    <g:HTMLPanel ui:field="curtainHTMLPanel"><div class="curtain"></div></g:HTMLPanel>
+	    <g:HTMLPanel ui:field="changeNameHTMLPanel">
+			<div class="mainContainerChangeName">
+				<h3>Quieres guardar tu plan?</h3>
+				<b:TextBox ui:field="textBoxChangeNamePlan"></b:TextBox>
+				Solo es necesario guardar una vez, luego los cambios se guardarán automáticamente.
+				<b:Button ui:field="cancelChangeNameButton" type="DANGER">No Guardar</b:Button>
+				<b:Button ui:field="changeNameButton" type="PRIMARY">Guardar</b:Button>
+			</div>
+	    </g:HTMLPanel>	
+	    <g:HTMLPanel ui:field="generalConfirmationHTMLPanel">
+			<div class="mainContainerChangeName" style="height:auto">
+				<h3><b:Label ui:field="generalLabel"></b:Label></h3>
+				<b:Button ui:field="deleteGeneralButton" type="DANGER">Borrar</b:Button>
+				<b:Button ui:field="cancelGeneralButton" type="SUCCESS">Cancelar</b:Button>
+			</div>
+	    </g:HTMLPanel>
+	</g:HTMLPanel>
+</ui:UiBinder> 
