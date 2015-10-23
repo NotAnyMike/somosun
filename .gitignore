@@ -46,6 +46,7 @@ test-classes/**
 /gwt-unitCache/
 bin/**
 /bin/**
+**/gwt-unitCache/**
 
 # Specific Files #
 ##################
