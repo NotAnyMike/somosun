@@ -12,7 +12,7 @@ import com.somosun.plan.shared.values.MessageTypeCodes;
 
 
 
-public class MessageDao {
+public class MessageDao implements Dao<Message> {
 
 	static{
 		ObjectifyService.register(Message.class);
@@ -23,7 +23,7 @@ public class MessageDao {
 	 * @param message
 	 * @return
 	 */
-	public Long saveMessage(Message message){
+	public Long save(Message message){
 		Long toReturn = null;
 		if(message != null){
 			if(message.getId() == null){
@@ -46,11 +46,14 @@ public class MessageDao {
 		return ofy().load().type(Message.class).list();
 	}
 	
-	public void deleteMessage(Long id){
+	public boolean delete(Long id){
+		boolean toReturn = false;
 		if(id!=null){			
 			Key<Message> key = Key.create(Message.class, id);
 			ofy().delete().key(key);
+			toReturn = true;
 		}
+		return toReturn;
 	}
 
 	public List<Message> getAllErrorMessages() {
@@ -65,7 +68,7 @@ public class MessageDao {
 		return ofy().load().type(Message.class).filter("type", MessageTypeCodes.OTHER).list();
 	}
 
-	public Message getMessageById(Long id) {
+	public Message getById(Long id) {
 		Key<Message> key = Key.create(Message.class, id);
 		return ofy().load().key(key).now();
 	}

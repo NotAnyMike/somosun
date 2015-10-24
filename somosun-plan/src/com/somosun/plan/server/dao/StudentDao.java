@@ -6,11 +6,12 @@ import com.google.appengine.api.users.UserServiceFactory;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
+import com.somosun.plan.shared.control.Group;
 import com.somosun.plan.shared.control.Student;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
-public class StudentDao {
+public class StudentDao implements Dao<Student> {
 	
 	static {
 		ObjectifyService.register(Student.class);
@@ -24,13 +25,16 @@ public class StudentDao {
 	 * 
 	 * @param user
 	 */
-	public void saveStudent(Student student){
+	public Long save(Student student){
+		Long toReturn = null;
 		if(student != null){
-			ofy().save().entity(student).now();			
+			ofy().save().entity(student).now();
+			toReturn = student.getIdSun();
 		}
+		return toReturn;
 	}
 	
-	public Student getStudentByUser(User user){
+	public Student getByUser(User user){
 		
 		Student student = null;
 		
@@ -48,14 +52,14 @@ public class StudentDao {
 					}
 					
 					student.setIdSun(generateId());
-					saveStudent(student);
+					save(student);
 				}
 			}
 		}
 		return student;
 	}
 	
-	private Long generateId() {
+	public Long generateId() {
 		ObjectifyFactory f = new ObjectifyFactory();
 		Key<Student> key = f.allocateId(Student.class);
 		return key.getId();
@@ -78,7 +82,7 @@ public class StudentDao {
 	 * @param id
 	 * @return
 	 */
-	public Student getStudentByIdSun(Long idSun) {
+	public Student getById(Long idSun) {
 		Key<Student> k = Key.create(Student.class, idSun);
 		Student s = null;
 		s = ofy().load().key(k).now();
@@ -87,6 +91,17 @@ public class StudentDao {
 
 	public Student getStudentByUserName(String userName) {
 		return (Student) ofy().load().type(Student.class).filter("username", userName).first().now();
+	}
+
+	@Override
+	public boolean delete(Long id) {
+		boolean toReturn = false;
+		if(id!=null){
+			Key<Student> key = Key.create(Student.class, id);
+			ofy().delete().key(key).now();
+			toReturn = true;
+		}
+		return toReturn;
 	}
 
 }

@@ -8,7 +8,7 @@ import com.somosun.plan.shared.control.Teacher;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
-public class TeacherDao extends Dao {
+public class TeacherDao implements Dao<Teacher> {
 
 	static{
 		ObjectifyService.register(Teacher.class);
@@ -25,11 +25,11 @@ public class TeacherDao extends Dao {
 	 * @param isSiaProxy: will give rights to update (delete and create) and create a new teacher from the bd, it will be true if and only if the request is coming from the SiaProxy class
 	 * @return
 	 */
-	public Teacher getTeacherByTeacher(Teacher t, boolean isSiaProxy){
+	public Teacher getByTeacher(Teacher t, boolean isSiaProxy){
 		Teacher teacherToReturn = getTeacherByUsername(t.getUsername());
 		if(teacherToReturn == null && isSiaProxy == true){
 			teacherToReturn = t;
-			saveTeacher(teacherToReturn);
+			save(teacherToReturn);
 		} else {
 			if(teacherToReturn.equals(t) == false && isSiaProxy == true){
 				teacherToReturn.setEmail(t.getEmail());
@@ -42,25 +42,48 @@ public class TeacherDao extends Dao {
 		return teacherToReturn;
 	}
 	
-	private void updateTeacher(Teacher t) {
-		deleteTeacher(t);
-		saveTeacher(t);
-	}
-
-	private void deleteTeacher(Teacher t) {
-		if(t.getIdSun()!=null){
-			Key<Teacher> key = Key.create(Teacher.class, t.getIdSun());
-			ofy().delete().key(key).now();
+	public Teacher getById(Long id){
+		Teacher toReturn = null;
+		if(id != null){
+			Key<Teacher> key = Key.create(Teacher.class, id);
+			toReturn = ofy().load().key(key).now();
 		}
+		return toReturn;
+	}
+	
+	private void updateTeacher(Teacher t) {
+		delete(t);
+		save(t);
 	}
 
-	void saveTeacher(Teacher t){
+	private boolean delete(Teacher t) {
+		boolean toReturn = false;
+		if(t!=null){
+			toReturn = delete(t.getIdSun());
+		}
+		return toReturn;
+	}
+	
+	public boolean delete(Long id){
+		boolean toReturn = false;
+		if(id!=null){
+			Key<Teacher> key = Key.create(Teacher.class, id);
+			ofy().delete().key(key).now();
+			toReturn = true;
+		}
+		return toReturn;
+	}
+
+	public Long save(Teacher t){
+		Long toReturn = null;
 		if(t != null)
 		{
 			t.setName(SomosUNUtils.removeAccents(t.getName()));
 			//OLD t.setName(SomosUNUtils.standardizeString(t.getName(), false));
 			ofy().save().entity(t).now();
+			toReturn = t.getIdSun();
 		}
+		return toReturn;
 	}
 
 	public Long generateId() {

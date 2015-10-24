@@ -11,14 +11,28 @@ import com.somosun.plan.shared.control.Subject;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
-public class GroupDao {
+public class GroupDao implements Dao<Group> {
 
 	static{
 		ObjectifyService.register(Group.class);
 	}
 	
-	public void saveGroup(Group g){
-		if(g != null) ofy().save().entity(g).now();
+	public Long save(Group g){
+		Long toReturn = null; 
+		if(g != null) {
+			ofy().save().entity(g).now();
+			toReturn = g.getId();
+		}
+		return toReturn;
+	}
+	
+	public Group getById(Long id){
+		Group toReturn = null;
+		if(id != null){
+			Key<Group> key = Key.create(Group.class, id);
+			toReturn = ofy().load().key(key).now();
+		}
+		return toReturn;
 	}
 
 	public List<Group> getGroups(Subject subject) {
@@ -27,11 +41,11 @@ public class GroupDao {
 		else return null;
 	}
 	
-	public Group getGroup(Group g){
-		return getGroup(g.getSubject(), g.getSemesterValue(), g.getGroupNumber());
+	public Group get(Group g){
+		return get(g.getSubject(), g.getSemesterValue(), g.getGroupNumber());
 	}
 
-	public Group getGroup(Subject subject, SemesterValue semesterValue, int groupNumber){
+	public Group get(Subject subject, SemesterValue semesterValue, int groupNumber){
 		return ofy().load().type(Group.class).filter("groupNumber", groupNumber).filter("subject.code", subject.getCode()).filter("semesterValue.year", semesterValue.getYear()).first().now();
 	}
 	
@@ -42,11 +56,11 @@ public class GroupDao {
 	 * @param b
 	 * @return
 	 */
-	public Group getGroupByGroup(Group group, boolean isSiaProxy) {
-		Group groupToReturn = getGroup(group);
+	public Group getByGroup(Group group, boolean isSiaProxy) {
+		Group groupToReturn = get(group);
 		if(groupToReturn == null){
 			groupToReturn = group;
-			saveGroup(groupToReturn);
+			save(groupToReturn);
 		}else{
 			if(groupToReturn.equals(group) == false && isSiaProxy == true){
 				groupToReturn.setFreePlaces(group.getFreePlaces());
@@ -60,16 +74,24 @@ public class GroupDao {
 	}
 
 	private void updateGroup(Group group) {
-		deleteGroup(group);
-		saveGroup(group);
+		delete(group);
+		save(group);
 	}
 
-	private void deleteGroup(Group group) {
-		if(group.getId()!=null){
-			Key<Group> key = Key.create(Group.class, group.getId());
+	private boolean delete(Group group) {
+		boolean toReturn = false;
+		if(group != null) toReturn = delete(group.getId());
+		return toReturn;
+	}
+	
+	public boolean delete(Long id){
+		boolean toReturn = false;
+		if(id!=null){
+			Key<Group> key = Key.create(Group.class, id);
 			ofy().delete().key(key).now();
+			toReturn = true;
 		}
-		
+		return toReturn;
 	}
 	
 	public Long generateId() {
@@ -81,7 +103,7 @@ public class GroupDao {
 	public Group getOrCreateGroup(Subject subject, SemesterValue semesterValue, Integer groupInt) {
 		Group group = null;
 		
-		group = getGroup(subject, semesterValue, groupInt);
+		group = get(subject, semesterValue, groupInt);
 		
 		if(group == null){
 			group = new Group(subject, semesterValue, groupInt);
@@ -95,9 +117,8 @@ public class GroupDao {
 	public void deleteAll() {
 		List<Group> list = ofy().load().type(Group.class).list();
 		for(Group g : list){
-			deleteGroup(g);
+			delete(g);
 		}
 	}
-
 	
 }

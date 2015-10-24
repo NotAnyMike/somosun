@@ -3,34 +3,60 @@ package com.somosun.plan.server.dao;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
+import com.somosun.plan.shared.control.Semester;
 import com.somosun.plan.shared.control.SemesterValue;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
-public class SemesterValueDao {
+public class SemesterValueDao implements Dao<SemesterValue> {
 
 	static{
 		ObjectifyService.register(SemesterValue.class);
 	}
 	
-	public void saveSemesterValue(SemesterValue semesterValue){
-		ofy().save().entity(semesterValue).now();
+	public Long save(int year, int numberSemester){
+		return save(new SemesterValue(year, numberSemester));
 	}
 	
-	public void saveSemesterValue(int year, int numberSemester){
-		ofy().save().entity(new SemesterValue(year, numberSemester)).now();
+	public Long save(SemesterValue sV){
+		Long toReturn = null;
+		if(sV != null){
+			if(sV.getId() == null) sV.setId(generateId());
+			ofy().save().entity(sV).now();
+			toReturn = sV.getId();
+		}
+		return toReturn;
 	}
 	
-	public SemesterValue getSemesterValue(int year, int numberSemester){
+	public SemesterValue getById(Long id){
+		SemesterValue toReturn = null;
+		if(id != null){
+			Key<SemesterValue> key = Key.create(SemesterValue.class, id);
+			toReturn = ofy().load().key(key).now();
+		}
+		return toReturn;
+	}
+	
+	public boolean delete(Long id){
+		boolean toReturn = false;
+		if(id != null){
+			Key<SemesterValue> key = Key.create(SemesterValue.class, id);
+			ofy().delete().key(key).now();
+			toReturn = true;
+		}
+		return toReturn;
+	}
+	
+	public SemesterValue get(int year, int numberSemester){
 		return (SemesterValue) ofy().load().type(SemesterValue.class).filter("year", year).filter("numberSemester", numberSemester).first().now();
 	}
 	
 	public SemesterValue getCurrentSemester(){
 		SemesterValue semesterValueToReturn = null;
-		semesterValueToReturn = getSemesterValue(SemesterValue.CURRENT_YEAR, SemesterValue.CURRENT_NUMBER_SEMESTER);
+		semesterValueToReturn = get(SemesterValue.CURRENT_YEAR, SemesterValue.CURRENT_NUMBER_SEMESTER);
 		if(semesterValueToReturn == null){
 			semesterValueToReturn = new SemesterValue(SemesterValue.CURRENT_YEAR, SemesterValue.CURRENT_NUMBER_SEMESTER);
-			saveSemesterValue(semesterValueToReturn);
+			save(semesterValueToReturn);
 		}
 		return semesterValueToReturn;
 	}
@@ -45,12 +71,12 @@ public class SemesterValueDao {
 	public SemesterValue getOrCreateSemester(int year, int semester) {
 		SemesterValue semesterValue = null;
 		
-		semesterValue = getSemesterValue(year, semester);
+		semesterValue = get(year, semester);
 		
 		if(semesterValue == null){
 			semesterValue = new SemesterValue(year, semester);
 			semesterValue.setId(generateId());
-			saveSemesterValue(semesterValue);
+			save(semesterValue);
 		}
 		
 		return semesterValue;

@@ -23,7 +23,7 @@ public class AnalyseAllCareersExpensiveOperation{
 	
 	public static void run(boolean includeAnalyzed) {
 		CareerDao careerDao = new CareerDao();
-		List<Career> careers = careerDao.getCareersBySede("bog");
+		List<Career> careers = careerDao.getBySede("bog");
 		List<String> careersAnalysed = new ArrayList<String>();
 		List<String> careersNotAnalysed = new ArrayList<String>();
 		String sede = "bog";

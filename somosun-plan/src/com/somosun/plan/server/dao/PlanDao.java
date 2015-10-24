@@ -38,7 +38,7 @@ import com.somosun.plan.shared.control.SubjectGroup;
 import com.somosun.plan.shared.control.SubjectValue;
 import com.somosun.plan.shared.values.TypologyCodes;
 
-public class PlanDao {
+public class PlanDao implements Dao<Plan>{
 	
 	private static final Logger log = Logger.getLogger("PlanDao");
 	
@@ -74,7 +74,7 @@ public class PlanDao {
 		
 		//TODO construct the plan from zero
 		
-		career = careerDao.getCareerByCode(jsonPlan.getString("code"));		
+		career = careerDao.getByCode(jsonPlan.getString("code"));		
 		sede = jsonPlan.getString("sede"); //sede is included in the code of the career
 		name = jsonPlan.getString("name");
 		
@@ -86,21 +86,21 @@ public class PlanDao {
 			for(int j = 0; j < jsonSubjects.length(); j++){
 				jsonSubject = jsonSubjects.getJSONObject(j);
 				if(jsonSubject.getBoolean("normal") == true){
-					subject = subjectDao.getSubjectByCode(jsonSubject.getString("code"));
+					subject = subjectDao.getByCode(jsonSubject.getString("code"));
 				}else{
 					subject = new Subject(jsonSubject.getInt("credits"), jsonSubject.getString("code"), jsonSubject.getString("code"), jsonSubject.getString("code"), sede);
 				}
 				subjectValues = new SubjectValue();
 				//getting the complementary values
 				if(subject!= null){
-					complementaryValue = complementaryValueDao.getComplementaryValues(career, subject);
+					complementaryValue = complementaryValueDao.get(career, subject);
 					if(complementaryValue != null) {subjectValues.setComplementaryValues(complementaryValue);}
 					else 
 					{
 						complementaryValue = new ComplementaryValue(career, subject);
 						subjectValues.getComplementaryValues().setMandatory(jsonSubject.getBoolean("oblig"));
 						subjectValues.getComplementaryValues().setTypology(jsonSubject.getString("type"));
-						if(jsonSubject.getBoolean("normal") == true && subject != null) complementaryValueDao.saveComplementaryValues(complementaryValue);
+						if(jsonSubject.getBoolean("normal") == true && subject != null) complementaryValueDao.save(complementaryValue);
 					}
 				}				
 				
@@ -129,7 +129,7 @@ public class PlanDao {
 		return intToReturn;
 	}
 	
-	public Long savePlan(Plan plan){
+	public Long save(Plan plan){
 		
 		Long id = null;
 		
@@ -168,12 +168,12 @@ public class PlanDao {
 													if(s2 != null){
 														if(s2.getId() == null){
 															Subject sT = null;
-															if(s2.getCode().isEmpty() == false) sT = subjectDao.getSubjectByCode(s2.getCode());
-															else sT = subjectDao.getSubjectByName(s2.getName());
+															if(s2.getCode().isEmpty() == false) sT = subjectDao.getByCode(s2.getCode());
+															else sT = subjectDao.getByName(s2.getName());
 															
 															if(sT.getId() == null){
 																s2.setId(subjectDao.generateId());
-																subjectDao.saveSubject(s2);																
+																subjectDao.save(s2);																
 															}
 														}
 													}
@@ -187,13 +187,13 @@ public class PlanDao {
 														if(s3 != null && s3.getId() == null){
 															
 															Subject sT = null;
-															if(s3.getCode().isEmpty() == false) sT = subjectDao.getSubjectByCode(s3.getCode());
-															else sT = subjectDao.getSubjectByName(s3.getName());
+															if(s3.getCode().isEmpty() == false) sT = subjectDao.getByCode(s3.getCode());
+															else sT = subjectDao.getByName(s3.getName());
 															
 															//OLD if(sR == null){
 															if(s3.getId() == null){
 																s3.setId(subjectDao.generateId());
-																subjectDao.saveSubject(s3);																
+																subjectDao.save(s3);																
 															}
 															
 														}
@@ -202,7 +202,7 @@ public class PlanDao {
 													if(cV.getId() == null){														
 														cV.setId(complementaryValueDao.generateId());
 													}
-													complementaryValueDao.saveComplementaryValues(cV);
+													complementaryValueDao.save(cV);
 												}else{
 													sV.setComplementaryValues(null);
 												}
@@ -210,7 +210,7 @@ public class PlanDao {
 											if(sV.getId() == null){												
 												sV.setId(subjectValueDao.generateId()); 
 											}
-											subjectValueDao.saveSubjectValue(sV);
+											subjectValueDao.save(sV);
 										}else{
 											sVToRemoveList.add(sV);
 										}
@@ -222,7 +222,7 @@ public class PlanDao {
 						if(s.getId() == null){
 							s.setId(semesterDao.generateId());
 						}
-						semesterDao.saveSemester(s);
+						semesterDao.save(s);
 					
 					
 						for(SubjectValue sVT : sVToRemoveList){						
@@ -244,7 +244,7 @@ public class PlanDao {
 		
 	}
 
-	private Long generateId() {
+	public Long generateId() {
 		ObjectifyFactory f = new ObjectifyFactory();
 		Key<Plan> key = f.allocateId(Plan.class);
 		return key.getId();
@@ -273,11 +273,14 @@ public class PlanDao {
 	 * 
 	 * @param id
 	 */
-	private void deletePlan(Long id) {
+	public boolean delete(Long id) {
+		boolean toReturn = false;
 		if(id != null){			
 			Key<Plan> key = Key.create(Plan.class, id);
 			ofy().delete().key(key).now();
+			toReturn = true;
 		}
+		return toReturn;
 	}
 
 	public List<Plan> getPlanByUser(Student s) {
@@ -290,15 +293,17 @@ public class PlanDao {
 		return plans;
 	}
 
-	public Plan getPlanById(Long planId) {
+	public Plan getById(Long planId) {
 		Plan pToReturn = null;
-		if(planId != null){			
-			pToReturn = ofy().load().type(Plan.class).id(planId).now();
+		if(planId != null){	
+			Key<Plan> key = Key.create(Plan.class, planId);
+			pToReturn = ofy().load().key(key).now();
+			//pToReturn = ofy().load().type(Plan.class).id(planId).now();
 		}
 		return pToReturn;
 	}
 
-	public void deletePlan(Plan plan) {
+	public void delete(Plan plan) {
 		if(plan != null){
 			SubjectDao subjectDao = new SubjectDao();
 			ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
@@ -316,23 +321,23 @@ public class PlanDao {
 							if(subject != null && subject.isDefault() == true){
 								
 								//delete all the Default Subjects
-								subjectDao.deleteSubject(subject.getId());
+								subjectDao.delete(subject.getId());
 								if(subject.getId() == null) {
 									log.severe("Subject id:" + subject.getCode() + " name: " + subject.getName() + " has no id");
 								}
 								//delete all the complementaryValues
-								complementaryValueDao.deleteComplementaryValue(complementaryValue.getId());
+								complementaryValueDao.delete(complementaryValue.getId());
 							}
 							//Delete subjectValue
-							subjectValueDao.deleteSubjectValue(subjectValue.getId());
+							subjectValueDao.delete(subjectValue.getId());
 						}
 					}
 					//delete all the semesters
-					semesterDao.deleteSemester(semester.getId());
+					semesterDao.delete(semester.getId());
 				}
 			}
 			//Delete the plan
-			deletePlan(plan.getId());
+			delete(plan.getId());
 			
 //			if(plan.getSemesters() != null && plan.getSemesters().size() > 0){
 //				
@@ -436,7 +441,7 @@ public class PlanDao {
 		
 		//getCareer
 		CareerDao careerDao = new CareerDao();
-		Career career = careerDao.getCareerByCode(careerCode);
+		Career career = careerDao.getByCode(careerCode);
 		
 		if(career != null){
 //			if(career.hasAnalysis() == false){
@@ -477,7 +482,7 @@ public class PlanDao {
 				for(SubjectDummy subjectD : semesterD.getSubjects()){
 					
 					//Get subject
-					Subject subject = subjectDao.getSubjectByCode(subjectD.getCode());
+					Subject subject = subjectDao.getByCode(subjectD.getCode());
 					assert subject != null;
 					
 					if(subject != null){
@@ -496,7 +501,7 @@ public class PlanDao {
 						
 						
 						//Get complementaryValue
-						ComplementaryValue complementaryValue = complementaryValueDao.getComplementaryValues(careerCode, subject.getCode());
+						ComplementaryValue complementaryValue = complementaryValueDao.get(careerCode, subject.getCode());
 						if(complementaryValue != null){
 							
 							subjectV.setComplementaryValues(complementaryValue);
@@ -605,7 +610,7 @@ public class PlanDao {
 						subjectValuesT.setId(subjectValueDao.generateId());
 						
 						//get complementaryValue
-						ComplementaryValue complementaryValuesT = complementaryValueDao.getComplementaryValues(career.getCode(), subjectDummyT.getCode());
+						ComplementaryValue complementaryValuesT = complementaryValueDao.get(career.getCode(), subjectDummyT.getCode());
 						
 						if(complementaryValuesT != null){
 
@@ -682,9 +687,9 @@ public class PlanDao {
 						subjectValuesT.setGroup(group);
 						subjectValuesT.setTaken(true);
 						
-						subjectDao.saveSubject(subject);
-						complementaryValueDao.saveComplementaryValues(complementaryValue);
-						subjectValueDao.saveSubjectValue(subjectValuesT);
+						subjectDao.save(subject);
+						complementaryValueDao.save(complementaryValue);
+						subjectValueDao.save(subjectValuesT);
 						
 						Semester semester = semesters.get(semesterDummyT.getPosition()-1);
 
@@ -701,7 +706,7 @@ public class PlanDao {
 			
 			//update subjects to update
 			for(Subject subject : subjectsToUpdate){
-				subjectDao.saveSubject(subject);
+				subjectDao.save(subject);
 			}
 			
 			PlanDao planDao = new PlanDao();
@@ -715,7 +720,7 @@ public class PlanDao {
 			planToReturn.setDefault(isDefault);
 			planToReturn.setSemesters(semesters);
 			
-			planDao.savePlan(planToReturn);
+			planDao.save(planToReturn);
 			
 			long totalEndTime = System.nanoTime();
 			
@@ -844,11 +849,11 @@ public class PlanDao {
 			public void vrun() {
 				List<Plan> plans = getAllDefaultPlans();
 				for(Plan plan : plans){
-					deletePlan(plan);
+					delete(plan);
 					CareerDao careerDao = new CareerDao();
 					Career career = plan.getCareer();
 					career.setHasDefault(false);
-					careerDao.saveCareer(career);
+					careerDao.save(career);
 				}
 				log.warning("All default plans were delted");
 			}
@@ -863,18 +868,18 @@ public class PlanDao {
 	public void deleteDefaultPlan(final String careerCode) {
 		final Plan plan = getPlanDefault(careerCode);
 		if(plan != null){
-			deletePlan(plan);
+			delete(plan);
 			CareerDao careerDao = new CareerDao();
-			Career career = careerDao.getCareerByCode(careerCode);
+			Career career = careerDao.getByCode(careerCode);
 			career.setHasDefault(false);
-			careerDao.saveCareer(career);
+			careerDao.save(career);
 		}
 	}
 
 	public void deleteAllPlans() {
 		final List<Plan> plans = getAllPlans();
 		for(Plan plan : plans){
-			deletePlan(plan);
+			delete(plan);
 		}
 		log.warning("All plans where deleted");
 	}

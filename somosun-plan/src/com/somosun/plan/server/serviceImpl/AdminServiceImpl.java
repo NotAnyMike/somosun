@@ -171,9 +171,9 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 	public void certainHasDefaultField(String careerCode) {
 		if(getUserLogged().isAdmin() == true){
 			CareerDao careerDao = new CareerDao();
-			Career c = careerDao.getCareerByCode(careerCode);
+			Career c = careerDao.getByCode(careerCode);
 			c.setHasDefault(true);
-			careerDao.saveCareer(c);
+			careerDao.save(c);
 		}
 	}
 
@@ -206,7 +206,7 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 			Student s = studentDao.getStudentByUserName(userName);
 			if(s!= null){			
 				s.setAdmin(true);
-				studentDao.saveStudent(s);
+				studentDao.save(s);
 			}
 		}
 	}
@@ -220,7 +220,7 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 			Student s = studentDao.getStudentByUserName(userName);
 			if(s!= null){						
 				s.setBlocked(!s.isBlocked());
-				studentDao.saveStudent(s);
+				studentDao.save(s);
 			}
 		}
 	}
@@ -365,7 +365,7 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 		Message toReturn = null;
 		if(getUserLogged().isAdmin() == true){
 			MessageDao messageDao = new MessageDao();
-			toReturn = messageDao.getMessageById(id);
+			toReturn = messageDao.getById(id);
 		}
 		return toReturn;
 	}
@@ -378,7 +378,7 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 			MessageDao messageDao = new MessageDao();
 			List<Message> list = messageDao.getAllMessages();
 			for(Message m : list){
-				messageDao.deleteMessage(m.getId());
+				messageDao.delete(m.getId());
 			}
 		}
 	}	
@@ -391,7 +391,7 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 			MessageDao messageDao = new MessageDao();
 			List<Message> list = messageDao.getAllSuggestionMessages();
 			for(Message m : list){
-				messageDao.deleteMessage(m.getId());
+				messageDao.delete(m.getId());
 			}
 		}
 	}
@@ -404,7 +404,7 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 			MessageDao messageDao = new MessageDao();
 			List<Message> list = messageDao.getAllErrorMessages();
 			for(Message m : list){
-				messageDao.deleteMessage(m.getId());
+				messageDao.delete(m.getId());
 			}
 		}
 	}
@@ -417,7 +417,7 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 			MessageDao messageDao = new MessageDao();
 			List<Message> list = messageDao.getAllOtherMessages();
 			for(Message m : list){
-				messageDao.deleteMessage(m.getId());
+				messageDao.delete(m.getId());
 			}
 		}
 	}
@@ -443,7 +443,7 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 		Plan plan = null;
 		if(getUserLogged().isAdmin() == true){			
 			PlanDao planDao = new PlanDao();
-			plan = planDao.getPlanById(Long.valueOf(id));
+			plan = planDao.getById(Long.valueOf(id));
 		}
 		return plan;
 	}

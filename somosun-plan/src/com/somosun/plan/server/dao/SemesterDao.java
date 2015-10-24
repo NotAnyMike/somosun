@@ -11,13 +11,14 @@ import com.somosun.plan.shared.control.SubjectValue;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
-public class SemesterDao {
+public class SemesterDao implements Dao<Semester> {
 	
 	static{
 		ObjectifyService.register(Semester.class);
 	}
 	
-	public void saveSemester(Semester s){
+	public Long save(Semester s){
+		Long toReturn = null;
 		if(s != null) {
 			List<SubjectValue> subjectValuesList = s.getSubjects();
 			SubjectValueDao sVDao = new SubjectValueDao();
@@ -28,15 +29,15 @@ public class SemesterDao {
 				if(sV.getId() == null){
 					if(sV.getGroup() != null){
 						if(sV.getGroup().getId() == null){
-							gDao.saveGroup(sV.getGroup());
+							gDao.save(sV.getGroup());
 						}
 					}
 					if(sV.getComplementaryValues() != null){
 						if(sV.getComplementaryValues().getId() == null){
-							cVDao.saveComplementaryValues(sV.getComplementaryValues());
+							cVDao.save(sV.getComplementaryValues());
 						}
 					}
-					sVDao.saveSubjectValue(sV);
+					sVDao.save(sV);
 				}
 			}
 			if(s.getSemesterValue() != null && s.getSemesterValue().getId() == null){
@@ -44,7 +45,9 @@ public class SemesterDao {
 				s.setSemesterValue(semesterValue);
 			}
 			ofy().save().entity(s).now();
+			toReturn = s.getId();
 		}
+		return toReturn;
 	}
 	
 	public Long generateId(){
@@ -55,15 +58,20 @@ public class SemesterDao {
 		
 	}
 
-	public void deleteSemester(Long id) {
-		Key<Semester> key = Key.create(Semester.class, id);
-		ofy().delete().key(key).now();
+	public boolean delete(Long id) {
+		boolean toReturn = false;
+		if(id != null){			
+			Key<Semester> key = Key.create(Semester.class, id);
+			ofy().delete().key(key).now();
+			toReturn = true;
+		}
+		return toReturn;
 	}
 
 	public void deleteAllSemesters() {
 		List<Semester> list = getAllSemesters();
 		for(Semester s : list){
-			deleteSemester(s.getId());
+			delete(s.getId());
 		}
 	}
 
@@ -71,5 +79,13 @@ public class SemesterDao {
 		return ofy().load().type(Semester.class).list(); 
 	}
 
+	public Semester getById(Long id){
+		Semester toReturn = null;
+		if(id != null){
+			Key<Semester> key = Key.create(Semester.class, id);
+			toReturn = ofy().load().key(key).now();
+		}
+		return toReturn;
+	}
 	
 }

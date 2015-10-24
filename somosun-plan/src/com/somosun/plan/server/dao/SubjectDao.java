@@ -12,7 +12,7 @@ import com.somosun.plan.shared.control.Subject;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
-public class SubjectDao extends Dao {
+public class SubjectDao implements Dao<Subject> {
 	
 	private static final Logger log = Logger.getLogger("SubjectDao");
 	
@@ -20,7 +20,16 @@ public class SubjectDao extends Dao {
 		ObjectifyService.register(Subject.class);
 	}
 	
-	public Subject getSubjectByName(String name){
+	public Subject getById(Long id){
+		Subject toReturn = null;
+		if(id != null){
+			Key<Subject> key = Key.create(Subject.class, id);
+			toReturn = ofy().load().key(key).now();
+		}
+		return toReturn;
+	}
+	
+	public Subject getByName(String name){
 		return (Subject) ofy().load().type(Subject.class).filter("name" , name).first().now();
 	}
 	
@@ -54,11 +63,11 @@ public class SubjectDao extends Dao {
 	 * @param siaCode
 	 * @return
 	 */
-	public Subject getSubjectBySiaCode(String siaCode) {
+	public Subject getBySiaCode(String siaCode) {
 		return (Subject) ofy().load().type(Subject.class).filter("siaCode", siaCode).first().now();
 	}
 	
-	public Subject getSubjectByCode(String code){
+	public Subject getByCode(String code){
 		Subject subjectToReturn = null;
 		if(code != null && code.isEmpty() == false){			
 			subjectToReturn = (Subject) ofy().load().type(Subject.class).filter("code", code).first().now();
@@ -84,15 +93,15 @@ public class SubjectDao extends Dao {
 	 * @param isSiaProxy: gives rights to update (delete and add) a subject
 	 * @return
 	 */
-	public Subject getSubjectbySubject(Subject subject, boolean isSiaProxy){
+	public Subject getBySubject(Subject subject, boolean isSiaProxy){
 		Subject subjectToReturn = null;
 		if(subject != null){
-			subjectToReturn = getSubjectByCode(subject.getCode());
+			subjectToReturn = getByCode(subject.getCode());
 			if(subjectToReturn==null){
 				if(subject.getId() == null){
 					subject.setId(generateId());
 				}
-				saveSubject(subject);
+				save(subject);
 				subjectToReturn = subject;
 			} else {
 				if(isSiaProxy && subjectToReturn.equals(subject)==false){ //takes care of the update just if the info is coming from the siaProxy class
@@ -101,16 +110,21 @@ public class SubjectDao extends Dao {
 					subjectToReturn.setLocation(subject.getLocation());
 					subjectToReturn.setName(subject.getName());
 					subjectToReturn.setSiaCode(subject.getSiaCode());
-					saveSubject(subjectToReturn);
+					save(subjectToReturn);
 				}
 			}
 		}
 		return subjectToReturn;
 	}
 	
-	public void deleteSubject(Long id){
-		Key<Subject> key = Key.create(Subject.class, id);
-		ofy().delete().key(key).now();
+	public boolean delete(Long id){
+		boolean toReturn = false;
+		if(id != null){			
+			Key<Subject> key = Key.create(Subject.class, id);
+			ofy().delete().key(key).now();
+			toReturn = true;
+		}
+		return toReturn;
 	}
 	
 	/**
@@ -120,7 +134,7 @@ public class SubjectDao extends Dao {
 	 * 
 	 * @param subject
 	 */
-	public Long saveSubject(Subject subject){
+	public Long save(Subject subject){
 		if(subject != null){
 			if(subject.getCode().isEmpty()){
 				subject.setSpecial(true);
@@ -149,7 +163,7 @@ public class SubjectDao extends Dao {
 	public void deleteAllSubjects() {
 		final List<Subject> list = getAllSubjects();
 		for(Subject s : list){
-			deleteSubject(s.getId());
+			delete(s.getId());
 		}
 		log.warning("All subjects deleted");
 	}

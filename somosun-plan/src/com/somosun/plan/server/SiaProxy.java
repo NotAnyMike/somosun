@@ -345,7 +345,7 @@ public class SiaProxy {
 		if(student != null){
 			StudentDao studentDao = new StudentDao();
 			SubjectDao subjectDao = new SubjectDao();
-			student = studentDao.getStudentByIdSun(student.getIdSun());
+			student = studentDao.getById(student.getIdSun());
 			if(student != null){
 				if(student.isAdmin() == true){
 					//Add libre and optativa
@@ -360,7 +360,7 @@ public class SiaProxy {
 						subject.setSpecial(false);
 						subject.setDummy(true);
 						subject.setId(subjectDao.generateId());
-						subjectDao.saveSubject(subject);
+						subjectDao.save(subject);
 					}else{
 						siaResultSubjects.addSubject(subject);
 					}
@@ -394,7 +394,7 @@ public class SiaProxy {
 	
 	public static SiaResultGroups getGroupsFromSubject(String subjectSiaCode, String sede){
 		SubjectDao subjectDao = new SubjectDao();
-		Subject s = subjectDao.getSubjectByCode(subjectSiaCode);
+		Subject s = subjectDao.getByCode(subjectSiaCode);
 		SiaResultGroups toReturn;
 		if(s!=null){
 			toReturn = getGroupsFromSubject(s, sede);
@@ -489,7 +489,7 @@ public class SiaProxy {
 						String siaCode = jsonObject.getString("codigo");
 						
 						Subject subject = new Subject(creditos, code, siaCode, name, "bog");
-						subject = subjectDao.getSubjectbySubject(subject, true);
+						subject = subjectDao.getBySubject(subject, true);
 						subjectList.add(subject);
 						typology.put(subject, jsonObject.getString("tipologia"));
 					}
@@ -566,7 +566,7 @@ public class SiaProxy {
 				blocks = new ArrayList<Block>();
 				careers = new ArrayList<Career>();
 				teacher = new Teacher(j.getString("nombredocente"), j.get("usuariodocente").toString(), j.get("usuariodocente").toString(), sede);
-				teacher = teacherDao.getTeacherByTeacher(teacher, true);
+				teacher = teacherDao.getByTeacher(teacher, true);
 				cuposDisponibles = j.getInt("cuposdisponibles");
 				cuposTotal = j.getInt("cupostotal");
 				try {
@@ -579,7 +579,7 @@ public class SiaProxy {
 				for(int r = 0; r < careersJSON.length(); r++){
 					careerJSON = careersJSON.getJSONObject(r);
 					career = null;
-					career = careerDao.getCareerByCode(careerJSON.get("plan").toString());
+					career = careerDao.getByCode(careerJSON.get("plan").toString());
 					if(career != null) {
 						if(careers.contains(career) == false) careers.add(career);
 					}
@@ -629,7 +629,7 @@ public class SiaProxy {
 						}
 					}
 				}
-				group = groupDao.getGroupByGroup(group, true); //TODO remove the synchronized call i.e. .now()
+				group = groupDao.getByGroup(group, true);
 				if(group != null) if(groupList.contains(group) == false) groupList.add(group);
 				if(group.getId() != null) bullshit = group.getId() + " ";
 			}
@@ -663,7 +663,7 @@ public class SiaProxy {
 					String code = option.attr("value");
 					String name = careerDao.fixName(option.text(), code);
 					career = new Career(name, code, sede); //TODO remove the code from the name
-					careerDao.saveCareer(career);
+					careerDao.save(career);
 				}
 			}
 		} catch (IOException e) {
@@ -700,11 +700,11 @@ public class SiaProxy {
 		SubjectDao subjectDao = new SubjectDao();
 		CareerDao careerDao = new CareerDao();
 		
-		Career mainCareer = careerDao.getCareerByCode(career);
-		Subject mainSubject = subjectDao.getSubjectByCode(code);
+		Career mainCareer = careerDao.getByCode(career);
+		Subject mainSubject = subjectDao.getByCode(code);
 		if(mainSubject == null){
 			getSubjects(code,"","","",1,1,"bog");
-			mainSubject = subjectDao.getSubjectByCode(code);
+			mainSubject = subjectDao.getByCode(code);
 		}
 		
 		if(mainSubject != null && mainCareer != null){
@@ -782,18 +782,18 @@ public class SiaProxy {
 			
 			Subject subject = null;
 			for(String s : prerequisites){
-				subject = subjectDao.getSubjectByCode(s);
+				subject = subjectDao.getByCode(s);
 				if(subject != null) prerequisitesSubjectList.add(subject);
 				subject = null;
 			}
 			for(String s : corequisites){
-				subject = subjectDao.getSubjectByCode(s);
+				subject = subjectDao.getByCode(s);
 				if(subject != null) corequisitesSubjectList.add(subject);
 				subject = null;
 			}
 			
 			ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
-			complementaryValue = complementaryValueDao.getComplementaryValues(mainCareer, mainSubject);
+			complementaryValue = complementaryValueDao.get(mainCareer, mainSubject);
 			if(complementaryValue == null){
 				complementaryValue = new ComplementaryValue(mainCareer, mainSubject);
 			}
@@ -807,24 +807,24 @@ public class SiaProxy {
 			//to save the pos requisites = pre requisites of
 			ComplementaryValue posRequisiteComplementeryValues = null;
 			for(Subject preRequisiteSubject : prerequisitesSubjectList){
-				posRequisiteComplementeryValues = complementaryValueDao.getComplementaryValues(mainCareer, preRequisiteSubject);
+				posRequisiteComplementeryValues = complementaryValueDao.get(mainCareer, preRequisiteSubject);
 				if(posRequisiteComplementeryValues == null) posRequisiteComplementeryValues = new ComplementaryValue(mainCareer, preRequisiteSubject);
 				posRequisiteComplementeryValues.addPrerequisiteOf(mainSubject);
-				complementaryValueDao.saveComplementaryValues(posRequisiteComplementeryValues);
+				complementaryValueDao.save(posRequisiteComplementeryValues);
 				posRequisiteComplementeryValues = null;
 			}
 			
 			//To save the co requisites of
 			ComplementaryValue coRequisiteOfComplementeryValues = null;
 			for(Subject coRequisiteSubject : corequisitesSubjectList){
-				coRequisiteOfComplementeryValues = complementaryValueDao.getComplementaryValues(mainCareer, coRequisiteSubject);
+				coRequisiteOfComplementeryValues = complementaryValueDao.get(mainCareer, coRequisiteSubject);
 				if(coRequisiteOfComplementeryValues == null) coRequisiteOfComplementeryValues = new ComplementaryValue(mainCareer, coRequisiteSubject);
 				coRequisiteOfComplementeryValues.addCorequisiteOf(mainSubject);
-				complementaryValueDao.saveComplementaryValues(coRequisiteOfComplementeryValues);
+				complementaryValueDao.save(coRequisiteOfComplementeryValues);
 				coRequisiteOfComplementeryValues = null;
 			}
 			
-			complementaryValueDao.saveComplementaryValues(complementaryValue);
+			complementaryValueDao.save(complementaryValue);
 		}
 		return complementaryValue;
 	}
@@ -1005,7 +1005,7 @@ public class SiaProxy {
 				CareerDao careerDao = new CareerDao();
 				
 				if(careerCode != null){
-					career = careerDao.getCareerByCode(careerCode);					
+					career = careerDao.getByCode(careerCode);					
 				}
 				
 				docPlan = Jsoup.parse(htmlPlan);
@@ -1518,12 +1518,12 @@ public class SiaProxy {
 				//Take the subjectGroup of freeElection and add the optative value This is done outside the saveSubjectGroupsAndReturnThem because it needs the freeElectionValue value
 				SubjectGroup subjectGroupFreeElection = subjectGroupDao.getSubjectGroupFromTypology(career, TypologyCodes.LIBRE_ELECCION);
 				subjectGroupFreeElection.setOptativeCredits(freeElectionValue);
-				subjectGroupDao.saveSubjectGroup(subjectGroupFreeElection);
+				subjectGroupDao.save(subjectGroupFreeElection);
 				
 				career.setHasAnalysis(true);
 				
 				//update the career
-				careerDao.saveCareer(career);
+				careerDao.save(career);
 				
 				
 			}
@@ -1632,7 +1632,7 @@ public class SiaProxy {
 			}
 			
 			Subject sTemporary = new Subject(credits, code, siaCode, name, location);
-		    Subject sFromDb = subjectDao.getSubjectByName(sD.getName());
+		    Subject sFromDb = subjectDao.getByName(sD.getName());
 
 		    if(sFromDb != null)
 			{
@@ -1646,7 +1646,7 @@ public class SiaProxy {
 		    		{
 		    			//the sTemporary is more updated thant the sFromDb ... allors udpate it
 		    			sTemporary.setId(sFromDb.getId());
-		    			sTemporary.setId(subjectDao.saveSubject(sTemporary));
+		    			sTemporary.setId(subjectDao.save(sTemporary));
 		    			sFinal = sTemporary;
 		    		}else{
 		    			//sTemporary is not more uptaded that sFromDb
@@ -1655,7 +1655,7 @@ public class SiaProxy {
 			}else
 			{
 				//Save the sTemporary into the DB and add it to the list
-				sTemporary.setId(subjectDao.saveSubject(sTemporary));
+				sTemporary.setId(subjectDao.save(sTemporary));
 				sFinal = sTemporary;
 			}
 		    
@@ -1714,7 +1714,7 @@ public class SiaProxy {
 		for(Subject s : subjectListFinalFromLaw)
 		{
 			ComplementaryValue cV = mapSCV.get(s);
-			ComplementaryValue cVT = complementaryValueDao.getComplementaryValues(career, s);
+			ComplementaryValue cVT = complementaryValueDao.get(career, s);
 			
 			updateTwoComplementaryValues(cV, cVT, complementaryValueDao);
 		}
@@ -1741,7 +1741,7 @@ public class SiaProxy {
 					cV.setId(cVFromDb.getId());
 				}
 				//complementaryValueDao.deleteComplementaryValues(cVFromDb); 
-				complementaryValueDao.saveComplementaryValues(cV);				
+				complementaryValueDao.save(cV);				
 			}
 		}
 		
@@ -1889,7 +1889,7 @@ public class SiaProxy {
 		
 		//SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
 		
-		List<SubjectGroup> sGFromDB = subjectGroupDao.getSubjectGroups(career.getCode());
+		List<SubjectGroup> sGFromDB = subjectGroupDao.getList(career.getCode());
 		//List<SubjectGroup> sGFinal = new ArrayList<SubjectGroup>();
 		Map<SubjectGroupDummy, SubjectGroup> mapSGDSG = new HashMap<SubjectGroupDummy, SubjectGroup>();
 				
@@ -1909,7 +1909,7 @@ public class SiaProxy {
 							((sGD.getObligatoryCredits() != 0 || sGD.getOptativeCredits() != 0) && sGD.getOptativeCredits() != sGDb.getOptativeCredits()) == true)
 					{
 						//in order to update the subjectGroups
-						subjectGroupDao.deleteSubjectGroup(sGDb.getName(), sGDb.isFundamental(), sGDb.getCareer().getCode());						
+						subjectGroupDao.delete(sGDb.getName(), sGDb.isFundamental(), sGDb.getCareer().getCode());						
 					}else{
 						isInDb = true;
 						sGFinal = sGDb;
@@ -1920,7 +1920,7 @@ public class SiaProxy {
 			}
 			if(isInDb == false)	
 			{
-				subjectGroupDao.saveSubjectGroup(sG);
+				subjectGroupDao.save(sG);
 				sGFinal = sG;
 			}
 			
@@ -1931,18 +1931,18 @@ public class SiaProxy {
 		 * TODO: SearchFor the libre elección and the Nivelación subjectGroups. if found, do nothing, otherwise create them
 		 */
 		//for libre eleccion
-		SubjectGroup subjectGroupIndividual = subjectGroupDao.getSubjectGroup(SubjectGroupCodes.LIBRE_NAME, career.getCode());
+		SubjectGroup subjectGroupIndividual = subjectGroupDao.get(SubjectGroupCodes.LIBRE_NAME, career.getCode());
 		if(subjectGroupIndividual == null)
 		{
 			subjectGroupIndividual = new SubjectGroup(SubjectGroupCodes.LIBRE_NAME, career, false, 0, 0, false);
-			subjectGroupDao.saveSubjectGroup(subjectGroupIndividual);
+			subjectGroupDao.save(subjectGroupIndividual);
 		}
 		//for nivelación
-			subjectGroupIndividual = subjectGroupDao.getSubjectGroup(SubjectGroupCodes.NIVELACION_NAME, career.getCode());
+			subjectGroupIndividual = subjectGroupDao.get(SubjectGroupCodes.NIVELACION_NAME, career.getCode());
 			if(subjectGroupIndividual == null)
 			{
 				subjectGroupIndividual = new SubjectGroup(SubjectGroupCodes.NIVELACION_NAME, career, false, 0, 0, false);
-				subjectGroupDao.saveSubjectGroup(subjectGroupIndividual);
+				subjectGroupDao.save(subjectGroupIndividual);
 			}
 		
 		
@@ -2442,12 +2442,12 @@ public class SiaProxy {
 									if(typology.equals("P"))
 									{
 										//get the Nivelación subjectGroup
-										sG = subjectGroupDao.getSubjectGroup(SubjectGroupCodes.NIVELACION_NAME, cV.getCareer().getCode());
+										sG = subjectGroupDao.get(SubjectGroupCodes.NIVELACION_NAME, cV.getCareer().getCode());
 									}
 									else if(typology.equals("L"))
 									{
 										//get the Libre elección subjectGroup
-										sG = subjectGroupDao.getSubjectGroup(SubjectGroupCodes.LIBRE_NAME, cV.getCareer().getCode());
+										sG = subjectGroupDao.get(SubjectGroupCodes.LIBRE_NAME, cV.getCareer().getCode());
 									}
 									
 									//create the complementaryValue and add it to the mapSCV
@@ -2538,7 +2538,7 @@ public class SiaProxy {
 		if(name != null){
 			subjectFinalT = new Subject(0, "", "", name, sede);
 			subjectFinalT.setSpecial(true);
-			Long id = subjectDao.saveSubject(subjectFinalT);
+			Long id = subjectDao.save(subjectFinalT);
 			subjectFinalT.setId(id);			
 		}
 		
@@ -2551,7 +2551,7 @@ public class SiaProxy {
 		if(name != null){
 			subjectFinalT = new Subject(0, "", "", name, sede);
 			subjectFinalT.setDummy(true);
-			Long id = subjectDao.saveSubject(subjectFinalT);
+			Long id = subjectDao.save(subjectFinalT);
 			subjectFinalT.setId(id);			
 		}
 		

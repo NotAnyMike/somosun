@@ -10,14 +10,23 @@ import com.somosun.plan.shared.control.SubjectValue;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
-public class SubjectValueDao {
+public class SubjectValueDao implements Dao<SubjectValue> {
 	
 	static{
 		ObjectifyService.register(SubjectValue.class);
 	}
+	
+	public SubjectValue getById(Long id){
+		SubjectValue toReturn = null;
+		if(id != null){
+			Key<SubjectValue> key = Key.create(SubjectValue.class, id);
+			toReturn = ofy().load().key(key).now();
+		}
+		return toReturn;
+	}
 
-	public void saveSubjectValue(SubjectValue sV){
-		
+	public Long save(SubjectValue sV){
+		Long toReturn = null;
 		if(sV != null){
 
 			if(sV.getGrade() > 5 || sV.getGrade() < 0){
@@ -25,8 +34,10 @@ public class SubjectValueDao {
 			}
 			
 			ofy().save().entity(sV).now();
+			toReturn = sV.getId();
 			
 		}
+		return toReturn;
 	}
 	
 	/**
@@ -35,7 +46,7 @@ public class SubjectValueDao {
 	 * @param g
 	 * @return
 	 */
-	public SubjectValue getSubjectValuesByGroup(Group g){
+	public SubjectValue getByGroup(Group g){
 		return (SubjectValue) ofy().load().type(SubjectValue.class).filter("group", g).first().now();
 	}
 
@@ -45,15 +56,20 @@ public class SubjectValueDao {
 		return key.getId();
 	}
 
-	public void deleteSubjectValue(Long id) {
-		Key<SubjectValue> key = Key.create(SubjectValue.class, id);
-		ofy().delete().key(key).now();
+	public boolean delete(Long id) {
+		boolean toReturn = false;
+		if(id != null){
+			Key<SubjectValue> key = Key.create(SubjectValue.class, id);
+			ofy().delete().key(key).now();
+			toReturn = true;
+		}
+		return toReturn;
 	}
 
 	public void deleteAllSubjectValues() {
 		List<SubjectValue> list = getAllSubjectValues();
 		for(SubjectValue sV : list){
-			deleteSubjectValue(sV.getId());
+			delete(sV.getId());
 		}
 	}
 

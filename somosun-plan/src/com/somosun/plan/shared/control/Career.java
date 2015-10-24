@@ -13,7 +13,7 @@ public class Career implements Serializable {
 	 * 
 	 */
 	private final static long serialVersionUID = 1L;
-	@Id private Long id=null;
+	@Id private Long id = null;
 	@Index private String name = null;
 	@Index private String code = null;
     @Index private String sede = null;
@@ -120,6 +120,10 @@ public class Career implements Serializable {
 
 	public void setHasDefault(boolean hasDefault) {
 		this.hasDefault = hasDefault;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 }

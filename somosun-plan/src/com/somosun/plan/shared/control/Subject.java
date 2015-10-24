@@ -18,7 +18,7 @@ import com.somosun.plan.shared.SomosUNUtils;
  */
 @Cache(expirationSeconds=9000)
 @Entity
-public class Subject implements Serializable {
+public class Subject implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	@Id private Long id = null;

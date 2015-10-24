@@ -15,7 +15,7 @@ import com.somosun.plan.shared.values.TypologyCodes;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
-public class SubjectGroupDao extends Dao {
+public class SubjectGroupDao implements Dao<SubjectGroup> {
 
 	private static final Logger log = Logger.getLogger("SubjectGroupDao");
 	
@@ -23,39 +23,49 @@ public class SubjectGroupDao extends Dao {
 		ObjectifyService.register(SubjectGroup.class);
 	}
 	
-	public void saveSubjectGroup(SubjectGroup sG){
+	public Long save(SubjectGroup sG){
+		Long toReturn = null;
 		if(sG != null)
 		{
 			// OLD sG.setName(SomosUNUtils.standardizeString(sG.getName(), false));
 			sG.setName(SomosUNUtils.removeAccents(sG.getName()));
 			ofy().save().entity(sG).now();
+			toReturn = sG.getId();
 		}
+		return toReturn;
 	}
 	
-	public SubjectGroup getSubjectGroup(String name, String careerCode){
+	public SubjectGroup get(String name, String careerCode){
 		return (SubjectGroup) ofy().load().type(SubjectGroup.class).filter("name", name).filter("career.code", careerCode).first().now();
 	}
 	
-	public SubjectGroup getSubjectGroup(String name, boolean isFundamental, String careerCode){
+	public SubjectGroup get(String name, boolean isFundamental, String careerCode){
 		return (SubjectGroup) ofy().load().type(SubjectGroup.class).filter("name", name).filter("career.code", careerCode).filter("fundamental", isFundamental).first().now();
 	}
 	
-	public List<SubjectGroup> getSubjectGroups(String careerCode){
+	public List<SubjectGroup> getList(String careerCode){
 		List<SubjectGroup> toReturn = ofy().load().type(SubjectGroup.class).filter("career.code", careerCode).list();
 		return toReturn;
 	}
 	
-	public void deleteSubjectGroup(String name, boolean isFundamental, String careerCode){
-		SubjectGroup toDelete = getSubjectGroup(name, isFundamental, careerCode);
+	public boolean delete(String name, boolean isFundamental, String careerCode){
+		boolean toReturn = false;
+		SubjectGroup toDelete = get(name, isFundamental, careerCode);
 		if(toDelete != null)
 		{
-			deleteSubjectGroup(toDelete.getId());
+			toReturn = delete(toDelete.getId());
 		}
+		return toReturn;
 	}
 	
-	private void deleteSubjectGroup(Long id) {
-		Key<SubjectGroup> key = Key.create(SubjectGroup.class, id);
-		ofy().delete().key(key).now();
+	public boolean delete(Long id) {
+		boolean toReturn = false;
+		if(id != null){			
+			Key<SubjectGroup> key = Key.create(SubjectGroup.class, id);
+			ofy().delete().key(key).now();
+			toReturn = true;
+		}
+		return toReturn;
 	}
 
 	/**
@@ -73,23 +83,33 @@ public class SubjectGroupDao extends Dao {
 		
 	}
 
-	public SubjectGroup getSubjectGroupById(String id) {
+	public SubjectGroup getById(String id) {
 		SubjectGroup sG = null;
-		Key<SubjectGroup> key = Key.create(SubjectGroup.class, id);
-		sG = ofy().load().key(key).now();
+		if(id!= null){			
+			Key<SubjectGroup> key = Key.create(SubjectGroup.class, id);
+			sG = ofy().load().key(key).now();
+		}
 		return sG;
-		
+	}
+	
+	public SubjectGroup getById(Long id){
+		SubjectGroup sG = null;
+		if(id!= null){			
+			Key<SubjectGroup> key = Key.create(SubjectGroup.class, id);
+			sG = ofy().load().key(key).now();
+		}
+		return sG;
 	}
 
 	public SubjectGroup getUnkownSubjectGroup(String careerCode, boolean isFundamental) {
 		SubjectGroup sG = null;
-		sG = this.getSubjectGroup(SubjectGroupCodes.UNKNOWN_NAME, isFundamental, careerCode);
+		sG = this.get(SubjectGroupCodes.UNKNOWN_NAME, isFundamental, careerCode);
 		if(sG == null){
 			CareerDao cDao = new CareerDao();
-			Career career = cDao.getCareerByCode(careerCode);
+			Career career = cDao.getByCode(careerCode);
 			sG = new SubjectGroup(SubjectGroupCodes.UNKNOWN_NAME, career, isFundamental, 0, 0, true);
 			sG.setId(generateId());
-			saveSubjectGroup(sG);
+			save(sG);
 		}
 		return sG;
 	}
@@ -110,32 +130,32 @@ public class SubjectGroupDao extends Dao {
 		SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
 		
 		if(typology == null || typology.equals(TypologyCodes.LIBRE_ELECCION) == true){
-			subjectGroup = subjectGroupDao.getSubjectGroup(SubjectGroupCodes.LIBRE_NAME, careerCode);
+			subjectGroup = subjectGroupDao.get(SubjectGroupCodes.LIBRE_NAME, careerCode);
 			if(subjectGroup == null){
 				subjectGroup = new SubjectGroup(SubjectGroupCodes.LIBRE_NAME, career, false, 0, 0, true);
 				subjectGroup.setId(subjectGroupDao.generateId());
-				subjectGroupDao.saveSubjectGroup(subjectGroup);
+				subjectGroupDao.save(subjectGroup);
 			}
 		}else if(typology.equals(TypologyCodes.NIVELACION) == true){
-			subjectGroup = subjectGroupDao.getSubjectGroup(SubjectGroupCodes.NIVELACION_NAME, careerCode);
+			subjectGroup = subjectGroupDao.get(SubjectGroupCodes.NIVELACION_NAME, careerCode);
 			if(subjectGroup == null){
 				subjectGroup = new SubjectGroup(SubjectGroupCodes.NIVELACION_NAME, career, false, 0, 0, true);
 				subjectGroup.setId(subjectGroupDao.generateId());
-				subjectGroupDao.saveSubjectGroup(subjectGroup);
+				subjectGroupDao.save(subjectGroup);
 			}
 		}else if(typology.equals(TypologyCodes.FUNDAMENTACION) == true){
-			subjectGroup = subjectGroupDao.getSubjectGroup(SubjectGroupCodes.UNKNOWN_NAME, true, careerCode);
+			subjectGroup = subjectGroupDao.get(SubjectGroupCodes.UNKNOWN_NAME, true, careerCode);
 			if(subjectGroup == null){
 				subjectGroup = new SubjectGroup(SubjectGroupCodes.UNKNOWN_NAME, career, true, 0, 0, true);
 				subjectGroup.setId(subjectGroupDao.generateId());
-				subjectGroupDao.saveSubjectGroup(subjectGroup);
+				subjectGroupDao.save(subjectGroup);
 			}
 		}else if(typology.equals(TypologyCodes.PROFESIONAL) == true){
-			subjectGroup = subjectGroupDao.getSubjectGroup(SubjectGroupCodes.UNKNOWN_NAME, false, careerCode);
+			subjectGroup = subjectGroupDao.get(SubjectGroupCodes.UNKNOWN_NAME, false, careerCode);
 			if(subjectGroup == null){
 				subjectGroup = new SubjectGroup(SubjectGroupCodes.UNKNOWN_NAME, career, false, 0, 0, true);
 				subjectGroup.setId(subjectGroupDao.generateId());
-				subjectGroupDao.saveSubjectGroup(subjectGroup);
+				subjectGroupDao.save(subjectGroup);
 			}
 		}
 		
@@ -145,7 +165,7 @@ public class SubjectGroupDao extends Dao {
 	public void deleteAllSubjectGroups() {
 		final List<SubjectGroup> list = getAllSubjectGroups();
 		for(SubjectGroup sG : list){
-			deleteSubjectGroup(sG.getId());
+			delete(sG.getId());
 		}
 		log.warning("All subjectGroup deleted");
 	}

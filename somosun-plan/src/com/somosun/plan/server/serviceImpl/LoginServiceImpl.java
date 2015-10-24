@@ -28,7 +28,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 		if(userService.isUserLoggedIn()){
 			loginInfo.setLoggedIn(true);
 			loginInfo.setLogoutUrl(userService.createLogoutURL(requestUri));
-			student = StudentDao.getStudentByUser(user);
+			student = StudentDao.getByUser(user);
 			loginInfo.setStudent(student);
 		} else {
 			loginInfo.setLoggedIn(false);
