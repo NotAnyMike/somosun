@@ -26,10 +26,8 @@ public class ComplementaryValueDao implements Dao<ComplementaryValue> {
 	
 	public Long save(ComplementaryValue cV){
 		Long toReturn = null;
-		if(cV != null)
-		{
-			if(cV.getSubjectGroup() != null && cV.getSubject() != null && cV.getCareer() != null)
-			{
+		if(cV != null){
+			if(cV.getSubjectGroup() != null && cV.getSubject() != null && cV.getCareer() != null){
 				if(cV.getSubjectGroup().getId() == null){
 					SubjectGroupDao sGDao = new SubjectGroupDao();
 					Long id = sGDao.generateId();

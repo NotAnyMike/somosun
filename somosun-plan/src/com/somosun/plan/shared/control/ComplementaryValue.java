@@ -272,11 +272,22 @@ public class ComplementaryValue implements Serializable {
 		this.corequisitesLists = corequisitesLists;
 	}
 	
+	/**
+	 * Old lists are not lost
+	 * @param list
+	 */
 	public void addListToCorequisites(List<Subject> list) {
 		if(corequisitesLists == null){
 			corequisitesLists = new ArrayList<List<Subject>>();
 		}
-		corequisitesLists.add(list);
+		List<Subject> realList = new ArrayList<Subject>();
+		for(Subject s : list){
+			if(containsSubject(getCorequisitesLists(), s) == false){
+				realList.add(s);
+			}
+		}
+		if(realList.isEmpty() == false)
+			corequisitesLists.add(realList);
 	}
 	
 	public List<Subject> getListCorequisitesOf() {
@@ -299,11 +310,22 @@ public class ComplementaryValue implements Serializable {
 		this.prerequisitesLists = prerequisitesLists;
 	}
 	
+	/**
+	 * This method doest not delete the old lists in the prerequisites list, just add the @param list to that list
+	 * @param list
+	 */
 	public void addListToPrerequisites(List<Subject> list) {
 		if(prerequisitesLists == null){
 			prerequisitesLists = new ArrayList<List<Subject>>();
 		}
-		prerequisitesLists.add(list);
+		List<Subject> realList = new ArrayList<Subject>();
+		for(Subject s : list){
+			if(containsSubject(getPrerequisitesLists(), s) == false){
+				realList.add(s);
+			}
+		}
+		if(realList.isEmpty() == false)
+			prerequisitesLists.add(list);
 	}
 
 	public List<Subject> getListPrerequisitesOf() {
@@ -348,7 +370,7 @@ public class ComplementaryValue implements Serializable {
 		
 		for(Subject s : list){
 			if(s.getCode().isEmpty() == false){
-				if(s.getCode().equals(subject) == true){
+				if(s.getCode().equals(subject.getCode()) == true){
 					toReturn = true;
 					break;
 				}

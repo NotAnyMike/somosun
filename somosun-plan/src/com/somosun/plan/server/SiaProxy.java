@@ -671,17 +671,360 @@ public class SiaProxy {
 		}
 	}
 	
+	private static ComplementaryValue analyseMisPlanesStringToGetCV(String mainHtmlString, Document doc , Career mainCareer, String code, SubjectDao subjectDao, ComplementaryValueDao complementaryValueDao, SubjectGroupDao subjectGroupDao){
+		
+		ComplementaryValue complementaryValue = null;
+
+		if(mainHtmlString.contains(code) == true){
+			
+			boolean isFundamental = false;
+			String typology = null;
+			Subject mainSubject = null;
+			SubjectGroup subjectGroup = null;
+			String career = mainCareer.getCode();
+			
+			List<String> requisitesList = new ArrayList<String>();
+			List<String> prerequisites = new ArrayList<String>();
+			List<String> corequisites = new ArrayList<String>();
+			List<Subject> prerequisitesSubjectList = new ArrayList<Subject>();
+			List<Subject> corequisitesSubjectList = new ArrayList<Subject>();
+			
+			mainSubject = subjectDao.getByCode(code);
+			
+			if(mainSubject == null){
+				getSubjects(code,"","","",1,1,"bog");
+				mainSubject = subjectDao.getByCode(code);
+			}
+			
+//			doc = Jsoup.parse(mainHtmlString);
+			Elements subjects = doc.getElementsContainingOwnText(code);
+			for(Element e : subjects){
+				//The code of the subject is inside <h5>
+				if(e.outerHtml().contains("</h5>")==true || (e.parent().getElementsByTag("td").size() > 1 && e.parent().getElementsByTag("td").get(1).toString().contains("mostrarRequisitoAM"))){
+					
+					//Get the real box (one box is for normal subject that appear in their own boxes, other subjects are the ones that appear in some group, as for instance "ingles semestreal ii" which is inside the subject "Asignaturas de ingles ii" with code ingni2
+					Element box = null;
+					if(e.outerHtml().contains("</h5>")==true){							
+						//Return three parents in order to get the hole box including code, credits and requisites
+						box = e.parent().parent().parent();
+					}else if(e.parent().getElementsByTag("td").size() > 1 && e.parent().getElementsByTag("td").get(1).toString().contains("mostrarRequisitoAM")){							
+						box = doc.getElementById("PreAM_" + code);
+					}
+					box = box.getElementsByClass("popup-int").first();
+					
+					//create the main subject otherwise delete it
+					if(mainSubject == null){
+						
+						String name = SomosUNUtils.removeAccents(box.getElementsByTag("h4").first().text().toLowerCase());
+						int credits = -1;
+						String creditsString = SomosUNUtils.removeAccents(box.getElementsByTag("b").first().text()).replaceAll("creditos","").replaceAll(" ","");
+						if(creditsString.matches("(\\s*)(\\d+)(\\s*)")){								
+							credits = Integer.valueOf(creditsString);
+						}
+						
+						if(name != null && credits != -1){								
+							mainSubject = new Subject();
+							
+							mainSubject.setCode(code);
+							mainSubject.setDummy(true);
+							mainSubject.setName(name);
+							mainSubject.setCredits(credits);
+						}
+					}
+					
+					if(mainSubject != null){
+						
+						
+						complementaryValue = complementaryValueDao.get(mainCareer, mainSubject);
+						if(complementaryValue == null){
+							complementaryValue = new ComplementaryValue(mainCareer, mainSubject);
+						}
+						
+						/***** <getting the subjectGroup for this subject> *****/
+						//return two parents of four (until its class is "indi-group" and not "indi-group2") and getting the first td from box to get the tr element, containing two td (columns) the first one with the subjectGroup image and the other one with the boxes (i.e. subjects)
+						Element subjectGroupContainer = box;
+						int numberOfTagElements = 0;
+						int counter = 0; //in order to avoid a very large loop
+						do{
+							counter ++;
+							subjectGroupContainer = subjectGroupContainer.parent();
+							numberOfTagElements = subjectGroupContainer.getElementsByTag("td").size();
+						}while(counter < 20 && (numberOfTagElements == 0 || subjectGroupContainer.getElementsByTag("td").get(0).attr("class").matches("(.*)(indi-group)((\\D+)|($))") == false));//("(.*)(indi-group)(\\d+)(.*)"));
+						
+						if(counter < 20){
+							subjectGroupContainer = subjectGroupContainer.getElementsByTag("td").get(0);
+						}
+						
+						if(subjectGroupContainer.attr("class").matches("(.*)(indi-group)((\\D+)|($))") == true){
+							//get the subjectGroupName and the subjecGroup
+							Elements imgContainer = subjectGroupContainer.getElementsByTag("img");
+							if(imgContainer.isEmpty() == false){								
+								String stringContainingSubjectGroupName = imgContainer.get(0).attr("src");
+								if(stringContainingSubjectGroupName.matches("(.*)(tt=)(.+)") == true){
+									String subjectGroupName = stringContainingSubjectGroupName.split("tt=")[1].split("(\\s)(\\()(.*)(\\))")[0];
+									//Take into account whether it is "optativa" or "obligatoria", if it is remove the real name
+									if(subjectGroupName.toLowerCase().matches("(.*)(\\s)((obligatorio(s?))|(optativo(s?)))($)") == true){
+										//if there is the name repeated somewhere in the document
+										String toSearch = subjectGroupName.toLowerCase().split("(\\s)((obligatorio(s?))|(optativo(s?)))($)")[0];
+										String[] splits = mainHtmlString.toLowerCase().split("tt=" + toSearch);
+										if(splits.length > 2){
+											//it does contains the subjectGroup optionals and mandatories
+											subjectGroupName = toSearch;
+										}
+									}
+									//do something with subjectGroupName
+									if(subjectGroupName != null && subjectGroupName.isEmpty() == false){
+										subjectGroupName = SomosUNUtils.removeAccents(subjectGroupName);
+										if(subjectGroupName.matches("(.*)(libre eleccion)(.*)")){ //if it is free election
+											subjectGroup = subjectGroupDao.getSubjectGroupFromTypology(mainCareer, TypologyCodes.LIBRE_ELECCION);
+										}else if(subjectGroupName.matches("(.*)((nivelacion)|(idioma))(.*)")){
+											subjectGroup = subjectGroupDao.getSubjectGroupFromTypology(mainCareer, TypologyCodes.NIVELACION);
+										}else{
+											subjectGroup = subjectGroupDao.get(subjectGroupName, career);
+										}
+										if(subjectGroup == null || complementaryValue.getTypology() == null){
+											//get isFundamental
+											//get if it is closer to "TRABAJO DE GRADO", "COMPONENTE DE LIBRE ELECCIÓN", "COMPONENETE DE FOR...O PROFESIONAL", "COMPOENENTE DE FUDAMENTACIÓN", "IDIOMA" OR "ESTUDIANTES DE DEBEN SU... O MATEMÁTICAS"
+											//get the string from the beginning to subject (box)
+											String stringToSearch = box.toString().toLowerCase().replaceAll("\\s", "");
+											String stringToSearchIn = doc.toString().toLowerCase().replaceAll("\\s", "");
+											int position = stringToSearchIn.indexOf(stringToSearch);
+											
+											if(position != -1){
+												stringToSearchIn = stringToSearchIn.substring(0,position);
+												int indexOfFreeElection = stringToSearchIn.indexOf("<spanclass=\"left\">componentedelibreelección</span>");
+												int indexOfProfessional = stringToSearchIn.indexOf("<spanclass=\"left\">componentedeformacióndisciplinaroprofesional</span>");
+												int indexOfFoundations = stringToSearchIn.indexOf("<span class=\"left\">componentedefundamentación</span>");
+												int indexOfLanguage = stringToSearchIn.indexOf("<spanclass=\"left\">idioma</span>");
+												int indexOfDegreeWork = stringToSearchIn.indexOf("<spanclass=\"left\">trabajodegrado</span>");
+												int indexOfLeveling = stringToSearchIn.indexOf("<spanclass=\"left\">estudiantesquedebensuperarlecto-escrituraymatemáticas</span>");
+												
+												//get the biggest int
+												int biggestInt = -1;
+												if(indexOfFreeElection > biggestInt) {
+													biggestInt = indexOfFreeElection;
+													isFundamental = false;
+													typology = TypologyCodes.LIBRE_ELECCION;
+												} else if(indexOfProfessional > biggestInt) {
+													biggestInt = indexOfFreeElection;
+													isFundamental = false;
+													typology = TypologyCodes.PROFESIONAL;
+												} else if(indexOfFoundations > biggestInt) {
+													biggestInt = indexOfFreeElection;
+													isFundamental = true;
+													typology = TypologyCodes.FUNDAMENTACION;
+												} else if(indexOfLanguage > biggestInt ) {
+													biggestInt = indexOfFreeElection;
+													isFundamental = false;
+													typology = TypologyCodes.NIVELACION;
+												} else if(indexOfLeveling > biggestInt) {
+													biggestInt = indexOfFreeElection;
+													isFundamental = false;
+													typology = TypologyCodes.NIVELACION;
+												}else if(indexOfDegreeWork > biggestInt){
+													biggestInt = indexOfFreeElection;
+													isFundamental = false;
+													typology = TypologyCodes.PROFESIONAL;
+												}
+												
+												if(complementaryValue.getTypology() == null && typology != null){
+													complementaryValue.setTypology(typology);
+												}
+												
+											}
+										}
+									}
+									counter ++;
+								}
+							}
+						}
+						/***** </getting the subjectGroup for this subject> ****/
+						
+						if(box.toString().contains("pre-requisitos") == true && box.toString().contains("sin prerequisitos")==false){
+							Elements requisites = box.getElementsByTag("p");
+							for(Element requisite : requisites){
+								int position = requisite.text().indexOf("-");
+								if(position != -1) {
+									if(requisitesList.contains(requisite.text().substring(0, position-1))==false){										
+										requisitesList.add(requisite.text().substring(0, position-1));	
+									}
+								}
+							}
+						}
+					}
+					
+					break;
+				}	
+				//subjects.remove(e);
+			}
+		
+		
+			if(mainSubject != null){
+				
+				//connect to see if it's co or pre-requisite
+				String secondaryHtmlString = null;
+				try {
+					secondaryHtmlString = getUrlSource(SIA_SUBJECT_BOG_HTML + "?plan=" + career + "&asignatura=" + code, false);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				
+				/****** <knowing if the requisite is pre or co> *******/
+				if(secondaryHtmlString.contains("prerrequisitos")){
+					for(String requisiteCodeString : requisitesList){
+						int indexOfRequisite = secondaryHtmlString.indexOf(requisiteCodeString);
+						if(indexOfRequisite != -1){
+							String subHtmlString = secondaryHtmlString.substring(indexOfRequisite);
+							int indexOfPrerequisite = subHtmlString.indexOf("[M | asignatura prerrequisito]");
+							int indexOfCorequisite = subHtmlString.indexOf("[E | asignatura prerrequisito o de ");
+							if(indexOfCorequisite != -1 && indexOfPrerequisite < indexOfCorequisite){
+								//it is a correqusite
+								corequisites.add(requisiteCodeString);
+							}else{
+								prerequisites.add(requisiteCodeString);
+							}
+						}
+					}
+					//<------ old code
+	//				doc = Jsoup.parse(htmlString);
+	//				Element completeRequisites = doc.getElementById("prerrequisitos");
+	//				/**
+	//				 * If contains that string means that it is COrequisite, the full string is:
+	//				 * [E | asignatura prerrequisito o de inscripción simultánea]
+	//				 */
+	//				if(completeRequisites.toString().contains("E | asignatura prerrequisito o de") == true){
+	//					Elements listRequisites = completeRequisites.getElementsByClass("separa-linea");
+	//					for(Element requisite : listRequisites){
+	//						Element requisiteName = requisite.getElementsByClass("zona-dato").first();
+	//						Element requisiteEsp = requisite.getElementsByClass("zona-dato").get(1);//Specification
+	//						if(requisiteName.text().contains("[") == true){
+	//							String codeRequisiteName = requisiteName.text();
+	//							codeRequisiteName = codeRequisiteName.substring(codeRequisiteName.indexOf("[")+1, codeRequisiteName.indexOf("]"));
+	//							if(requisiteEsp.text().contains("E | asignatura prerrequisito o de") == true){
+	//								//co requisite
+	//								int indexOfRequisite = prerequisites.indexOf(codeRequisiteName);
+	//								if(indexOfRequisite != -1){
+	//									prerequisites.remove(codeRequisiteName);
+	//								}
+	//								corequisites.add(codeRequisiteName);
+	//							}//else it is a prerequisite 
+	//						}
+	//					}
+	//				}else{
+	//					//all of them are prerequisites
+	//				}
+					//----- end of old code !>
+				}
+				/***** </knowing if the requisite is pre or co> ******/
+				
+				if(prerequisites.contains(code)) prerequisites.remove(code);
+				if(corequisites.contains(code)) corequisites.remove(code);
+				
+				Subject subject = null;
+				for(String s : prerequisites){
+					subject = subjectDao.getByCode(s);
+					if(subject != null) prerequisitesSubjectList.add(subject);
+					subject = null;
+				}
+				for(String s : corequisites){
+					subject = subjectDao.getByCode(s);
+					if(subject != null) corequisitesSubjectList.add(subject);
+					subject = null;
+				}
+				
+				if(prerequisitesSubjectList.isEmpty() == false){
+					for(Subject s : prerequisitesSubjectList){
+						if(s != null){						
+							List<Subject> listToAdd = new ArrayList<Subject>();
+							listToAdd.add(s);
+							complementaryValue.addListToPrerequisites(listToAdd);
+						}
+					}
+				}
+				if(corequisitesSubjectList.isEmpty() == false){
+					for(Subject s : corequisitesSubjectList){
+						if(s != null){						
+							List<Subject> listToAdd = new ArrayList<Subject>();
+							listToAdd.add(s);
+							complementaryValue.addListToCorequisites(listToAdd);
+						}
+					}
+				}
+				
+				//Adding this subject @param code to requisiteOf list of its pre and co requisites (to save the pos requisites = pre requisites of)
+				ComplementaryValue posRequisiteComplementeryValues = null;
+				for(Subject preRequisiteSubject : prerequisitesSubjectList){
+					posRequisiteComplementeryValues = complementaryValueDao.get(mainCareer, preRequisiteSubject);
+					if(posRequisiteComplementeryValues == null) posRequisiteComplementeryValues = new ComplementaryValue(mainCareer, preRequisiteSubject);
+					posRequisiteComplementeryValues.addPrerequisiteOf(mainSubject);
+					complementaryValueDao.save(posRequisiteComplementeryValues);
+					posRequisiteComplementeryValues = null;
+				}
+				
+				//To save the co requisites of
+				ComplementaryValue coRequisiteOfComplementeryValues = null;
+				for(Subject coRequisiteSubject : corequisitesSubjectList){
+					coRequisiteOfComplementeryValues = complementaryValueDao.get(mainCareer, coRequisiteSubject);
+					if(coRequisiteOfComplementeryValues == null) coRequisiteOfComplementeryValues = new ComplementaryValue(mainCareer, coRequisiteSubject);
+					coRequisiteOfComplementeryValues.addCorequisiteOf(mainSubject);
+					complementaryValueDao.save(coRequisiteOfComplementeryValues);
+					coRequisiteOfComplementeryValues = null;
+				}
+				
+				/**** <adding the known subjectGroup to the complementaryValue> *****/
+				if(complementaryValue.getSubjectGroup() == null){
+					if(subjectGroup != null){
+						complementaryValue.setSubjectGroup(subjectGroup);
+					}else{
+						subjectGroup = subjectGroupDao.getUnkownSubjectGroup(career, isFundamental);
+						if(subjectGroup != null){
+							complementaryValue.setSubjectGroup(subjectGroup);
+						}else{
+							log.warning("SiaProxy - getRequisitesFromSia(String,String) : error getting the subjectGroup for subject " + code + " for career " + career);
+						}
+					}
+				}
+				/**** </adding the known subjectGroup to the complementaryValue> ****/
+				
+				complementaryValueDao.save(complementaryValue);
+				
+			}
+		}
+		
+		return complementaryValue;
+	}
+	
 	/**
 	 * 
-	 * If what you want is the full requisites (co, pos and pre) then use the method getRequisites(career, subject)
+	 * 
+	 * The use of this method is very discouraged (Significant number of times this method will get the wrong information and this ignores 
+	 * the OR (pre/co)requisites and this method will also add the @param code to the list of (pre/co)requisiteOf of its (pre/co)requisites, 
+	 * so this could be editing several subjects at the same time), this method will use the info-asignaturas.sdo (a popup of the MIS Planes pages) 
+	 * and catalogo-programas/semaforo.do (MIS PLANES) page to get the information.
+	 * <br/>
+	 * 
+	 * JUST FOR OLD VERSION OF THIS ALGORITHM -> This method will (did) only work for subjects existing in the action.pub (search in the sia)
+	 * <br/>
+	 * 
+	 * This method is very likely to return false information because samaforo.do and info-asignaturas.sdo don't have matching 
+	 * information (i.e. in one pages it shows something and in the other the information is different), the page with 
+	 * the worst information between those two is the info-asignaturas.do (that's why this algorithm uses the other 
+	 * more 'reliable' page as the main source of information to work with and only uses the info-asignauras.sdo to get if it is co-requisite or not
+	 * <br/>
+	 * 
+	 * This method will ONLY be used when there is an IMPORTANT error with the law (i.e. norma) (Norma1.jsp)
+	 * <br/>
+	 * 
+	 * This method will not get the [is]requisiteOf for @param code
+	 * <br/>
 	 * 
 	 * This method only works with undergraduate courses, and it is build to find only one course at the time, if you need
 	 * to find more than one subject (all subjects from a career -mandatory ones) use GetPrerequisitesFromSia(String career) 
 	 * but that method would take way to long.
+	 * <br/>
 	 * 
-	 * TODO: save the requisites in the db
 	 * TODO: make it works with graduated courses
-	 * TODO: create the getPrerequisitesFromSia(String career) method
+	 * TODO: make the algorithm work with several subjects at the same time to reduce the time consumed
 	 * 
 	 * @param code
 	 * @param career
@@ -690,143 +1033,29 @@ public class SiaProxy {
 	 */
 	public static ComplementaryValue getRequisitesFromSia(String code, String career){
 		
-		ComplementaryValue complementaryValue = null;
-		
-		List<String> prerequisites = new ArrayList<String>();
-		List<String> corequisites = new ArrayList<String>();
-		List<Subject> prerequisitesSubjectList = new ArrayList<Subject>();
-		List<Subject> corequisitesSubjectList = new ArrayList<Subject>();
-		
+		ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
+		SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
 		SubjectDao subjectDao = new SubjectDao();
 		CareerDao careerDao = new CareerDao();
 		
 		Career mainCareer = careerDao.getByCode(career);
-		Subject mainSubject = subjectDao.getByCode(code);
-		if(mainSubject == null){
-			getSubjects(code,"","","",1,1,"bog");
-			mainSubject = subjectDao.getByCode(code);
-		}
 		
-		if(mainSubject != null && mainCareer != null){
+		if(/* mainSubject != null && */ mainCareer != null){
 		
-			String htmlString = "";
+			String mainHtmlString = "";
 			try {
 				//If there is a "?" sign in the string set true to false
-				htmlString = getUrlSource(SIA_MIS_PLANES_BOG_HTML + "?plan=" + career + "&tipo=PRE&tipoVista=semaforo&nodo=4&parametro=on", false); 
+				mainHtmlString = getUrlSource(SIA_MIS_PLANES_BOG_HTML + "?plan=" + career + "&tipo=PRE&tipoVista=semaforo&nodo=4&parametro=on", false); 
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
-			Document doc;
+			Document doc = Jsoup.parse(mainHtmlString);
 			
-			if(htmlString.contains(code) == true){			
-				doc = Jsoup.parse(htmlString);
-				Elements subjects = doc.getElementsContainingOwnText(code);
-				for(Element e : subjects){
-					if(e.outerHtml().contains("</h5>")==true){
-						e = e.parent().parent().parent();
-						if(e.toString().contains("pre-requisitos") == true && e.toString().contains("sin prerequisitos")==false){
-							Elements requisites = e.getElementsByClass("popup-int").first().getElementsByTag("p");
-							for(Element requisite : requisites){
-								int position = requisite.text().indexOf("-");
-								if(position != -1) {
-									if(prerequisites.contains(requisite.text().substring(0, position-1))==false){										
-										prerequisites.add(requisite.text().substring(0, position-1));	
-									}
-								}
-							}
-						}
-					}
-					//subjects.remove(e);
-				}
-			}
+			ComplementaryValue complementaryValue = analyseMisPlanesStringToGetCV(mainHtmlString, doc, mainCareer, code, subjectDao, complementaryValueDao, subjectGroupDao);
 			
-			//connect to see if it's co or pre-requisite
-			htmlString = "";
-			try {
-				htmlString = getUrlSource(SIA_SUBJECT_BOG_HTML + "?plan=" + career + "&asignatura=" + code, false);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			
-			if(htmlString.contains("prerrequisitos")){
-				doc = Jsoup.parse(htmlString);
-				Element completeRequisites = doc.getElementById("prerrequisitos");
-				if(completeRequisites.toString().contains("E | asignatura prerrequisito o de") == true){
-					Elements listRequisites = completeRequisites.getElementsByClass("separa-linea");
-					for(Element requisite : listRequisites){
-						Element requisiteName = requisite.getElementsByClass("zona-dato").first();
-						Element requisiteEsp = requisite.getElementsByClass("zona-dato").get(1);//Esp ecification
-						if(requisiteName.text().contains("[") == true){
-							String codeRequisiteName = requisiteName.text();
-							codeRequisiteName = codeRequisiteName.substring(codeRequisiteName.indexOf("[")+1, codeRequisiteName.indexOf("]"));
-							if(requisiteEsp.text().contains("E | asignatura prerrequisito o de") == true){
-								//co requisito
-								int indexOfRequisite = prerequisites.indexOf(codeRequisiteName);
-								if(indexOfRequisite != -1){
-									prerequisites.remove(codeRequisiteName);
-								}
-								corequisites.add(codeRequisiteName);
-							}//else it is a prerequisite 
-						}
-					}
-				}else{
-					//all of them are prerequisites
-				}
-			}
-			
-			if(prerequisites.contains(code)) prerequisites.remove(code);
-			if(corequisites.contains(code)) corequisites.remove(code);
-			
-			Subject subject = null;
-			for(String s : prerequisites){
-				subject = subjectDao.getByCode(s);
-				if(subject != null) prerequisitesSubjectList.add(subject);
-				subject = null;
-			}
-			for(String s : corequisites){
-				subject = subjectDao.getByCode(s);
-				if(subject != null) corequisitesSubjectList.add(subject);
-				subject = null;
-			}
-			
-			ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
-			complementaryValue = complementaryValueDao.get(mainCareer, mainSubject);
-			if(complementaryValue == null){
-				complementaryValue = new ComplementaryValue(mainCareer, mainSubject);
-			}
-			if(prerequisitesSubjectList.isEmpty() == false){//be careful it could be deleting the old list
-				complementaryValue.addListToPrerequisites(prerequisitesSubjectList);
-			}
-			if(corequisitesSubjectList.isEmpty() == false){//be careful it could be deleting the old list
-				complementaryValue.addListToCorequisites(corequisitesSubjectList);
-			}
-			
-			//to save the pos requisites = pre requisites of
-			ComplementaryValue posRequisiteComplementeryValues = null;
-			for(Subject preRequisiteSubject : prerequisitesSubjectList){
-				posRequisiteComplementeryValues = complementaryValueDao.get(mainCareer, preRequisiteSubject);
-				if(posRequisiteComplementeryValues == null) posRequisiteComplementeryValues = new ComplementaryValue(mainCareer, preRequisiteSubject);
-				posRequisiteComplementeryValues.addPrerequisiteOf(mainSubject);
-				complementaryValueDao.save(posRequisiteComplementeryValues);
-				posRequisiteComplementeryValues = null;
-			}
-			
-			//To save the co requisites of
-			ComplementaryValue coRequisiteOfComplementeryValues = null;
-			for(Subject coRequisiteSubject : corequisitesSubjectList){
-				coRequisiteOfComplementeryValues = complementaryValueDao.get(mainCareer, coRequisiteSubject);
-				if(coRequisiteOfComplementeryValues == null) coRequisiteOfComplementeryValues = new ComplementaryValue(mainCareer, coRequisiteSubject);
-				coRequisiteOfComplementeryValues.addCorequisiteOf(mainSubject);
-				complementaryValueDao.save(coRequisiteOfComplementeryValues);
-				coRequisiteOfComplementeryValues = null;
-			}
-			
-			complementaryValueDao.save(complementaryValue);
 		}
-		return complementaryValue;
+		return null;
 	}
 	
 	private static String getUrlSource(String url, boolean readAccents) throws IOException {

@@ -249,4 +249,29 @@ public class SomosUNUtils {
 		return toReturn;
 	}
 
+	/**
+	 * This method will return null if the code is empty or is a free election or optative generic code
+	 * 
+	 * @param code
+	 * @param list
+	 * @return
+	 */
+	public static Subject getSubjectByCodeInList(String code, List<ComplementaryValue> list) {
+		Subject toReturn = null;
+		
+		if(code.trim().isEmpty() == false && code.matches("(" + LIBRE_CODE + ")|("+ LIBRE_NAME + ")|(" + OPTATIVA_NAME + ")|(" + OPTATIVA_CODE + ")") == false){
+			if(list != null && list.isEmpty() == false){
+				for(ComplementaryValue cV : list){
+					if(cV.getSubject().getCode().equals(code)){
+						toReturn = cV.getSubject();
+						break;
+					}
+				}
+			}
+		}
+			
+			
+		return toReturn;
+	}
+
 }

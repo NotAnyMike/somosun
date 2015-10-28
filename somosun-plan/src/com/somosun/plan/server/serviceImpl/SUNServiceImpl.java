@@ -1071,6 +1071,40 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 				}
 				/*************************************************************************/
 
+				/****** <Add the requisites not added in the plan *******/
+//				List<ComplementaryValue> subjectsToAdd = new ArrayList<ComplementaryValue>();
+//				for(ComplementaryValue cV: toReturn.getMandatoryComplementaryValues()){
+//					//Check for requisites, add the ones that are not here into a list
+//					for(List<Subject> list : cV.getPrerequisitesLists()){
+//						//This is a OR list, if there is any subject in the plan then not add all of them, select just one
+//						boolean toAdd = true;
+//						for(Subject s : list){
+//							if(SomosUNUtils.getSubjectByCodeInList(s.getCode(), toReturn.getMandatoryComplementaryValues()) != null){
+//								toAdd = false;
+//							}
+//						}
+//						//Add only one subject from that list
+//						if(toAdd == true){							
+//							for(Subject s : list){
+//								if(s.getCode().trim().isEmpty() == false && s.getCode().matches("(" + SomosUNUtils.LIBRE_CODE + ")|("+ SomosUNUtils.LIBRE_NAME + ")|(" + SomosUNUtils.OPTATIVA_NAME + ")|(" + SomosUNUtils.OPTATIVA_CODE + ")") == false){									
+//									//get the complementaryValue for this subject
+//									ComplementaryValue cVToAdd = complementaryValueDao.get(careerCode, s.getCode());
+//									//if the complementaryValue exists add it and break it
+//									if(cVToAdd == null){
+//										SiaProxy.getRequisitesFromSia("1000045", careerCode);
+//									}
+//									if(cVToAdd != null){
+//										subjectsToAdd.add(cVToAdd);
+//										break;
+//									}
+//								}
+//							}
+//						}
+//					}
+//				}
+//				if(subjectsToAdd.isEmpty() == false) toReturn.getMandatoryComplementaryValues().addAll(subjectsToAdd);
+				/****** </Add the requisites not added in the plan ******/
+				
 				/******** <taking care of the subjects groups> *********/
 				// Count the number of the no-mandatory subjects for a given subjectGroup and find the credits number left to complete that subjectGroup
 				// For every subject, if not mandatory find the subjectGroup in the map and add the number of credits
@@ -1131,5 +1165,4 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		return toReturn;
 	}
 
-	
 }

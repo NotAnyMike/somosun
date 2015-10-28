@@ -1,5 +1,7 @@
 # README #
 
+Somthing important to do is to change the default charset coding of eclipse to utf-8 to avoid removing all the accents when any file is moved
+
 ## General Information about the project
 The branch dev is a development branch (it means this version is used as the branch master of the new version) so all features should be created in a different branch a later it should be merged into dev, when the new version is ready, dev should be merge with master but dev must not be deleted
 
