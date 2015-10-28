@@ -516,7 +516,9 @@ ComplementaryValueView.Presenter{
 		if(timesUpdated < LIMIT_TO_REQUISITES_UPDATES){
 			//OLD subjectTimesUpdated.put(valuesAndSubjectMap.get(sV), timesUpdated+1);
 			subjectTimesUpdated.put(sV.getComplementaryValues().getSubject(), timesUpdated+1);
-			rpcService.getComplementaryValueFromMisPlanes(plan.getCareerCode(), sV.getComplementaryValues().getSubject().getCode(), new AsyncCallback<ComplementaryValue>(){
+			List<String> codes = new ArrayList<String>();
+			codes.add(sV.getComplementaryValues().getSubject().getCode());
+			rpcService.getComplementaryValueFromMisPlanes(plan.getCareerCode(), codes, new AsyncCallback<List<ComplementaryValue>>(){
 			//OLD rpcService.getComplementaryValues(plan.getCareerCode(), valuesAndSubjectMap.get(sV).getCode(), new AsyncCallback<ComplementaryValues>(){
 				
 				@Override
@@ -525,30 +527,32 @@ ComplementaryValueView.Presenter{
 				}
 	
 				@Override
-				public void onSuccess(ComplementaryValue result) {
-					boolean isOldNull = false;
-					if(result != null){
-						List<SubjectValue> list = getSubjectValuesBySubject(result.getSubject());
-						for(SubjectValue sV : list){
-							if(sV.getComplementaryValues()== null || sV.getComplementaryValues().getListCorequisites().size() == 0 || sV.getComplementaryValues().getListPrerequisitesOf().size() == 0 || sV.getComplementaryValues().getListCorequisitesOf().size() == 0 || sV.getComplementaryValues().getListPrerequisites().size() == 0) isOldNull = true;//TODO: show arrows and opacity again
-							sV.setComplementaryValues(result);
-							//the main subject is pre requisite of some subject, and it is adding it to them
-							for(Subject s : result.getListPrerequisites()){
-								for(SubjectValue sVTemporary : getSubjectValuesBySubject(s)){
-									sVTemporary.getComplementaryValues().addPrerequisiteOf(result.getSubject());
+				public void onSuccess(List<ComplementaryValue> results) {
+					for(ComplementaryValue result : results){						
+						boolean isOldNull = false;
+						if(result != null){
+							List<SubjectValue> list = getSubjectValuesBySubject(result.getSubject());
+							for(SubjectValue sV : list){
+								if(sV.getComplementaryValues()== null || sV.getComplementaryValues().getListCorequisites().size() == 0 || sV.getComplementaryValues().getListPrerequisitesOf().size() == 0 || sV.getComplementaryValues().getListCorequisitesOf().size() == 0 || sV.getComplementaryValues().getListPrerequisites().size() == 0) isOldNull = true;//TODO: show arrows and opacity again
+								sV.setComplementaryValues(result);
+								//the main subject is pre requisite of some subject, and it is adding it to them
+								for(Subject s : result.getListPrerequisites()){
+									for(SubjectValue sVTemporary : getSubjectValuesBySubject(s)){
+										sVTemporary.getComplementaryValues().addPrerequisiteOf(result.getSubject());
+									}
 								}
+								//the main subject is co requisite of some subject, and it is adding it to them
+								for(Subject s : result.getListCorequisites()){
+									for(SubjectValue sVTemporary : getSubjectValuesBySubject(s)){
+										sVTemporary.getComplementaryValues().addCorequisiteOf(result.getSubject());
+									}
+								}
+								if(isOldNull == true)  
+									if(sV.equals(subjectValuesSelected) == true) {
+										modifyOpacity(sV);
+										showConnections(sV);
+									}
 							}
-							//the main subject is co requisite of some subject, and it is adding it to them
-							for(Subject s : result.getListCorequisites()){
-								for(SubjectValue sVTemporary : getSubjectValuesBySubject(s)){
-									sVTemporary.getComplementaryValues().addCorequisiteOf(result.getSubject());
-								}
-							}
-							if(isOldNull == true)  
-								if(sV.equals(subjectValuesSelected) == true) {
-									modifyOpacity(sV);
-									showConnections(sV);
-								}
 						}
 					}
 					

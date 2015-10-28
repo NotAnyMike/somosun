@@ -256,14 +256,14 @@ public class SomosUNUtils {
 	 * @param list
 	 * @return
 	 */
-	public static Subject getSubjectByCodeInList(String code, List<ComplementaryValue> list) {
-		Subject toReturn = null;
+	public static ComplementaryValue getSubjectByCodeInList(String code, List<ComplementaryValue> list) {
+		ComplementaryValue toReturn = null;
 		
 		if(code.trim().isEmpty() == false && code.matches("(" + LIBRE_CODE + ")|("+ LIBRE_NAME + ")|(" + OPTATIVA_NAME + ")|(" + OPTATIVA_CODE + ")") == false){
 			if(list != null && list.isEmpty() == false){
 				for(ComplementaryValue cV : list){
 					if(cV.getSubject().getCode().equals(code)){
-						toReturn = cV.getSubject();
+						toReturn = cV;
 						break;
 					}
 				}

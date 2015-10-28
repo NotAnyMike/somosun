@@ -59,7 +59,7 @@ public interface SUNServiceAsync {
 
 	void toTest(AsyncCallback<Void> callback);
 
-	void getComplementaryValueFromMisPlanes(String career, String code,	AsyncCallback<ComplementaryValue> callback);
+	void getComplementaryValueFromMisPlanes(String career, List<String> codes,	AsyncCallback<List<ComplementaryValue>> callback);
 
 	void getSubjectsFromSia(String nameOrCode, String typology, String career, String sede, int page, Student student, AsyncCallback<SiaResultSubjects> callback);
 

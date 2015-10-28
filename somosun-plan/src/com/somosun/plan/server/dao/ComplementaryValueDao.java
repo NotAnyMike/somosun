@@ -28,18 +28,32 @@ public class ComplementaryValueDao implements Dao<ComplementaryValue> {
 		Long toReturn = null;
 		if(cV != null){
 			if(cV.getSubjectGroup() != null && cV.getSubject() != null && cV.getCareer() != null){
+				SubjectDao sDao = new SubjectDao();
+
 				if(cV.getSubjectGroup().getId() == null){
 					SubjectGroupDao sGDao = new SubjectGroupDao();
 					Long id = sGDao.generateId();
 					cV.getSubjectGroup().setId(id);
 				}
 				if(cV.getSubject().getId() == null){
-					SubjectDao sDao = new SubjectDao();
 					Long id = sDao.generateId();
 					cV.getSubject().setId(id);
 				}
 				if(cV.getSubject().getId() != null && cV.getSubjectGroup().getId() != null)
 					cV.setTypology(SomosUNUtils.standardizeString(cV.getTypology(), false, false));//standardizeString(cV.getTypology()));
+				
+				for(List<Subject> lists : cV.getCorequisitesLists()){
+					for(Subject s : lists)
+						if(s.getId() == null) s.setId(sDao.generateId());
+				}
+				for(List<Subject> lists : cV.getPrerequisitesLists()){
+					for(Subject s : lists)
+						if(s.getId() == null) s.setId(sDao.generateId());
+				}
+				for(Subject s : cV.getListCorequisitesOf())
+					if(s.getId() == null) s.setId(sDao.generateId());
+				for(Subject s : cV.getListPrerequisitesOf())
+					if(s.getId() == null) s.setId(sDao.generateId());
 				
 				ofy().save().entity(cV).now();
 				toReturn = cV.getId();

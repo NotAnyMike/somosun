@@ -59,7 +59,7 @@ public interface SUNService extends RemoteService{
 	
 	public void toTest();
 	
-	public ComplementaryValue getComplementaryValueFromMisPlanes(String career, String code);
+	public List<ComplementaryValue> getComplementaryValueFromMisPlanes(String career, List<String> codes);
 	public ComplementaryValue getComplementaryValueFromDb(String careerCode, String subjectCode);
 	public List<ComplementaryValue> getComplementaryValuesFromMisPlanes(String careerCode);
 	public List<ComplementaryValue> getMandatoryComplementaryValues(String careerCode);
