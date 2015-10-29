@@ -210,7 +210,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 	@Override
 	public List<ComplementaryValue> getComplementaryValueFromMisPlanes(String career, List<String> codes) {
 		List<ComplementaryValue> toReturn = new ArrayList<ComplementaryValue>();
-		List<ComplementaryValue> list = (List<ComplementaryValue>) SiaProxy.getRequisitesFromSia(codes, career);
+		List<ComplementaryValue> list = (List<ComplementaryValue>) SiaProxy.getRequisitesFromMisPlanes(codes, career);
 		for(ComplementaryValue cV : list) toReturn.add(cV);
 		return toReturn;
 	}
@@ -1106,7 +1106,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 				}
 				//Getting the cV for those subjectsToSearch
 				if(subjectsToSearch.isEmpty() == false){					
-					List<ComplementaryValue> complementaryValuesLeftout = SiaProxy.getRequisitesFromSia(subjectsToSearch, careerCode);
+					List<ComplementaryValue> complementaryValuesLeftout = SiaProxy.getRequisitesFromMisPlanes(subjectsToSearch, careerCode);
 					
 					for(ComplementaryValue cV : subjectsIncomplete){
 						List<List<Subject>> listOfListsToSearch = new ArrayList<List<Subject>>();

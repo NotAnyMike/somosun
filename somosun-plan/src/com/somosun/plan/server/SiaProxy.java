@@ -671,6 +671,18 @@ public class SiaProxy {
 		}
 	}
 	
+	/**
+	 * THis method is called by getRequisitesFromSia, nothing must be null otherwise and error will be triggered
+	 * 
+	 * @param mainHtmlString
+	 * @param doc
+	 * @param mainCareer
+	 * @param code
+	 * @param subjectDao
+	 * @param complementaryValueDao
+	 * @param subjectGroupDao
+	 * @return
+	 */
 	private static ComplementaryValue analyseMisPlanesStringToGetCV(String mainHtmlString, Document doc , Career mainCareer, String code, SubjectDao subjectDao, ComplementaryValueDao complementaryValueDao, SubjectGroupDao subjectGroupDao){
 		
 		ComplementaryValue complementaryValue = null;
@@ -698,7 +710,6 @@ public class SiaProxy {
 					mainSubject = subjectDao.getByCode(code);
 				}
 				
-//			doc = Jsoup.parse(mainHtmlString);
 				Elements subjects = doc.getElementsContainingOwnText(code);
 				for(Element e : subjects){
 					//The code of the subject is inside <h5>
@@ -1034,7 +1045,7 @@ public class SiaProxy {
 	 * 
 	 * @return a complementaryValues with the pos-requisite list empty
 	 */
-	public static List<ComplementaryValue> getRequisitesFromSia(List<String> codes, String career){
+	public static List<ComplementaryValue> getRequisitesFromMisPlanes(List<String> codes, String career){
 		
 		List<ComplementaryValue> toReturn = null;
 		ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
