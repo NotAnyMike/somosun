@@ -2079,7 +2079,7 @@ ComplementaryValueView.Presenter{
 						cVFromList.getSubjectGroup().isFundamental() == cV.getSubjectGroup().isFundamental()){
 					toReturn = sV;
 					break;
-				}
+				} 
 			}
 		}
 		
