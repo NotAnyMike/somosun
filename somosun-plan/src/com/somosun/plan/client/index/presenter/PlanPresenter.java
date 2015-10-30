@@ -1941,7 +1941,7 @@ ComplementaryValueView.Presenter{
 	
 	/**
 	 * This method will take care into account the number of subjects in the semester to select the semi-final value for the variable. It will add the subjects to the plan too. 
-	 * This method will also check it the subject is a default subject in order to check it that default subjects has been fulfilled 
+	 * This method will also check it the subject is a default subject in order to check it that default subjects has been fulfilled, no matter if it is free election or just optional
 	 * 
 	 * @param s
 	 * @param cV
