@@ -2041,7 +2041,7 @@ ComplementaryValueView.Presenter{
 				//If it has been fulfilled delete it and not add it
 				SubjectValue subjectValueFulfilled = getSubjectValueFromListForDefaultSubject(subjectValueList, cV);
 				if(subjectValueFulfilled != null){
-					//delete the subjectValue from the list
+					//delete the subjectValue from the list of the copy of the subjects in the plan
 					subjectValueList.remove(subjectValueFulfilled);
 				} else{					
 					// Add them to the plan
