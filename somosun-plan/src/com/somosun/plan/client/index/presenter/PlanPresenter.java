@@ -2055,7 +2055,6 @@ ComplementaryValueView.Presenter{
 		//set the variable to that semester
 		variablesList.remove(s);
 		
-		
 	}
 	
 	/** 
