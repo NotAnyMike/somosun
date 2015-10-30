@@ -2050,7 +2050,7 @@ ComplementaryValueView.Presenter{
 				/**** </Check if the subject is a default subject, if it is then check it that requisite has been fulfilled> ***/
 				
 				mandatoryComplementaryValues_copy.remove(cV);
-			}
+			} 
 		}
 		//set the variable to that semester
 		variablesList.remove(s);
