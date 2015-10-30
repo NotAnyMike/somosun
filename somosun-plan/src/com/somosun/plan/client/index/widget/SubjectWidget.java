@@ -115,9 +115,9 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers {
 		this.setCode(s.getCode());
 		this.setCredits(s.getCredits());
 		this.setGrade(null);
-		this.setObligatoriness(sV.getComplementaryValues().isMandatory());
-		this.setType(getTypeFromString(sV.getComplementaryValues().getTypology()));
-		this.setPublicId(sV.getSubjectValuesPublicId());
+		this.setObligatoriness(sV.getComplementaryValue().isMandatory());
+		this.setType(getTypeFromString(sV.getComplementaryValue().getTypology()));
+		this.setPublicId(sV.getSubjectValuePublicId());
 		this.presenter = presenter;
 		
 		//setAttributes();

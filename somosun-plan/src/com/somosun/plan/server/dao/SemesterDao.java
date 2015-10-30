@@ -32,9 +32,9 @@ public class SemesterDao implements Dao<Semester> {
 							gDao.save(sV.getGroup());
 						}
 					}
-					if(sV.getComplementaryValues() != null){
-						if(sV.getComplementaryValues().getId() == null){
-							cVDao.save(sV.getComplementaryValues());
+					if(sV.getComplementaryValue() != null){
+						if(sV.getComplementaryValue().getId() == null){
+							cVDao.save(sV.getComplementaryValue());
 						}
 					}
 					sVDao.save(sV);

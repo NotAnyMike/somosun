@@ -99,9 +99,9 @@ public class Plan implements Serializable {
 		for(Semester semester : semesters){
 			for(SubjectValue subjectValue : semester.getSubjects()){
 				if(subjectValue.isTaken()){
-					if(subjectValue.getComplementaryValues().getSubject().isApprovenType() == false){						
-						sum += (subjectValue.getGrade()*(subjectValue.getComplementaryValues().getSubject().getCredits()));
-						credits += subjectValue.getComplementaryValues().getSubject().getCredits();
+					if(subjectValue.getComplementaryValue().getSubject().isApprovenType() == false){						
+						sum += (subjectValue.getGrade()*(subjectValue.getComplementaryValue().getSubject().getCredits()));
+						credits += subjectValue.getComplementaryValue().getSubject().getCredits();
 					}
 				}
 			}
