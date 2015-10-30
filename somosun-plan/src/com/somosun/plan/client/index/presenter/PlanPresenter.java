@@ -2052,6 +2052,7 @@ ComplementaryValueView.Presenter{
 				mandatoryComplementaryValues_copy.remove(cV);
 			} 
 		}
+		
 		//set the variable to that semester
 		variablesList.remove(s);
 		
