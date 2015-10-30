@@ -1941,6 +1941,7 @@ ComplementaryValueView.Presenter{
 	
 	/**
 	 * This method will take care into account the number of subjects in the semester to select the semi-final value for the variable. It will add the subjects to the plan too.
+	 * 
 	 * @param s
 	 * @param cV
 	 * @param mandatoryComplementaryValues_copy
