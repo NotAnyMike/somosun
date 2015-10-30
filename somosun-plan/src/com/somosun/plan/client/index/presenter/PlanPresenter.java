@@ -319,9 +319,9 @@ ComplementaryValueView.Presenter{
 					createSemester(semester2, false);
 					for(SubjectValue subjectValues2 : semester2.getSubjects()){
 						if(subjectValues2 != null){
-							if(subjectValues2.getComplementaryValues() != null){
-								if(subjectValues2.getComplementaryValues().getSubject() != null ){
-									createSubject(subjectValues2.getComplementaryValues().getSubject() ,subjectValues2, semester2);								
+							if(subjectValues2.getComplementaryValue() != null){
+								if(subjectValues2.getComplementaryValue().getSubject() != null ){
+									createSubject(subjectValues2.getComplementaryValue().getSubject() ,subjectValues2, semester2);								
 								}
 							}
 						}
@@ -400,9 +400,9 @@ ComplementaryValueView.Presenter{
 		if(semester.getSubjects().contains(subjectValue) == false) semester.addSubject(subjectValue);
 		//TODO avoid the same subject twice in the same semester
 		
-		SubjectWidget subjectWidget = new SubjectWidget(subject.getName(), subject.getCode(), subject.getCredits(), subjectValue.getComplementaryValues().isMandatory(), subjectValue.getComplementaryValues().getTypology(), subjectValue.getSubjectValuesPublicId(), (subjectValue.getComplementaryValues().getSubjectGroup() != null ? subjectValue.getComplementaryValues().getSubjectGroup().getName() : ""), this);
+		SubjectWidget subjectWidget = new SubjectWidget(subject.getName(), subject.getCode(), subject.getCredits(), subjectValue.getComplementaryValue().isMandatory(), subjectValue.getComplementaryValue().getTypology(), subjectValue.getSubjectValuePublicId(), (subjectValue.getComplementaryValue().getSubjectGroup() != null ? subjectValue.getComplementaryValue().getSubjectGroup().getName() : ""), this);
 		if(subjectValue.isTaken() == true){
-			if(subjectValue.getComplementaryValues().getSubject().isApprovenType() == true){
+			if(subjectValue.getComplementaryValue().getSubject().isApprovenType() == true){
 				if(subjectValue.getGrade() >= 3){					
 					subjectWidget.setGrade("AP");
 				}else{
@@ -414,7 +414,7 @@ ComplementaryValueView.Presenter{
 				subjectWidget.setGrade(gradeString);
 			}
 		}
-		String codeTitle = "Agrupación: "+  (subjectValue.getComplementaryValues().getSubjectGroup() != null ? subjectValue.getComplementaryValues().getSubjectGroup().getName() : "Unknown");
+		String codeTitle = "Agrupación: "+  (subjectValue.getComplementaryValue().getSubjectGroup() != null ? subjectValue.getComplementaryValue().getSubjectGroup().getName() : "Unknown");
 		subjectWidget.setCodeLabel(codeTitle);
 		
 		subjectWidgetList.add(subjectWidget);
@@ -441,12 +441,12 @@ ComplementaryValueView.Presenter{
 	private boolean areRelated(SubjectValue sV, SubjectValue sV2) {
 		boolean toReturn = false;
 		List<Subject> relatedSubjects = new ArrayList<Subject>();
-		relatedSubjects.addAll(sV.getComplementaryValues().getListPrerequisites());
-		relatedSubjects.addAll(sV.getComplementaryValues().getListCorequisites());
-		relatedSubjects.addAll(sV.getComplementaryValues().getListPrerequisitesOf());
-		relatedSubjects.addAll(sV.getComplementaryValues().getListCorequisitesOf());
+		relatedSubjects.addAll(sV.getComplementaryValue().getListPrerequisites());
+		relatedSubjects.addAll(sV.getComplementaryValue().getListCorequisites());
+		relatedSubjects.addAll(sV.getComplementaryValue().getListPrerequisitesOf());
+		relatedSubjects.addAll(sV.getComplementaryValue().getListCorequisitesOf());
 		for(Subject s : relatedSubjects){
-			if(s.equals(sV2.getComplementaryValues().getSubject())){
+			if(s.equals(sV2.getComplementaryValue().getSubject())){
 			//OLD if(s.equals(valuesAndSubjectMap.get(sV2))){
 				toReturn = true;
 				break;
@@ -457,22 +457,22 @@ ComplementaryValueView.Presenter{
 
 	private void showConnections(SubjectValue sV) {
 		if(sV !=null){
-			for(Subject s : sV.getComplementaryValues().getListPrerequisites()){
+			for(Subject s : sV.getComplementaryValue().getListPrerequisites()){
 				for(SubjectValue sVTempo : getSubjectValuesBySubject(s)){
 					connectionsController.addConnection(subjectValuesAndWidgetBiMap.get(sVTempo), subjectValuesAndWidgetBiMap.get(sV), "pre");
 				}
 			}
-			for(Subject s : sV.getComplementaryValues().getListCorequisites()){
+			for(Subject s : sV.getComplementaryValue().getListCorequisites()){
 				for(SubjectValue sVTempo : getSubjectValuesBySubject(s)){
 					connectionsController.addConnection(subjectValuesAndWidgetBiMap.get(sVTempo), subjectValuesAndWidgetBiMap.get(sV), "co");
 				}
 			}
-			for(Subject s : sV.getComplementaryValues().getListPrerequisitesOf()){
+			for(Subject s : sV.getComplementaryValue().getListPrerequisitesOf()){
 				for(SubjectValue sVTempo : getSubjectValuesBySubject(s)){
 					connectionsController.addConnection(subjectValuesAndWidgetBiMap.get(sV), subjectValuesAndWidgetBiMap.get(sVTempo), "pre");
 				}
 			}
-			for(Subject s : sV.getComplementaryValues().getListCorequisitesOf()){
+			for(Subject s : sV.getComplementaryValue().getListCorequisitesOf()){
 				for(SubjectValue sVTempo : getSubjectValuesBySubject(s)){
 					connectionsController.addConnection(subjectValuesAndWidgetBiMap.get(sV), subjectValuesAndWidgetBiMap.get(sVTempo), "co");
 				}
@@ -487,7 +487,7 @@ ComplementaryValueView.Presenter{
 	private void modifyOpacity(SubjectValue sV) {
 		boolean isRelated = false;
 		List<Subject> subjectRelatedList = new ArrayList<Subject>();
-		ComplementaryValue cV = sV.getComplementaryValues();
+		ComplementaryValue cV = sV.getComplementaryValue();
 		
 		subjectRelatedList.addAll(cV.getListPrerequisites());
 		subjectRelatedList.addAll(cV.getListCorequisites());
@@ -496,7 +496,7 @@ ComplementaryValueView.Presenter{
 		for(SubjectValue sVTemporary : subjectValuesList){
 			isRelated = false;
 			for(Subject sTemporary : subjectRelatedList){
-				if(sTemporary.equals(sVTemporary.getComplementaryValues().getSubject())==true){
+				if(sTemporary.equals(sVTemporary.getComplementaryValue().getSubject())==true){
 				//OLD if(sTemporary.equals(valuesAndSubjectMap.get(sVTemporary))==true){
 					isRelated = true;
 					subjectRelatedList.remove(sTemporary);
@@ -512,12 +512,12 @@ ComplementaryValueView.Presenter{
 
 	private void getComplementaryValues(SubjectValue sV) {
 		//int timesUpdated = subjectTimesUpdated.get(valuesAndSubjectMap.get(sV));
-		int timesUpdated = subjectTimesUpdated.get(sV.getComplementaryValues().getSubject());
+		int timesUpdated = subjectTimesUpdated.get(sV.getComplementaryValue().getSubject());
 		if(timesUpdated < LIMIT_TO_REQUISITES_UPDATES){
 			//OLD subjectTimesUpdated.put(valuesAndSubjectMap.get(sV), timesUpdated+1);
-			subjectTimesUpdated.put(sV.getComplementaryValues().getSubject(), timesUpdated+1);
+			subjectTimesUpdated.put(sV.getComplementaryValue().getSubject(), timesUpdated+1);
 			List<String> codes = new ArrayList<String>();
-			codes.add(sV.getComplementaryValues().getSubject().getCode());
+			codes.add(sV.getComplementaryValue().getSubject().getCode());
 			rpcService.getComplementaryValueFromMisPlanes(plan.getCareerCode(), codes, new AsyncCallback<List<ComplementaryValue>>(){
 			//OLD rpcService.getComplementaryValues(plan.getCareerCode(), valuesAndSubjectMap.get(sV).getCode(), new AsyncCallback<ComplementaryValues>(){
 				
@@ -533,18 +533,18 @@ ComplementaryValueView.Presenter{
 						if(result != null){
 							List<SubjectValue> list = getSubjectValuesBySubject(result.getSubject());
 							for(SubjectValue sV : list){
-								if(sV.getComplementaryValues()== null || sV.getComplementaryValues().getListCorequisites().size() == 0 || sV.getComplementaryValues().getListPrerequisitesOf().size() == 0 || sV.getComplementaryValues().getListCorequisitesOf().size() == 0 || sV.getComplementaryValues().getListPrerequisites().size() == 0) isOldNull = true;//TODO: show arrows and opacity again
-								sV.setComplementaryValues(result);
+								if(sV.getComplementaryValue()== null || sV.getComplementaryValue().getListCorequisites().size() == 0 || sV.getComplementaryValue().getListPrerequisitesOf().size() == 0 || sV.getComplementaryValue().getListCorequisitesOf().size() == 0 || sV.getComplementaryValue().getListPrerequisites().size() == 0) isOldNull = true;//TODO: show arrows and opacity again
+								sV.setComplementaryValue(result);
 								//the main subject is pre requisite of some subject, and it is adding it to them
 								for(Subject s : result.getListPrerequisites()){
 									for(SubjectValue sVTemporary : getSubjectValuesBySubject(s)){
-										sVTemporary.getComplementaryValues().addPrerequisiteOf(result.getSubject());
+										sVTemporary.getComplementaryValue().addPrerequisiteOf(result.getSubject());
 									}
 								}
 								//the main subject is co requisite of some subject, and it is adding it to them
 								for(Subject s : result.getListCorequisites()){
 									for(SubjectValue sVTemporary : getSubjectValuesBySubject(s)){
-										sVTemporary.getComplementaryValues().addCorequisiteOf(result.getSubject());
+										sVTemporary.getComplementaryValue().addCorequisiteOf(result.getSubject());
 									}
 								}
 								if(isOldNull == true)  
@@ -566,7 +566,7 @@ ComplementaryValueView.Presenter{
 		List<SubjectValue> list = new ArrayList<SubjectValue>();
 		for(SubjectValue sV : subjectValuesList){
 			//if(valuesAndSubjectMap.get(sV).equals(s) == true){
-			if(sV.getComplementaryValues().getSubject().equals(s) == true){
+			if(sV.getComplementaryValue().getSubject().equals(s) == true){
 				list.add(sV);
 			}
 		}
@@ -595,12 +595,12 @@ ComplementaryValueView.Presenter{
 	private void updateCredits(SubjectValue subjectValues2, Semester semester2, boolean toAdd) {
 		
 		//OLD if(valuesAndSubjectMap.containsKey(subjectValues2) == true){
-		if(subjectValues2.getComplementaryValues() != null){
-			if(subjectValues2.getComplementaryValues().getSubject() != null){
+		if(subjectValues2.getComplementaryValue() != null){
+			if(subjectValues2.getComplementaryValue().getSubject() != null){
 				//UNTIL HERE IS THE NEW CODE
 				
 				//OLD int creditsValue = valuesAndSubjectMap.get(subjectValues2).getCredits();
-				int creditsValue = subjectValues2.getComplementaryValues().getSubject().getCredits();
+				int creditsValue = subjectValues2.getComplementaryValue().getSubject().getCredits();
 				
 				if(toAdd == true){
 					credits.put(semester2, credits.get(semester2) + creditsValue);
@@ -615,7 +615,7 @@ ComplementaryValueView.Presenter{
 					if(subjectValues2.isTaken()) totalCredits[2] -= creditsValue;
 					if(subjectValues2.getGrade()>=3) totalCredits[1] -= creditsValue;
 				}
-				switch(SomosUNUtils.getTypology(subjectValues2.getComplementaryValues().getTypology())){
+				switch(SomosUNUtils.getTypology(subjectValues2.getComplementaryValue().getTypology())){
 				case TypologyCodes.NIVELACION:
 					updateCreditsLeveling(subjectValues2, semester2, toAdd);
 					break;
@@ -636,7 +636,7 @@ ComplementaryValueView.Presenter{
 
 	private void updateCreditsFoundation(SubjectValue subjectValues2, Semester semester2, boolean toAdd) {
 		//OLD int creditsValue = valuesAndSubjectMap.get(subjectValues2).getCredits();
-		int creditsValue = subjectValues2.getComplementaryValues().getSubject().getCredits();
+		int creditsValue = subjectValues2.getComplementaryValue().getSubject().getCredits();
 		if(toAdd== true){
 			foundationCredits[0]+= creditsValue;
 			if(subjectValues2.getGrade()>=3) foundationCredits[1] += creditsValue;
@@ -647,7 +647,7 @@ ComplementaryValueView.Presenter{
 	}
 
 	private void updateCreditsDisciplinary(SubjectValue subjectValues2,	Semester semester2, boolean toAdd) {
-		int creditsValue = subjectValues2.getComplementaryValues().getSubject().getCredits();
+		int creditsValue = subjectValues2.getComplementaryValue().getSubject().getCredits();
 		if(toAdd== true){
 			disciplinaryCredits[0]+= creditsValue;
 			if(subjectValues2.getGrade()>=3) disciplinaryCredits[1] += creditsValue;
@@ -658,7 +658,7 @@ ComplementaryValueView.Presenter{
 	}
 
 	private void updateCreditsFreeElection(SubjectValue subjectValues2, Semester semester2, boolean toAdd) {
-		int creditsValue = subjectValues2.getComplementaryValues().getSubject().getCredits();
+		int creditsValue = subjectValues2.getComplementaryValue().getSubject().getCredits();
 		if(toAdd== true){
 			freeElectionCredits[0]+= creditsValue;
 			if(subjectValues2.getGrade()>=3) freeElectionCredits[1] += creditsValue;
@@ -670,7 +670,7 @@ ComplementaryValueView.Presenter{
 
 	private void updateCreditsLeveling(SubjectValue subjectValues2, Semester semester2, boolean toAdd) {
 		//OLD int creditsValue = valuesAndSubjectMap.get(subjectValues2).getCredits();
-		int creditsValue = subjectValues2.getComplementaryValues().getSubject().getCredits();
+		int creditsValue = subjectValues2.getComplementaryValue().getSubject().getCredits();
 		if(toAdd== true){
 			levelingCredits[0]+= creditsValue;
 			if(subjectValues2.getGrade()>=3) levelingCredits[1] += creditsValue;
@@ -790,7 +790,7 @@ ComplementaryValueView.Presenter{
 	private void deleteSubject(SubjectValue subjectValues) {
 		
 		//OLD Subject subject = valuesAndSubjectMap.get(subjectValues);
-		Subject subject = subjectValues.getComplementaryValues().getSubject();
+		Subject subject = subjectValues.getComplementaryValue().getSubject();
 		SubjectWidget subjectW = subjectValuesAndWidgetBiMap.get(subjectValues);
 		Semester semester = subjectValuesAndSemesterMap.get(subjectValues);
 		
@@ -851,7 +851,7 @@ ComplementaryValueView.Presenter{
 		SubjectValue subjectValuesToReturn = null;
 		if(subjectValuesList.isEmpty() == false){
 			for(SubjectValue subjectValues : subjectValuesList){
-				if(subjectValues.getSubjectValuesPublicId().equals(publicId)){
+				if(subjectValues.getSubjectValuePublicId().equals(publicId)){
 					subjectValuesToReturn = subjectValues;
 				}
 			}
@@ -956,7 +956,7 @@ ComplementaryValueView.Presenter{
 		int optative = 0;
 		for(Semester semester : plan.getSemesters()){
 			for(SubjectValue subjectValue : semester.getSubjects()){
-				String typology = subjectValue.getComplementaryValues().getTypology();
+				String typology = subjectValue.getComplementaryValue().getTypology();
 				
 				//Assigning the right array to @param array
 				switch(typology){
@@ -978,7 +978,7 @@ ComplementaryValueView.Presenter{
 						break;
 				}
 				
-				int credits = subjectValue.getComplementaryValues().getSubject().getCredits();
+				int credits = subjectValue.getComplementaryValue().getSubject().getCredits();
 				
 				//Add it to the total 
 				array[0] += credits;
@@ -987,7 +987,7 @@ ComplementaryValueView.Presenter{
 					array[1] += credits;
 				}
 				if(subjectValue.isTaken() && subjectValue.getGrade() >= 3){						
-					if(subjectValue.getComplementaryValues().isMandatory()){
+					if(subjectValue.getComplementaryValue().isMandatory()){
 						array[3] += credits;
 					}else{
 						optative += credits;
@@ -1008,9 +1008,9 @@ ComplementaryValueView.Presenter{
 			for(SubjectValue subjectValue : semester.getSubjects()){
 				if(subjectValue.isTaken()){
 					if(subjectValue.getGrade() >=3){
-						toReturn += subjectValue.getComplementaryValues().getSubject().getCredits();
+						toReturn += subjectValue.getComplementaryValue().getSubject().getCredits();
 					}else{
-						toRemove += subjectValue.getComplementaryValues().getSubject().getCredits();
+						toRemove += subjectValue.getComplementaryValue().getSubject().getCredits();
 					}
 				}
 			}
@@ -1077,7 +1077,7 @@ ComplementaryValueView.Presenter{
 
 	private void confirmDeleteSubject(SubjectValue subjectValuesToDelete) {
 		//OLD Subject subjectToDelete = valuesAndSubjectMap.get(subjectValuesToDelete);
-		Subject subjectToDelete = subjectValuesToDelete.getComplementaryValues().getSubject();
+		Subject subjectToDelete = subjectValuesToDelete.getComplementaryValue().getSubject();
 		warningDeleteSubjectView.setSubject(subjectValuesToDelete, subjectToDelete);
 		warningDeleteSubjectView.showIt();
 	}
@@ -1307,7 +1307,7 @@ ComplementaryValueView.Presenter{
 		 */
 		for(ComplementaryValue cVT : result){
 			SubjectValue sV = new SubjectValue(0.0 , false, cVT);
-			createSubject(sV.getComplementaryValues().getSubject(), sV, semester);
+			createSubject(sV.getComplementaryValue().getSubject(), sV, semester);
 		}
 		
 		if(toSave == true){			
@@ -1848,6 +1848,7 @@ ComplementaryValueView.Presenter{
 			boolean passed = true;
 			mandatoryComplementaryValues_copy = new ArrayList<ComplementaryValue>(completePlanInfo.getMandatoryComplementaryValues());
 			List<Subject> variablesList = new ArrayList<Subject>(variables.keySet());
+			List<SubjectValue> subjectValueList = new ArrayList<SubjectValue>(subjectValuesList);
 			while(greaterNumber != -1){
 				passed = true;
 				int pos = 0;
@@ -1863,7 +1864,7 @@ ComplementaryValueView.Presenter{
 						//do stuff in a in-loop
 						ComplementaryValue cV = getCvBySubjectInCVList(s.getId(), mandatoryComplementaryValues_copy);
 						if(cV != null){
-							arrangeBySemesterMaxNumberOfSubjectAllowed(s, cV, mandatoryComplementaryValues_copy, variables, completePlanInfo, variablesList, currentSemesterNumber);
+							arrangeBySemesterMaxNumberOfSubjectAllowed(s, cV, mandatoryComplementaryValues_copy, variables, completePlanInfo, variablesList, subjectValueList, currentSemesterNumber);
 						}
 					}
 					pos = variablesList.indexOf(s) +1;
@@ -1939,7 +1940,10 @@ ComplementaryValueView.Presenter{
 	}
 	
 	/**
-	 * This method will take care into account the number of subjects in the semester to select the semi-final value for the variable. It will add the subjects to the plan too.
+	 * This method will take care into account the number of subjects in the semester to select the semi-final value for the variable. 
+	 * It will add the subjects to the plan too. This method will also check it the subject is a default subject in order 
+	 * to check it that default subjects has been fulfilled, no matter if it is free election or just optional
+	 * 
 	 * @param s
 	 * @param cV
 	 * @param mandatoryComplementaryValues_copy
@@ -1948,7 +1952,7 @@ ComplementaryValueView.Presenter{
 	 * @param variablesList
 	 * @param currentSemesterNumber
 	 */
-	private void arrangeBySemesterMaxNumberOfSubjectAllowed(Subject s, ComplementaryValue cV, List<ComplementaryValue> mandatoryComplementaryValues_copy, Map<Subject, Integer> variables, CompletePlanInfo completePlanInfo,List<Subject> variablesList , int currentSemesterNumber) {
+	private void arrangeBySemesterMaxNumberOfSubjectAllowed(Subject s, ComplementaryValue cV, List<ComplementaryValue> mandatoryComplementaryValues_copy, Map<Subject, Integer> variables, CompletePlanInfo completePlanInfo,List<Subject> variablesList , List<SubjectValue> subjectValueList, int currentSemesterNumber) {
 		int x = getLastSemesterForASubject(s.getId());
 		if(x == -1){
 			x = getVariableForSimultaneousEquationsMap(variables, s.getId());
@@ -1960,7 +1964,7 @@ ComplementaryValueView.Presenter{
 						//Get sRequisite from the variables
 						sRequisite = getSubjectFromVariables(sRequisite.getId(), variablesList);
 						if(sRequisite != null){					
-							arrangeBySemesterMaxNumberOfSubjectAllowed(sRequisite, cVRequisite, mandatoryComplementaryValues_copy, variables, completePlanInfo, variablesList, currentSemesterNumber);
+							arrangeBySemesterMaxNumberOfSubjectAllowed(sRequisite, cVRequisite, mandatoryComplementaryValues_copy, variables, completePlanInfo, variablesList, subjectValueList, currentSemesterNumber);
 						}
 					}
 				}
@@ -2036,17 +2040,52 @@ ComplementaryValueView.Presenter{
 					/******************************************************/
 				}
 				
-				// Add them to the plan
-				addComplementaryValueToASemester(cV, x);	
+				/**** <Check if the subject is a default subject, if it is then check it that requisite has been fulfilled> ****/
+				//If it has been fulfilled delete it and not add it
+				SubjectValue subjectValueFulfilled = getSubjectValueFromListForDefaultSubject(subjectValueList, cV);
+				if(subjectValueFulfilled != null){
+					//delete the subjectValue from the list
+					subjectValueList.remove(subjectValueFulfilled);
+				} else{					
+					// Add them to the plan
+					addComplementaryValueToASemester(cV, x);	
+				}
+				/**** </Check if the subject is a default subject, if it is then check it that requisite has been fulfilled> ***/
+				
 				mandatoryComplementaryValues_copy.remove(cV);
-			}
+			} 
 		}
+		
 		//set the variable to that semester
 		variablesList.remove(s);
 		
-		
 	}
 	
+	/** 
+	 * Remember that @param cV must be a default subject
+	 * 
+	 * @param subjectValueList
+	 * @param cV: must be a default subject
+	 * @return
+	 */
+	private SubjectValue getSubjectValueFromListForDefaultSubject(List<SubjectValue> subjectValueList,	ComplementaryValue cV) {
+		SubjectValue toReturn = null;
+		
+		for(SubjectValue sV : subjectValueList){
+			if(sV.getComplementaryValue().isMandatory() == false && (sV.isTaken() == false || (sV.isTaken() == true &&  sV.getGrade() >= 3))){
+				ComplementaryValue cVFromList = sV.getComplementaryValue();
+				if(
+						cVFromList.getSubjectGroup().getName().equals(cV.getSubjectGroup().getName()) && 
+						cVFromList.getSubjectGroup().isFundamental() == cV.getSubjectGroup().isFundamental()){
+					toReturn = sV;
+					break;
+				}
+			}
+		}
+		
+		return toReturn;
+	}
+
 	/**
 	 * This method will add the cV to the @param x-th semester, if the semester does not exist, this method will create the necessary semesters
 	 * @param cV
@@ -2074,7 +2113,7 @@ ComplementaryValueView.Presenter{
 		
 		for(Semester semester : planDefautl.getSemesters()){
 			for(SubjectValue sV : semester.getSubjects()){
-				if(sV.getComplementaryValues().getSubject().getId().equals(subjectId)){
+				if(sV.getComplementaryValue().getSubject().getId().equals(subjectId)){
 					toReturn = planDefautl.getSemesters().indexOf(semester);
 					break;
 				}
@@ -2219,7 +2258,7 @@ ComplementaryValueView.Presenter{
 		int semesterNumber = -1;
 		//Check if the subject Exists and is approved
 		for(SubjectValue sV : subjectValuesList){
-			if(sV.getComplementaryValues().getSubject().getId().equals(subjectId) == true){
+			if(sV.getComplementaryValue().getSubject().getId().equals(subjectId) == true){
 				if(sV.getGrade() >= 3 || sV.isTaken() == false){
 					int semesterNumber_T = semesterList.indexOf(subjectValuesAndSemesterMap.get(sV));
 					if(semesterNumber_T > semesterNumber){
@@ -2587,7 +2626,7 @@ ComplementaryValueView.Presenter{
 				
 				SubjectWidget sW = subjectValuesAndWidgetBiMap.get(sV);
 				if(sW != null){
-					if(sV.getComplementaryValues().getSubject().isApprovenType() == true){
+					if(sV.getComplementaryValue().getSubject().isApprovenType() == true){
 						if(sV.getGrade() >= 3){
 							sW.setGrade("AP");
 						}else{

@@ -1065,9 +1065,9 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 					for(Semester semester : toReturn.getPlanDefautl().getSemesters()){
 						for(SubjectValue subjectValue : semester.getSubjects()){
 							//Check if it is in the list
-							if(SomosUNUtils.getSubjectFromListByCode(subjectValue.getComplementaryValues().getSubject().getCode(), subjectValue.getComplementaryValues().getSubject().getId(), subjectValue.getComplementaryValues().getSubject().getName(), toReturn.getMandatoryComplementaryValues()) == null){
+							if(SomosUNUtils.getSubjectFromListByCode(subjectValue.getComplementaryValue().getSubject().getCode(), subjectValue.getComplementaryValue().getSubject().getId(), subjectValue.getComplementaryValue().getSubject().getName(), toReturn.getMandatoryComplementaryValues()) == null){
 								//add it
-								toReturn.getMandatoryComplementaryValues().add(subjectValue.getComplementaryValues());
+								toReturn.getMandatoryComplementaryValues().add(subjectValue.getComplementaryValue());
 							}						
 						}
 					}

@@ -90,7 +90,6 @@ public class CreatePresenter implements Presenter, CreateView.Presenter {
 	@Override
 	public void onContinueButtonClicked(String academicHistory) {
 		view.clearTextBoxCreate();
-		Window.alert("motherf*ckeR");
 		eventBus.fireEvent(new GenerateAcademicHistoryFromStringEvent(academicHistory));
 	}
 

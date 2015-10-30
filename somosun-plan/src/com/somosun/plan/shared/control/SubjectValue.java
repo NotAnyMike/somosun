@@ -90,7 +90,7 @@ public class SubjectValue implements Serializable {
 		}
 	}
 
-	public String getSubjectValuesPublicId() {
+	public String getSubjectValuePublicId() {
 		return subjectValuesPublicId;
 	}
 
@@ -98,11 +98,11 @@ public class SubjectValue implements Serializable {
 		this.subjectValuesPublicId = subjectValuesPublicId;
 	}
 
-	public ComplementaryValue getComplementaryValues() {
+	public ComplementaryValue getComplementaryValue() {
 		return complementaryValue;
 	}
 
-	public void setComplementaryValues(ComplementaryValue complementaryValue) {
+	public void setComplementaryValue(ComplementaryValue complementaryValue) {
 		this.complementaryValue = complementaryValue;
 	}
 
