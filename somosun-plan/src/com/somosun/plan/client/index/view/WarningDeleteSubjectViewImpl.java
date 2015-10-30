@@ -87,9 +87,9 @@ public class WarningDeleteSubjectViewImpl extends Composite implements WarningDe
 		subjectCode.setText(s.getCode());
 		subjectGrade.setText(Double.toString(sV.getGrade()));
 		subjectCredits.setText(Integer.toString(s.getCredits()));
-		subjectOblig.setText((sV.getComplementaryValues().isMandatory() == true ? "Oblig: Si" : "Oblig: No"));
+		subjectOblig.setText((sV.getComplementaryValue().isMandatory() == true ? "Oblig: Si" : "Oblig: No"));
 		//Type = 0 Leveling, 1 Foundations, 2 Disciplinary, 3 Free Election, 4 Add to post-grade.
-		switch(sV.getComplementaryValues().getTypology()){
+		switch(sV.getComplementaryValue().getTypology()){
 			case "N":
 			case "n":
 				subjectType.setText("N");

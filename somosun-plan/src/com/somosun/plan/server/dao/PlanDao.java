@@ -94,12 +94,12 @@ public class PlanDao implements Dao<Plan>{
 				//getting the complementary values
 				if(subject!= null){
 					complementaryValue = complementaryValueDao.get(career, subject);
-					if(complementaryValue != null) {subjectValues.setComplementaryValues(complementaryValue);}
+					if(complementaryValue != null) {subjectValues.setComplementaryValue(complementaryValue);}
 					else 
 					{
 						complementaryValue = new ComplementaryValue(career, subject);
-						subjectValues.getComplementaryValues().setMandatory(jsonSubject.getBoolean("oblig"));
-						subjectValues.getComplementaryValues().setTypology(jsonSubject.getString("type"));
+						subjectValues.getComplementaryValue().setMandatory(jsonSubject.getBoolean("oblig"));
+						subjectValues.getComplementaryValue().setTypology(jsonSubject.getString("type"));
 						if(jsonSubject.getBoolean("normal") == true && subject != null) complementaryValueDao.save(complementaryValue);
 					}
 				}				
@@ -159,7 +159,7 @@ public class PlanDao implements Dao<Plan>{
 							if(subjectValuesList.size() != 0){
 								for(SubjectValue sV : subjectValuesList){
 									
-										ComplementaryValue cV = sV.getComplementaryValues();
+										ComplementaryValue cV = sV.getComplementaryValue();
 										if(cV != null){
 											
 												if(cV.getCareer() != null && cV.getSubject() != null){
@@ -204,7 +204,7 @@ public class PlanDao implements Dao<Plan>{
 													}
 													complementaryValueDao.save(cV);
 												}else{
-													sV.setComplementaryValues(null);
+													sV.setComplementaryValue(null);
 												}
 											
 											if(sV.getId() == null){												
@@ -314,7 +314,7 @@ public class PlanDao implements Dao<Plan>{
 				for(Semester semester : semesters){
 					List<SubjectValue> subjectValues = semester.getSubjects();
 					for(SubjectValue subjectValue : subjectValues){
-						ComplementaryValue complementaryValue = subjectValue.getComplementaryValues();
+						ComplementaryValue complementaryValue = subjectValue.getComplementaryValue();
 						
 						if(complementaryValue != null){						
 							Subject subject = complementaryValue.getSubject();
@@ -504,7 +504,7 @@ public class PlanDao implements Dao<Plan>{
 						ComplementaryValue complementaryValue = complementaryValueDao.get(careerCode, subject.getCode());
 						if(complementaryValue != null){
 							
-							subjectV.setComplementaryValues(complementaryValue);
+							subjectV.setComplementaryValue(complementaryValue);
 							subjectV.setGrade(subjectD.getGrade());
 							if(subjectD.getApproved()){								
 								subject.setApprovenType(true);
@@ -578,7 +578,7 @@ public class PlanDao implements Dao<Plan>{
 							SubjectValue subjectValuesT = new SubjectValue();
 							subjectValuesT.setId(subjectValueDao.generateId());
 							
-							subjectValuesT.setComplementaryValues(complementaryValuesT);
+							subjectValuesT.setComplementaryValue(complementaryValuesT);
 							subjectValuesT.setGrade(subjectDummyT.getGrade());
 							if(subjectDummyT.getApproved() == true){
 								complementaryValuesT.getSubject().setApprovenType(true);
@@ -621,7 +621,7 @@ public class PlanDao implements Dao<Plan>{
 								SemesterValue semesterValueT = semesterValueDao.getOrCreateSemester(semesterDummyT.getYear(), semesterDummyT.getSemester());
 								Group groupT = groupDao.getOrCreateGroup(complementaryValuesT.getSubject(), semesterValueT, subjectDummyT.getGroup());
 								
-								subjectValuesT.setComplementaryValues(complementaryValuesT);
+								subjectValuesT.setComplementaryValue(complementaryValuesT);
 								subjectValuesT.setGroup(groupT);
 								subjectValuesT.setGrade(subjectDummyT.getGrade());
 								if(subjectDummyT.getApproved() == true){
@@ -679,7 +679,7 @@ public class PlanDao implements Dao<Plan>{
 						
 						SubjectValue subjectValuesT = new SubjectValue();
 						subjectValuesT.setId(subjectValueDao.generateId());
-						subjectValuesT.setComplementaryValues(complementaryValue);
+						subjectValuesT.setComplementaryValue(complementaryValue);
 						subjectValuesT.setGrade(subjectD.getGrade());
 						if(subjectD.getApproved() == true){
 							subject.setApprovenType(true);
