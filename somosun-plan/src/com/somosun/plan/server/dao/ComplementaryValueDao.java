@@ -13,7 +13,6 @@ import com.somosun.plan.shared.control.Career;
 import com.somosun.plan.shared.control.ComplementaryValue;
 import com.somosun.plan.shared.control.Subject;
 import com.somosun.plan.shared.control.SubjectGroup;
-import com.somosun.plan.shared.values.SubjectCodes;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
@@ -106,13 +105,13 @@ public class ComplementaryValueDao implements Dao<ComplementaryValue> {
 	}
 
 	public void createComplementaryValuesForLibre(String careerCode) {
-		if(get(careerCode, SubjectCodes.LIBRE_CODE) == null && careerCode.isEmpty() == false){
+		if(get(careerCode, SomosUNUtils.LIBRE_CODE) == null && careerCode.isEmpty() == false){
 			CareerDao careerDao = new CareerDao();
 			SubjectDao subjectDao = new SubjectDao();
 			SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
 			Career c = careerDao.getByCode(careerCode);
-			Subject s = subjectDao.getDummySubjectByCode(SubjectCodes.LIBRE_CODE);
-			SubjectGroup sG = subjectGroupDao.get(SubjectCodes.LIBRE_CODE, careerCode);
+			Subject s = subjectDao.getDummySubjectByCode(SomosUNUtils.LIBRE_CODE);
+			SubjectGroup sG = subjectGroupDao.get(SomosUNUtils.LIBRE_CODE, careerCode);
 			
 			if(s != null && c != null && sG != null){				
 				ComplementaryValue cVT = new ComplementaryValue(c, s, "l", false, sG);
@@ -125,12 +124,12 @@ public class ComplementaryValueDao implements Dao<ComplementaryValue> {
 	}
 	
 	public void createComplementaryValuesForOptativa(String careerCode, String subjectGroupId) {
-		if(get(careerCode, SubjectCodes.OPTATIVA_CODE) == null && careerCode.isEmpty() == false && subjectGroupId.isEmpty() == false){
+		if(get(careerCode, SomosUNUtils.OPTATIVA_CODE) == null && careerCode.isEmpty() == false && subjectGroupId.isEmpty() == false){
 			CareerDao careerDao = new CareerDao();
 			SubjectDao subjectDao = new SubjectDao();
 			SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
 			Career c = careerDao.getByCode(careerCode);
-			Subject s = subjectDao.getDummySubjectByCode(SubjectCodes.OPTATIVA_CODE);
+			Subject s = subjectDao.getDummySubjectByCode(SomosUNUtils.OPTATIVA_CODE);
 			SubjectGroup sG = subjectGroupDao.getById(subjectGroupId);
 			
 			if(s != null && c != null && sG != null){				
