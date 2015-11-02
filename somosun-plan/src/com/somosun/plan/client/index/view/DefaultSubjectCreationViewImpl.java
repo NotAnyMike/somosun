@@ -15,7 +15,6 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.somosun.plan.shared.SomosUNUtils;
 import com.somosun.plan.shared.control.SubjectGroup;
-import com.somosun.plan.shared.values.SubjectCodes;
 
 public class DefaultSubjectCreationViewImpl extends Composite implements DefaultSubjectCreationView{
 
@@ -36,7 +35,7 @@ public class DefaultSubjectCreationViewImpl extends Composite implements Default
 
 	public DefaultSubjectCreationViewImpl() {
 		initWidget(uiBinder.createAndBindUi(this));
-		addEntryToList(SubjectCodes.LIBRE_CODE);
+		addEntryToList(SomosUNUtils.LIBRE_CODE);
 		hideIt();
 	}
 
@@ -54,7 +53,7 @@ public class DefaultSubjectCreationViewImpl extends Composite implements Default
 	@Override
 	public void clear() {
 		listBoxSubjectGroups.clear();
-		addEntryToList(SubjectCodes.LIBRE_CODE);
+		addEntryToList(SomosUNUtils.LIBRE_CODE);
 		creditsInput.setText("");
 		
 	}
