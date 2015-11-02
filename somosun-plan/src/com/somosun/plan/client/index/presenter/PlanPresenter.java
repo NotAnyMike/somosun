@@ -412,7 +412,7 @@ ComplementaryValueView.Presenter{
 			}else if(subject.getCode().equals(SubjectCodes.OPTATIVA_CODE) &&  subjectValue.getComplementaryValue() != null && subjectValue.getComplementaryValue().getSubjectGroup() != null){
 				name = "Asignatura optativa de " + subjectValue.getComplementaryValue().getSubjectGroup().getName();
 				code = "optativa";
-			}
+			} 
 		}
 		
 		SubjectWidget subjectWidget = new SubjectWidget(name, code, subject.getCredits(), subjectValue.getComplementaryValue().isMandatory(), subjectValue.getComplementaryValue().getTypology(), subjectValue.getSubjectValuePublicId(), (subjectValue.getComplementaryValue().getSubjectGroup() != null ? subjectValue.getComplementaryValue().getSubjectGroup().getName() : ""), this);
