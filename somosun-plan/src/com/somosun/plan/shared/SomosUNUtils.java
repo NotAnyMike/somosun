@@ -7,17 +7,12 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.gwt.i18n.client.NumberFormat;
-import com.somosun.plan.server.dao.CareerDao;
-import com.somosun.plan.server.dao.ComplementaryValueDao;
-import com.somosun.plan.server.dao.SubjectDao;
-import com.somosun.plan.server.dao.SubjectGroupDao;
 import com.somosun.plan.shared.control.Career;
 import com.somosun.plan.shared.control.ComplementaryValue;
-import com.somosun.plan.shared.control.Student;
 import com.somosun.plan.shared.control.Subject;
 import com.somosun.plan.shared.control.SubjectGroup;
 import com.somosun.plan.shared.values.MessageTypeCodes;
-import com.somosun.plan.shared.values.SubjectGroupCodes;
+import com.somosun.plan.shared.values.SubjectCodes;
 
 /**
  * This class will contain methods useful to every class in every side of the app
@@ -26,11 +21,6 @@ import com.somosun.plan.shared.values.SubjectGroupCodes;
  *
  */
 public class SomosUNUtils {
-
-	public static final String LIBRE_CODE = "libre";
-	public static final String LIBRE_NAME = "libre eleccion";
-	public static final String OPTATIVA_CODE ="opativa";
-	public static final String OPTATIVA_NAME ="opativa";
 	
 	public static final String COLOR_CO = "9C27B0";
 	public static final String COLOR_PRE = "E91E63";
@@ -267,7 +257,7 @@ public class SomosUNUtils {
 	public static ComplementaryValue getSubjectByCodeInList(String code, List<ComplementaryValue> list) {
 		ComplementaryValue toReturn = null;
 		
-		if(code.trim().isEmpty() == false && code.matches("(" + LIBRE_CODE + ")|("+ LIBRE_NAME + ")|(" + OPTATIVA_NAME + ")|(" + OPTATIVA_CODE + ")") == false){
+		if(code.trim().isEmpty() == false && code.matches("(" + SubjectCodes.LIBRE_CODE + ")|("+ SubjectCodes.LIBRE_NAME + ")|(" + SubjectCodes.OPTATIVA_NAME + ")|(" + SubjectCodes.OPTATIVA_CODE + ")") == false){
 			if(list != null && list.isEmpty() == false){
 				for(ComplementaryValue cV : list){
 					if(cV.getSubject().getCode().equals(code)){

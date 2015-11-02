@@ -66,6 +66,7 @@ import com.somosun.plan.shared.control.Student;
 import com.somosun.plan.shared.control.Subject;
 import com.somosun.plan.shared.control.SubjectGroup;
 import com.somosun.plan.shared.control.SubjectValue;
+import com.somosun.plan.shared.values.SubjectCodes;
 import com.somosun.plan.shared.values.TypologyCodes;
 
 /**
@@ -400,7 +401,21 @@ ComplementaryValueView.Presenter{
 		if(semester.getSubjects().contains(subjectValue) == false) semester.addSubject(subjectValue);
 		//TODO avoid the same subject twice in the same semester
 		
-		SubjectWidget subjectWidget = new SubjectWidget(subject.getName(), subject.getCode(), subject.getCredits(), subjectValue.getComplementaryValue().isMandatory(), subjectValue.getComplementaryValue().getTypology(), subjectValue.getSubjectValuePublicId(), (subjectValue.getComplementaryValue().getSubjectGroup() != null ? subjectValue.getComplementaryValue().getSubjectGroup().getName() : ""), this);
+		String name = subject.getName();
+		String code = subject.getCode();
+		
+		GWT.debugger();
+		if(subject.isDefault()){
+			if(subject.getCode().equals(SubjectCodes.LIBRE_CODE)){
+				name = "libre elección";
+				code = "libre elección";
+			}else if(subject.getCode().equals(SubjectCodes.OPTATIVA_CODE) &&  subjectValue.getComplementaryValue() != null && subjectValue.getComplementaryValue().getSubjectGroup() != null){
+				name = "Asignatura optativa de " + subjectValue.getComplementaryValue().getSubjectGroup().getName();
+				code = "optativa";
+			} 
+		}
+		
+		SubjectWidget subjectWidget = new SubjectWidget(name, code, subject.getCredits(), subjectValue.getComplementaryValue().isMandatory(), subjectValue.getComplementaryValue().getTypology(), subjectValue.getSubjectValuePublicId(), (subjectValue.getComplementaryValue().getSubjectGroup() != null ? subjectValue.getComplementaryValue().getSubjectGroup().getName() : ""), this);
 		if(subjectValue.isTaken() == true){
 			if(subjectValue.getComplementaryValue().getSubject().isApprovenType() == true){
 				if(subjectValue.getGrade() >= 3){					
@@ -2574,7 +2589,7 @@ ComplementaryValueView.Presenter{
 		List<String> selectedDefaultSubjectCodeStrings = new ArrayList<String>();
 		List<String> selectedDefaultSubjectCareerStrings = new ArrayList<String>();
 		for(SelectedSubjectViewImpl selectedSubjectsViewImpl : selectedSubjects){
-			if(selectedSubjectsViewImpl.getCode().equals(SomosUNUtils.LIBRE_CODE) || selectedSubjectsViewImpl.getCode().equals(SomosUNUtils.OPTATIVA_CODE)){
+			if(selectedSubjectsViewImpl.getCode().equals(SubjectCodes.LIBRE_CODE) || selectedSubjectsViewImpl.getCode().equals(SubjectCodes.OPTATIVA_CODE)){
 				selectedDefaultSubjectCodeStrings.add(selectedSubjectsViewImpl.getCode());
 				selectedDefaultSubjectCareerStrings.add(selectedSubjectsViewImpl.getCareer());
 			}else{				
