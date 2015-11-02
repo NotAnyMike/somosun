@@ -1,7 +1,9 @@
 package com.somosun.plan.shared;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.gwt.i18n.client.NumberFormat;
@@ -10,6 +12,7 @@ import com.somosun.plan.shared.control.ComplementaryValue;
 import com.somosun.plan.shared.control.Subject;
 import com.somosun.plan.shared.control.SubjectGroup;
 import com.somosun.plan.shared.values.MessageTypeCodes;
+import com.somosun.plan.shared.values.SubjectCodes;
 
 /**
  * This class will contain methods useful to every class in every side of the app
@@ -18,11 +21,6 @@ import com.somosun.plan.shared.values.MessageTypeCodes;
  *
  */
 public class SomosUNUtils {
-
-	public static final String LIBRE_CODE = "libre";
-	public static final String LIBRE_NAME = "libre eleccion";
-	public static final String OPTATIVA_CODE ="opativa";
-	public static final String OPTATIVA_NAME ="opativa";
 	
 	public static final String COLOR_CO = "9C27B0";
 	public static final String COLOR_PRE = "E91E63";
@@ -259,7 +257,7 @@ public class SomosUNUtils {
 	public static ComplementaryValue getSubjectByCodeInList(String code, List<ComplementaryValue> list) {
 		ComplementaryValue toReturn = null;
 		
-		if(code.trim().isEmpty() == false && code.matches("(" + LIBRE_CODE + ")|("+ LIBRE_NAME + ")|(" + OPTATIVA_NAME + ")|(" + OPTATIVA_CODE + ")") == false){
+		if(code.trim().isEmpty() == false && code.matches("(" + SubjectCodes.LIBRE_CODE + ")|("+ SubjectCodes.LIBRE_NAME + ")|(" + SubjectCodes.OPTATIVA_NAME + ")|(" + SubjectCodes.OPTATIVA_CODE + ")") == false){
 			if(list != null && list.isEmpty() == false){
 				for(ComplementaryValue cV : list){
 					if(cV.getSubject().getCode().equals(code)){
@@ -272,6 +270,45 @@ public class SomosUNUtils {
 			
 			
 		return toReturn;
+	}
+	
+	/**
+	 * This method will only take into account only the no mandatory ones and depending of the @param countDefaultSubjects it will take or not take into account
+	 * the default subjects
+	 * 
+	 * @param list
+	 * @return
+	 */
+	public static Map<SubjectGroup, Integer> getMapWithNumberOfCreditsForEachSubjectGroup(List<ComplementaryValue> list, boolean countDefaultSubjects){
+		
+		Map<SubjectGroup, Integer> toReturn = new HashMap<SubjectGroup, Integer>();
+		
+		for(ComplementaryValue cVToSG : list){
+			if(cVToSG.isMandatory() == false && cVToSG.getSubject().isDefault() == countDefaultSubjects){
+				SubjectGroup sG_temporary = SomosUNUtils.getSubjectGroupInSetByName(cVToSG.getSubjectGroup().getName(), toReturn.keySet());
+				int x = -1;
+				
+				if(sG_temporary != null) {
+					x = toReturn.get(sG_temporary);
+				} else {
+					x = 0;
+					sG_temporary = cVToSG.getSubjectGroup();
+				}
+				
+				x += cVToSG.getSubject().getCredits();
+				
+				toReturn.put(sG_temporary, x);
+				
+			}
+		}
+		
+		return toReturn;
+	}
+
+	public static String standardizeForSiaSearch(String nameOrCode) {
+		nameOrCode = removeAccents(nameOrCode);
+		nameOrCode = nameOrCode.replaceAll("ñ", "\\\\u00f1").replaceAll("Ñ", "\\\\u00d1");
+		return nameOrCode;
 	}
 
 }

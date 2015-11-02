@@ -13,6 +13,7 @@ public class CompletePlanInfo implements Serializable{
 	private Career career = null;
 	private Plan planDefautl = null;
 	private List<ComplementaryValue> mandatoryComplementaryValues = null;
+	private List<ComplementaryValue> dummyComplementaryValues = null;
 	private List<SubjectGroup> subjectGroups = null;
 	
 	public CompletePlanInfo(){
@@ -49,6 +50,14 @@ public class CompletePlanInfo implements Serializable{
 	public void setMandatoryComplementaryValues(
 			List<ComplementaryValue> mandatoryComplementaryValue) {
 		this.mandatoryComplementaryValues = mandatoryComplementaryValue;
+	}
+
+	public List<ComplementaryValue> getDummyComplementaryValues() {
+		return dummyComplementaryValues;
+	}
+
+	public void setDummyComplementaryValues(List<ComplementaryValue> dummyComplementaryValues) {
+		this.dummyComplementaryValues = dummyComplementaryValues;
 	}
 
 }
