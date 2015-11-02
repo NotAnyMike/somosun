@@ -50,6 +50,7 @@ import com.somosun.plan.shared.control.Student;
 import com.somosun.plan.shared.control.Subject;
 import com.somosun.plan.shared.control.SubjectGroup;
 import com.somosun.plan.shared.control.Teacher;
+import com.somosun.plan.shared.values.SubjectCodes;
 import com.somosun.plan.shared.values.SubjectGroupCodes;
 import com.somosun.plan.shared.values.TypologyCodes;
 
@@ -349,14 +350,14 @@ public class SiaProxy {
 			if(student != null){
 				if(student.isAdmin() == true){
 					//Add libre and optativa
-					Subject subject = subjectDao.getDummySubjectByCode(SomosUNUtils.OPTATIVA_CODE);
+					Subject subject = subjectDao.getDummySubjectByCode(SubjectCodes.OPTATIVA_CODE);
 					if(subject == null){
 						subject = new Subject();
-						subject.setCode(SomosUNUtils.OPTATIVA_CODE);
+						subject.setCode(SubjectCodes.OPTATIVA_CODE);
 						subject.setCredits(0);
 						subject.setLocation(sede);
-						subject.setName(SomosUNUtils.OPTATIVA_NAME);
-						subject.setSiaCode(SomosUNUtils.OPTATIVA_CODE);
+						subject.setName(SubjectCodes.OPTATIVA_NAME);
+						subject.setSiaCode(SubjectCodes.OPTATIVA_CODE);
 						subject.setSpecial(false);
 						subject.setDummy(true);
 						subject.setId(subjectDao.generateId());

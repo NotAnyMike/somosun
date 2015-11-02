@@ -46,6 +46,7 @@ import com.somosun.plan.shared.control.Subject;
 import com.somosun.plan.shared.control.SubjectGroup;
 import com.somosun.plan.shared.control.SubjectValue;
 import com.somosun.plan.shared.control.UserSun;
+import com.somosun.plan.shared.values.SubjectCodes;
 import com.somosun.plan.shared.values.SubjectGroupCodes;
 import com.somosun.plan.shared.values.TypologyCodes;
 
@@ -593,7 +594,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 //						analyzeCareer(career.getCode());
 //						career = careerDao.getCareerByCode(subjectCareerStrings.get(0));
 //					}
-					if(subjectCodeT.equals(SomosUNUtils.LIBRE_CODE) == false || subjectCodeT.equals(SomosUNUtils.OPTATIVA_CODE) == false){						
+					if(subjectCodeT.equals(SubjectCodes.LIBRE_CODE) == false || subjectCodeT.equals(SubjectCodes.OPTATIVA_CODE) == false){						
 						levelingResult = getSubjectFromSia("", "p", ""/*career.getCode()*/, "", 1, 10000, "bog", null);
 						levelingList = levelingResult.getSubjectList();
 						freeElectionResult = getSubjectFromSia("", "l", ""/*career.getCode()*/, "", 1, 10000, "bog", null);
@@ -603,8 +604,8 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 				}
 				
 				if(career != null){
-					if(subjectCodeT.equals(SomosUNUtils.LIBRE_CODE)){
-					}else if(subjectCodeT.equals(SomosUNUtils.OPTATIVA_CODE)){
+					if(subjectCodeT.equals(SubjectCodes.LIBRE_CODE)){
+					}else if(subjectCodeT.equals(SubjectCodes.OPTATIVA_CODE)){
 					}else{
 						//The subject is not the dummy subjects "opativa" nor "libre"
 						/**
@@ -766,14 +767,14 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 	}
 
 	/**
-	 * Be really careful because here to send the code it is used the SomosUNUtils.LIBRE_CODE and the SubjetGroupCodes.LIBRE_NAME 
+	 * Be really careful because here to send the code it is used the SubjectCodes.LIBRE_CODE and the SubjetGroupCodes.LIBRE_NAME 
 	 */
 	public ComplementaryValue createDefaultSubject(String subjectGroupName, String credits, String careerCode, Student student) {
 		
 		SubjectGroupDao subjectGroupDao = new SubjectGroupDao(); 
 		
 		SubjectGroup subjectGroup = null;
-		if(subjectGroupName.equals(SomosUNUtils.LIBRE_CODE) == true || subjectGroupName.equals(SubjectGroupCodes.LIBRE_NAME) == true){
+		if(subjectGroupName.equals(SubjectCodes.LIBRE_CODE) == true || subjectGroupName.equals(SubjectGroupCodes.LIBRE_NAME) == true){
 			subjectGroup = subjectGroupDao.get(SubjectGroupCodes.LIBRE_NAME, careerCode);
 		}else{						
 			subjectGroup = subjectGroupDao.get(subjectGroupName, careerCode);
@@ -811,12 +812,12 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 				
 				Subject subjectDefault = null;
 				
-				//if(subjectGroup.getName().equals(SomosUNUtils.LIBRE_CODE) == true){
+				//if(subjectGroup.getName().equals(SubjectCodes.LIBRE_CODE) == true){
 				if(subjectGroup.getName().equals(SubjectGroupCodes.LIBRE_NAME) == true){
-					subjectDefault = new Subject(Integer.valueOf(credits), SomosUNUtils.LIBRE_CODE, SomosUNUtils.LIBRE_CODE, SubjectGroupCodes.LIBRE_NAME, "bog");
+					subjectDefault = new Subject(Integer.valueOf(credits), SubjectCodes.LIBRE_CODE, SubjectCodes.LIBRE_CODE, SubjectGroupCodes.LIBRE_NAME, "bog");
 					subjectGroup = subjectGroupDao.get(SubjectGroupCodes.LIBRE_NAME, careerCode);
 				}else{						
-					subjectDefault = new Subject(Integer.valueOf(credits), SomosUNUtils.OPTATIVA_CODE, SomosUNUtils.OPTATIVA_CODE, SomosUNUtils.OPTATIVA_NAME, "bog");
+					subjectDefault = new Subject(Integer.valueOf(credits), SubjectCodes.OPTATIVA_CODE, SubjectCodes.OPTATIVA_CODE, SubjectCodes.OPTATIVA_NAME, "bog");
 					subjectGroup = subjectGroupDao.get(subjectGroup.getName(), careerCode);
 				}
 				
