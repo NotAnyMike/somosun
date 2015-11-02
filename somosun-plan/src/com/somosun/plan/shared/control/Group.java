@@ -28,6 +28,7 @@ public class Group implements Serializable {
     private int totalPlaces;
     private List<Block> schedule=null;
     private List<Career> careers = null;
+    //TODO GRADE?
 
     public Group(){
     }
