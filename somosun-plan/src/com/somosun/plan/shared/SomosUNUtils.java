@@ -1,7 +1,9 @@
 package com.somosun.plan.shared;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.gwt.i18n.client.NumberFormat;
@@ -267,6 +269,39 @@ public class SomosUNUtils {
 		}
 			
 			
+		return toReturn;
+	}
+	
+	/**
+	 * This method will only take into account only the no mandatory ones and depending of the @param countDefaultSubjects it will take or not take into account
+	 * the default subjects
+	 * 
+	 * @param list
+	 * @return
+	 */
+	public static Map<SubjectGroup, Integer> getMapWithNumberOfCreditsForEachSubjectGroup(List<ComplementaryValue> list, boolean countDefaultSubjects){
+		
+		Map<SubjectGroup, Integer> toReturn = new HashMap<SubjectGroup, Integer>();
+		
+		for(ComplementaryValue cVToSG : list){
+			if(cVToSG.isMandatory() == false && cVToSG.getSubject().isDefault() == countDefaultSubjects){
+				SubjectGroup sG_temporary = SomosUNUtils.getSubjectGroupInSetByName(cVToSG.getSubjectGroup().getName(), toReturn.keySet());
+				int x = -1;
+				
+				if(sG_temporary != null) {
+					x = toReturn.get(sG_temporary);
+				} else {
+					x = 0;
+					sG_temporary = cVToSG.getSubjectGroup();
+				}
+				
+				x += cVToSG.getSubject().getCredits();
+				
+				toReturn.put(sG_temporary, x);
+				
+			}
+		}
+		
 		return toReturn;
 	}
 
