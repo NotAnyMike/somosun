@@ -754,6 +754,9 @@ ComplementaryValueView.Presenter{
 		
 	}
 
+	/** 
+	 * DO NOT use this method directly, it is better to use planChanged(String triggered) in order to print in the console the reason why it is being saved.
+	 */
 	private void savePlan() {
 		if(plan.getName() != null && plan.getName().isEmpty() == false){
 			rpcService.savePlan(student, plan, new AsyncCallback<Long>(){
@@ -1644,6 +1647,8 @@ ComplementaryValueView.Presenter{
 		 * 3.2.1 Add default subjects in the closest semester to the Select_Semester which has less than 6 subjects until a maximum of 6 subjects per semester
 		 */
 		
+		view.showLoadingSubjects();
+		
 		if(plan.getCareer() != null && (plan.getCareer().hasAnalysis() || plan.getCareer().hasDefault())){
 			/************ 1. Getting the info ************/
 			GWT.log("--Getting the completePlanInfo");
@@ -1653,6 +1658,7 @@ ComplementaryValueView.Presenter{
 				public void onFailure(Throwable caught) {
 					GWT.log("Error getting the completePlanInfo");
 					Window.alert("Sorry, something happening while we were retrieving the infomation");
+					view.hideLoadingSubjects();
 				}
 
 				@Override
@@ -1697,6 +1703,7 @@ ComplementaryValueView.Presenter{
 						@Override
 						public void onFailure(Throwable caught) {
 							GWT.log("Error getting the current semesterValue");
+							view.hideLoadingSubjects();
 						}
 
 						@Override
@@ -1849,6 +1856,19 @@ ComplementaryValueView.Presenter{
 			mandatoryComplementaryValues_copy = new ArrayList<ComplementaryValue>(completePlanInfo.getMandatoryComplementaryValues());
 			List<Subject> variablesList = new ArrayList<Subject>(variables.keySet());
 			List<SubjectValue> subjectValueList = new ArrayList<SubjectValue>(subjectValuesList);
+			
+			/**** <Getting the list of complememtaryValues to get the number credits per subjectGroup> ****/
+			List<ComplementaryValue> listOfComplementaryValuesToSend = new ArrayList<ComplementaryValue>(completePlanInfo.getMandatoryComplementaryValues());
+			GWT.debugger();
+			for(SubjectValue sV : subjectValuesList){
+				if((sV.isTaken() == false || sV.getGrade() >= 3) && sV.getComplementaryValue().isMandatory() == false){
+					listOfComplementaryValuesToSend.add(sV.getComplementaryValue());
+				}
+			}
+			/**** </Getting the list of complememtaryValues to get the number credits per subjectGroup> ***/
+			GWT.debugger();
+			Map<SubjectGroup, Integer> creditsInListBySubjectGroup = SomosUNUtils.getMapWithNumberOfCreditsForEachSubjectGroup(listOfComplementaryValuesToSend, false);
+			
 			while(greaterNumber != -1){
 				passed = true;
 				int pos = 0;
@@ -1864,7 +1884,7 @@ ComplementaryValueView.Presenter{
 						//do stuff in a in-loop
 						ComplementaryValue cV = getCvBySubjectInCVList(s.getId(), mandatoryComplementaryValues_copy);
 						if(cV != null){
-							arrangeBySemesterMaxNumberOfSubjectAllowed(s, cV, mandatoryComplementaryValues_copy, variables, completePlanInfo, variablesList, subjectValueList, currentSemesterNumber);
+							arrangeBySemesterMaxNumberOfSubjectAllowed(s, cV, mandatoryComplementaryValues_copy, variables, completePlanInfo, variablesList, subjectValueList, creditsInListBySubjectGroup, currentSemesterNumber);
 						}
 					}
 					pos = variablesList.indexOf(s) +1;
@@ -1878,41 +1898,95 @@ ComplementaryValueView.Presenter{
 			/*******************************************************/
 			
 			/***** Adding the subjects left (i.e. not added) ******/
-			//In order to test this comment the two big while previous to this part in this method
-			if(mandatoryComplementaryValues_copy.size() != 0){
-				GWT.debugger();
-				//start from the last semester and add them
-				int usefulSemesterNumber = currentSemesterNumber;
-				Integer numberOfSubjects = null;
-				for(ComplementaryValue cVLeft : mandatoryComplementaryValues_copy){
+			addListToFirstSemesterAvailable(mandatoryComplementaryValues_copy, currentSemesterNumber, 6);
+			/*******************************************************/
+			
+			/**** <Adding the optional subjects necessary to graduate> ****/
+			List<ComplementaryValue> dummySubjectsToAdd = new ArrayList<ComplementaryValue>();
+			List<ComplementaryValue> dummySubjectsToAddToEnd = new ArrayList<ComplementaryValue>();
+			for(ComplementaryValue cV_temporary: completePlanInfo.getDummyComplementaryValues()){
+				SubjectGroup subjectGroup_temporary = cV_temporary.getSubjectGroup();
+				if(subjectGroup_temporary.getOptativeCredits() > 0){
+					int creditsToAdd = subjectGroup_temporary.getOptativeCredits();
+					SubjectGroup subjectGroupInList = SomosUNUtils.getSubjectGroupInSetByName(cV_temporary.getSubjectGroup().getName(), creditsInListBySubjectGroup.keySet());
+					if(subjectGroupInList != null){						
+						int creditsAdded = creditsInListBySubjectGroup.get(subjectGroupInList);
+						creditsToAdd -= creditsAdded;
+					}
 					
-					numberOfSubjects = getNumberOfSubjectsInSemester(usefulSemesterNumber);
-					
-					//if it is -1 means that the semester does not exist so it should continue in order to get to addComplementaryValueToASemester and create the semester
-					while(numberOfSubjects != null && numberOfSubjects >= 6){
-						numberOfSubjects = getNumberOfSubjectsInSemester(usefulSemesterNumber);
-						if(numberOfSubjects >= 6){
-							usefulSemesterNumber++;
+					if(creditsToAdd > 0){
+						cV_temporary.getSubject().setCredits(creditsToAdd);
+						int semester = this.getFirstEmptySemesterAfterLastNonEmpty();
+						if(semester == -1 || semester < currentSemesterNumber) semester = semesters-1;
+						
+						if(creditsToAdd <= 4){							
+							dummySubjectsToAdd.add(cV_temporary);
+						}else{
+							dummySubjectsToAddToEnd.add(cV_temporary);
 						}
 					}
-					
-					//Add the cV to the usefulSemesterNumber
-					if(getLastSemesterForASubject(cVLeft.getSubject().getId()) == -1){						
-						addComplementaryValueToASemester(cVLeft, usefulSemesterNumber);
-					}
-					
 				}
 				
-				mandatoryComplementaryValues_copy.clear();
 			}
-			/*******************************************************/
+			if(dummySubjectsToAdd.isEmpty() == false) addListToFirstSemesterAvailable(dummySubjectsToAdd, currentSemesterNumber, 6);
+			if(dummySubjectsToAddToEnd.isEmpty() == false) addListToFirstSemesterAvailable(dummySubjectsToAddToEnd, semesters-1, 6);
+			/**** </Adding the optional subjects necessary to graduate> ***/
 			/***********************************************************/				
 			
-			//save the plan TODO
+			//save the plan
+			planChanged("planCompleted");
 			
 		}
+		
+		view.hideLoadingSubjects();
+		
 	}
 	
+	/**
+	 * This method will add all the complementaryValues in @param list into the first semester from @param minimunSemester-th (including it) which has at most @param maxSubjectsPerSemester
+	 * This method does not take into account the requisites or nothing like similar, just the @param minimumSemester and the @param maxSubjectsPerSemester. 
+	 * 
+	 * <br/> 
+	 * 
+	 * IMPORTANT! this method will clear the list
+	 * 
+	 * <br/>
+	 * 
+	 * originally this was use to add the subjects that the completePlan algorithm was not able to add and the optional subjects (dummy subjects) necessary to complete the plan
+	 * 
+	 * @param list
+	 * @param minimunSemester
+	 * @param maxSubjectsPerSemester
+	 */
+	private void addListToFirstSemesterAvailable(List<ComplementaryValue> list, int minimunSemester, int maxSubjectsPerSemester) {
+		//In order to test this comment the two big while previous to this part in this method
+		if(list.size() != 0){
+			//start from the last semester and add them
+			int usefulSemesterNumber = minimunSemester;
+			Integer numberOfSubjects = null;
+			for(ComplementaryValue cVLeft : list){
+				
+				numberOfSubjects = getNumberOfSubjectsInSemester(usefulSemesterNumber);
+				
+				//if it is -1 means that the semester does not exist so it should continue in order to get to addComplementaryValueToASemester and create the semester
+				while(numberOfSubjects != null && numberOfSubjects >= maxSubjectsPerSemester){
+					numberOfSubjects = getNumberOfSubjectsInSemester(usefulSemesterNumber);
+					if(numberOfSubjects >= maxSubjectsPerSemester){
+						usefulSemesterNumber++;
+					}
+				}
+				
+				//Add the cV to the usefulSemesterNumber
+				if(getLastSemesterForASubject(cVLeft.getSubject().getId()) == -1){						
+					addComplementaryValueToASemester(cVLeft, usefulSemesterNumber);
+				}
+				
+			}
+			
+			list.clear();
+		}
+	}
+
 	/**
 	 * Returns -1 if there is no empty semester after the last non-empty semester 
 	 * 
@@ -1952,7 +2026,7 @@ ComplementaryValueView.Presenter{
 	 * @param variablesList
 	 * @param currentSemesterNumber
 	 */
-	private void arrangeBySemesterMaxNumberOfSubjectAllowed(Subject s, ComplementaryValue cV, List<ComplementaryValue> mandatoryComplementaryValues_copy, Map<Subject, Integer> variables, CompletePlanInfo completePlanInfo,List<Subject> variablesList , List<SubjectValue> subjectValueList, int currentSemesterNumber) {
+	private void arrangeBySemesterMaxNumberOfSubjectAllowed(Subject s, ComplementaryValue cV, List<ComplementaryValue> mandatoryComplementaryValues_copy, Map<Subject, Integer> variables, CompletePlanInfo completePlanInfo,List<Subject> variablesList , List<SubjectValue> subjectValueList, Map<SubjectGroup, Integer> creditsInListBySubjectGroup, int currentSemesterNumber) {
 		int x = getLastSemesterForASubject(s.getId());
 		if(x == -1){
 			x = getVariableForSimultaneousEquationsMap(variables, s.getId());
@@ -1964,7 +2038,7 @@ ComplementaryValueView.Presenter{
 						//Get sRequisite from the variables
 						sRequisite = getSubjectFromVariables(sRequisite.getId(), variablesList);
 						if(sRequisite != null){					
-							arrangeBySemesterMaxNumberOfSubjectAllowed(sRequisite, cVRequisite, mandatoryComplementaryValues_copy, variables, completePlanInfo, variablesList, subjectValueList, currentSemesterNumber);
+							arrangeBySemesterMaxNumberOfSubjectAllowed(sRequisite, cVRequisite, mandatoryComplementaryValues_copy, variables, completePlanInfo, variablesList, subjectValueList, creditsInListBySubjectGroup, currentSemesterNumber);
 						}
 					}
 				}
@@ -2042,18 +2116,36 @@ ComplementaryValueView.Presenter{
 				
 				/**** <Check if the subject is a default subject, if it is then check it that requisite has been fulfilled> ****/
 				//If it has been fulfilled delete it and not add it
-				SubjectValue subjectValueFulfilled = getSubjectValueFromListForDefaultSubject(subjectValueList, cV);
-				if(subjectValueFulfilled != null){
-					//delete the subjectValue from the list
-					subjectValueList.remove(subjectValueFulfilled);
-				} else{					
+				//get the subjectGroup
+				boolean toAdd = true;
+				if(cV.isMandatory() == false && cV.getSubject().isDefault() == true){
+					GWT.debugger();
+					SubjectGroup sG_temporary = SomosUNUtils.getSubjectGroupInSetByName(cV.getSubjectGroup().getName(), creditsInListBySubjectGroup.keySet());
+					//get the amount of credits
+					
+					int creditsAdded = 0;
+					if(sG_temporary != null){
+						creditsAdded = creditsInListBySubjectGroup.get(sG_temporary);
+						int creditsLeft = sG_temporary.getOptativeCredits() - creditsAdded;
+						if(creditsLeft <= 0){
+							toAdd = false;
+						}else{
+							creditsAdded += cV.getSubject().getCredits();
+							creditsInListBySubjectGroup.put(sG_temporary, creditsAdded);
+						}
+					}else{
+						creditsInListBySubjectGroup.put(cV.getSubjectGroup(), creditsAdded);
+					}
+				}
+				
+				if(toAdd == true){		
 					// Add them to the plan
 					addComplementaryValueToASemester(cV, x);	
 				}
 				/**** </Check if the subject is a default subject, if it is then check it that requisite has been fulfilled> ***/
 				
 				mandatoryComplementaryValues_copy.remove(cV);
-			} 
+			}
 		}
 		
 		//set the variable to that semester
@@ -2364,7 +2456,6 @@ ComplementaryValueView.Presenter{
 	/************************************************************/
 
 	/*********************** Behaviors **************************/
-	
 	
 	public void onSpecificSubjectSelected(String subjectName, String subjectCode, String careerCode) {
 		
