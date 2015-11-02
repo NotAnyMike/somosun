@@ -264,12 +264,12 @@ public class SiaProxy {
 		}
 		
 		sede = confirmSede(sede);
-		nameOrCode = SomosUNUtils.removeAccents(nameOrCode).replaceAll("  ", " ");
+		nameOrCode = SomosUNUtils.standardizeForSiaSearch(nameOrCode).replaceAll("  ", " ");
 		
 		String respString = null;
 		SiaResultSubjects siaResult = new SiaResultSubjects();
 		typology = SomosUNUtils.getTypology(typology);
-		String data = "{method:buscador.obtenerAsignaturas,params:['"+nameOrCode+"','"+VALOR_NIVELACADEMICO_TIPOLOGIA_PRE+"','"+typology+"','"+VALOR_NIVELACADEMICO_PLANESTUDIO_PRE+"','"+career+"','"+scheduleCP+"',"+page+","+ammount+"]}";
+		String data = "{method:buscador.obtenerAsignaturas,params:[\""+nameOrCode+"\",\""+VALOR_NIVELACADEMICO_TIPOLOGIA_PRE+"\",\""+typology+"\",\""+VALOR_NIVELACADEMICO_PLANESTUDIO_PRE+"\",\""+career+"\",\""+scheduleCP+"\","+page+","+ammount+"]}";
 		
 		respString = connectToSia(data, sede);
 		
