@@ -1647,6 +1647,8 @@ ComplementaryValueView.Presenter{
 		 * 3.2.1 Add default subjects in the closest semester to the Select_Semester which has less than 6 subjects until a maximum of 6 subjects per semester
 		 */
 		
+		view.showLoadingSubjects();
+		
 		if(plan.getCareer() != null && (plan.getCareer().hasAnalysis() || plan.getCareer().hasDefault())){
 			/************ 1. Getting the info ************/
 			GWT.log("--Getting the completePlanInfo");
@@ -1656,6 +1658,7 @@ ComplementaryValueView.Presenter{
 				public void onFailure(Throwable caught) {
 					GWT.log("Error getting the completePlanInfo");
 					Window.alert("Sorry, something happening while we were retrieving the infomation");
+					view.hideLoadingSubjects();
 				}
 
 				@Override
@@ -1700,6 +1703,7 @@ ComplementaryValueView.Presenter{
 						@Override
 						public void onFailure(Throwable caught) {
 							GWT.log("Error getting the current semesterValue");
+							view.hideLoadingSubjects();
 						}
 
 						@Override
@@ -1933,6 +1937,9 @@ ComplementaryValueView.Presenter{
 			planChanged("planCompleted");
 			
 		}
+		
+		view.hideLoadingSubjects();
+		
 	}
 	
 	/**
@@ -2449,7 +2456,6 @@ ComplementaryValueView.Presenter{
 	/************************************************************/
 
 	/*********************** Behaviors **************************/
-	
 	
 	public void onSpecificSubjectSelected(String subjectName, String subjectCode, String careerCode) {
 		
