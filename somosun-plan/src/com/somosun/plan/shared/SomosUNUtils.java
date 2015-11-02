@@ -305,4 +305,10 @@ public class SomosUNUtils {
 		return toReturn;
 	}
 
+	public static String standardizeForSiaSearch(String nameOrCode) {
+		nameOrCode = removeAccents(nameOrCode);
+		nameOrCode = nameOrCode.replaceAll("ñ", "\\\\u00f1").replaceAll("Ñ", "\\\\u00d1");
+		return nameOrCode;
+	}
+
 }
