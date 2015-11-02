@@ -754,6 +754,9 @@ ComplementaryValueView.Presenter{
 		
 	}
 
+	/** 
+	 * DO NOT use this method directly, it is better to use planChanged(String triggered) in order to print in the console the reason why it is being saved.
+	 */
 	private void savePlan() {
 		if(plan.getName() != null && plan.getName().isEmpty() == false){
 			rpcService.savePlan(student, plan, new AsyncCallback<Long>(){
@@ -1926,7 +1929,8 @@ ComplementaryValueView.Presenter{
 			/**** </Adding the optional subjects necessary to graduate> ***/
 			/***********************************************************/				
 			
-			//save the plan TODO
+			//save the plan
+			planChanged("planCompleted");
 			
 		}
 	}
