@@ -28,7 +28,7 @@ public class Group implements Serializable {
     private int totalPlaces;
     private List<Block> schedule=null;
     private List<Career> careers = null;
-    //TODO GRADE?
+    @Index private Double averageGrade = null; 
 
     public Group(){
     }
@@ -191,6 +191,14 @@ public class Group implements Serializable {
 	 */
 	private void setCareers(List<Career> careers) {
 		this.careers = careers;
+	}
+
+	public Double getAverageGrade() {
+		return averageGrade;
+	}
+
+	public void setAverageGrade(Double grade) {
+		this.averageGrade = grade;
 	}
 
 }
