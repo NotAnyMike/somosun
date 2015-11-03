@@ -1188,27 +1188,6 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 			//TODO updateGrade
 			/****** add the oldGrade and the newGrade with the group to a cron job *******/
 			
-			//in order to test the new classes
-//			Score score = new Score();
-//			SubjectDao subjectDao = new SubjectDao();
-//			score.setSubject(subjectDao.getByCode("1000004"));
-//			score.setTotalAverage(2.0);
-//			score.setTotalAmount(1);
-//			
-//			SingleScore singleScore = new SingleScore();
-//			singleScore.setAmount(1);
-//			singleScore.setAverage(2.0);
-//			
-//			SemesterValueDao sVDao = new SemesterValueDao();
-//			singleScore.setSemesterValue(sVDao.getCurrentSemester());
-//			
-			ScoreDao scoreDao = new ScoreDao();
-//			scoreDao.save(score);
-			
-			Score score = scoreDao.getById(new Long(23884));
-			
-			int x = 0;
-			
 		}else{
 			log.warning("savePlanAndGrade - A subject which has no group, the plan's id is " + plan.getId());
 		}
