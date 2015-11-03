@@ -2717,19 +2717,25 @@ ComplementaryValueView.Presenter{
 	}
 
 	public void onGradeAdded(String publicId, String grade){
-		if(publicId != null && publicId.isEmpty() == false){
-			
+		
+		GWT.debugger();
+		
+		if(publicId != null && publicId.isEmpty() == false){	
 			
 			SubjectValue sV = getSubjectValuesByPublicId(publicId);
 			
 			grade = grade.trim().replaceAll(",", ".");
-			Double gradeDouble = Double.valueOf(grade);
+			Double gradeDouble = null;
+			if(grade.isEmpty() == true) gradeDouble = new Double(0);
+			else gradeDouble = Double.valueOf(grade);
 			
 			if(sV != null && gradeDouble >= 0 && gradeDouble <= 5){
 				
-				sV.setTaken(true);
-				sV.setGrade(gradeDouble);
+				if(gradeDouble == 0) sV.setTaken(false);
+				else sV.setTaken(true);
 				
+				sV.setGrade(gradeDouble);
+					
 				SubjectWidget sW = subjectValuesAndWidgetBiMap.get(sV);
 				if(sW != null){
 					if(sV.getComplementaryValue().getSubject().isApprovenType() == true){
@@ -2738,13 +2744,15 @@ ComplementaryValueView.Presenter{
 						}else{
 							sW.setGrade("NA");
 						}
-					}else{						
-						String gradeString = SomosUNUtils.getOneDecimalPointString(sV.getGrade());
+					}else{			
+						String gradeString = null;
+						if(sV.isTaken()) gradeString = SomosUNUtils.getOneDecimalPointString(sV.getGrade());
 						sW.setGrade(gradeString);
 					}
-				}
+				}	
 				
 				planChanged("NewGrade");
+				
 			}
 		}
 
