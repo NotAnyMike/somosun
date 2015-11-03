@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Icon;
@@ -66,6 +67,7 @@ import com.somosun.plan.shared.control.Student;
 import com.somosun.plan.shared.control.Subject;
 import com.somosun.plan.shared.control.SubjectGroup;
 import com.somosun.plan.shared.control.SubjectValue;
+import com.somosun.plan.shared.values.PlanCodes;
 import com.somosun.plan.shared.values.SubjectCodes;
 import com.somosun.plan.shared.values.TypologyCodes;
 
@@ -174,6 +176,23 @@ ComplementaryValueView.Presenter{
 		}
 	};
 		
+	
+	AsyncCallback<Long> callbackOnPlanSave = new AsyncCallback<Long>(){
+		
+		@Override
+		public void onFailure(Throwable caught) {
+			GWT.log("Error saving the plan - PlanPresenter");
+		}
+		
+		@Override
+		public void onSuccess(Long result) {
+			if(plan.getId() == null){
+				plan.setId(result);
+			}
+			GWT.log("Plan saved - PP");
+		}
+		
+	};
 	
 	AsyncCallback<List<ComplementaryValue>> asyncGetComplementaryValuesByCareer = new AsyncCallback<List<ComplementaryValue>>(){
 		
@@ -375,7 +394,7 @@ ComplementaryValueView.Presenter{
 		}
 		
 		if(save == true){			
-			planChanged("NewSemester");
+			planChanged(PlanCodes.CHANGE_BY_NEW_SEMESTER);
 		}
 
 		siaSummaryView.setMaxSemesterInForm(plan.getSemesters().size());
@@ -383,8 +402,31 @@ ComplementaryValueView.Presenter{
 	}
 	
 	public void planChanged(String triggered){
-		GWT.log(triggered);
-		savePlan();
+		
+		Callable<Void> toSave = new Callable<Void>(){
+			
+			public Void call(){				
+				rpcService.savePlan(student, plan, new AsyncCallback<Long>(){
+					
+					@Override
+					public void onFailure(Throwable caught) {
+						GWT.log("Error saving the plan - PlanPresenter");
+					}
+					
+					@Override
+					public void onSuccess(Long result) {
+						if(plan.getId() == null){
+							plan.setId(result);
+						}
+						GWT.log("Plan saved - PP");
+					}
+					
+				});
+				return null;
+			}
+		};
+		
+		savePlan(toSave, triggered);
 	}
 
 	private void createSubject(Subject subject, SubjectValue subjectValue, Semester semester) {
@@ -726,7 +768,7 @@ ComplementaryValueView.Presenter{
 			GWT.log("The number of semesters do not match");
 		}
 		
-		planChanged("SemesterDelete");
+		planChanged(PlanCodes.CHANGE_BY_SEMESTER_DELETE);
 		
 		siaSummaryView.setMaxSemesterInForm(plan.getSemesters().size());
 		
@@ -771,25 +813,18 @@ ComplementaryValueView.Presenter{
 
 	/** 
 	 * DO NOT use this method directly, it is better to use planChanged(String triggered) in order to print in the console the reason why it is being saved.
+	 * @param triggered 
 	 */
-	private void savePlan() {
+	private void savePlan(Callable<Void> func, String triggered) {
+		
 		if(plan.getName() != null && plan.getName().isEmpty() == false){
-			rpcService.savePlan(student, plan, new AsyncCallback<Long>(){
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GWT.log("Error saving the plan - PlanPresenter");
-				}
-
-				@Override
-				public void onSuccess(Long result) {
-					if(plan.getId() == null){
-						plan.setId(result);
-					}
-					GWT.log("Plan saved - PP");
-				}
-				
-			});
+			try {
+				func.call();
+				GWT.log(triggered);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
 		}else if(changeNameAsked == false){
 			changeNameAsked = true;
 			showSavePlanPopup();
@@ -1102,7 +1137,7 @@ ComplementaryValueView.Presenter{
 
 	public void confirmedDeleteSubject(SubjectValue sV) {
 		deleteSubject(sV);
-		planChanged("SubjectDelete");
+		planChanged(PlanCodes.CHANGE_BY_SUBJECT_DELETE);
 		warningDeleteSubjectView.hideIt();
 	}
 
@@ -1329,7 +1364,7 @@ ComplementaryValueView.Presenter{
 		}
 		
 		if(toSave == true){			
-			planChanged("NewSubjects");
+			planChanged(PlanCodes.CHANGE_BY_NEW_SUBJECTS);
 		}
 
 	}
@@ -1580,7 +1615,7 @@ ComplementaryValueView.Presenter{
 					}
 				}
 				if(save){					
-					planChanged("SemesterValues updated");
+					planChanged(PlanCodes.CHANGE_BY_SEMESTERVALUE_UPDATED);
 				}
 			}
 			
@@ -1949,7 +1984,7 @@ ComplementaryValueView.Presenter{
 			/***********************************************************/				
 			
 			//save the plan
-			planChanged("planCompleted");
+			planChanged(PlanCodes.CHANGE_BY_PLAN_COMPLETED);
 			
 		}
 		
@@ -2694,7 +2729,7 @@ ComplementaryValueView.Presenter{
 	@Override
 	public void planNameChanged(String s) {
 		plan.setName(s);
-		planChanged("NewName");
+		planChanged(PlanCodes.CHANGE_BY_NEW_NAME);
 		view.hidePopups();
 	}
 	
@@ -2726,12 +2761,15 @@ ComplementaryValueView.Presenter{
 			
 			grade = grade.trim().replaceAll(",", ".");
 			Double gradeDouble = null;
-			if(grade.isEmpty() == true) gradeDouble = new Double(0);
+			if(grade.isEmpty() == true) gradeDouble = null;
 			else gradeDouble = Double.valueOf(grade);
 			
-			if(sV != null && gradeDouble >= 0 && gradeDouble <= 5){
+			if(sV != null && ((gradeDouble >= 0 && gradeDouble <= 5) || gradeDouble == null)){
 				
-				if(gradeDouble == 0) sV.setTaken(false);
+				Double oldGrade = (sV.isTaken() ? sV.getGrade() : null);
+				Double newGrade = gradeDouble;
+				
+				if(gradeDouble == null) sV.setTaken(false);
 				else sV.setTaken(true);
 				
 				sV.setGrade(gradeDouble);
@@ -2751,7 +2789,7 @@ ComplementaryValueView.Presenter{
 					}
 				}	
 				
-				planChanged("NewGrade");
+				planChangedByGrade(oldGrade, newGrade, sV.getGroup());
 				
 			}
 		}
@@ -2760,6 +2798,19 @@ ComplementaryValueView.Presenter{
 
 	}
 	
+	private void planChangedByGrade(final Double oldGrade, final Double newGrade, final Group group) {
+		
+		Callable<Void> toSave = new Callable<Void>(){
+			public Void call(){				
+				rpcService.savePlanAndGrade(student, plan, group, oldGrade, newGrade, callbackOnPlanSave);
+				return null;
+			}
+		};
+		
+		savePlan(toSave, PlanCodes.CHANGE_BY_NEW_GRADE);
+		
+	}
+
 	@Override
 	public void onAccordionClicked(String subjectCode, final SubjectAccordionViewImpl accordion, final ComplementaryValueViewImpl view) {
 		

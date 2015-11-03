@@ -24,6 +24,7 @@ import com.somosun.plan.server.dao.CareerDao;
 import com.somosun.plan.server.dao.ComplementaryValueDao;
 import com.somosun.plan.server.dao.MessageDao;
 import com.somosun.plan.server.dao.PlanDao;
+import com.somosun.plan.server.dao.ScoreDao;
 import com.somosun.plan.server.dao.SemesterValueDao;
 import com.somosun.plan.server.dao.StudentDao;
 import com.somosun.plan.server.dao.SubjectDao;
@@ -37,10 +38,13 @@ import com.somosun.plan.shared.SiaResultSubjects;
 import com.somosun.plan.shared.SomosUNUtils;
 import com.somosun.plan.shared.control.Career;
 import com.somosun.plan.shared.control.ComplementaryValue;
+import com.somosun.plan.shared.control.Group;
 import com.somosun.plan.shared.control.Message;
 import com.somosun.plan.shared.control.Plan;
+import com.somosun.plan.shared.control.Score;
 import com.somosun.plan.shared.control.Semester;
 import com.somosun.plan.shared.control.SemesterValue;
+import com.somosun.plan.shared.control.SingleScore;
 import com.somosun.plan.shared.control.Student;
 import com.somosun.plan.shared.control.Subject;
 import com.somosun.plan.shared.control.SubjectGroup;
@@ -1175,6 +1179,41 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		}
 		
 		return toReturn;
+	}
+
+	@Override
+	public Long savePlanAndGrade(Student student, Plan plan, Group group, double oldGrade, double newGrade) {
+		
+		if(group != null || true){
+			//TODO updateGrade
+			/****** add the oldGrade and the newGrade with the group to a cron job *******/
+			
+			//in order to test the new classes
+//			Score score = new Score();
+//			SubjectDao subjectDao = new SubjectDao();
+//			score.setSubject(subjectDao.getByCode("1000004"));
+//			score.setTotalAverage(2.0);
+//			score.setTotalAmount(1);
+//			
+//			SingleScore singleScore = new SingleScore();
+//			singleScore.setAmount(1);
+//			singleScore.setAverage(2.0);
+//			
+//			SemesterValueDao sVDao = new SemesterValueDao();
+//			singleScore.setSemesterValue(sVDao.getCurrentSemester());
+//			
+			ScoreDao scoreDao = new ScoreDao();
+//			scoreDao.save(score);
+			
+			Score score = scoreDao.getById(new Long(23884));
+			
+			int x = 0;
+			
+		}else{
+			log.warning("savePlanAndGrade - A subject which has no group, the plan's id is " + plan.getId());
+		}
+		
+		return savePlan(student, plan);
 	}
 
 }

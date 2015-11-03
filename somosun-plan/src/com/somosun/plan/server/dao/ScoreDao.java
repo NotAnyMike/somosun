@@ -42,9 +42,13 @@ public class ScoreDao implements Dao<Score>{
 			}
 			score.setSubjectRef(Ref.create(score.getSubject()));
 			
+			ofy().save().entity(score).now();
+			
+			toReturn = score.getId();
 		}
 		
 		return toReturn;
+		
 	}
 
 	public Long generateId() {
