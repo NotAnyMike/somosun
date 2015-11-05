@@ -1184,7 +1184,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 	@Override
 	public Long savePlanAndGrade(Student student, Plan plan, Group group, double oldGrade, double newGrade) {
 		
-		if(group != null || true){
+		if(group != null){
 			//TODO updateGrade
 			/****** add the oldGrade and the newGrade with the group to a cron job *******/
 			
