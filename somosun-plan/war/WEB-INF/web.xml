@@ -21,16 +21,6 @@
 	</servlet-mapping>
 	
 	<servlet>
-		<servlet-name>ServletToTest</servlet-name>
-		<servlet-class>com.somosun.plan.server.cronJob.updateGradesCronJob</servlet-class>
-	</servlet>
-	
-	<servlet-mapping>
-		<servlet-name>ServletToTest</servlet-name>
-		<url-pattern>/cronJob/updateGrade</url-pattern>
-	</servlet-mapping>
-	
-	<servlet>
 		<servlet-name>LoginServiceImpl</servlet-name>
 		<servlet-class>com.somosun.plan.server.serviceImpl.LoginServiceImpl</servlet-class>
 	</servlet>

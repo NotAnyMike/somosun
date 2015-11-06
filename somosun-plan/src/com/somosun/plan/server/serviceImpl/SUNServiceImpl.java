@@ -16,6 +16,9 @@ import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Transaction;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.somosun.plan.client.index.service.SUNService;
@@ -1184,9 +1187,11 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 	@Override
 	public Long savePlanAndGrade(Student student, Plan plan, Group group, double oldGrade, double newGrade) {
 		
-		if(group != null){
+		if(group != null || true){
 			//TODO updateGrade
 			/****** add the oldGrade and the newGrade with the group to a cron job *******/
+			Queue q = QueueFactory.getQueue("updateSubjectGrade");
+			q.add(TaskOptions.Builder.withMethod(TaskOptions.Method.PULL).param("name", "test").param("grade", "test2"));
 			
 		}else{
 			log.warning("savePlanAndGrade - A subject which has no group, the plan's id is " + plan.getId());
