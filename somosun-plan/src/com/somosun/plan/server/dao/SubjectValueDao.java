@@ -28,6 +28,15 @@ public class SubjectValueDao implements Dao<SubjectValue> {
 	public Long save(SubjectValue sV){
 		Long toReturn = null;
 		if(sV != null){
+			
+			GroupDao groupDao = new GroupDao();
+			if(sV.getGroup() == null){
+				sV.setGroup(groupDao.getOrCreateGroup(sV.getComplementaryValue().getSubject(), null, null));
+			}
+			
+			if(sV.getGroup().getId() == null){
+				groupDao.save(sV.getGroup());
+			}
 
 			if(sV.getGrade() > 5 || sV.getGrade() < 0){
 				sV.setTaken(false);

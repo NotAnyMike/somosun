@@ -104,6 +104,6 @@ public interface SUNServiceAsync {
 	void getCompletePlanInfo(String careerCode,
 			AsyncCallback<CompletePlanInfo> callback);
 
-	void savePlanAndGrade(Student student, Plan plan, Group group, double oldGrade, double newGrade,
+	void savePlanAndGrade(Student student, Plan plan, Group group, Double oldGrade, Double newGrade,
 			AsyncCallback<Long> callback);
 }

@@ -2,7 +2,7 @@
 <cronentries>
 	<cron>
 		<url>/cronJob/updateGrade</url>
-		<schedule>every 3 mins</schedule>
+		<schedule>every 1 hours</schedule>
 		<target>grade-updater</target>
 	</cron>
 </cronentries>

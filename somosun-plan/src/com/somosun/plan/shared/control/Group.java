@@ -23,7 +23,7 @@ public class Group implements Serializable {
     @Index private Subject subject = null;
     @Index private Teacher teacher = null;
     @Index private SemesterValue semesterValue=null;
-    @Index private int groupNumber;
+    @Index private Integer groupNumber;
     @Index private int freePlaces;
     private int totalPlaces;
     private List<Block> schedule=null;

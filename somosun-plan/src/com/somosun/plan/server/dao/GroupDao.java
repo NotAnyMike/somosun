@@ -5,6 +5,7 @@ import java.util.List;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
+import com.googlecode.objectify.cmd.Query;
 import com.somosun.plan.shared.control.Group;
 import com.somosun.plan.shared.control.SemesterValue;
 import com.somosun.plan.shared.control.Subject;
@@ -45,8 +46,25 @@ public class GroupDao implements Dao<Group> {
 		return get(g.getSubject(), g.getSemesterValue(), g.getGroupNumber());
 	}
 
-	public Group get(Subject subject, SemesterValue semesterValue, int groupNumber){
-		return ofy().load().type(Group.class).filter("groupNumber", groupNumber).filter("subject.code", subject.getCode()).filter("semesterValue.year", semesterValue.getYear()).first().now();
+	public Group get(Subject subject, SemesterValue semesterValue, Integer groupNumber){
+		Group toReturn = null;
+		if(subject != null){			
+			Query<Group> query = ofy().load().type(Group.class).filter("groupNumber", groupNumber);
+			if(subject.getCode() == null){
+				query = query.filter("subject.id", subject.getId());
+			}else{
+				query = query.filter("subject.code", subject.getCode());
+			}
+			
+			if(semesterValue != null){				
+				query = query.filter("semesterValue.year", semesterValue.getYear());
+			}else{
+				query = query.filter("semesterValue", "null");
+			}
+			
+			toReturn = query.first().now();
+		}
+		return toReturn;
 	}
 	
 	/**
@@ -108,6 +126,7 @@ public class GroupDao implements Dao<Group> {
 		if(group == null){
 			group = new Group(subject, semesterValue, groupInt);
 			group.setId(generateId());
+			save(group);
 		}
 		
 		

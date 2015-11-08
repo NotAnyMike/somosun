@@ -28,7 +28,7 @@
     </retry-parameters>
   </queue>
   <queue>
-  	<name>updateSubjectGrade</name>
+  	<name>updateSubjectGradePullQueue</name>
   	<mode>pull</mode>
   	<retry-parameters>
   		<task-retry-limit>5</task-retry-limit>
