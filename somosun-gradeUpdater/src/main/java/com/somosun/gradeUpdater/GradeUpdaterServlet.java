@@ -8,8 +8,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import server.cronJob.GradeUpdaterCronJob;
-
 public class GradeUpdaterServlet extends HttpServlet{
 
 	private static Logger log = Logger.getLogger("GradeUpdaterCronJob [grade-updater]");
@@ -19,7 +17,7 @@ public class GradeUpdaterServlet extends HttpServlet{
 		log.info("hello there");
 		
 		//call some cron job 
-		GradeUpdaterCronJob.updateAllGrades();
+		//GradeUpdaterCronJob.updateAllGrades();
 	}
 
 }

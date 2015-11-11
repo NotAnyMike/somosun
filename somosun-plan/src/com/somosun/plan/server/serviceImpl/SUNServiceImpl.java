@@ -1192,9 +1192,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 			//TODO updateGrade
 			/****** add the oldGrade and the newGrade with the group to a cron job *******/
 			Queue q = QueueFactory.getQueue("updateSubjectGradePullQueue");
-			q.add(TaskOptions.Builder.withMethod(TaskOptions.Method.PULL).param("old-grade", (oldGrade == null ? "" : oldGrade.toString())).param("new-grade", (newGrade == null ? "" : newGrade.toString())).param("group-id", "" +  group.getId()));
-			q.add(TaskOptions.Builder.withMethod(TaskOptions.Method.PULL).param("old-grade", (oldGrade == null ? "" : oldGrade.toString())).param("new-grade", (newGrade == null ? "" : newGrade.toString())).param("group-id", "" +  group.getId()));
-			q.add(TaskOptions.Builder.withMethod(TaskOptions.Method.PULL).param("old-grade", (oldGrade == null ? "" : oldGrade.toString())).param("new-grade", (newGrade == null ? "" : newGrade.toString())).param("group-id", "" +  group.getId()));
+			q.add(TaskOptions.Builder.withMethod(TaskOptions.Method.PULL).param("old-grade", (oldGrade == null ? "" : oldGrade.toString())).param("new-grade", (newGrade == null ? "" : newGrade.toString())).param("group-id", "" +  group.getId()).param("subject-id", "" + group.getSubject().getId()));
 			GradeUpdaterCronJob.updateAllGrades();
 		}else{
 			log.warning("savePlanAndGrade - A subject which has no group, the plan's id is " + plan.getId());

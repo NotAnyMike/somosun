@@ -49,11 +49,4 @@
 		<nature>org.eclipse.wst.common.project.facet.core.nature</nature>
 		<nature>org.eclipse.wst.jsdt.core.jsNature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>plan</name>
-			<type>2</type>
-			<location>/Users/Mike/Documents/Mike/Documents/Projets-Mars/somosun/somosun-plan/src/com/somosun/plan</location>
-		</link>
-	</linkedResources>
 </projectDescription>

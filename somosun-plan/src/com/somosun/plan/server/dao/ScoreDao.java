@@ -7,6 +7,7 @@ import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;import com.googlecode.objectify.Ref;
 import com.somosun.plan.shared.control.Score;
 import com.somosun.plan.shared.control.SingleScore;
+import com.somosun.plan.shared.control.Subject;
 
 public class ScoreDao implements Dao<Score>{
 	
@@ -79,6 +80,18 @@ public class ScoreDao implements Dao<Score>{
 		}
 		
 		return toReturn;
+	}
+
+	public Score getBySubjectId(Long subjectId) {
+		
+		Score toReturn = null;
+		
+		if(subjectId != null){
+			toReturn = (Score) ofy().load().type(Score.class).filter("subjectRef", Ref.create(Key.create(Subject.class, subjectId))).first().now();
+		}
+		
+		return toReturn;
+
 	}
 
 }

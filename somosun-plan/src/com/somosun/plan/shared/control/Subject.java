@@ -27,6 +27,7 @@ public class Subject implements Serializable{
     @Index private String code = null;   
     @Index private String siaCode = null;
     private String location = null;
+    private Double averageGrade = null; 
     private boolean isApprovenType = false;
     /**
      * A special subject is a kind of subject that will NOT be shown as a subject in the planPresenter, but still need to be a subject. e.g. "80% de los créditos de..."
@@ -200,6 +201,14 @@ public class Subject implements Serializable{
 
 	public void setApprovenType(boolean isApprovenType) {
 		this.isApprovenType = isApprovenType;
+	}
+
+	public Double getAverageGrade() {
+		return averageGrade;
+	}
+
+	public void setAverageGrade(Double averageGrade) {
+		this.averageGrade = averageGrade;
 	}
 }
    

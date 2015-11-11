@@ -2764,7 +2764,7 @@ ComplementaryValueView.Presenter{
 			if(grade.isEmpty() == true) gradeDouble = null;
 			else gradeDouble = Double.valueOf(grade);
 			
-			if(sV != null && ((gradeDouble >= 0 && gradeDouble <= 5) || gradeDouble == null)){
+			if(sV != null && (gradeDouble == null || (gradeDouble >= 0 && gradeDouble <= 5))){
 				
 				Double oldGrade = (sV.isTaken() ? sV.getGrade() : null);
 				Double newGrade = gradeDouble;

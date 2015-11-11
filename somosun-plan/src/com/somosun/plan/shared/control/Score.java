@@ -20,7 +20,7 @@ public class Score implements Serializable {
 	@Ignore private Teacher teacher = null;
 	@Index @Load private Ref<Subject> subjectRef = null;
 	@Ignore private Subject subject = null;
-	@Index private Double totalAverage = null;
+	@Index private double totalAverage = 0.0;
 	private int totalAmount = 0;
 	@Load private List<Ref<SingleScore>> scoresRef = null;
 	@Ignore private List<SingleScore> scores = null;
@@ -71,7 +71,7 @@ public class Score implements Serializable {
 		return totalAverage;
 	}
 
-	public void setTotalAverage(Double totalAverage) {
+	public void setTotalAverage(double totalAverage) {
 		this.totalAverage = totalAverage;
 	}
 
