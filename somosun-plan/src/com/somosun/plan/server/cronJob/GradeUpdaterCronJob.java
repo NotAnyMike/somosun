@@ -14,6 +14,7 @@ import com.somosun.plan.server.dao.ScoreDao;
 import com.somosun.plan.server.dao.SubjectDao;
 import com.somosun.plan.server.dummy.GradeDummy;
 import com.somosun.plan.shared.SomosUNUtils;
+import com.somosun.plan.shared.control.Group;
 import com.somosun.plan.shared.control.Score;
 import com.somosun.plan.shared.control.Subject;
 
@@ -32,15 +33,17 @@ public class GradeUpdaterCronJob {
 				
 				String oldGradeString = task.extractParams().get(0).getValue();
 				String newGradeString = task.extractParams().get(1).getValue();
+				String professorIdString = task.extractParams().get(3).getValue();
+				String semesterString = task.extractParams().get(4).getValue();
 				
 				Double oldGrade = (oldGradeString.isEmpty() ? null : Double.valueOf(oldGradeString));
 				Double newGrade = (newGradeString.isEmpty() ? null : Double.valueOf(newGradeString));
-				Long groupId = Long.valueOf(task.extractParams().get(2).getValue());
-				Long subjectId = Long.valueOf(task.extractParams().get(3).getValue());
+				Long subjectId = Long.valueOf(task.extractParams().get(2).getValue());
+				Long professorId = (professorIdString.isEmpty() ? null : Long.valueOf(professorIdString));
+				Double semester = (semesterString.isEmpty() ? null : Double.valueOf(semesterString));
 				
-				list.add(new GradeDummy(oldGrade, newGrade, groupId, subjectId));
+				list.add(new GradeDummy(oldGrade, newGrade, subjectId, professorId, semester));
 				
-				log.info("old-grade:" + oldGrade + " and new-grade: " + newGrade + " and group-id: " + groupId + " and subject-id: " + subjectId);
 			} catch (UnsupportedEncodingException | UnsupportedOperationException e) {
 				e.printStackTrace();
 				log.warning("Error while reading the parameters of the task from the pull queue: " + e.toString());
@@ -117,10 +120,57 @@ public class GradeUpdaterCronJob {
 						subjectDao.save(score.getSubject());
 						
 						//sort by group
-						listWithSameSubject = GradeDummy.sortByGroupId(listWithSameSubject);
+						listWithSameSubject = GradeDummy.sortByProfessorId(listWithSameSubject);
 						
 						//repeat this loop and deal with specific groups
-						//TODO
+						List<GradeDummy> listWithSameProfessor = new ArrayList<GradeDummy>();
+						for(GradeDummy gradeDummy2 : listWithSameSubject){
+							if(gradeDummy.getSubjectId().equals(lastSubjectId) == false || listWithSameSubject.size() == listWithSameSubject.indexOf(gradeDummy)+1) {
+								if(listWithSameProfessor.isEmpty() == false){
+									/******* <do the stuff for grades with the subject and the professor even if it is null> *********/
+									
+									int amount2 = 0;
+									Double grade2 = null;
+									int oldAmount2 = 0;
+									Double oldGrade2 = 0.0;
+									//get the score with this professor
+									//get the new amount and new grade
+									for(GradeDummy gradeDummy_temporary : listWithSameProfessor){
+										if(gradeDummy_temporary.getOldGrade() != null) {
+											if(gradeDummy_temporary.getOldGrade() >= 0 && gradeDummy_temporary.getOldGrade() <= 5){									
+												oldAmount2++;
+												oldGrade2 += gradeDummy_temporary.getOldGrade() ;
+											}
+										}
+										if(gradeDummy_temporary.getNewGrade() != null) {
+											if(gradeDummy_temporary.getNewGrade() >= 0 && gradeDummy_temporary.getNewGrade() <= 5){									
+												amount2 ++;
+												grade2 += gradeDummy_temporary.getNewGrade();
+											}
+										}
+									}
+									
+									//TODO Edit the grade in the grade entity
+									
+									 /*
+									  * Update the grade for all groups with have this professor and this subject if not null
+									  */
+									List<Group> groups = groupDao.getGroups(listWithSameProfessor.get(0).getSubjectId(), listWithSameProfessor.get(0).getProfessorId());
+									for(Group g : groups){
+										g.setAverageGrade(grade2);
+										groupDao.save(g);
+									}
+									
+									
+									//TODO repeat the loop but sorted by semester
+									
+									/******* </do the stuff for grades with the subject and the professor even if it is null> ********/
+								}
+								
+								listWithSameProfessor = new ArrayList<GradeDummy>();
+							}
+							listWithSameProfessor.add(gradeDummy2);
+						}
 						
 						scoreDao.save(score);
 					}

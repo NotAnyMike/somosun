@@ -1192,7 +1192,9 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 			//TODO updateGrade
 			/****** add the oldGrade and the newGrade with the group to a cron job *******/
 			Queue q = QueueFactory.getQueue("updateSubjectGradePullQueue");
-			q.add(TaskOptions.Builder.withMethod(TaskOptions.Method.PULL).param("old-grade", (oldGrade == null ? "" : oldGrade.toString())).param("new-grade", (newGrade == null ? "" : newGrade.toString())).param("group-id", "" +  group.getId()).param("subject-id", "" + group.getSubject().getId()));
+			String professorId = (group.getTeacher() == null ? "" : "" + group.getTeacher().getIdSun());
+			String semester = (group.getSemesterValue() == null ? "" : group.getSemesterValue().toStringDouble().toString());
+			q.add(TaskOptions.Builder.withMethod(TaskOptions.Method.PULL).param("old-grade", (oldGrade == null ? "" : oldGrade.toString())).param("new-grade", (newGrade == null ? "" : newGrade.toString())).param("subject-id", "" + group.getSubject().getId()).param("professor-id", professorId).param("semester", semester));
 			GradeUpdaterCronJob.updateAllGrades();
 		}else{
 			log.warning("savePlanAndGrade - A subject which has no group, the plan's id is " + plan.getId());

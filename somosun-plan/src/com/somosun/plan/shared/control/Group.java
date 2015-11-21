@@ -4,9 +4,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
+import com.googlecode.objectify.annotation.OnLoad;
 
 /**
  *
@@ -20,8 +23,10 @@ public class Group implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	@Id private Long id=null;
-    @Index private Subject subject = null;
-    @Index private Teacher teacher = null;
+	@Index private Ref<Subject> subjectRef = null;
+    @Ignore private Subject subject = null;
+    @Index private Ref<Teacher> teacherRef = null;
+    @Ignore private Teacher teacher = null;
     @Index private SemesterValue semesterValue=null;
     @Index private Integer groupNumber;
     @Index private int freePlaces;
@@ -51,6 +56,11 @@ public class Group implements Serializable {
         setCareers(new ArrayList<Career>());
 	}
     
+    @OnLoad
+    private void onLoad(){
+    	if(getSubjectRef() != null) subject = subjectRef.get();
+    	if(getTeacherRef() != null) teacher = teacherRef.get();
+    }
 
 	/**
      * Two groups will be the same group if the subject,
@@ -199,6 +209,22 @@ public class Group implements Serializable {
 
 	public void setAverageGrade(Double grade) {
 		this.averageGrade = grade;
+	}
+
+	public Ref<Subject> getSubjectRef() {
+		return subjectRef;
+	}
+
+	public void setSubjectRef(Ref<Subject> subjectRef) {
+		this.subjectRef = subjectRef;
+	}
+
+	public Ref<Teacher> getTeacherRef() {
+		return teacherRef;
+	}
+
+	public void setTeacherRef(Ref<Teacher> teacherRef) {
+		this.teacherRef = teacherRef;
 	}
 
 }

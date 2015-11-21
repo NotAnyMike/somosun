@@ -5,10 +5,12 @@ import java.util.List;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
+import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.cmd.Query;
 import com.somosun.plan.shared.control.Group;
 import com.somosun.plan.shared.control.SemesterValue;
 import com.somosun.plan.shared.control.Subject;
+import com.somosun.plan.shared.control.Teacher;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
@@ -21,6 +23,26 @@ public class GroupDao implements Dao<Group> {
 	public Long save(Group g){
 		Long toReturn = null; 
 		if(g != null) {
+			if(g.getSubject() != null){
+				if(g.getSubject().getId() == null){
+					SubjectDao subjectDao = new SubjectDao();
+					g.getSubject().setId(subjectDao.save(g.getSubject()));
+				}
+				g.setSubjectRef(Ref.create(g.getSubject()));
+			}else{
+				g.setSubjectRef(null);
+			}
+			
+			if(g.getTeacher() != null){
+				if(g.getTeacher().getIdSun() != null){
+					TeacherDao teacherDao = new TeacherDao();
+					g.getTeacher().setIdSun(teacherDao.save(g.getTeacher()));
+				}
+				g.setTeacherRef(Ref.create(g.getTeacher()));
+			}else{
+				g.setTeacherRef(null);
+			}
+			
 			ofy().save().entity(g).now();
 			toReturn = g.getId();
 		}
@@ -37,8 +59,9 @@ public class GroupDao implements Dao<Group> {
 	}
 
 	public List<Group> getGroups(Subject subject) {
-		//return ofy().load().type(Group.class).filter("subject", subject).list();
-		if(subject.getId() != null)	return ofy().load().type(Group.class).filter("subject.code", subject.getCode()).list();
+		if(subject != null && subject.getId() != null){
+			return ofy().load().type(Group.class).filter("subjectRef", Ref.create(subject)).list();
+		}
 		else return null;
 	}
 	
@@ -46,14 +69,19 @@ public class GroupDao implements Dao<Group> {
 		return get(g.getSubject(), g.getSemesterValue(), g.getGroupNumber());
 	}
 
+	/**
+	 * The subject must have an id not null
+	 * @param subject
+	 * @param semesterValue
+	 * @param groupNumber
+	 * @return
+	 */
 	public Group get(Subject subject, SemesterValue semesterValue, Integer groupNumber){
 		Group toReturn = null;
 		if(subject != null){			
 			Query<Group> query = ofy().load().type(Group.class).filter("groupNumber", groupNumber);
-			if(subject.getCode() == null){
-				query = query.filter("subject.id", subject.getId());
-			}else{
-				query = query.filter("subject.code", subject.getCode());
+			if(subject.getId() != null){
+				query = query.filter("subjectRef", Ref.create(subject));
 			}
 			
 			if(semesterValue != null){				
@@ -138,6 +166,35 @@ public class GroupDao implements Dao<Group> {
 		for(Group g : list){
 			delete(g);
 		}
+	}
+
+	public List<Group> getGroups(Long subjectId, Long professorId) {
+		List<Group> toReturn = null;
+		
+		if(subjectId != null && professorId != null){			
+			SubjectDao subjectDao = new SubjectDao();
+			Subject s = subjectDao.getById(subjectId);
+			if(s != null){				
+				Query q = ofy().load().type(Group.class).filter("subjectRef", Ref.create(s));
+				
+				TeacherDao teacherDao = new TeacherDao();
+				Teacher teacher = teacherDao.getById(professorId);
+				
+				if(teacher != null){
+					List<Group> notToReturn = q.filter("professorRef", teacher).list();
+					
+					if(notToReturn != null && notToReturn.isEmpty() == false){
+						for(Group g : notToReturn){
+							toReturn.add(g);
+						}
+					}
+				}
+				
+			}
+		}
+		
+		
+		return toReturn;
 	}
 	
 }

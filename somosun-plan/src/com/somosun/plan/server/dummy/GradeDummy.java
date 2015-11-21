@@ -7,14 +7,17 @@ public class GradeDummy {
 
 	private Double oldGrade = null;
 	private Double newGrade = null;
-	private Long groupId = null;
 	private Long subjectId = null;
+	private Long professorId = null;
+	private Double semesterNumber = null;
 	
-	public GradeDummy(Double oldGrade, Double newGrade, Long groupId, Long subjectId) {
+	public GradeDummy(Double oldGrade, Double newGrade, Long subjectId, Long professorId, Double semesterNumber) {
+		super();
 		this.oldGrade = oldGrade;
 		this.newGrade = newGrade;
-		this.groupId = groupId;
 		this.subjectId = subjectId;
+		this.professorId = professorId;
+		this.semesterNumber = semesterNumber;
 	}
 	
 	public Double getOldGrade() {
@@ -29,12 +32,6 @@ public class GradeDummy {
 	public void setNewGrade(Double newGrade) {
 		this.newGrade = newGrade;
 	}
-	public Long getGroupId() {
-		return groupId;
-	}
-	public void setGroupId(Long groupId) {
-		this.groupId = groupId;
-	}
 	public Long getSubjectId() {
 		return subjectId;
 	}
@@ -43,14 +40,20 @@ public class GradeDummy {
 	}
 	
 	public static List<GradeDummy> sortBySubjectId(List<GradeDummy> originalList){
-		return sortByCallable(true, originalList);
+		return sortByCallable(0, originalList);
 	}
 	
-	public static List<GradeDummy> sortByGroupId(List<GradeDummy> originalList){
-		return sortByCallable(false, originalList);
+	public static List<GradeDummy> sortByProfessorId(List<GradeDummy> originalList){
+		return sortByCallable(1, originalList);
 	}
 	
-	public static List<GradeDummy> sortByCallable(boolean subjectId, List<GradeDummy> originalList){
+	/**
+	 * 
+	 * @param type: 0 = sort by subjectId, 1 = sort by professorID, 2 = sortBySemester
+	 * @param originalList
+	 * @return
+	 */
+	private static List<GradeDummy> sortByCallable(int type, List<GradeDummy> originalList){
 		/*
 		 * 1. Divide the list in two
 		 * 2. Send recursively both to this method only if the list contains more than one entry
@@ -71,8 +74,8 @@ public class GradeDummy {
 				else listTwo.add(originalList.get(x));
 			}
 			
-			if(listOne.isEmpty() == false && listOne.size() != 1) listOne = sortByCallable(subjectId, listOne);
-			if(listTwo.isEmpty() == false && listTwo.size() != 1) listTwo = sortByCallable(subjectId, listTwo);
+			if(listOne.isEmpty() == false && listOne.size() != 1) listOne = sortByCallable(type, listOne);
+			if(listTwo.isEmpty() == false && listTwo.size() != 1) listTwo = sortByCallable(type, listTwo);
 			
 			int one = 0;
 			int two = 0;
@@ -81,8 +84,8 @@ public class GradeDummy {
 						(listOne.size() > one) && 
 						(listTwo.size() <= two ||
 						(
-								(listOne.get(one).getSubjectId() >= listTwo.get(two).getSubjectId() && subjectId == true) ||
-								(listOne.get(one).getGroupId() >= listTwo.get(two).getGroupId() && subjectId == false)
+								(listOne.get(one).getSubjectId() >= listTwo.get(two).getSubjectId() && type == 0) ||
+								(listOne.get(one).getProfessorId() >= listTwo.get(two).getProfessorId() && type == 1)
 								))) {
 					listToReturn.add(listOne.get(one));
 					one++;
@@ -95,6 +98,18 @@ public class GradeDummy {
 		}
 		
 		return listToReturn;
+	}
+	public Long getProfessorId() {
+		return professorId;
+	}
+	public void setProfessorId(Long professorId) {
+		this.professorId = professorId;
+	}
+	public Double getSemesterNumber() {
+		return semesterNumber;
+	}
+	public void setSemesterNumber(Double semesterNumber) {
+		this.semesterNumber = semesterNumber;
 	}
 	
 }
