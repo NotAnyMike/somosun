@@ -5,7 +5,6 @@ import java.util.List;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
-import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.cmd.Query;
 import com.somosun.plan.shared.control.Group;
 import com.somosun.plan.shared.control.SemesterValue;
@@ -28,9 +27,9 @@ public class GroupDao implements Dao<Group> {
 					SubjectDao subjectDao = new SubjectDao();
 					g.getSubject().setId(subjectDao.save(g.getSubject()));
 				}
-				g.setSubjectRef(Ref.create(g.getSubject()));
+				//g.setSubjectRef(Ref.create(g.getSubject()));
 			}else{
-				g.setSubjectRef(null);
+				//g.setSubjectRef(null);
 			}
 			
 			if(g.getTeacher() != null){
@@ -38,9 +37,9 @@ public class GroupDao implements Dao<Group> {
 					TeacherDao teacherDao = new TeacherDao();
 					g.getTeacher().setIdSun(teacherDao.save(g.getTeacher()));
 				}
-				g.setTeacherRef(Ref.create(g.getTeacher()));
+				//g.setTeacherRef(Ref.create(g.getTeacher()));
 			}else{
-				g.setTeacherRef(null);
+				//g.setTeacherRef(null);
 			}
 			
 			ofy().save().entity(g).now();
@@ -60,7 +59,7 @@ public class GroupDao implements Dao<Group> {
 
 	public List<Group> getGroups(Subject subject) {
 		if(subject != null && subject.getId() != null){
-			return ofy().load().type(Group.class).filter("subjectRef", Ref.create(subject)).list();
+			return ofy().load().type(Group.class).filter("subject.code", subject.getCode()).list();
 		}
 		else return null;
 	}
@@ -81,7 +80,7 @@ public class GroupDao implements Dao<Group> {
 		if(subject != null){			
 			Query<Group> query = ofy().load().type(Group.class).filter("groupNumber", groupNumber);
 			if(subject.getId() != null){
-				query = query.filter("subjectRef", Ref.create(subject));
+				query = query.filter("subject.code", subject.getCode());
 			}
 			
 			if(semesterValue != null){				
@@ -175,13 +174,13 @@ public class GroupDao implements Dao<Group> {
 			SubjectDao subjectDao = new SubjectDao();
 			Subject s = subjectDao.getById(subjectId);
 			if(s != null){				
-				Query q = ofy().load().type(Group.class).filter("subjectRef", Ref.create(s));
+				Query q = ofy().load().type(Group.class).filter("subject.code", s.getCode());
 				
 				TeacherDao teacherDao = new TeacherDao();
 				Teacher teacher = teacherDao.getById(professorId);
 				
 				if(teacher != null){
-					List<Group> notToReturn = q.filter("professorRef", teacher).list();
+					List<Group> notToReturn = q.filter("username", teacher.getUsername()).list();
 					
 					if(notToReturn != null && notToReturn.isEmpty() == false){
 						for(Group g : notToReturn){
