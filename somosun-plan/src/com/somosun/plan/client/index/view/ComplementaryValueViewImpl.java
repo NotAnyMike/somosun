@@ -40,6 +40,7 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 
 	PlanPresenter presenter;
 	
+	@UiField Label labelGrade;
 	@UiField Label labelSubjectGroup;
 	@UiField VerticalPanel preRequisitesPanel;
 	@UiField VerticalPanel coRequisitesPanel;
@@ -152,6 +153,11 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 	
 	public void setSubjectGroupName(String s) {
 		labelSubjectGroup.setText("Agrupación: " + s);
+	}
+	
+	public void setGrade(Double grade){
+		if(grade == null) labelGrade.setText("Nota promedio: -");
+		else labelGrade.setText("Nota promedio: " + grade.toString());
 	}
 	
 	public void addRequisite(String type, final String name, final String code, final String careerCode, final SubjectAccordionViewImpl accordion, boolean makeStatic, boolean makeUnavailable) {

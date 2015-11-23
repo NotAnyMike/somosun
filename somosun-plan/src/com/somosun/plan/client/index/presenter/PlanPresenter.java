@@ -1174,6 +1174,7 @@ ComplementaryValueView.Presenter{
 			ComplementaryValueViewImpl complementaryValueView = new ComplementaryValueViewImpl(s.getName(), s.getCode(), accordion, searchSubjectView.getSubjectsAmmount(), 0);
 			complementaryValueView.setPresenter(this);
 			complementaryValueView.setSubjectGroupName("-");
+			complementaryValueView.setGrade(null);
 			
 			//mapAccordion.put(accordion, complementaryValueView);
 			accordion.addComplementaryView(complementaryValueView);
@@ -1452,11 +1453,16 @@ ComplementaryValueView.Presenter{
 			
 			String subjectGroupName = null;
 			if(complementaryValue != null && complementaryValue.getSubjectGroup() != null){			
-				subjectGroupName =complementaryValue.getSubjectGroup().getName();
+				subjectGroupName = complementaryValue.getSubjectGroup().getName();
 			}else{
 				subjectGroupName = "Desconocido";
 			}
+			
+			GWT.debugger();
+			Double grade = complementaryValue.getSubject().getAverageGrade();
+			
 			cVView.setSubjectGroupName(subjectGroupName);
+			cVView.setGrade(grade);
 			
 			if(complementaryValue.getSubject().isDummy()){ //|| complementaryValue.getSubject().isDefault() || complementaryValue.getSubject().isDummy()){
 				cVView.showUnavailableWarning();
