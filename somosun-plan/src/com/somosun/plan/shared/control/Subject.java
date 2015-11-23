@@ -22,6 +22,7 @@ public class Subject implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	@Id private Long id = null;
+	@Index private Long idCopy = null;
     private int credits = 0;
     @Index private String name = null;
     @Index private String code = null;   
@@ -156,6 +157,7 @@ public class Subject implements Serializable{
 
 	public void setId(Long id) {
 		this.id = id;
+		this.idCopy = id;
 	}
 
 	/**

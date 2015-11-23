@@ -129,6 +129,8 @@ public class GradeUpdaterCronJob {
 								if(listWithSameProfessor.isEmpty() == false){
 									/******* <do the stuff for grades with the subject and the professor even if it is null> *********/
 									
+									Score score2 = scoreDao.getBySubjectAndProfesor(listWithSameProfessor.get(0).getSubjectId(), listWithSameProfessor.get(0).getProfessorId());
+									
 									int amount2 = 0;
 									Double grade2 = null;
 									int oldAmount2 = 0;
@@ -150,19 +152,59 @@ public class GradeUpdaterCronJob {
 										}
 									}
 									
-									//TODO Edit the grade in the grade entity
+									//Edit the grade in the grade entity
+									score2.setTotalAverage((score2.getTotalAverage()*score2.getTotalAmount() + grade2 - oldGrade2)/(score2.getTotalAmount() + amount2 - oldAmount2));
+									score2.setTotalAmount(score2.getTotalAmount() + amount2 - oldAmount2);
+									scoreDao.save(score2);
 									
 									 /*
-									  * Update the grade for all groups with have this professor and this subject if not null
+									  * Update the grade for all groups which have this professor and this subject if not null
 									  */
 									List<Group> groups = groupDao.getGroups(listWithSameProfessor.get(0).getSubjectId(), listWithSameProfessor.get(0).getProfessorId());
 									for(Group g : groups){
-										g.setAverageGrade(grade2);
+										g.setAverageGrade(score2.getTotalAverage());
 										groupDao.save(g);
 									}
 									
-									
-									//TODO repeat the loop but sorted by semester
+									listWithSameProfessor = GradeDummy.sortBySemester(listWithSameProfessor);
+									//repeat the loop but sorted by semester
+									int amount3 = 0;
+									int amountOld3 = 0;
+									double grade3 = 0.0;
+									double gradeOld3 = 0.0;
+									for(int pos = 0; pos < listWithSameProfessor.size(); pos ++){
+										if(pos == listWithSameProfessor.size() -1 || (pos > 0 && listWithSameProfessor.get(pos).getSemesterNumber() != listWithSameProfessor.get(pos-1).getSemesterNumber())){
+											
+											if(pos == listWithSameProfessor.size()-1){
+												if(listWithSameProfessor.get(pos).getNewGrade() != null) {
+													amount++;
+													grade3 += listWithSameProfessor.get(pos).getNewGrade();
+												}
+												if(listWithSameProfessor.get(pos).getOldGrade() != null) {
+													amountOld++;
+													gradeOld3 += listWithSameProfessor.get(pos).getOldGrade();
+												}
+											}
+											
+											//Do something with the this semester
+											score2.getSemester(listWithSameProfessor.get(pos).getSemesterNumber()).sumToAmountAndAverage(amount3 - amountOld3, grade3 - gradeOld3);
+											
+											amount3 = 0;
+											amountOld3 = 0;
+											grade3 = 0.0;
+											gradeOld3 = 0.0;
+											
+										}
+										if(listWithSameProfessor.get(pos).getNewGrade() != null) {
+											amount++;
+											grade3 += listWithSameProfessor.get(pos).getNewGrade();
+										}
+										if(listWithSameProfessor.get(pos).getOldGrade() != null) {
+											amountOld++;
+											gradeOld3 += listWithSameProfessor.get(pos).getOldGrade();
+										}
+									}
+									scoreDao.save(score2);
 									
 									/******* </do the stuff for grades with the subject and the professor even if it is null> ********/
 								}

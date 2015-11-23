@@ -15,17 +15,17 @@ public class SingleScoreDao implements Dao<SingleScore> {
 		if(singleScore != null){
 			if(singleScore.getId() == null) singleScore.setId(generateId());
 			
-			if(singleScore.getSemesterValue() != null && singleScore.getSemesterValue().getId() == null){
+			if(singleScore.getSemesterValue() != null){
 				SemesterValueDao sVDao = new SemesterValueDao();
-				singleScore.getSemesterValue().setId(sVDao.generateId());
+				if(singleScore.getSemesterValue().getId() == null) singleScore.getSemesterValue().setId(sVDao.generateId());
 				sVDao.save(singleScore.getSemesterValue());
 			}
 			
-			if(singleScore.getSemesterValue() != null){				
-				singleScore.setSemesterValueRef(Ref.create(singleScore.getSemesterValue()));
-			}else{
-				singleScore.setSemesterValueRef(null);
-			}
+//			if(singleScore.getSemesterValue() != null){				
+//				singleScore.setSemesterValueRef(Ref.create(singleScore.getSemesterValue()));
+//			}else{
+//				singleScore.setSemesterValueRef(null);
+//			}
 			
 			ofy().save().entity(singleScore).now();
 			toReturn = singleScore.getId();

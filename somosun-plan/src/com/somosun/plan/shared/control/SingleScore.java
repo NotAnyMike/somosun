@@ -14,17 +14,17 @@ import com.googlecode.objectify.annotation.OnLoad;
 public class SingleScore implements Serializable{
 
 	@Id private Long id = null;
-	@Load @Index private Ref<SemesterValue> semesterValueRef = null;
-	@Ignore private SemesterValue semesterValue = null;
+//	@Load @Index private Ref<SemesterValue> semesterValueRef = null;
+	@Index private SemesterValue semesterValue = null;
 	private Double average = null;
 	private int amount = 0;
 	
 	public SingleScore(){}
 	
-	@OnLoad
-	private void onLoad(){
-		semesterValue = semesterValueRef.get();
-	}
+//	@OnLoad
+//	private void onLoad(){
+//		semesterValue = semesterValueRef.get();
+//	}
 
 	public SemesterValue getSemesterValue() {
 		return semesterValue;
@@ -58,13 +58,15 @@ public class SingleScore implements Serializable{
 		this.id = id;
 	}
 
-	public Ref<SemesterValue> getSemesterValueRef() {
-		return semesterValueRef;
+	/**
+	 * 
+	 * @param amountToAdd
+	 * @param averageToAdd
+	 */
+	public void sumToAmountAndAverage(int amountToAdd, double averageAgregatedToAdd) {
+		setAverage((getAverage()*getAmount() + averageAgregatedToAdd)/(getAmount() + amountToAdd));
+		setAmount(getAmount() + amountToAdd);
+		
 	}
-
-	public void setSemesterValueRef(Ref<SemesterValue> semesterValueRef) {
-		this.semesterValueRef = semesterValueRef;
-	}
-	
 	
 }

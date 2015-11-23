@@ -16,32 +16,32 @@ import com.googlecode.objectify.annotation.OnLoad;
 public class Score implements Serializable {
 
 	@Id private Long id = null;
-	@Index @Load private Ref<Teacher> teacherRef = null;
-	@Ignore private Teacher teacher = null;
-	@Index @Load private Ref<Subject> subjectRef = null;
-	@Ignore private Subject subject = null;
+//	@Index @Load private Ref<Teacher> teacherRef = null;
+//	@Index @Load private Ref<Subject> subjectRef = null;
+//	@Load private List<Ref<SingleScore>> scoresRef = null;
+	@Index private Teacher teacher = null;
+	@Index private Subject subject = null;
 	@Index private double totalAverage = 0.0;
 	private int totalAmount = 0;
-	@Load private List<Ref<SingleScore>> scoresRef = null;
-	@Ignore private List<SingleScore> scores = null;
+	@Index private List<SingleScore> scores = null;
 	
 	public Score(){}
 	
-	@OnLoad
-	private void onLoad(){
-		
-		if(scoresRef != null && scoresRef.isEmpty() == false){
-			setScores(new ArrayList<SingleScore>());
-			for(Ref<SingleScore> ref : scoresRef){
-				SingleScore sS = ref.get();
-				if(sS != null) getScores().add(sS);
-			}
-		}
-		
-		if(teacherRef != null) teacher = teacherRef.get();
-		
-		subject = subjectRef.get();
-	}
+//	@OnLoad
+//	private void onLoad(){
+//		
+//		if(scoresRef != null && scoresRef.isEmpty() == false){
+//			setScores(new ArrayList<SingleScore>());
+//			for(Ref<SingleScore> ref : scoresRef){
+//				SingleScore sS = ref.get();
+//				if(sS != null) getScores().add(sS);
+//			}
+//		}
+//		
+//		if(teacherRef != null) teacher = teacherRef.get();
+//		
+//		subject = subjectRef.get();
+//	}
 
 	public Long getId() {
 		return id;
@@ -89,32 +89,24 @@ public class Score implements Serializable {
 
 	public void setScores(List<SingleScore> scores) {
 		this.scores = scores;
-		scoresRef = new ArrayList<Ref<SingleScore>>();
-		for(SingleScore sS : scores){
-			scoresRef.add(Ref.create(sS));
-		}
 	}
 	
 	public void addSingleScore(SingleScore singleScore){
-		if(scoresRef == null) scoresRef = new ArrayList<Ref<SingleScore>>();
 		if(scores == null) scores = new ArrayList<SingleScore>();
 		scores.add(singleScore);
-		scoresRef.add(Ref.create(singleScore));
 	}
 
-	public Ref<Teacher> getTeacherRef() {
-		return teacherRef;
+	public SingleScore getSemester(Double semesterNumber) {
+		SingleScore toReturn = null;
+		
+		for(SingleScore singleScore : scores){
+			if(singleScore.getSemesterValue().toStringDouble().equals(semesterNumber.toString())){
+				toReturn = singleScore;
+				break;
+			}
+		}
+		
+		return toReturn;
 	}
 
-	public void setTeacherRef(Ref<Teacher> teacherRef) {
-		this.teacherRef = teacherRef;
-	}
-
-	public Ref<Subject> getSubjectRef() {
-		return subjectRef;
-	}
-
-	public void setSubjectRef(Ref<Subject> subjectRef) {
-		this.subjectRef = subjectRef;
-	}
 }

@@ -47,6 +47,10 @@ public class GradeDummy {
 		return sortByCallable(1, originalList);
 	}
 	
+	public static List<GradeDummy> sortBySemester(List<GradeDummy> originalList){
+		return sortByCallable(2, originalList);
+	}
+	
 	/**
 	 * 
 	 * @param type: 0 = sort by subjectId, 1 = sort by professorID, 2 = sortBySemester
@@ -85,7 +89,8 @@ public class GradeDummy {
 						(listTwo.size() <= two ||
 						(
 								(listOne.get(one).getSubjectId() >= listTwo.get(two).getSubjectId() && type == 0) ||
-								(listOne.get(one).getProfessorId() >= listTwo.get(two).getProfessorId() && type == 1)
+								(listOne.get(one).getProfessorId() >= listTwo.get(two).getProfessorId() && type == 1) ||
+								(listOne.get(one).getSemesterNumber() >= listTwo.get(two).getSemesterNumber() && type == 2)
 								))) {
 					listToReturn.add(listOne.get(one));
 					one++;

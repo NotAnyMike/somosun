@@ -34,14 +34,14 @@ public class ScoreDao implements Dao<Score>{
 					TeacherDao teacherDao = new TeacherDao();
 					score.getTeacher().setIdSun(teacherDao.save(score.getTeacher()));
 				}
-				score.setTeacherRef(Ref.create(score.getTeacher()));
+//				score.setTeacherRef(Ref.create(score.getTeacher()));
 			}
 			
 			if(score.getSubject().getId() == null) {
 				SubjectDao subjectDao = new SubjectDao();
 				score.getSubject().setId(subjectDao.save(score.getSubject()));
 			}
-			score.setSubjectRef(Ref.create(score.getSubject()));
+//			score.setSubjectRef(Ref.create(score.getSubject()));
 			
 			ofy().save().entity(score).now();
 			
@@ -87,11 +87,21 @@ public class ScoreDao implements Dao<Score>{
 		Score toReturn = null;
 		
 		if(subjectId != null){
-			toReturn = (Score) ofy().load().type(Score.class).filter("subjectRef", Ref.create(Key.create(Subject.class, subjectId))).first().now();
+			toReturn = (Score) ofy().load().type(Score.class).filter("subject.idCopy", subjectId).first().now();
 		}
 		
 		return toReturn;
 
+	}
+
+	public Score getBySubjectAndProfesor(Long subjectId, Long professorId) {
+Score toReturn = null;
+		
+		if(professorId != null && subjectId != null){
+			toReturn = (Score) ofy().load().type(Score.class).filter("subject.idCopy", subjectId).filter("teacher.idCopy", professorId).first().now();
+		}
+		
+		return toReturn;
 	}
 
 }
