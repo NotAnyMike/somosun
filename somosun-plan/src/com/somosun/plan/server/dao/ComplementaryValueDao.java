@@ -96,9 +96,14 @@ public class ComplementaryValueDao implements Dao<ComplementaryValue> {
 	public ComplementaryValue get(String careerCode, String subjectCode) {
 		
 		ComplementaryValue toReturn = null;
-		if(subjectCode != null && careerCode != null)
-		{
+		if(subjectCode != null && careerCode != null){
 			toReturn = (ComplementaryValue) ofy().load().type(ComplementaryValue.class).filter("career.code", careerCode).filter("subject.code", subjectCode).first().now();
+			if(toReturn != null && toReturn.getSubject() != null && toReturn.getSubject().getId() != null){
+				//Update the new values
+				SubjectDao subjectDao = new SubjectDao();
+				Subject s = subjectDao.getById(toReturn.getSubject().getId());
+				toReturn.setSubject(s);
+			}
 		}
 		
 		return toReturn;
