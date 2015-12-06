@@ -1167,6 +1167,7 @@ ComplementaryValueView.Presenter{
 		accordions.clear();
 		
 		for(Subject s : subjectList){
+			GWT.debugger();
 			SubjectAccordionViewImpl accordion = new SubjectAccordionViewImpl(searchSubjectView.getSubjectsAmmount());
 			accordion.setPresenter(this);
 			accordion.setHeader(s.getCode(), s.getName(), "L", Integer.toString(s.getCredits()), careerCode);
@@ -1449,6 +1450,8 @@ ComplementaryValueView.Presenter{
 	private void populateAccordionWithComplementaryValue(SubjectAccordionViewImpl accordion, ComplementaryValueViewImpl cVView, ComplementaryValue complementaryValue) {
 		//SubjectGroup, pre-co requisites (Of) TODO
 		
+		GWT.debugger();
+		
 		if(complementaryValue != null && complementaryValue.getSubject() != null){
 			
 			String subjectGroupName = null;
@@ -1540,7 +1543,7 @@ ComplementaryValueView.Presenter{
 					classRoom[block.getDay()] = classRoom[block.getDay()].concat(block.getClassRoom() + " ");
 				}
 				
-				view.addGroup("" + group.getGroupNumber(), teacherName, "-", "-", "-", "" + group.getFreePlaces(), "" + group.getTotalPlaces(), daysTime[0], classRoom[0], daysTime[1], classRoom[1], daysTime[2], classRoom[2], daysTime[3], classRoom[3], daysTime[4], classRoom[4], daysTime[5], classRoom[5], daysTime[6], classRoom[6]);
+				view.addGroup("" + group.getGroupNumber(), teacherName, "-" , (group.getAverageGrade() == null ? "-" :  group.getAverageGrade().toString()), "-", "" + group.getFreePlaces(), "" + group.getTotalPlaces(), daysTime[0], classRoom[0], daysTime[1], classRoom[1], daysTime[2], classRoom[2], daysTime[3], classRoom[3], daysTime[4], classRoom[4], daysTime[5], classRoom[5], daysTime[6], classRoom[6]);
 				GWT.log(group.getFreePlaces() + " " + group.getTotalPlaces());
 			}
 		}else{

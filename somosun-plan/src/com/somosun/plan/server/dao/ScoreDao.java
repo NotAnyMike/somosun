@@ -82,26 +82,57 @@ public class ScoreDao implements Dao<Score>{
 		return toReturn;
 	}
 
+	/**
+	 * This will search the general score (i.e. for no teacher (null))
+	 * @param subjectId
+	 * @return
+	 */
 	public Score getBySubjectId(Long subjectId) {
 		
 		Score toReturn = null;
 		
 		if(subjectId != null){
-			toReturn = (Score) ofy().load().type(Score.class).filter("subject.idCopy", subjectId).first().now();
+			toReturn = (Score) ofy().load().type(Score.class).filter("subject.idCopy", subjectId).filter("teacher", null).first().now();
 		}
 		
 		return toReturn;
 
 	}
 
+	/**
+	 * Send null in order to mean no teacher, be careful if professorId == null that means there is no information in the db nor that the professor is pending-info.
+	 * <br></br>
+	 * If there is a score with null professorId means that it is the general score and it MUST NOT be used in the group averageGrade field, it should be used only in the subject averageGrade field
+	 * 
+	 * @param subjectId
+	 * @param professorId
+	 * @return
+	 */
 	public Score getBySubjectAndProfesor(Long subjectId, Long professorId) {
-Score toReturn = null;
+		Score toReturn = null;
 		
 		if(professorId != null && subjectId != null){
 			toReturn = (Score) ofy().load().type(Score.class).filter("subject.idCopy", subjectId).filter("teacher.idCopy", professorId).first().now();
 		}
 		
 		return toReturn;
+	}
+
+	/**
+	 * This will search the general score (i.e. for no teacher (null))
+	 * @param code
+	 * @return
+	 */
+	public Score getByCode(String code) {
+		
+		Score toReturn = null;
+		
+		if(code != null){
+			toReturn = (Score) ofy().load().type(Score.class).filter("subject.code", code).filter("teacher", null).first().now();
+		}
+		
+		return toReturn;
+		
 	}
 
 }

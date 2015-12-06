@@ -21,6 +21,7 @@ import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.VoidWork;
 import com.googlecode.objectify.cmd.Deferred;
 import com.somosun.plan.server.SiaProxy;
+import com.somosun.plan.server.SomosUNServerUtils;
 import com.somosun.plan.server.dummy.SemesterDummy;
 import com.somosun.plan.server.dummy.SubjectDummy;
 import com.somosun.plan.server.serviceImpl.LoginServiceImpl;
@@ -401,10 +402,6 @@ public class PlanDao implements Dao<Plan>{
 				boolean semesterBoolean = Pattern.matches(semesterLinePattern,s);
 				boolean subjectBoolean = Pattern.matches(subjectLinePattern,s);
 				
-
-				@SuppressWarnings("unused")
-				int x = 0;
-				
 				//Save the career
 				if(careerBoolean == true && careerCode == null){
 					careerCode = s.substring(0, s.indexOf("|")).trim();
@@ -483,6 +480,7 @@ public class PlanDao implements Dao<Plan>{
 					
 					//Get subject
 					Subject subject = subjectDao.getByCode(subjectD.getCode());
+					//Create the subject
 					assert subject != null;
 					
 					if(subject != null){
@@ -497,8 +495,7 @@ public class PlanDao implements Dao<Plan>{
 						//  Add career to careers list
 						if(group.containsCareer(career.getCode()) == false){
 							group.addCareer(career);
-						}
-						
+						}						
 						
 						//Get complementaryValue
 						ComplementaryValue complementaryValue = complementaryValueDao.get(careerCode, subject.getCode());
@@ -539,7 +536,7 @@ public class PlanDao implements Dao<Plan>{
 				
 				List<ComplementaryValue> complementaryValuesProblematics = null;
 				List<String> subjectCodes = new ArrayList<String>();
-				List<String> careerCodes = new ArrayList<String>(); //in order to be send to te function in the siaProxy
+				List<String> careerCodes = new ArrayList<String>(); //in order to be send to the function in the siaProxy
 				for(SubjectDummy subjectDT : problematicSubjects){
 					subjectCodes.add(subjectDT.getCode());
 					careerCodes.add(career.getCode());
@@ -703,10 +700,16 @@ public class PlanDao implements Dao<Plan>{
 				/**********************************************************************************/				
 			}
 			
-			
 			//update subjects to update
 			for(Subject subject : subjectsToUpdate){
 				subjectDao.save(subject);
+			}
+			
+			//Create a task and add it to the cron job
+			for(Semester semesterTemporary : semesters){
+				for(SubjectValue subjectValue : semesterTemporary.getSubjects()){
+					SomosUNServerUtils.createGradeUpdaterTask(subjectValue.getGroup().getTeacher(), subjectValue.getGroup().getSemesterValue(), null, subjectValue.getGrade(), subjectValue.getComplementaryValue().getSubject());					
+				}
 			}
 			
 			PlanDao planDao = new PlanDao();

@@ -16,6 +16,7 @@ import com.somosun.plan.server.dummy.GradeDummy;
 import com.somosun.plan.shared.SomosUNUtils;
 import com.somosun.plan.shared.control.Group;
 import com.somosun.plan.shared.control.Score;
+import com.somosun.plan.shared.control.SingleScore;
 import com.somosun.plan.shared.control.Subject;
 
 public class GradeUpdaterCronJob {
@@ -55,7 +56,7 @@ public class GradeUpdaterCronJob {
 		list = GradeDummy.sortBySubjectId(list);
 		
 		//dividing the list and sorting by groupId
-		List<GradeDummy> listWithSameSubject = new ArrayList<GradeDummy>();;
+		List<GradeDummy> listWithSameSubject = new ArrayList<GradeDummy>();
 		Long lastSubjectId = null;
 		GroupDao groupDao = new GroupDao();
 		ScoreDao scoreDao = new ScoreDao();
@@ -130,6 +131,14 @@ public class GradeUpdaterCronJob {
 									/******* <do the stuff for grades with the subject and the professor even if it is null> *********/
 									
 									Score score2 = scoreDao.getBySubjectAndProfesor(listWithSameProfessor.get(0).getSubjectId(), listWithSameProfessor.get(0).getProfessorId());
+									if(score2 == null){
+										Subject subject = subjectDao.getById(listWithSameProfessor.get(0).getSubjectId());
+										if(subject != null){							
+											score2 = new Score();
+											score2.setSubject(subject);
+											score2.setId(scoreDao.generateId());
+										}
+									}
 									
 									int amount2 = 0;
 									Double grade2 = null;
@@ -147,6 +156,7 @@ public class GradeUpdaterCronJob {
 										if(gradeDummy_temporary.getNewGrade() != null) {
 											if(gradeDummy_temporary.getNewGrade() >= 0 && gradeDummy_temporary.getNewGrade() <= 5){									
 												amount2 ++;
+												if(grade2 == null) grade2 = 0.0;
 												grade2 += gradeDummy_temporary.getNewGrade();
 											}
 										}
@@ -161,9 +171,11 @@ public class GradeUpdaterCronJob {
 									  * Update the grade for all groups which have this professor and this subject if not null
 									  */
 									List<Group> groups = groupDao.getGroups(listWithSameProfessor.get(0).getSubjectId(), listWithSameProfessor.get(0).getProfessorId());
-									for(Group g : groups){
-										g.setAverageGrade(score2.getTotalAverage());
-										groupDao.save(g);
+									if(groups != null && groups.isEmpty() == false){
+										for(Group g : groups){
+											g.setAverageGrade(score2.getTotalAverage());
+											groupDao.save(g);
+										}										
 									}
 									
 									listWithSameProfessor = GradeDummy.sortBySemester(listWithSameProfessor);
@@ -187,7 +199,8 @@ public class GradeUpdaterCronJob {
 											}
 											
 											//Do something with the this semester
-											score2.getSemester(listWithSameProfessor.get(pos).getSemesterNumber()).sumToAmountAndAverage(amount3 - amountOld3, grade3 - gradeOld3);
+											SingleScore singleScore2 = score2.getSemester(listWithSameProfessor.get(pos).getSemesterNumber());
+											if(singleScore2 != null) singleScore2.sumToAmountAndAverage(amount3 - amountOld3, grade3 - gradeOld3);
 											
 											amount3 = 0;
 											amountOld3 = 0;

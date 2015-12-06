@@ -38,5 +38,20 @@
 	    <property name="career.code" direction="asc"/>
 	    <property name="fundamental" direction="asc"/>
 	</datastore-index>
+	
+	<datastore-index kind="Score" ancestor="false">
+	    <property name="subject.idCopy" direction="asc"/>
+	    <property name="teacher.idCopy" direction="asc"/>
+	</datastore-index>
+	
+	<datastore-index kind="Score" ancestor="false">
+	    <property name="subject.idCopy" direction="asc"/>
+	    <property name="teacher" direction="asc"/>
+	</datastore-index>
+	
+	<datastore-index kind="Score" ancestor="false">
+	    <property name="subject.code" direction="asc"/>
+	    <property name="teacher" direction="asc"/>
+	</datastore-index>
 
 </datastore-indexes>

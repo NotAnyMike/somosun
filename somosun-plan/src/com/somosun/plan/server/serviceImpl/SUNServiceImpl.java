@@ -23,6 +23,7 @@ import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.somosun.plan.client.index.service.SUNService;
 import com.somosun.plan.server.SiaProxy;
+import com.somosun.plan.server.SomosUNServerUtils;
 import com.somosun.plan.server.cronJob.GradeUpdaterCronJob;
 import com.somosun.plan.server.dao.CareerDao;
 import com.somosun.plan.server.dao.ComplementaryValueDao;
@@ -1190,11 +1191,8 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		
 		if(group != null){
 			//TODO updateGrade
-			/****** add the oldGrade and the newGrade with the group to a cron job *******/
-			Queue q = QueueFactory.getQueue("updateSubjectGradePullQueue");
-			String professorId = (group.getTeacher() == null ? "" : "" + group.getTeacher().getIdSun());
-			String semester = (group.getSemesterValue() == null ? "" : group.getSemesterValue().toStringDouble().toString());
-			q.add(TaskOptions.Builder.withMethod(TaskOptions.Method.PULL).param("old-grade", (oldGrade == null ? "" : oldGrade.toString())).param("new-grade", (newGrade == null ? "" : newGrade.toString())).param("subject-id", "" + group.getSubject().getId()).param("professor-id", professorId).param("semester", semester));
+			SomosUNServerUtils.createGradeUpdaterTask(group.getTeacher(), group.getSemesterValue(), oldGrade, newGrade, group.getSubject());
+			
 			GradeUpdaterCronJob.updateAllGrades();
 		}else{
 			log.warning("savePlanAndGrade - A subject which has no group, the plan's id is " + plan.getId());

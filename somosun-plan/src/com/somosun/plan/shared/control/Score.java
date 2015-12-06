@@ -99,10 +99,12 @@ public class Score implements Serializable {
 	public SingleScore getSemester(Double semesterNumber) {
 		SingleScore toReturn = null;
 		
-		for(SingleScore singleScore : scores){
-			if(singleScore.getSemesterValue().toStringDouble().equals(semesterNumber.toString())){
-				toReturn = singleScore;
-				break;
+		if(scores != null && !scores.isEmpty()){			
+			for(SingleScore singleScore : scores){
+				if(singleScore.getSemesterValue().toStringDouble().equals(semesterNumber.toString())){
+					toReturn = singleScore;
+					break;
+				}
 			}
 		}
 		

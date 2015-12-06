@@ -89,7 +89,7 @@ public class GradeDummy {
 						(listTwo.size() <= two ||
 						(
 								(listOne.get(one).getSubjectId() >= listTwo.get(two).getSubjectId() && type == 0) ||
-								(listOne.get(one).getProfessorId() >= listTwo.get(two).getProfessorId() && type == 1) ||
+								((listOne.get(one).getProfessorId() != null && listTwo.get(two).getProfessorId() != null) && (listOne.get(one).getProfessorId() >= listTwo.get(two).getProfessorId() && type == 1)) ||
 								(listOne.get(one).getSemesterNumber() >= listTwo.get(two).getSemesterNumber() && type == 2)
 								))) {
 					listToReturn.add(listOne.get(one));
