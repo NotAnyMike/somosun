@@ -103,10 +103,11 @@ public class GradeUpdaterCronJob {
 						int amount = score.getTotalAmount();
 						double grade = score.getTotalAverage()*amount;
 						
-						if(amount == 0 || grade < 0 || grade > 5) {
+						if(amount == 0 || (double) (grade/amount) < 0 || (double) (grade/amount) > 5) {
 							amountOld = 0;
 							totalOld = 0.0;
 							grade = 0;
+							amount = 0;
 						}
 						amount = amount - amountOld + amountNew;
 						if(amount > 0) grade = (grade - totalOld + totalNew)/amount;
