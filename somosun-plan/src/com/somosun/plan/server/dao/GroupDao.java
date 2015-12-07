@@ -1,5 +1,6 @@
 package com.somosun.plan.server.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.googlecode.objectify.Key;
@@ -106,6 +107,15 @@ public class GroupDao implements Dao<Group> {
 		Group groupToReturn = get(group);
 		if(groupToReturn == null){
 			groupToReturn = group;
+			
+			if(group.getAverageGrade() == null && group.getTeacher() != null){
+				ScoreDao scoreDao = new ScoreDao();
+				Score score = scoreDao.getBySubjectAndProfesor(group.getSubject().getId(), group.getTeacher().getIdSun());
+				if(score != null && score.getTotalAverage() != null){
+					groupToReturn.setAverageGrade(score.getTotalAverage());
+				}
+			}
+			
 			save(groupToReturn);
 		}else{
 			if(groupToReturn.equals(group) == false && isSiaProxy == true){
@@ -154,6 +164,7 @@ public class GroupDao implements Dao<Group> {
 		if(group == null){
 			group = new Group(subject, semesterValue, groupInt);
 			group.setId(generateId());
+			
 			save(group);
 		}
 		
@@ -191,10 +202,11 @@ public class GroupDao implements Dao<Group> {
 				Teacher teacher = teacherDao.getById(professorId);
 				
 				if(teacher != null){
-					List<Group> notToReturn = q.filter("username", teacher.getUsername()).list();
+					List<Group> notToReturn = q.filter("teacher.username", teacher.getUsername()).list();
 					
 					if(notToReturn != null && notToReturn.isEmpty() == false){
 						for(Group g : notToReturn){
+							if(toReturn == null) toReturn = new ArrayList<Group>();
 							toReturn.add(g);
 						}
 					}

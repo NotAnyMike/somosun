@@ -12,12 +12,14 @@ import com.google.appengine.api.taskqueue.TaskHandle;
 import com.somosun.plan.server.dao.GroupDao;
 import com.somosun.plan.server.dao.ScoreDao;
 import com.somosun.plan.server.dao.SubjectDao;
+import com.somosun.plan.server.dao.TeacherDao;
 import com.somosun.plan.server.dummy.GradeDummy;
 import com.somosun.plan.shared.SomosUNUtils;
 import com.somosun.plan.shared.control.Group;
 import com.somosun.plan.shared.control.Score;
 import com.somosun.plan.shared.control.SingleScore;
 import com.somosun.plan.shared.control.Subject;
+import com.somosun.plan.shared.control.Teacher;
 
 public class GradeUpdaterCronJob {
 	
@@ -126,9 +128,16 @@ public class GradeUpdaterCronJob {
 						
 						//repeat this loop and deal with specific groups
 						List<GradeDummy> listWithSameProfessor = new ArrayList<GradeDummy>();
-						for(GradeDummy gradeDummy2 : listWithSameSubject){
-							if(gradeDummy.getSubjectId().equals(lastSubjectId) == false || listWithSameSubject.size() == listWithSameSubject.indexOf(gradeDummy)+1) {
-								if(listWithSameProfessor.isEmpty() == false){
+						//for(GradeDummy gradeDummy2 : listWithSameSubject){ OLD
+						for(int position = 0; position <= listWithSameSubject.size(); position ++){
+						
+							GradeDummy gradeDummy2  = null;	
+							if(position != listWithSameSubject.size()){
+								gradeDummy2 = listWithSameSubject.get(position);
+							}
+						
+							if(position == listWithSameSubject.size() || (gradeDummy2 != null && gradeDummy2.getSubjectId().equals(lastSubjectId) == false)) {
+								if(listWithSameProfessor.isEmpty() == false || position == listWithSameSubject.size()){
 									/******* <do the stuff for grades with the subject and the professor even if it is null> *********/
 									
 									Score score2 = scoreDao.getBySubjectAndProfesor(listWithSameProfessor.get(0).getSubjectId(), listWithSameProfessor.get(0).getProfessorId());
@@ -137,6 +146,16 @@ public class GradeUpdaterCronJob {
 										if(subject != null){							
 											score2 = new Score();
 											score2.setSubject(subject);
+											
+											if(listWithSameProfessor.get(0).getProfessorId() != null){												
+												TeacherDao teacherDao = new TeacherDao();
+												Teacher teacher = teacherDao.getById(listWithSameProfessor.get(0).getProfessorId());
+												
+												if(teacher != null){
+													score2.setTeacher(teacher);
+												}
+											}
+											
 											score2.setId(scoreDao.generateId());
 										}
 									}

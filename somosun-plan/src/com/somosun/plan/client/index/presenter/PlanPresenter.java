@@ -1532,6 +1532,7 @@ ComplementaryValueView.Presenter{
 	private void populateAccordionWithGroups(ComplementaryValueViewImpl view, SiaResultGroups result) {
 		
 		if(result != null && result.getGroups() != null && result.getGroups().size() > 0){
+			
 			for(Group group : result.getGroups()){
 				String teacherName = group.getTeacher().getName();
 				if(teacherName.trim().isEmpty()) teacherName = "Unknown";
@@ -1543,7 +1544,7 @@ ComplementaryValueView.Presenter{
 					classRoom[block.getDay()] = classRoom[block.getDay()].concat(block.getClassRoom() + " ");
 				}
 				
-				view.addGroup("" + group.getGroupNumber(), teacherName, "-" , (group.getAverageGrade() == null ? "-" :  group.getAverageGrade().toString()), "-", "" + group.getFreePlaces(), "" + group.getTotalPlaces(), daysTime[0], classRoom[0], daysTime[1], classRoom[1], daysTime[2], classRoom[2], daysTime[3], classRoom[3], daysTime[4], classRoom[4], daysTime[5], classRoom[5], daysTime[6], classRoom[6]);
+				view.addGroup("" + group.getGroupNumber(), teacherName, null , group.getAverageGrade(), "" + group.getFreePlaces(), "" + group.getTotalPlaces(), daysTime[0], classRoom[0], daysTime[1], classRoom[1], daysTime[2], classRoom[2], daysTime[3], classRoom[3], daysTime[4], classRoom[4], daysTime[5], classRoom[5], daysTime[6], classRoom[6]);
 				GWT.log(group.getFreePlaces() + " " + group.getTotalPlaces());
 			}
 		}else{
