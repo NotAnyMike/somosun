@@ -11,6 +11,7 @@ import com.somosun.plan.shared.SiaResultGroups;
 import com.somosun.plan.shared.SiaResultSubjects;
 import com.somosun.plan.shared.control.Career;
 import com.somosun.plan.shared.control.ComplementaryValue;
+import com.somosun.plan.shared.control.Group;
 import com.somosun.plan.shared.control.Plan;
 import com.somosun.plan.shared.control.SemesterValue;
 import com.somosun.plan.shared.control.Student;
@@ -54,6 +55,7 @@ public interface SUNService extends RemoteService{
 	public void deletePlanFromUser(String planId);
 	public void savePlanAsDefault(Student student, Plan plan);
 	public Long savePlan(Student student, Plan plan);
+	public Long savePlanAndGrade(Student student, Plan plan, Group group, Double oldGrade, Double newGrade);
 	public Plan getPlanDefault(String careerCode);
 	public Plan generatePlanFromAcademicHistory(String academicHistory);
 	

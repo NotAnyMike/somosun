@@ -31,6 +31,7 @@ import com.somosun.plan.server.dao.BlockDao;
 import com.somosun.plan.server.dao.CareerDao;
 import com.somosun.plan.server.dao.ComplementaryValueDao;
 import com.somosun.plan.server.dao.GroupDao;
+import com.somosun.plan.server.dao.ScoreDao;
 import com.somosun.plan.server.dao.SemesterValueDao;
 import com.somosun.plan.server.dao.StudentDao;
 import com.somosun.plan.server.dao.SubjectDao;
@@ -46,6 +47,7 @@ import com.somosun.plan.shared.control.Block;
 import com.somosun.plan.shared.control.Career;
 import com.somosun.plan.shared.control.ComplementaryValue;
 import com.somosun.plan.shared.control.Group;
+import com.somosun.plan.shared.control.Score;
 import com.somosun.plan.shared.control.Student;
 import com.somosun.plan.shared.control.Subject;
 import com.somosun.plan.shared.control.SubjectGroup;
@@ -537,6 +539,7 @@ public class SiaProxy {
 		TeacherDao teacherDao = new TeacherDao();
 		BlockDao blockDao = new BlockDao();
 		CareerDao careerDao = new CareerDao();
+		ScoreDao scoreDao = new ScoreDao();
 		int cuposDisponibles = 0;
 		int cuposTotal = 0;
 		int groupNumber = -1;
@@ -615,6 +618,12 @@ public class SiaProxy {
 						}
 					}
 				}
+				
+				Score scoreTemporary = null;
+				if(subject != null && subject.getId() != null && teacher != null && teacher.getIdSun() != null){					
+					scoreTemporary = scoreDao.getBySubjectAndProfesor(subject.getId(), teacher.getIdSun());
+				}
+				
 				group.setSubject(subject);
 				group.setSchedule(blocks);
 				group.setTeacher(teacher);
@@ -622,6 +631,8 @@ public class SiaProxy {
 				group.setTotalPlaces(cuposTotal);
 				group.setGroupNumber(groupNumber); //be careful here, because it could be some group that has no number and instead a char
 				group.setSemesterValue(semesterValueDao.getCurrentSemester());
+				if(scoreTemporary != null) group.setAverageGrade(scoreTemporary.getTotalAverage());
+				
 				if(careers != null && careers.size() != 0) {
 					//group.setCareers(careers);
 					for(Career careerT : careers){

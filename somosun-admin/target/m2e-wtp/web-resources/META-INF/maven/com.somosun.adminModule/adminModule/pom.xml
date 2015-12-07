@@ -157,22 +157,12 @@
         					<pluginExecutions>
         						<pluginExecution>
         							<pluginExecutionFilter>
-        								<groupId>
-        									org.codehaus.mojo
-        								</groupId>
-        								<artifactId>
-        									versions-maven-plugin
-        								</artifactId>
-        								<versionRange>
-        									[2.1,)
-        								</versionRange>
+        								<groupId>org.codehaus.mojo</groupId>
+        								<artifactId>versions-maven-plugin</artifactId>
+        								<versionRange>[2.1,)</versionRange>
         								<goals>
-        									<goal>
-        										display-plugin-updates
-        									</goal>
-        									<goal>
-        										display-dependency-updates
-        									</goal>
+        									<goal>display-plugin-updates</goal>
+        									<goal>display-dependency-updates</goal>
         								</goals>
         							</pluginExecutionFilter>
         							<action>

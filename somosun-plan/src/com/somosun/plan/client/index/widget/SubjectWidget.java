@@ -201,10 +201,10 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers {
 			@Override
 			public void onBlur(BlurEvent event) {
 				textBoxGrade.setVisible(false);
-				gradeLabel.setVisible(true);
-				if(getTextOfGradeTextBox().isEmpty() == false){					
-					presenter.onGradeAdded(publicId, getTextOfGradeTextBox());
-				}
+				gradeLabel.setVisible(true);			
+				
+				presenter.onGradeAdded(publicId, getTextOfGradeTextBox());
+
 			}
 			
 		});
@@ -432,7 +432,7 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers {
 
 		String title = null;
 
-		if (grade == null) {
+		if (grade == null || grade.isEmpty() == true) {
 			grade = "-";
 			title = "Nota no registrada, para registrarla haz click";
 		} else if(grade.equals("AP")){

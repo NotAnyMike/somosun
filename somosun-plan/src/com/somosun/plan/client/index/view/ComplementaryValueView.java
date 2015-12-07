@@ -19,6 +19,7 @@ public interface ComplementaryValueView {
 	void hasNoPrerequisites();
 	void hasNoCorequisites();
 	void setSubjectGroupName(String s);
+	void setGrade(Double grade);
 	void addRequisite(String type, String name, String code, String careerCode, SubjectAccordionViewImpl accordion, boolean makeStatic, boolean makeUnavailable);
 	void addAntiRequisite(String type, String name, String code, String careerCode, SubjectAccordionViewImpl accordion,  boolean makeStatic);
 	void isNoCorequisite();

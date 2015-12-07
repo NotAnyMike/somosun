@@ -8,6 +8,7 @@ import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.VoidWork;
 import com.somosun.plan.shared.SomosUNUtils;
+import com.somosun.plan.shared.control.Score;
 import com.somosun.plan.shared.control.Subject;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
@@ -136,6 +137,34 @@ public class SubjectDao implements Dao<Subject> {
 	 */
 	public Long save(Subject subject){
 		if(subject != null){
+			
+			//Checking for any entity repetition
+			if(subject.getCode() != null){				
+				Subject subjectRepeted = getByCode(subject.getCode());
+				if(subjectRepeted != null) {
+					delete(subject.getId());
+					subject.setId(subjectRepeted.getId());
+				}
+			}
+			
+			//Adding the averageGrade if it is empty
+			if(subject.getAverageGrade() == null && subject.getId() != null){
+				ScoreDao scoreDao = new ScoreDao();
+				Score score = scoreDao.getBySubjectId(subject.getId());
+				if(score != null){
+					subject.setAverageGrade(score.getTotalAverage());
+				}
+			}
+			
+			//Addding the averageGrade if it is empty (this time search for code and not by id)
+			if(subject.getAverageGrade() == null && subject.getCode() != null){
+				ScoreDao scoreDao = new ScoreDao();
+				Score score = scoreDao.getByCode(subject.getCode());
+				if(score != null){
+					subject.setAverageGrade(score.getTotalAverage());
+				}
+			}
+			
 			if(subject.getCode().isEmpty()){
 				subject.setSpecial(true);
 			}

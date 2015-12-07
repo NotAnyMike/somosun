@@ -114,4 +114,8 @@ public class SemesterValue implements Serializable {
 		return year + "-" + numberSemester;
 	}
 
+	public String toStringDouble() {
+		return "" + year + "." + numberSemester;
+	}
+
 }

@@ -2,6 +2,13 @@
 
 <datastore-indexes autoGenerate="true">
 
+	<datastore-index kind="Block" ancestor="false">
+		<property name="classRoom" direction="asc" />
+		<property name="day" direction="asc" />
+		<property name="endHour" direction="asc" />
+		<property name="startHour" direction="asc" />
+	</datastore-index>
+	
 	<datastore-index kind="SemesterValue" ancestor="false">
 		<property name="year" direction="asc" />
 		<property name="numberSemester" direction="asc" />
@@ -37,6 +44,21 @@
 	    <property name="name" direction="asc"/>
 	    <property name="career.code" direction="asc"/>
 	    <property name="fundamental" direction="asc"/>
+	</datastore-index>
+	
+	<datastore-index kind="Score" ancestor="false">
+	    <property name="subject.idCopy" direction="asc"/>
+	    <property name="teacher.idCopy" direction="asc"/>
+	</datastore-index>
+	
+	<datastore-index kind="Score" ancestor="false">
+	    <property name="subject.idCopy" direction="asc"/>
+	    <property name="teacher" direction="asc"/>
+	</datastore-index>
+	
+	<datastore-index kind="Score" ancestor="false">
+	    <property name="subject.code" direction="asc"/>
+	    <property name="teacher" direction="asc"/>
 	</datastore-index>
 
 </datastore-indexes>

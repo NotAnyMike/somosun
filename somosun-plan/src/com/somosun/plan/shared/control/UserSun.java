@@ -21,6 +21,7 @@ public class UserSun implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	@Id private Long idSun = null; 
+	@Index private Long idCopy = null;
 	@Index private String idG = null;
 	@Index private String username = null;
 	@Index private String email = null;
@@ -55,6 +56,7 @@ public class UserSun implements Serializable {
 	
 	public void setIdSun(Long idSun) {
 		this.idSun = idSun;
+		this.idCopy = idSun;
 	}
 
 	public boolean isBlocked() {

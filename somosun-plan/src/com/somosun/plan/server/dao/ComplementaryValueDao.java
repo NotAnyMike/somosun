@@ -96,9 +96,39 @@ public class ComplementaryValueDao implements Dao<ComplementaryValue> {
 	public ComplementaryValue get(String careerCode, String subjectCode) {
 		
 		ComplementaryValue toReturn = null;
-		if(subjectCode != null && careerCode != null)
-		{
+		if(subjectCode != null && careerCode != null){
 			toReturn = (ComplementaryValue) ofy().load().type(ComplementaryValue.class).filter("career.code", careerCode).filter("subject.code", subjectCode).first().now();
+			if(toReturn != null){
+				SubjectDao subjectDao = new SubjectDao();
+				if(toReturn.getSubject() != null) {
+					
+					Subject subjectUpdated = subjectDao.getById(toReturn.getSubject().getId());
+					if(subjectUpdated != null){
+						toReturn.setSubject(subjectUpdated);						
+					}else{						
+						toReturn.setSubject(subjectDao.getByCode(toReturn.getSubject().getCode()));
+					}
+					
+				}
+				if(toReturn.getSubjectGroup() != null){
+					SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
+					
+					SubjectGroup subjectGroupUpdated = subjectGroupDao.getById(toReturn.getSubjectGroup().getId());
+					if(subjectGroupUpdated != null){
+						toReturn.setSubjectGroup(subjectGroupUpdated);						
+					}else{						
+						toReturn.setSubjectGroup(subjectGroupDao.get(toReturn.getSubjectGroup().getName(), toReturn.getSubjectGroup().isFundamental(), toReturn.getCareer().getCode()));
+					}
+					
+					
+				}
+				if(toReturn.getSubject() != null && toReturn.getSubject().getId() != null){
+					//Update the new values
+					Subject s = subjectDao.getById(toReturn.getSubject().getId());
+					toReturn.setSubject(s);
+				}
+				save(toReturn);
+			}
 		}
 		
 		return toReturn;

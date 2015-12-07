@@ -18,10 +18,10 @@ public class Block implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	@Id private Long id = null;
-	private int startHour;
-	private int endHour;
-	private int day;
-	private String classRoom;
+	@Index private int startHour;
+	@Index private int endHour;
+	@Index private int day;
+	@Index private String classRoom;
 	
 	public Block(){
 	}

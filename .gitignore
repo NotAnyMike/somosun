@@ -27,6 +27,7 @@ war/WEB-INF/deploy/index/rpcPolicyManifest/**/*.*
 *.log
 *.sql
 *.sqlite
+log.txt
  
 # OS generated files #
 ######################

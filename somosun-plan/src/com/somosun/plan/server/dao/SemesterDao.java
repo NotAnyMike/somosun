@@ -5,6 +5,7 @@ import java.util.List;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
+import com.somosun.plan.shared.control.Group;
 import com.somosun.plan.shared.control.Semester;
 import com.somosun.plan.shared.control.SemesterValue;
 import com.somosun.plan.shared.control.SubjectValue;
@@ -26,11 +27,15 @@ public class SemesterDao implements Dao<Semester> {
 			GroupDao gDao = new GroupDao();
 			ComplementaryValueDao cVDao = new ComplementaryValueDao();
 			for(SubjectValue sV : subjectValuesList){
-				if(sV.getId() == null){
+				if(sV.getId() == null || sV.getGroup() == null){
 					if(sV.getGroup() != null){
 						if(sV.getGroup().getId() == null){
 							gDao.save(sV.getGroup());
 						}
+					}else{
+						Group g = null;
+						g = gDao.getOrCreateGroup(sV.getComplementaryValue().getSubject(), s.getSemesterValue(), null);
+						sV.setGroup(g);
 					}
 					if(sV.getComplementaryValue() != null){
 						if(sV.getComplementaryValue().getId() == null){

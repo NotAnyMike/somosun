@@ -65,9 +65,9 @@ public class SubjectValue implements Serializable {
 	}
 
 	public void setGrade(Double grade) {
-		if(grade >= 0 && grade <= 5){			
+		if(grade == null || (grade >= 0 && grade <= 5)){			
 			this.grade = grade;
-			//if(grade != null) setTaken(true);
+			if(grade == null) setTaken(false);
 		}
 	}
 
