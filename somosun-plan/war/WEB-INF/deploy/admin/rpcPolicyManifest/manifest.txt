@@ -1,4 +1,4 @@
 # Module admin
 # RPC service class, partial path of RPC policy file
-com.somosun.plan.client.admin.service.AdminService, AEFFA0DDE2171E16104B78008075FB6B.gwt.rpc
-com.somosun.plan.client.index.service.SUNService, BFEB5A16730961F344803ADFAD898A04.gwt.rpc
+com.somosun.plan.client.index.service.SUNService, A324036788ECB368C1BFF402C46AD4D5.gwt.rpc
+com.somosun.plan.client.admin.service.AdminService, A104CB59FD655D5643CEB6594E97838A.gwt.rpc

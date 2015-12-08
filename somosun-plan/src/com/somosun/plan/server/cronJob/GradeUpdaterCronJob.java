@@ -52,6 +52,7 @@ public class GradeUpdaterCronJob {
 				log.warning("Error while reading the parameters of the task from the pull queue: " + e.toString());
 			}
 			q.deleteTask(task.getName());
+			log.info("Task deleted");
 		}
 		
 		//sorting the list
