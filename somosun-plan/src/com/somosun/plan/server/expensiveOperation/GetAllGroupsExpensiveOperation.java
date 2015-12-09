@@ -20,7 +20,7 @@ public class GetAllGroupsExpensiveOperation {
 		
 		log.info("<------ Starting to get all the groups ------>");
 		log.info("Getting all subjects");
-		SiaResultSubjects subjects = SiaProxy.getSubjects("", "", "", "", 1, 10000, "bog");
+		SiaResultSubjects subjects = SiaProxy.getSubjects("", "", "", "", 1, 1000, "bog");
 		log.info("All subjects recived, total: " + subjects.getTotalAsignaturas());
 		
 		int subjectNumber = 0;
