@@ -22,6 +22,7 @@ import com.somosun.plan.server.dao.SubjectGroupDao;
 import com.somosun.plan.server.expensiveOperation.AnalyseAllCareersExpensiveOperation;
 import com.somosun.plan.server.expensiveOperation.AnalyseCareerExpensiveOperation;
 import com.somosun.plan.server.expensiveOperation.ComplementaryValueExpensiveOperations;
+import com.somosun.plan.server.expensiveOperation.GetAllGroupsExpensiveOperation;
 import com.somosun.plan.server.expensiveOperation.SubjectExpensiveOperations;
 import com.somosun.plan.server.expensiveOperation.SubjectValueExpensiveOperations;
 import com.somosun.plan.server.expensiveOperation.Codes.ComplementaryValueExpensiveOperationsCodes;
@@ -464,6 +465,22 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 			groupDao.deleteAll();
 		}
 		log.warning("All groups were deleted");
+	}
+	
+	@Override
+	public void getAllGroups() {
+//		if(getUserLogged().isAdmin() == true){			
+//			//TODO add the task to the queue
+//			GetAllGroupsExpensiveOperation.run();
+//			log.info("Task added to the admin queue");
+//		}
+		
+		if(getUserLogged().isAdmin() == true){
+			Queue q = QueueFactory.getQueue("adminQueue");
+			String hostName = ModulesServiceFactory.getModulesService().getVersionHostname("admin-module", "1");
+			q.add(TaskOptions.Builder.withUrl("/admin/get-all-groups").header("Host",hostName));
+			log.info("Task to get all groups was added to the queue");
+		}
 	}
 	
 }

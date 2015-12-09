@@ -221,6 +221,7 @@
 						<div class="panel-body">
 							<b:VerticalButtonGroup>
 								<b:Button type="DANGER" enabled="true" ui:field="deleteAllGroupsButton">- Delete ALL groups -</b:Button>
+								<b:Button type="WARNING" enabled="true" ui:field="getAllGroupsButton">- Get ALL groups -</b:Button>
 							</b:VerticalButtonGroup>
 						</div>
 					</div>

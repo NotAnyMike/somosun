@@ -73,5 +73,7 @@ public interface AdminServiceAsync {
 	void deleteAllGroups(AsyncCallback<Void> callback);
 
 	void certainHasDefaultField(String careerCode, AsyncCallback<Void> callback);
+
+	void getAllGroups(AsyncCallback<Void> callback);
 	
 }

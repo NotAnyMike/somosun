@@ -480,5 +480,21 @@ public class IndexPresenter implements Presenter, IndexView.Presenter {
 			
 		});
 	}
+
+	public void onGetAllGroupsButton() {
+		rpcAdminService.getAllGroups(new AsyncCallback(){
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert("Error while trying add the task to the queue");
+			}
+
+			@Override
+			public void onSuccess(Object result) {
+				Window.alert("The task was added to the queue");
+			}
+			
+		});
+	}
 	
 }

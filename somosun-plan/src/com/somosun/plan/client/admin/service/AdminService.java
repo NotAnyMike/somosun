@@ -43,5 +43,5 @@ public interface AdminService extends RemoteService{
 	void analyseCareer(String careerCode);
 	void deleteAllBlocks();
 	void deleteAllGroups();
-	
+	void getAllGroups();
 }
