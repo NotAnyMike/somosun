@@ -25,6 +25,8 @@ public class GetAllGroupsExpensiveOperation {
 		
 		int subjectNumber = 0;
 		int groupNumber = 0;
+		int error = 0;
+		int subjectsSkiped = 0;
 		for(int position = 0; position < subjects.getSubjectList().size(); position ++){
 			Subject s = subjects.getSubjectList().get(position);
 			try{
@@ -34,13 +36,20 @@ public class GetAllGroupsExpensiveOperation {
 				log.info("Subject has " + groups.getGroups().size() + "groups, total groups gathered " + groupNumber);
 			}catch (Exception e){
 				log.warning("ERROR, 30s delay");
-				position --;
-				subjectNumber --;
 				try {
+					error++;
 					Thread.sleep(30000);
 				} catch (InterruptedException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
+				}
+				if(error > 5){
+					subjectsSkiped ++;	
+					error = 0;
+					log.warning("Skipping subject");
+				}else{
+					position --;
+					subjectNumber --;
 				}
 			}
 			

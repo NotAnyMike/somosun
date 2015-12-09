@@ -32,6 +32,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="/Users/Mike/Documents/Mike/Documents/Projets-Mars/somosun/somosun-admin/target/adminModule-1.0-SNAPSHOT/WEB-INF/lib/somosun-plan-shared-1.0.12.jar"/>
-	<classpathentry kind="lib" path="/Users/Mike/Documents/Mike/Documents/Projets-Mars/somosun/somosun-admin/target/adminModule-1.0-SNAPSHOT/WEB-INF/lib/somosun-plan-server-1.0.22.jar"/>
+	<classpathentry kind="lib" path="/Users/Mike/Documents/Mike/Documents/Projets-Mars/somosun/somosun-admin/target/adminModule-1.0-SNAPSHOT/WEB-INF/lib/somosun-plan-server-1.0.23.jar"/>
 	<classpathentry kind="output" path="target/adminModule-1.0-SNAPSHOT/WEB-INF/classes"/>
 </classpath>
