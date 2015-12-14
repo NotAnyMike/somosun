@@ -18,8 +18,12 @@ import com.google.common.collect.HashBiMap;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.DoubleClickEvent;
+import com.google.gwt.event.dom.client.DoubleClickHandler;
+import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
@@ -1108,13 +1112,25 @@ ComplementaryValueView.Presenter{
 			}});
 	}
 	
-	private void addClickHandlerSubjectWidget(SubjectWidget s){
+	private void addClickHandlerSubjectWidget(final SubjectWidget s){
 		s.addClickHandler(new ClickHandler(){
 			@Override
 			public void onClick(ClickEvent event) {
 				onSubjectWidgetClicked(event.getRelativeElement().getAttribute("publicId"));
 			}			
 		});
+		
+		s.addDoubleClickHandler(new DoubleClickHandler(){
+
+			@Override
+			public void onDoubleClick(DoubleClickEvent event) {
+				onClickAddSubject("" + getSemesterFromPublicId(s.getPublicId()));
+				searchSubjectView.setSearchBox(s.getName());
+				onSearchButtonClicked(s.getName(), plan.getCareer().getCode(), "", 1, true);
+			}
+			
+		});
+
 	}
 	
 	private void addClickHandlerDeleteSemesterButton(SemesterWidget semester){
@@ -1155,25 +1171,30 @@ ComplementaryValueView.Presenter{
 		subContainer.add(i);
 	}	
 	
-	protected void loadSubjectsToSearchView(SiaResultSubjects result, String careerCode, String searchText, String type) {
+	protected void loadSubjectsToSearchView(SiaResultSubjects result, String careerCode, String searchText, String type, boolean openFirst) {
 		
-		addSubjectsToSearchView(result.getSubjectList(), careerCode);
+		addSubjectsToSearchView(result.getSubjectList(), careerCode, openFirst);
 		createPagination(result, searchText, type, careerCode);
 		showToolTip();
 				
 	}
-
+	
 	private void addSubjectsToSearchView(List<Subject> subjectList, String careerCode) {
+		addSubjectsToSearchView(subjectList, careerCode, false);
+	}
+
+	private void addSubjectsToSearchView(List<Subject> subjectList, String careerCode, boolean openFirst) {
 		
 		searchSubjectView.clearAccordionContainer();
 		accordions.clear();
 		
+		boolean isFirst = true;
 		for(Subject s : subjectList){
 			GWT.debugger();
 			SubjectAccordionViewImpl accordion = new SubjectAccordionViewImpl(searchSubjectView.getSubjectsAmmount());
 			accordion.setPresenter(this);
 			accordion.setHeader(s.getCode(), s.getName(), "L", Integer.toString(s.getCredits()), careerCode);
-
+			
 			ComplementaryValueViewImpl complementaryValueView = new ComplementaryValueViewImpl(s.getName(), s.getCode(), accordion, searchSubjectView.getSubjectsAmmount(), 0);
 			complementaryValueView.setPresenter(this);
 			complementaryValueView.setSubjectGroupName("-");
@@ -1188,14 +1209,19 @@ ComplementaryValueView.Presenter{
 			if(selected != null){
 				accordion.changeState();
 			}
-			
+						
 			searchSubjectView.addSubject(accordion);
+			
+			if(openFirst == true && isFirst == true){
+				clickElement(accordion.getHeader().getElement());
+			}
+			isFirst = false;
 		}
 		
 		avoidAccordionPropagation();
 		
 	}
-
+	
 	private void createPagination(SiaResultSubjects result, final String searchText, final String type, final String careerCode) {
 		searchSubjectView.clearPagination();
 		
@@ -1223,7 +1249,7 @@ ComplementaryValueView.Presenter{
 
 				@Override
 				public void onClick(ClickEvent event) {
-					onSearchButtonClicked(searchText, careerCode, type, 1);
+					onSearchButtonClicked(searchText, careerCode, type, 1, false);
 				}
 				
 			});
@@ -1245,7 +1271,7 @@ ComplementaryValueView.Presenter{
 
 				@Override
 				public void onClick(ClickEvent event) {
-					onSearchButtonClicked(searchText, careerCode, type, page);
+					onSearchButtonClicked(searchText, careerCode, type, page, false);
 				}
 				
 			});
@@ -1276,7 +1302,7 @@ ComplementaryValueView.Presenter{
 
 				@Override
 				public void onClick(ClickEvent event) {
-					onSearchButtonClicked(searchText, careerCode, type, lastPage);
+					onSearchButtonClicked(searchText, careerCode, type, lastPage, false);
 				}
 				
 			});
@@ -2461,6 +2487,16 @@ ComplementaryValueView.Presenter{
 		view.hideCurtain();
 	}
 	
+	private int getSemesterFromPublicId(String publicId){
+		int toReturn = -1;
+		SubjectValue subjectValues = getSubjectValuesByPublicId(publicId);
+		if(subjectValues != null){			
+			toReturn = semesterList.indexOf(subjectValuesAndSemesterMap.get(subjectValues));
+		}
+		
+		return toReturn;
+	}
+	
 	/******************** JQUERY FUNCTIONS *********************/
 
 	/**
@@ -2515,6 +2551,10 @@ ComplementaryValueView.Presenter{
 		$wnd.selectCurrentSemesterPanel();
 	}-*/;
 	
+	public static native void clickElement(Element elem) /*-{
+		elem.click();
+	}-*/;
+	
 	/************************************************************/
 
 	/*********************** Behaviors **************************/
@@ -2560,7 +2600,7 @@ ComplementaryValueView.Presenter{
 		}
 	}
 
-	public void onSearchButtonClicked(final String searchText, final String careerCode, final String type, int page) {
+	public void onSearchButtonClicked(final String searchText, final String careerCode, final String type, int page, final boolean openFirst) {
 		
 		accordions.clear();
 
@@ -2573,7 +2613,7 @@ ComplementaryValueView.Presenter{
 			
 			@Override
 			public void onSuccess(SiaResultSubjects result) {
-				loadSubjectsToSearchView(result, careerCode, searchText, type);
+				loadSubjectsToSearchView(result, careerCode, searchText, type, openFirst);
 			}
 			
 		});

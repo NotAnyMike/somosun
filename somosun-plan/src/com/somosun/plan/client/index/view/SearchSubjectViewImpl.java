@@ -175,12 +175,17 @@ public class SearchSubjectViewImpl extends Composite implements SearchSubjectVie
 	
 	@UiHandler("searchButton")
 	public void onSearchButtonClick(ClickEvent event){
-		presenter.onSearchButtonClicked(searchField.getText(), listBoxCareersToSearch.getSelectedValue(), getCheckBoxesValue(), 1);
+		presenter.onSearchButtonClicked(searchField.getText(), listBoxCareersToSearch.getSelectedValue(), getCheckBoxesValue(), 1, false);
 	}
 	
 	@UiHandler("cancelButton")
 	public void onCancelButtonClick(ClickEvent e){
 		presenter.hideSearchBox();
+	}
+
+	@Override
+	public void setSearchBox(String s) {
+		searchField.setText(s);
 	}
 
 }
