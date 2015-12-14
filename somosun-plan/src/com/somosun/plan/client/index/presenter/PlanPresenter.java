@@ -1139,6 +1139,8 @@ ComplementaryValueView.Presenter{
 		deleteSubject(sV);
 		planChanged(PlanCodes.CHANGE_BY_SUBJECT_DELETE);
 		warningDeleteSubjectView.hideIt();
+		deleteAllOpacities();
+		hideArrows();
 	}
 
 	public SubjectValue getSubjectValuesSelected() {
