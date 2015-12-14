@@ -2,6 +2,8 @@ package com.somosun.plan.client.index.view;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.shared.event.HideEvent;
+import org.gwtbootstrap3.client.shared.event.HideHandler;
 import org.gwtbootstrap3.client.shared.event.ShowEvent;
 import org.gwtbootstrap3.client.shared.event.ShowHandler;
 import org.gwtbootstrap3.client.ui.Alert;
@@ -96,6 +98,15 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 			public void onShow(ShowEvent showEvent) {
 				presenter.onGroupsAccordionShows(subjectCode, view);
 				onGroupsShows.removeHandler();
+			}
+			
+		});
+		
+		groupsTableContainer.addHideHandler(new HideHandler(){
+
+			@Override
+			public void onHide(HideEvent hideEvent) {
+				hideEvent.stopPropagation();
 			}
 			
 		});
