@@ -1,6 +1,7 @@
 package com.somosun.plan.client.index.view;
 
 import org.gwtbootstrap3.client.shared.event.ShowEvent;
+import org.gwtbootstrap3.client.ui.PanelHeader;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.user.client.ui.Widget;
@@ -23,5 +24,6 @@ public interface SubjectAccordionView {
 	String getCode();
 	void showError();
 	void addComplementaryView(ComplementaryValueViewImpl view);
+	PanelHeader getHeader();
 	
 }

@@ -76,6 +76,7 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 	interface SubjectAccordionViewUiBinder extends
 			UiBinder<Widget, SubjectAccordionViewImpl> {
 	}
+	
 
 	public SubjectAccordionViewImpl(int counter) {
 		initWidget(uiBinder.createAndBindUi(this));
@@ -134,6 +135,11 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 			
 		});
 	}
+	
+	public PanelHeader getHeader(){
+		return header;
+	}
+
 	
 	private void setSubheader(String name, String code){
 		h1Name.setText(name);
@@ -327,8 +333,6 @@ public class SubjectAccordionViewImpl extends Composite implements SubjectAccord
 
 	public void goTo1(){
 		int position = Integer.valueOf(this.getElement().getAttribute("position"));
-		
-		GWT.debugger();
 		
 		if(position != 0) {
 
