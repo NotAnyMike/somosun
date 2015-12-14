@@ -556,7 +556,7 @@ ComplementaryValueView.Presenter{
 				if(sTemporary.equals(sVTemporary.getComplementaryValue().getSubject())==true){
 				//OLD if(sTemporary.equals(valuesAndSubjectMap.get(sVTemporary))==true){
 					isRelated = true;
-					subjectRelatedList.remove(sTemporary);
+					//subjectRelatedList.remove(sTemporary);
 				}				
 			}
 			if(isRelated == false && sVTemporary.equals(sV)==false){
