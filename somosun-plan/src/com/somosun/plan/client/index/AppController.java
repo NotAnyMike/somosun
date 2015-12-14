@@ -104,11 +104,13 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 		
 	};
 	
-	/************** AsyncCallback variables *****************/
+	/************** AsyncCallback variables 
+	 * @param loginService2 *****************/
 	
-	public AppController(SUNServiceAsync rpcService, HandlerManager eventBus){
+	public AppController(SUNServiceAsync rpcService, LoginServiceAsync loginService, HandlerManager eventBus){
 		this.rpcService = rpcService;
 		this.eventBus = eventBus;
+		this.loginService = loginService;
 		bind();
 		getRandomPhrases();
 	}
@@ -223,13 +225,14 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	public void go(HasWidgets container){
 		this.container = container;
 		
+		getLoginInfo();
+
 		if(History.getToken().equals("")){
 			History.newItem("index");
 		} else {
 			History.fireCurrentHistoryState();
 		}
 		
-		getLoginInfo();
 	}
 
 	@Override
@@ -238,7 +241,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 		
 		token = event.getValue();
 		
-		if(token != null){
+		if(token != null && loginInfo != null){
 			
 			if(topBarView == null){
 				topBarView = new TopBarViewImpl();
@@ -254,91 +257,103 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 			}
 			
 			/************ Restricting access to just non-blocked users **************/
-			if(loginInfo.isLoggedIn() == false || student.isBlocked()){
-				if(token.equals("plan") ||  token.equals("create")){
-					token = "aboutUs";
-					History.replaceItem("aboutUs");
+			if((loginInfo.isLoggedIn() == true && student.isBlocked()) && (token.equals("plan") ||  token.equals("create"))){
+				token = "aboutUs";
+				History.replaceItem("aboutUs");
+			}else if((loginInfo.isLoggedIn() == false || student == null) && (token.equals("plan") ||  token.equals("create"))){
+				if(loginInfo.getLoginUrl() != null){					
+					Window.Location.replace(loginInfo.getLoginUrl());
 				}
-			}
-			
-			/**
-			 * This part will take care of the stability of the plan widget when its height changes due
-			 * to the changes on the number of max subjects on one semester
-			 */
-			if(token.equals("plan")){
-				if(RootPanel.get("centerArea").getElement().getAttribute("valign") != "top")
-				RootPanel.get("centerArea").getElement().setAttribute("valign","top");
-			}else if(RootPanel.get("centerArea").getElement().getAttribute("valign")!="middle"){
-				RootPanel.get("centerArea").getElement().setAttribute("valign","middle");
-			}
-			
-			if(token.equals("create")){
-				if(createView == null){
-					createView = new CreateViewImpl();
+			}else{
+				/**
+				 * This part will take care of the stability of the plan widget when its height changes due
+				 * to the changes on the number of max subjects on one semester
+				 */
+				if(token.equals("plan")){
+					if(RootPanel.get("centerArea").getElement().getAttribute("valign") != "top")
+						RootPanel.get("centerArea").getElement().setAttribute("valign","top");
+				}else if(RootPanel.get("centerArea").getElement().getAttribute("valign")!="middle"){
+					RootPanel.get("centerArea").getElement().setAttribute("valign","middle");
 				}
-				if(createPresenter == null){
-					createPresenter = new CreatePresenter(rpcService, eventBus, createView);
-					createPresenter.loadPlans(); 
-				}
-				if(student == null){					
-					createPresenter.showWarning();
-				}else{
-					createPresenter.hideWarning();
-				}
-				createPresenter.loadPlans();
-				createPresenter.go(RootPanel.get("centerArea"));
-			} else if(token.equals("plan")) {
-				if(planView != null && planPresenter != null){
-					if(student == null){
-						siaSummaryView.showWarning();
-					}else{
-						siaSummaryView.hideWarning();						
+				
+				if(token.equals("create")){
+					if(createView == null){
+						createView = new CreateViewImpl();
 					}
-					RootPanel.get("mainContainer").addStyleName("noSelect");
-					planPresenter.go(RootPanel.get("centerArea"));
-					planPresenter.showToolTip();
-				}else{
-					History.newItem("create");
+					if(createPresenter == null){
+						createPresenter = new CreatePresenter(rpcService, eventBus, createView);
+						createPresenter.loadPlans(); 
+					}
+					if(student == null){					
+						createPresenter.showWarning();
+					}else{
+						createPresenter.hideWarning();
+					}
+					createPresenter.loadPlans();
+					createPresenter.go(RootPanel.get("centerArea"));
+				} else if(token.equals("plan")) {
+					if(planView != null && planPresenter != null){
+						if(student == null){
+							siaSummaryView.showWarning();
+						}else{
+							siaSummaryView.hideWarning();						
+						}
+						RootPanel.get("mainContainer").addStyleName("noSelect");
+						planPresenter.go(RootPanel.get("centerArea"));
+						planPresenter.showToolTip();
+					}else{
+						History.newItem("create");
+					}
+				} else if(token.equals("aboutUs")) {
+					if(aboutUsView == null){
+						aboutUsView = new AboutUsViewImpl();
+					}
+					if(aboutUsPresenter == null){
+						aboutUsPresenter = new AboutUsPresenter(rpcService, eventBus, aboutUsView);
+					}
+					aboutUsPresenter.go(RootPanel.get("centerArea"));
+				} else if(token.equals("announcement")) {
+					if(aboutUsView == null){
+						announcementView = new AnnouncementViewImpl();
+					}
+					if(aboutUsPresenter == null){
+						announcementPresenter = new AnnouncementPresenter(rpcService, eventBus, announcementView);
+					}
+					announcementPresenter.go(RootPanel.get("centerArea"));
+				} else if(token.contains("contactUs")){
+					if(contactUsView == null){
+						contactUsView = new ContactUsViewImpl();
+					}
+					if(contactUsPresenter == null){
+						contactUsPresenter = new ContactUsPresenter(rpcService, eventBus, contactUsView);
+					}
+					String type = "";
+					if(token.contains("type=error")) type = "error";
+					if(token.contains("type=other")) type = "other";
+					contactUsPresenter.setType(type);
+					contactUsPresenter.go(RootPanel.get("centerArea"));
+				} else {
+					if(indexView == null){
+						indexView = new IndexViewImpl();
+					}
+					if(indexPresenter == null){
+						indexPresenter = new IndexPresenter(rpcService, eventBus, indexView);					
+					}
+					indexPresenter.go(RootPanel.get("centerArea"));
 				}
-			} else if(token.equals("aboutUs")) {
-				if(aboutUsView == null){
-					aboutUsView = new AboutUsViewImpl();
-				}
-				if(aboutUsPresenter == null){
-					aboutUsPresenter = new AboutUsPresenter(rpcService, eventBus, aboutUsView);
-				}
-				aboutUsPresenter.go(RootPanel.get("centerArea"));
-			} else if(token.equals("announcement")) {
-				if(aboutUsView == null){
-					announcementView = new AnnouncementViewImpl();
-				}
-				if(aboutUsPresenter == null){
-					announcementPresenter = new AnnouncementPresenter(rpcService, eventBus, announcementView);
-				}
-				announcementPresenter.go(RootPanel.get("centerArea"));
-			} else if(token.contains("contactUs")){
-				if(contactUsView == null){
-					contactUsView = new ContactUsViewImpl();
-				}
-				if(contactUsPresenter == null){
-					contactUsPresenter = new ContactUsPresenter(rpcService, eventBus, contactUsView);
-				}
-				String type = "";
-				if(token.contains("type=error")) type = "error";
-				if(token.contains("type=other")) type = "other";
-				contactUsPresenter.setType(type);
-				contactUsPresenter.go(RootPanel.get("centerArea"));
-			} else {
-				if(indexView == null){
-					indexView = new IndexViewImpl();
-				}
-				if(indexPresenter == null){
-					indexPresenter = new IndexPresenter(rpcService, eventBus, indexView);					
-				}
-				indexPresenter.go(RootPanel.get("centerArea"));
 			}
+			
+			
 			setLabelsOnTopBar(token);
 			lastToken = token;
+		}else{
+			if(indexView == null){
+				indexView = new IndexViewImpl();
+			}
+			if(indexPresenter == null){
+				indexPresenter = new IndexPresenter(rpcService, eventBus, indexView);					
+			}
+			indexPresenter.go(RootPanel.get("centerArea"));
 		}
 		
 	}
@@ -410,9 +425,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 	}
 	
 	public void getLoginInfo(){
-		loginService = GWT.create(LoginService.class);
 		loginService.login(GWT.getHostPageBaseURL() + "#" + token, new AsyncCallback<LoginInfo>() {
-
 			@Override
 			public void onFailure(Throwable caught) {
 				loginInfo.setLoggedIn(false);
@@ -425,6 +438,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 				if(siaSummaryView != null){
 					siaSummaryView.showWarning();
 				}
+				History.fireCurrentHistoryState();
 			}
 
 			@Override
@@ -447,6 +461,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 					}
 					
 				}
+				History.fireCurrentHistoryState();
 			}});
 	}
 	
