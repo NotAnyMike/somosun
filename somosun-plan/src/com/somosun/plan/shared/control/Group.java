@@ -4,9 +4,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
+import com.googlecode.objectify.annotation.OnLoad;
 
 /**
  *
@@ -23,11 +26,12 @@ public class Group implements Serializable {
     @Index private Subject subject = null;
     @Index private Teacher teacher = null;
     @Index private SemesterValue semesterValue=null;
-    @Index private int groupNumber;
+    @Index private Integer groupNumber;
     @Index private int freePlaces;
     private int totalPlaces;
     private List<Block> schedule=null;
     private List<Career> careers = null;
+    @Index private Double averageGrade = null; 
 
     public Group(){
     }
@@ -49,7 +53,6 @@ public class Group implements Serializable {
         this.groupNumber = groupInt;
         setCareers(new ArrayList<Career>());
 	}
-    
 
 	/**
      * Two groups will be the same group if the subject,
@@ -190,6 +193,14 @@ public class Group implements Serializable {
 	 */
 	private void setCareers(List<Career> careers) {
 		this.careers = careers;
+	}
+
+	public Double getAverageGrade() {
+		return averageGrade;
+	}
+
+	public void setAverageGrade(Double grade) {
+		this.averageGrade = grade;
 	}
 
 }

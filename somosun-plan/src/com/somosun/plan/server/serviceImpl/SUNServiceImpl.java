@@ -16,14 +16,20 @@ import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Transaction;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.somosun.plan.client.index.service.SUNService;
 import com.somosun.plan.server.SiaProxy;
+import com.somosun.plan.server.SomosUNServerUtils;
+import com.somosun.plan.server.cronJob.GradeUpdaterCronJob;
 import com.somosun.plan.server.dao.CareerDao;
 import com.somosun.plan.server.dao.ComplementaryValueDao;
 import com.somosun.plan.server.dao.MessageDao;
 import com.somosun.plan.server.dao.PlanDao;
+import com.somosun.plan.server.dao.ScoreDao;
 import com.somosun.plan.server.dao.SemesterValueDao;
 import com.somosun.plan.server.dao.StudentDao;
 import com.somosun.plan.server.dao.SubjectDao;
@@ -37,10 +43,13 @@ import com.somosun.plan.shared.SiaResultSubjects;
 import com.somosun.plan.shared.SomosUNUtils;
 import com.somosun.plan.shared.control.Career;
 import com.somosun.plan.shared.control.ComplementaryValue;
+import com.somosun.plan.shared.control.Group;
 import com.somosun.plan.shared.control.Message;
 import com.somosun.plan.shared.control.Plan;
+import com.somosun.plan.shared.control.Score;
 import com.somosun.plan.shared.control.Semester;
 import com.somosun.plan.shared.control.SemesterValue;
+import com.somosun.plan.shared.control.SingleScore;
 import com.somosun.plan.shared.control.Student;
 import com.somosun.plan.shared.control.Subject;
 import com.somosun.plan.shared.control.SubjectGroup;
@@ -1189,6 +1198,21 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		}
 		
 		return toReturn;
+	}
+
+	@Override
+	public Long savePlanAndGrade(Student student, Plan plan, Group group, Double oldGrade, Double newGrade) {
+		
+		if(group != null){
+			//TODO updateGrade
+			SomosUNServerUtils.createGradeUpdaterTask(group.getTeacher(), group.getSemesterValue(), oldGrade, newGrade, group.getSubject());
+			
+			GradeUpdaterCronJob.updateAllGrades();
+		}else{
+			log.warning("savePlanAndGrade - A subject which has no group, the plan's id is " + plan.getId());
+		}
+		
+		return savePlan(student, plan);
 	}
 
 }

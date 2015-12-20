@@ -13,9 +13,16 @@
 	    
 		<g:HTML ui:field="unavailableWarning">Advertencia: La clase no existe en el SIA</g:HTML>
 		<g:HTML ui:field="errorWarning">Error: Algún error ocurrió mientras descargabamos la información</g:HTML>
-		<div class="panel panel-default complementaryValue-subjectGroupContainer">
-			<div class="panel-body text-center" style="padding:6px">
-				<g:Label ui:field="labelSubjectGroup">Agrupacion:</g:Label>
+		<div>
+			<div class="panel panel-default complementaryValue-subjectGroupContainer" style="margin-top:5px; width:170px" data-toggle="tooltip" data-placement="bottom" data-container="body" title="Nota promedio que han obtenido los estudiantes en este asignatura (no solo en el último semestre)">
+				<div class="panel-body text-center" style="padding:6px">
+					<g:Label ui:field="labelGrade">Nota promedio: -</g:Label>
+				</div>
+			</div>
+			<div class="panel panel-default complementaryValue-subjectGroupContainer" style="width:auto; right:0px; left: 175px; position:absolute">
+				<div class="panel-body text-center" style="padding:6px">
+					<g:Label ui:field="labelSubjectGroup">Agrupacion:</g:Label>
+				</div>
 			</div>
 		</div>
 		<table border="0" cellspacing="0" cellpadding="0" class="table table-bordered" style="padding:0px">

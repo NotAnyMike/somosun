@@ -47,9 +47,10 @@ public class StudentDao implements Dao<Student> {
 					UserService userService = UserServiceFactory.getUserService();
 					if(userService.isUserAdmin()){
 						student.setAdmin(true);
-					}else{						
-						student.setBlocked(true);
 					}
+//					else{						
+//						student.setBlocked(true);
+//					}
 					
 					student.setIdSun(generateId());
 					save(student);

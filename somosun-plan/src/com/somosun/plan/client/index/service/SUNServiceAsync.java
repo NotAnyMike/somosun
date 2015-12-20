@@ -11,6 +11,7 @@ import com.somosun.plan.shared.SiaResultGroups;
 import com.somosun.plan.shared.SiaResultSubjects;
 import com.somosun.plan.shared.control.Career;
 import com.somosun.plan.shared.control.ComplementaryValue;
+import com.somosun.plan.shared.control.Group;
 import com.somosun.plan.shared.control.Plan;
 import com.somosun.plan.shared.control.SemesterValue;
 import com.somosun.plan.shared.control.Student;
@@ -102,4 +103,7 @@ public interface SUNServiceAsync {
 
 	void getCompletePlanInfo(String careerCode,
 			AsyncCallback<CompletePlanInfo> callback);
+
+	void savePlanAndGrade(Student student, Plan plan, Group group, Double oldGrade, Double newGrade,
+			AsyncCallback<Long> callback);
 }

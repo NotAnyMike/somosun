@@ -2,6 +2,8 @@ package com.somosun.plan.client.index.view;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.shared.event.HideEvent;
+import org.gwtbootstrap3.client.shared.event.HideHandler;
 import org.gwtbootstrap3.client.shared.event.ShowEvent;
 import org.gwtbootstrap3.client.shared.event.ShowHandler;
 import org.gwtbootstrap3.client.ui.Alert;
@@ -34,12 +36,14 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.somosun.plan.client.index.presenter.PlanPresenter;
+import com.somosun.plan.shared.SomosUNUtils;
 import com.somosun.plan.shared.control.Career;
 
 public class ComplementaryValueViewImpl extends Composite implements ComplementaryValueView {
 
 	PlanPresenter presenter;
 	
+	@UiField Label labelGrade;
 	@UiField Label labelSubjectGroup;
 	@UiField VerticalPanel preRequisitesPanel;
 	@UiField VerticalPanel coRequisitesPanel;
@@ -98,6 +102,15 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 			
 		});
 		
+		groupsTableContainer.addHideHandler(new HideHandler(){
+
+			@Override
+			public void onHide(HideEvent hideEvent) {
+				hideEvent.stopPropagation();
+			}
+			
+		});
+		
 	}
 
 
@@ -152,6 +165,11 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 	
 	public void setSubjectGroupName(String s) {
 		labelSubjectGroup.setText("Agrupación: " + s);
+	}
+	
+	public void setGrade(Double grade){
+		if(grade == null) labelGrade.setText("Nota promedio: -");
+		else labelGrade.setText("Nota promedio: " + SomosUNUtils.getOneDecimalPointString(grade));
 	}
 	
 	public void addRequisite(String type, final String name, final String code, final String careerCode, final SubjectAccordionViewImpl accordion, boolean makeStatic, boolean makeUnavailable) {
@@ -225,8 +243,8 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 		}
 	}
 	
-	public void addGroup(String group, String professor, String professorGrade,
-			String groupGrade, String averageGrade, String freeSpaces,
+	public void addGroup(String group, String professor, Double professorGrade,
+			Double groupGrade, String freeSpaces,
 			String totalSpaces, String L, String classRoomL, String M, String classRoomM, String C, String classRoomC, String J, String classRoomJ,
 			String V, String classRoomV, String S, String classRoomS, String D, String classRoomD) {
 		
@@ -237,8 +255,8 @@ public class ComplementaryValueViewImpl extends Composite implements Complementa
 		
 		groupTable.setText(0, 0, group);
 		groupTable.setText(0, 1, professor);
-		groupTable.setText(0, 2, professorGrade);
-		groupTable.setText(0, 3, averageGrade);
+		groupTable.setText(0, 2, (professorGrade == null ? "-" : SomosUNUtils.getOneDecimalPointString(professorGrade)));
+		groupTable.setText(0, 3, (groupGrade == null ? "-" : SomosUNUtils.getOneDecimalPointString(groupGrade)));
 		groupTable.setText(0, 4, freeSpaces);
 		groupTable.setText(0, 5, totalSpaces);
 		groupTable.setText(0, 6, L);

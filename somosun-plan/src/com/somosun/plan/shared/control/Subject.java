@@ -22,11 +22,13 @@ public class Subject implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	@Id private Long id = null;
+	@Index private Long idCopy = null;
     private int credits = 0;
     @Index private String name = null;
     @Index private String code = null;   
     @Index private String siaCode = null;
     private String location = null;
+    private Double averageGrade = null; 
     private boolean isApprovenType = false;
     /**
      * A special subject is a kind of subject that will NOT be shown as a subject in the planPresenter, but still need to be a subject. e.g. "80% de los créditos de..."
@@ -155,6 +157,7 @@ public class Subject implements Serializable{
 
 	public void setId(Long id) {
 		this.id = id;
+		this.idCopy = id;
 	}
 
 	/**
@@ -200,6 +203,14 @@ public class Subject implements Serializable{
 
 	public void setApprovenType(boolean isApprovenType) {
 		this.isApprovenType = isApprovenType;
+	}
+
+	public Double getAverageGrade() {
+		return averageGrade;
+	}
+
+	public void setAverageGrade(Double averageGrade) {
+		this.averageGrade = averageGrade;
 	}
 }
    

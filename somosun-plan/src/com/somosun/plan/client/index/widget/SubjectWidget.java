@@ -10,14 +10,18 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.DoubleClickEvent;
+import com.google.gwt.event.dom.client.DoubleClickHandler;
 import com.google.gwt.event.dom.client.HasChangeHandlers;
 import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.HasDoubleClickHandlers;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
@@ -27,7 +31,7 @@ import com.somosun.plan.client.index.presenter.PlanPresenter;
 import com.somosun.plan.shared.control.Subject;
 import com.somosun.plan.shared.control.SubjectValue;
 
-public class SubjectWidget extends FlowPanel implements HasClickHandlers {
+public class SubjectWidget extends FlowPanel implements HasClickHandlers, HasDoubleClickHandlers {
 	
 	private static final String ENTER_HTMLCODE = "&#xA;";//"&#013;";
 	
@@ -201,10 +205,10 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers {
 			@Override
 			public void onBlur(BlurEvent event) {
 				textBoxGrade.setVisible(false);
-				gradeLabel.setVisible(true);
-				if(getTextOfGradeTextBox().isEmpty() == false){					
-					presenter.onGradeAdded(publicId, getTextOfGradeTextBox());
-				}
+				gradeLabel.setVisible(true);			
+				
+				presenter.onGradeAdded(publicId, getTextOfGradeTextBox());
+
 			}
 			
 		});
@@ -220,7 +224,7 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers {
 			}
 			
 		});
-
+		
 	}
 
 	private void AddStyles() {
@@ -376,11 +380,6 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers {
 		return publicId;
 	}
 
-	@Override
-	public HandlerRegistration addClickHandler(ClickHandler handler) {
-	        return addDomHandler(handler, ClickEvent.getType());
-	    }
-
 	public void setSubjectGroup(String subjectGroup) {
 		setCodeLabel(subjectGroup);
 	}
@@ -432,7 +431,7 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers {
 
 		String title = null;
 
-		if (grade == null) {
+		if (grade == null || grade.isEmpty() == true) {
 			grade = "-";
 			title = "Nota no registrada, para registrarla haz click";
 		} else if(grade.equals("AP")){
@@ -468,6 +467,18 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers {
 	
 	public String getTextOfGradeTextBox(){
 		return textBoxGrade.getText();
+	}
+
+	/*************** CLICK HANDLERS *********************/
+	
+	@Override
+	public HandlerRegistration addDoubleClickHandler(DoubleClickHandler handler) {
+		return addDomHandler(handler, DoubleClickEvent.getType());
+	}
+	
+	@Override
+	public HandlerRegistration addClickHandler(ClickHandler handler) {
+		return addDomHandler(handler, ClickEvent.getType());
 	}
 
 }

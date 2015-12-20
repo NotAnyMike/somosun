@@ -49,13 +49,15 @@ public class BlockDao implements Dao<Block>{
 	}
 
 	/**
-	 * This method should be used only to create a block, not to update a block, this method will delete any id in order to create and not to save
+	 * This method should be used only to create a block, not to update a block, This method will create a new entity if it has already an id
 	 * @param b
 	 */
 	public Long save(Block b) {
+			
 		if(b.getId() != null) b.setId(generateId());
 		ofy().save().entity(b).now();
 		return b.getId();
+		
 	}
 
 	public Long generateId() {

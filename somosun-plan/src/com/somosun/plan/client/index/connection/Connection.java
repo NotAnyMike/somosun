@@ -26,6 +26,8 @@ public class Connection {
 	
 	private final String CO = SomosUNUtils.COLOR_CO;
 	private final String PRE = SomosUNUtils.COLOR_PRE;
+	private final int Z_INDEX_LINE = 3;
+	private final int Z_INDEX_ARROW = Z_INDEX_LINE+1;
 	
 	public Connection(SubjectWidget from, SubjectWidget to, String type){
 		this.from = from;
@@ -175,8 +177,8 @@ public class Connection {
 	}
 
 	public void setPoints(double width, double top, double left, double angle, int x2, int y2) {
-		this.line.getElement().setAttribute("style", "z-index:199; background-color: #" + (type == "pre" ? PRE : CO) + ";width: "+ width + "px; top:" + top + "px; left:" + left  + "px; -webkit-transform: rotate(" + angle +"rad); -moz-transform: rotate(" + angle + "rad);");
-		this.arrow.getElement().setAttribute("style", "color: #" + (type == "pre"? PRE : CO) + "; z-index: 200;position:absolute; top:" + (y2-13/2/*-arrow.getElement().getOffsetHeight()/2*/) + "px; left:" + (x2-9/2/*-arrow.getElement().getOffsetWidth()/2*/) + "px; -webkit-transform: rotate(" + angle +"rad); -moz-transform: rotate(" + angle + "rad);");
+		this.line.getElement().setAttribute("style", "z-index:" + Z_INDEX_LINE + "; background-color: #" + (type == "pre" ? PRE : CO) + ";width: "+ width + "px; top:" + top + "px; left:" + left  + "px; -webkit-transform: rotate(" + angle +"rad); -moz-transform: rotate(" + angle + "rad);");
+		this.arrow.getElement().setAttribute("style", "color: #" + (type == "pre"? PRE : CO) + "; z-index: " + Z_INDEX_ARROW + ";position:absolute; top:" + (y2-13/2/*-arrow.getElement().getOffsetHeight()/2*/) + "px; left:" + (x2-9/2/*-arrow.getElement().getOffsetWidth()/2*/) + "px; -webkit-transform: rotate(" + angle +"rad); -moz-transform: rotate(" + angle + "rad);");
 	}
 
 	public Integer getPosition() {

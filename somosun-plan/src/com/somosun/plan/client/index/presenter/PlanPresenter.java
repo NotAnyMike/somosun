@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Icon;
@@ -17,8 +18,12 @@ import com.google.common.collect.HashBiMap;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.DoubleClickEvent;
+import com.google.gwt.event.dom.client.DoubleClickHandler;
+import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
@@ -66,6 +71,7 @@ import com.somosun.plan.shared.control.Student;
 import com.somosun.plan.shared.control.Subject;
 import com.somosun.plan.shared.control.SubjectGroup;
 import com.somosun.plan.shared.control.SubjectValue;
+import com.somosun.plan.shared.values.PlanCodes;
 import com.somosun.plan.shared.values.TypologyCodes;
 
 /**
@@ -173,6 +179,23 @@ ComplementaryValueView.Presenter{
 		}
 	};
 		
+	
+	AsyncCallback<Long> callbackOnPlanSave = new AsyncCallback<Long>(){
+		
+		@Override
+		public void onFailure(Throwable caught) {
+			GWT.log("Error saving the plan - PlanPresenter");
+		}
+		
+		@Override
+		public void onSuccess(Long result) {
+			if(plan.getId() == null){
+				plan.setId(result);
+			}
+			GWT.log("Plan saved - PP");
+		}
+		
+	};
 	
 	AsyncCallback<List<ComplementaryValue>> asyncGetComplementaryValuesByCareer = new AsyncCallback<List<ComplementaryValue>>(){
 		
@@ -374,7 +397,7 @@ ComplementaryValueView.Presenter{
 		}
 		
 		if(save == true){			
-			planChanged("NewSemester");
+			planChanged(PlanCodes.CHANGE_BY_NEW_SEMESTER);
 		}
 
 		siaSummaryView.setMaxSemesterInForm(plan.getSemesters().size());
@@ -382,8 +405,31 @@ ComplementaryValueView.Presenter{
 	}
 	
 	public void planChanged(String triggered){
-		GWT.log(triggered);
-		savePlan();
+		
+		Callable<Void> toSave = new Callable<Void>(){
+			
+			public Void call(){				
+				rpcService.savePlan(student, plan, new AsyncCallback<Long>(){
+					
+					@Override
+					public void onFailure(Throwable caught) {
+						GWT.log("Error saving the plan - PlanPresenter");
+					}
+					
+					@Override
+					public void onSuccess(Long result) {
+						if(plan.getId() == null){
+							plan.setId(result);
+						}
+						GWT.log("Plan saved - PP");
+					}
+					
+				});
+				return null;
+			}
+		};
+		
+		savePlan(toSave, triggered);
 	}
 
 	private void createSubject(Subject subject, SubjectValue subjectValue, Semester semester) {
@@ -499,7 +545,7 @@ ComplementaryValueView.Presenter{
 				if(sTemporary.equals(sVTemporary.getComplementaryValue().getSubject())==true){
 				//OLD if(sTemporary.equals(valuesAndSubjectMap.get(sVTemporary))==true){
 					isRelated = true;
-					subjectRelatedList.remove(sTemporary);
+					//subjectRelatedList.remove(sTemporary);
 				}				
 			}
 			if(isRelated == false && sVTemporary.equals(sV)==false){
@@ -711,7 +757,7 @@ ComplementaryValueView.Presenter{
 			GWT.log("The number of semesters do not match");
 		}
 		
-		planChanged("SemesterDelete");
+		planChanged(PlanCodes.CHANGE_BY_SEMESTER_DELETE);
 		
 		siaSummaryView.setMaxSemesterInForm(plan.getSemesters().size());
 		
@@ -754,24 +800,19 @@ ComplementaryValueView.Presenter{
 		
 	}
 
-	private void savePlan() {
+	/** 
+	 * DO NOT use this method directly, it is better to use planChanged(String triggered) in order to print in the console the reason why it is being saved.
+	 * @param triggered 
+	 */
+	private void savePlan(Callable<Void> func, String triggered) {
 		if(plan.getName() != null && plan.getName().isEmpty() == false){
-			rpcService.savePlan(student, plan, new AsyncCallback<Long>(){
-
-				@Override
-				public void onFailure(Throwable caught) {
-					GWT.log("Error saving the plan - PlanPresenter");
-				}
-
-				@Override
-				public void onSuccess(Long result) {
-					if(plan.getId() == null){
-						plan.setId(result);
-					}
-					GWT.log("Plan saved - PP");
-				}
-				
-			});
+			try {
+				func.call();
+				GWT.log(triggered);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
 		}else if(changeNameAsked == false){
 			changeNameAsked = true;
 			showSavePlanPopup();
@@ -1055,13 +1096,25 @@ ComplementaryValueView.Presenter{
 			}});
 	}
 	
-	private void addClickHandlerSubjectWidget(SubjectWidget s){
+	private void addClickHandlerSubjectWidget(final SubjectWidget s){
 		s.addClickHandler(new ClickHandler(){
 			@Override
 			public void onClick(ClickEvent event) {
 				onSubjectWidgetClicked(event.getRelativeElement().getAttribute("publicId"));
 			}			
 		});
+		
+		s.addDoubleClickHandler(new DoubleClickHandler(){
+
+			@Override
+			public void onDoubleClick(DoubleClickEvent event) {
+				onClickAddSubject("" + getSemesterFromPublicId(s.getPublicId()));
+				searchSubjectView.setSearchBox(s.getName());
+				onSearchButtonClicked(s.getName(), plan.getCareer().getCode(), "", 1, true);
+			}
+			
+		});
+
 	}
 	
 	private void addClickHandlerDeleteSemesterButton(SemesterWidget semester){
@@ -1084,8 +1137,10 @@ ComplementaryValueView.Presenter{
 
 	public void confirmedDeleteSubject(SubjectValue sV) {
 		deleteSubject(sV);
-		planChanged("SubjectDelete");
+		planChanged(PlanCodes.CHANGE_BY_SUBJECT_DELETE);
 		warningDeleteSubjectView.hideIt();
+		deleteAllOpacities();
+		hideArrows();
 	}
 
 	public SubjectValue getSubjectValuesSelected() {
@@ -1100,27 +1155,34 @@ ComplementaryValueView.Presenter{
 		subContainer.add(i);
 	}	
 	
-	protected void loadSubjectsToSearchView(SiaResultSubjects result, String careerCode, String searchText, String type) {
+	protected void loadSubjectsToSearchView(SiaResultSubjects result, String careerCode, String searchText, String type, boolean openFirst) {
 		
-		addSubjectsToSearchView(result.getSubjectList(), careerCode);
+		addSubjectsToSearchView(result.getSubjectList(), careerCode, openFirst);
 		createPagination(result, searchText, type, careerCode);
 		showToolTip();
 				
 	}
-
+	
 	private void addSubjectsToSearchView(List<Subject> subjectList, String careerCode) {
+		addSubjectsToSearchView(subjectList, careerCode, false);
+	}
+
+	private void addSubjectsToSearchView(List<Subject> subjectList, String careerCode, boolean openFirst) {
 		
 		searchSubjectView.clearAccordionContainer();
 		accordions.clear();
 		
+		boolean isFirst = true;
 		for(Subject s : subjectList){
+			GWT.debugger();
 			SubjectAccordionViewImpl accordion = new SubjectAccordionViewImpl(searchSubjectView.getSubjectsAmmount());
 			accordion.setPresenter(this);
 			accordion.setHeader(s.getCode(), s.getName(), "L", Integer.toString(s.getCredits()), careerCode);
-
+			
 			ComplementaryValueViewImpl complementaryValueView = new ComplementaryValueViewImpl(s.getName(), s.getCode(), accordion, searchSubjectView.getSubjectsAmmount(), 0);
 			complementaryValueView.setPresenter(this);
 			complementaryValueView.setSubjectGroupName("-");
+			complementaryValueView.setGrade(null);
 			
 			//mapAccordion.put(accordion, complementaryValueView);
 			accordion.addComplementaryView(complementaryValueView);
@@ -1131,14 +1193,19 @@ ComplementaryValueView.Presenter{
 			if(selected != null){
 				accordion.changeState();
 			}
-			
+						
 			searchSubjectView.addSubject(accordion);
+			
+			if(openFirst == true && isFirst == true){
+				clickElement(accordion.getHeader().getElement());
+			}
+			isFirst = false;
 		}
 		
 		avoidAccordionPropagation();
 		
 	}
-
+	
 	private void createPagination(SiaResultSubjects result, final String searchText, final String type, final String careerCode) {
 		searchSubjectView.clearPagination();
 		
@@ -1166,7 +1233,7 @@ ComplementaryValueView.Presenter{
 
 				@Override
 				public void onClick(ClickEvent event) {
-					onSearchButtonClicked(searchText, careerCode, type, 1);
+					onSearchButtonClicked(searchText, careerCode, type, 1, false);
 				}
 				
 			});
@@ -1188,7 +1255,7 @@ ComplementaryValueView.Presenter{
 
 				@Override
 				public void onClick(ClickEvent event) {
-					onSearchButtonClicked(searchText, careerCode, type, page);
+					onSearchButtonClicked(searchText, careerCode, type, page, false);
 				}
 				
 			});
@@ -1219,7 +1286,7 @@ ComplementaryValueView.Presenter{
 
 				@Override
 				public void onClick(ClickEvent event) {
-					onSearchButtonClicked(searchText, careerCode, type, lastPage);
+					onSearchButtonClicked(searchText, careerCode, type, lastPage, false);
 				}
 				
 			});
@@ -1311,7 +1378,7 @@ ComplementaryValueView.Presenter{
 		}
 		
 		if(toSave == true){			
-			planChanged("NewSubjects");
+			planChanged(PlanCodes.CHANGE_BY_NEW_SUBJECTS);
 		}
 
 	}
@@ -1395,15 +1462,22 @@ ComplementaryValueView.Presenter{
 	private void populateAccordionWithComplementaryValue(SubjectAccordionViewImpl accordion, ComplementaryValueViewImpl cVView, ComplementaryValue complementaryValue) {
 		//SubjectGroup, pre-co requisites (Of) TODO
 		
+		GWT.debugger();
+		
 		if(complementaryValue != null && complementaryValue.getSubject() != null){
 			
 			String subjectGroupName = null;
 			if(complementaryValue != null && complementaryValue.getSubjectGroup() != null){			
-				subjectGroupName =complementaryValue.getSubjectGroup().getName();
+				subjectGroupName = complementaryValue.getSubjectGroup().getName();
 			}else{
 				subjectGroupName = "Desconocido";
 			}
+			
+			GWT.debugger();
+			Double grade = complementaryValue.getSubject().getAverageGrade();
+			
 			cVView.setSubjectGroupName(subjectGroupName);
+			cVView.setGrade(grade);
 			
 			if(complementaryValue.getSubject().isDummy()){ //|| complementaryValue.getSubject().isDefault() || complementaryValue.getSubject().isDummy()){
 				cVView.showUnavailableWarning();
@@ -1470,6 +1544,7 @@ ComplementaryValueView.Presenter{
 	private void populateAccordionWithGroups(ComplementaryValueViewImpl view, SiaResultGroups result) {
 		
 		if(result != null && result.getGroups() != null && result.getGroups().size() > 0){
+			
 			for(Group group : result.getGroups()){
 				String teacherName = group.getTeacher().getName();
 				if(teacherName.trim().isEmpty()) teacherName = "Unknown";
@@ -1481,7 +1556,7 @@ ComplementaryValueView.Presenter{
 					classRoom[block.getDay()] = classRoom[block.getDay()].concat(block.getClassRoom() + " ");
 				}
 				
-				view.addGroup("" + group.getGroupNumber(), teacherName, "-", "-", "-", "" + group.getFreePlaces(), "" + group.getTotalPlaces(), daysTime[0], classRoom[0], daysTime[1], classRoom[1], daysTime[2], classRoom[2], daysTime[3], classRoom[3], daysTime[4], classRoom[4], daysTime[5], classRoom[5], daysTime[6], classRoom[6]);
+				view.addGroup("" + group.getGroupNumber(), teacherName, null , group.getAverageGrade(), "" + group.getFreePlaces(), "" + group.getTotalPlaces(), daysTime[0], classRoom[0], daysTime[1], classRoom[1], daysTime[2], classRoom[2], daysTime[3], classRoom[3], daysTime[4], classRoom[4], daysTime[5], classRoom[5], daysTime[6], classRoom[6]);
 				GWT.log(group.getFreePlaces() + " " + group.getTotalPlaces());
 			}
 		}else{
@@ -1562,7 +1637,7 @@ ComplementaryValueView.Presenter{
 					}
 				}
 				if(save){					
-					planChanged("SemesterValues updated");
+					planChanged(PlanCodes.CHANGE_BY_SEMESTERVALUE_UPDATED);
 				}
 			}
 			
@@ -1908,7 +1983,8 @@ ComplementaryValueView.Presenter{
 			/*******************************************************/
 			/***********************************************************/				
 			
-			//save the plan TODO
+			//save the plan
+			planChanged(PlanCodes.CHANGE_BY_PLAN_COMPLETED);
 			
 		}
 	}
@@ -2307,6 +2383,16 @@ ComplementaryValueView.Presenter{
 		view.hideCurtain();
 	}
 	
+	private int getSemesterFromPublicId(String publicId){
+		int toReturn = -1;
+		SubjectValue subjectValues = getSubjectValuesByPublicId(publicId);
+		if(subjectValues != null){			
+			toReturn = semesterList.indexOf(subjectValuesAndSemesterMap.get(subjectValues));
+		}
+		
+		return toReturn;
+	}
+	
 	/******************** JQUERY FUNCTIONS *********************/
 
 	/**
@@ -2361,6 +2447,10 @@ ComplementaryValueView.Presenter{
 		$wnd.selectCurrentSemesterPanel();
 	}-*/;
 	
+	public static native void clickElement(Element elem) /*-{
+		elem.click();
+	}-*/;
+	
 	/************************************************************/
 
 	/*********************** Behaviors **************************/
@@ -2407,7 +2497,7 @@ ComplementaryValueView.Presenter{
 		}
 	}
 
-	public void onSearchButtonClicked(final String searchText, final String careerCode, final String type, int page) {
+	public void onSearchButtonClicked(final String searchText, final String careerCode, final String type, int page, final boolean openFirst) {
 		
 		accordions.clear();
 
@@ -2420,7 +2510,7 @@ ComplementaryValueView.Presenter{
 			
 			@Override
 			public void onSuccess(SiaResultSubjects result) {
-				loadSubjectsToSearchView(result, careerCode, searchText, type);
+				loadSubjectsToSearchView(result, careerCode, searchText, type, openFirst);
 			}
 			
 		});
@@ -2588,7 +2678,7 @@ ComplementaryValueView.Presenter{
 	@Override
 	public void planNameChanged(String s) {
 		plan.setName(s);
-		planChanged("NewName");
+		planChanged(PlanCodes.CHANGE_BY_NEW_NAME);
 		view.hidePopups();
 	}
 	
@@ -2611,19 +2701,28 @@ ComplementaryValueView.Presenter{
 	}
 
 	public void onGradeAdded(String publicId, String grade){
-		if(publicId != null && publicId.isEmpty() == false){
-			
+		
+		GWT.debugger();
+		
+		if(publicId != null && publicId.isEmpty() == false){	
 			
 			SubjectValue sV = getSubjectValuesByPublicId(publicId);
 			
 			grade = grade.trim().replaceAll(",", ".");
-			Double gradeDouble = Double.valueOf(grade);
+			Double gradeDouble = null;
+			if(grade.isEmpty() == true) gradeDouble = null;
+			else gradeDouble = Double.valueOf(grade);
 			
-			if(sV != null && gradeDouble >= 0 && gradeDouble <= 5){
+			if(sV != null && (gradeDouble == null || (gradeDouble >= 0 && gradeDouble <= 5))){
 				
-				sV.setTaken(true);
+				Double oldGrade = (sV.isTaken() ? sV.getGrade() : null);
+				Double newGrade = gradeDouble;
+				
+				if(gradeDouble == null) sV.setTaken(false);
+				else sV.setTaken(true);
+				
 				sV.setGrade(gradeDouble);
-				
+					
 				SubjectWidget sW = subjectValuesAndWidgetBiMap.get(sV);
 				if(sW != null){
 					if(sV.getComplementaryValue().getSubject().isApprovenType() == true){
@@ -2632,13 +2731,15 @@ ComplementaryValueView.Presenter{
 						}else{
 							sW.setGrade("NA");
 						}
-					}else{						
-						String gradeString = SomosUNUtils.getOneDecimalPointString(sV.getGrade());
+					}else{			
+						String gradeString = null;
+						if(sV.isTaken()) gradeString = SomosUNUtils.getOneDecimalPointString(sV.getGrade());
 						sW.setGrade(gradeString);
 					}
-				}
+				}	
 				
-				planChanged("NewGrade");
+				planChangedByGrade(oldGrade, newGrade, sV.getGroup());
+				
 			}
 		}
 
@@ -2646,6 +2747,19 @@ ComplementaryValueView.Presenter{
 
 	}
 	
+	private void planChangedByGrade(final Double oldGrade, final Double newGrade, final Group group) {
+		
+		Callable<Void> toSave = new Callable<Void>(){
+			public Void call(){				
+				rpcService.savePlanAndGrade(student, plan, group, oldGrade, newGrade, callbackOnPlanSave);
+				return null;
+			}
+		};
+		
+		savePlan(toSave, PlanCodes.CHANGE_BY_NEW_GRADE);
+		
+	}
+
 	@Override
 	public void onAccordionClicked(String subjectCode, final SubjectAccordionViewImpl accordion, final ComplementaryValueViewImpl view) {
 		

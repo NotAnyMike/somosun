@@ -23,8 +23,8 @@ public class SemesterValue implements Serializable {
 	@Index private int year;
 	@Index private int numberSemester;
 	
-	public static final int CURRENT_YEAR = 2015;
-	public static final int CURRENT_NUMBER_SEMESTER = 2;
+	public static final int CURRENT_YEAR = 2016;
+	public static final int CURRENT_NUMBER_SEMESTER = 1;
 	
 	public SemesterValue(){
 	}
@@ -112,6 +112,10 @@ public class SemesterValue implements Serializable {
 	
 	public String toString(){
 		return year + "-" + numberSemester;
+	}
+
+	public String toStringDouble() {
+		return "" + year + "." + numberSemester;
 	}
 
 }

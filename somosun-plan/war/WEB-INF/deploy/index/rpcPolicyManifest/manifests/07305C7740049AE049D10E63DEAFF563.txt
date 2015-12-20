@@ -1,0 +1,2 @@
+serviceClass: com.somosun.plan.client.index.service.LoginService
+path: 488B4C7F720D974A0FBD90D583CA371E.gwt.rpc

@@ -145,6 +145,7 @@
 	          </div>
 	          <a>Visita la norma de la carrera</a>
 	          <a href="#contactUs?type=error" target="_BLANK">Reportar un error</a>
+	          <div class="siaSummaryCabelContainer" style="width: 100%;">Dbl-click: mostrar requisitos</div>
 	        </div>
 	    </div>
 	</g:HTMLPanel>

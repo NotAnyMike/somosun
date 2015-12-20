@@ -36,5 +36,6 @@ public interface SearchSubjectView {
 	void clear();
 	void setSemester(String semester);
 	String getCareerCodeSelected();
+	void setSearchBox(String s);
 	
 }
