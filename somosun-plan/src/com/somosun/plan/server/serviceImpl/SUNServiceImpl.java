@@ -1207,7 +1207,8 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 			//TODO updateGrade
 			SomosUNServerUtils.createGradeUpdaterTask(group.getTeacher(), group.getSemesterValue(), oldGrade, newGrade, group.getSubject());
 			
-			GradeUpdaterCronJob.updateAllGrades();
+			//This is only for dev mode
+			//GradeUpdaterCronJob.updateAllGrades();
 		}else{
 			log.warning("savePlanAndGrade - A subject which has no group, the plan's id is " + plan.getId());
 		}
