@@ -347,13 +347,14 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 			setLabelsOnTopBar(token);
 			lastToken = token;
 		}else{
-			if(indexView == null){
-				indexView = new IndexViewImpl();
-			}
-			if(indexPresenter == null){
-				indexPresenter = new IndexPresenter(rpcService, eventBus, indexView);					
-			}
-			indexPresenter.go(RootPanel.get("centerArea"));
+//			if(indexView == null){
+//				indexView = new IndexViewImpl();
+//			}
+//			if(indexPresenter == null){
+//				indexPresenter = new IndexPresenter(rpcService, eventBus, indexView);					
+//			}
+//			indexPresenter.go(RootPanel.get("centerArea"));
+			showLoadingPage("Cargando ... ");
 		}
 		
 	}

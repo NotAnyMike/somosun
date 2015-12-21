@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.somosun.plan.server.dummy.GradeDummy;
 import com.somosun.plan.shared.control.Career;
@@ -274,6 +275,16 @@ public class SomosUNUtils {
 		}
 			
 			
+		return toReturn;
+	}
+
+	public static String getTwoDecimalPointString(Double d) {
+		String toReturn = null;
+		
+		if(d != null){
+			double gradeFixed = (double) Math.round(d * 100) / 100;
+			toReturn = NumberFormat.getFormat("0.00").format(gradeFixed);
+		}
 		return toReturn;
 	}
 

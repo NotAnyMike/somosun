@@ -960,7 +960,7 @@ ComplementaryValueView.Presenter{
 	private void updateSmallSummary() {
 		//updateAllCredits(); FIXME uncomment when method ready
 		plan.calculateGpa();
-		siaSummaryView.setGPA(SomosUNUtils.getOneDecimalPointString(plan.getGpa()));
+		siaSummaryView.setGPA(SomosUNUtils.getTwoDecimalPointString(plan.getGpa()));
 		siaSummaryView.setApprovedCredits("" + totalCredits[1]);
 		siaSummaryView.setAdditionalyCredits("" + getAdditionalCredits());
 	}
