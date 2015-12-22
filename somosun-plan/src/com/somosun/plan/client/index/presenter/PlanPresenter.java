@@ -960,7 +960,7 @@ ComplementaryValueView.Presenter{
 	private void updateSmallSummary() {
 		//updateAllCredits(); FIXME uncomment when method ready
 		plan.calculateGpa();
-		siaSummaryView.setGPA(SomosUNUtils.getOneDecimalPointString(plan.getGpa()));
+		siaSummaryView.setGPA(SomosUNUtils.getTwoDecimalPointString(plan.getGpa()));
 		siaSummaryView.setApprovedCredits("" + totalCredits[1]);
 		siaSummaryView.setAdditionalyCredits("" + getAdditionalCredits());
 	}
@@ -1295,7 +1295,7 @@ ComplementaryValueView.Presenter{
 	}
 
 	/**
-	 * This method wil get the complementaryValues for the subjects and subjectsValues and add it to them.
+	 * This method will get the complementaryValues for the subjects and subjectsValues and add it to them.
 	 * 
 	 * @param listCV
 	 */

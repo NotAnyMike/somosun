@@ -1,3 +1,19 @@
+<<<<<<< HEAD
+279F3CC67F8754B6D11D52CDA9EC988B.cache.js
+user.agent safari
+
+61C0F651D9C6E2FC83E74C1F5800BF15.cache.js
+user.agent ie10
+
+8202131C1418E77687BD1EE28D53EDFB.cache.js
+user.agent gecko1_8
+
+92F850C9BB9C9635F64D2CD24AF87767.cache.js
+user.agent ie9
+
+A35B8D120E6D4967D1437D40849C2C8F.cache.js
+user.agent ie8
+=======
 16DAA362E785C291286D8B9C51623C87.cache.js
 user.agent ie10
 
@@ -12,5 +28,6 @@ user.agent ie8
 
 CDC45A5642C503687A59A80757D6F02B.cache.js
 user.agent gecko1_8
+>>>>>>> master
 
 Devmode:devmode.js

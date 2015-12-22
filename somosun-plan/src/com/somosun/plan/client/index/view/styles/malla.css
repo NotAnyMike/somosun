@@ -131,7 +131,7 @@ h1 {
 	float: left;
 	font-family:inherit;
 	width:34px;
-	height:18px;
+	height:20px;
 	border-right: 1px #CCC solid;
 }
 .creditsBottomSubjectBox {
@@ -139,7 +139,7 @@ h1 {
 	float: left;
 	font-family:inherit;
 	width: 44px;
-	height:18px;
+	height:20px;
 	border-right: 1px #CCC solid;
 }
 .obligBottomSubjectBox {
@@ -148,15 +148,16 @@ h1 {
 	font-family:inherit;
 	width: 64px;
 	border-right: 1px #CCC solid;
-	height:18px;
+	height:20px;
 }
 .typeBottomSubjectBox {
 	padding-top:3px;
 	float: left;
 	font-family:inherit;
-	width: 35px;
-	height:18px;
+	width: 38px;
+	height:20px;
 	color:#000;
+	border-bottom-right-radius: 4px;
 }
 .textBoxGrade{
 	width: 34px;
