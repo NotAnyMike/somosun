@@ -1295,7 +1295,7 @@ ComplementaryValueView.Presenter{
 	}
 
 	/**
-	 * This method wil get the complementaryValues for the subjects and subjectsValues and add it to them.
+	 * This method will get the complementaryValues for the subjects and subjectsValues and add it to them.
 	 * 
 	 * @param listCV
 	 */

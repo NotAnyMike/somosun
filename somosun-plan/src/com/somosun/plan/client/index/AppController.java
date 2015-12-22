@@ -243,6 +243,7 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 		
 		if(token != null && loginInfo != null){
 			
+			
 			if(topBarView == null){
 				topBarView = new TopBarViewImpl();
 				topBarPresenter = new TopBarPresenter(rpcService, eventBus, topBarView);
@@ -269,6 +270,9 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 				 * This part will take care of the stability of the plan widget when its height changes due
 				 * to the changes on the number of max subjects on one semester
 				 */
+				
+				RootPanel.get("centerArea").clear(true);
+				
 				if(token.equals("plan")){
 					if(RootPanel.get("centerArea").getElement().getAttribute("valign") != "top")
 						RootPanel.get("centerArea").getElement().setAttribute("valign","top");
@@ -347,14 +351,8 @@ public class AppController implements Presenter, ValueChangeHandler<String> {
 			setLabelsOnTopBar(token);
 			lastToken = token;
 		}else{
-//			if(indexView == null){
-//				indexView = new IndexViewImpl();
-//			}
-//			if(indexPresenter == null){
-//				indexPresenter = new IndexPresenter(rpcService, eventBus, indexView);					
-//			}
-//			indexPresenter.go(RootPanel.get("centerArea"));
-			showLoadingPage("Cargando ... ");
+			//the loading is added in the DOM from index.html so there is no need to create it here
+			//showLoadingPage("Cargando ... ");
 		}
 		
 	}
