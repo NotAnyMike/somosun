@@ -48,7 +48,7 @@ test-classes/**
 bin/**
 /bin/**
 **/gwt-unitCache/
-**/manifests/**
+**/manifests/**/*.*
 
 # Specific Files #
 ##################
