@@ -7,15 +7,15 @@ import java.util.List;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
-import com.somosun.plan.shared.control.Message;
+import com.somosun.plan.server.control.MessageServer;
 import com.somosun.plan.shared.values.MessageTypeCodes;
 
 
 
-public class MessageDao implements Dao<Message> {
+public class MessageDao implements Dao<MessageServer> {
 
 	static{
-		ObjectifyService.register(Message.class);
+		ObjectifyService.register(MessageServer.class);
 	}
 	
 	/**
@@ -23,7 +23,7 @@ public class MessageDao implements Dao<Message> {
 	 * @param message
 	 * @return
 	 */
-	public Long save(Message message){
+	public Long save(MessageServer message){
 		Long toReturn = null;
 		if(message != null){
 			if(message.getId() == null){
@@ -38,38 +38,38 @@ public class MessageDao implements Dao<Message> {
 	
 	public Long generateId(){
 		ObjectifyFactory f = new ObjectifyFactory();
-		Key<Message> key = f.allocateId(Message.class);
+		Key<MessageServer> key = f.allocateId(MessageServer.class);
 		return key.getId();
 	}
 
-	public List<Message> getAllMessages() {
-		return ofy().load().type(Message.class).list();
+	public List<MessageServer> getAllMessages() {
+		return ofy().load().type(MessageServer.class).list();
 	}
 	
 	public boolean delete(Long id){
 		boolean toReturn = false;
 		if(id!=null){			
-			Key<Message> key = Key.create(Message.class, id);
+			Key<MessageServer> key = Key.create(MessageServer.class, id);
 			ofy().delete().key(key);
 			toReturn = true;
 		}
 		return toReturn;
 	}
 
-	public List<Message> getAllErrorMessages() {
-		return ofy().load().type(Message.class).filter("type", MessageTypeCodes.ERROR).list();
+	public List<MessageServer> getAllErrorMessages() {
+		return ofy().load().type(MessageServer.class).filter("type", MessageTypeCodes.ERROR).list();
 	}
 
-	public List<Message> getAllSuggestionMessages() {
-		return ofy().load().type(Message.class).filter("type", MessageTypeCodes.SUGGESTION).list();
+	public List<MessageServer> getAllSuggestionMessages() {
+		return ofy().load().type(MessageServer.class).filter("type", MessageTypeCodes.SUGGESTION).list();
 	}
 	
-	public List<Message> getAllOtherMessages() {
-		return ofy().load().type(Message.class).filter("type", MessageTypeCodes.OTHER).list();
+	public List<MessageServer> getAllOtherMessages() {
+		return ofy().load().type(MessageServer.class).filter("type", MessageTypeCodes.OTHER).list();
 	}
 
-	public Message getById(Long id) {
-		Key<Message> key = Key.create(Message.class, id);
+	public MessageServer getById(Long id) {
+		Key<MessageServer> key = Key.create(MessageServer.class, id);
 		return ofy().load().key(key).now();
 	}
 
@@ -78,12 +78,12 @@ public class MessageDao implements Dao<Message> {
 	 * @param username
 	 * @return
 	 */
-	public List<Message> getUserMessages(String username) {
-		List<Message> toReturn = null;
+	public List<MessageServer> getUserMessages(String username) {
+		List<MessageServer> toReturn = null;
 		if(username == null || username.isEmpty() == true){
-			toReturn =  ofy().load().type(Message.class).filter("student", null).list();
+			toReturn =  ofy().load().type(MessageServer.class).filter("student", null).list();
 		}else{			
-			toReturn =  ofy().load().type(Message.class).filter("student.username", username).list();
+			toReturn =  ofy().load().type(MessageServer.class).filter("student.username", username).list();
 		}
 		return toReturn;
 	}

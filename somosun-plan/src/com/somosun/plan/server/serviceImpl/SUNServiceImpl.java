@@ -24,6 +24,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.somosun.plan.client.index.service.SUNService;
 import com.somosun.plan.server.SiaProxy;
 import com.somosun.plan.server.SomosUNServerUtils;
+import com.somosun.plan.server.control.MessageServer;
 import com.somosun.plan.server.cronJob.GradeUpdaterCronJob;
 import com.somosun.plan.server.dao.CareerDao;
 import com.somosun.plan.server.dao.ComplementaryValueDao;
@@ -1016,7 +1017,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		Message message = new Message(name, subject, type, messageString, student);
 		
 		MessageDao messageDao = new MessageDao();
-		messageDao.save(message);
+		messageDao.save(new MessageServer(message));
 	}
 
 	@Override
