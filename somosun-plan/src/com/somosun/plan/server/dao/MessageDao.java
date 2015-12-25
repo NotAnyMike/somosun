@@ -26,6 +26,7 @@ public class MessageDao implements Dao<MessageServer> {
 	 * @return
 	 */
 	public Long save(MessageServer message){
+		
 		Long toReturn = null;
 		if(message != null){
 			if(message.getId() == null){

@@ -22,4 +22,20 @@ public class SingleScoreServer extends SingleScoreIncomplete {
 		this.semesterValue = semesterValue;
 	}
 	
+	/**
+	 * This method will compare just the direct values [including id] (i.e. will compare the ref value and not the values of the entity referred)
+	 * 
+	 * @param sS
+	 * @return
+	 */
+	public boolean compare(SingleScoreServer sS){
+		boolean toReturn = false;
+		
+		if(this.getId() == sS.getId() && this.getAmount() == sS.getAmount() && this.getAverage() == sS.getAverage() && this.getSemesterValue() == this.getSemesterValue()){
+			toReturn = true;
+		}
+		
+		return toReturn;
+	}
+	
 }

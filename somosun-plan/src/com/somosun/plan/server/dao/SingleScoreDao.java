@@ -14,16 +14,21 @@ public class SingleScoreDao implements Dao<SingleScoreServer> {
 		Long toReturn = null;
 		
 		if(singleScore != null){
-			if(singleScore.getId() == null) singleScore.setId(generateId());
+			if(singleScore.getId() == null) singleScore.setId(generateId());			
 			
 			if(singleScore.getSemesterValue() != null){
 				SemesterValueDao sVDao = new SemesterValueDao();
-				if(singleScore.getSemesterValue().get().getId() == null) singleScore.getSemesterValue().get().setId(sVDao.generateId());
+				if(singleScore.getSemesterValue().get().getId() == null) {
+					singleScore.getSemesterValue().get().setId(sVDao.generateId());
+				}
 				sVDao.save(singleScore.getSemesterValue().get());
 			}
 			
-			ofy().save().entity(singleScore).now();
-			toReturn = singleScore.getId();
+			SingleScoreServer singleScoreOriginal = getById(singleScore.getId());
+			if(singleScoreOriginal.compare(singleScore) == false){
+				ofy().save().entity(singleScore).now();
+			}
+			toReturn = singleScore.getId();				
 		}
 		
 		return toReturn;

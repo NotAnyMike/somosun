@@ -75,4 +75,27 @@ public class ScoreServer extends ScoreIncomplete{
 		return toReturn;
 	}
 	
+	public boolean compare(ScoreServer s){
+		boolean toReturn = false;
+		
+		if(s != null){
+			if(this.getId() == s.getId() && this.getTotalAmount() == s.getTotalAmount() && this.getTotalAverage() == s.getTotalAverage() && 
+					this.getTeacher() == s.getTeacher() && this.getSubject() == s.getSubject()){
+				List<Ref<SingleScoreServer>> list = this.getScores();
+				boolean isEqual = true;
+				if(list.size() == s.getScores().size()){
+					for(int x = 0; x < list.size(); x++){
+						if(list.get(x) != s.getScores().get(x)){
+							isEqual = false;
+							break;
+						}
+					}
+					if(isEqual == true) toReturn = true;
+				}
+			}
+		}
+		
+		return toReturn;
+	}
+	
 }

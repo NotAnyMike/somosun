@@ -26,27 +26,24 @@ public class ScoreDao implements Dao<ScoreServer>{
 			if(score.getScores() != null && score.getScores().isEmpty() == false){				
 				SingleScoreDao sSDao = new SingleScoreDao();
 				for(Ref<SingleScoreServer> sS : score.getScores()){
-					if(sS.get().getId() == null) sS.get().setId(sSDao.save(sS.get()));
+					sS.get().setId(sSDao.save(sS.get()));
 				}
 			}
 			
 			if(score.getTeacher() != null){				
-				if(score.getTeacher().get().getIdSun() == null) {
-					TeacherDao teacherDao = new TeacherDao();
-					score.getTeacher().get().setIdSun(teacherDao.save(score.getTeacher().get()));
-				}
-//				score.setTeacherRef(Ref.create(score.getTeacher()));
+				TeacherDao teacherDao = new TeacherDao();
+				score.getTeacher().get().setIdSun(teacherDao.save(score.getTeacher().get()));
 			}
 			
-			if(score.getSubject().get().getId() == null) {
-				SubjectDao subjectDao = new SubjectDao();
-				score.getSubject().get().setId(subjectDao.save(score.getSubject().get()));
+			SubjectDao subjectDao = new SubjectDao();
+			score.getSubject().get().setId(subjectDao.save(score.getSubject().get()));
+			
+			ScoreServer scoreOriginal = getById(score.getId());
+			if(score.compare(scoreOriginal) == false){				
+				ofy().save().entity(score).now();
 			}
-//			score.setSubjectRef(Ref.create(score.getSubject()));
-			
-			ofy().save().entity(score).now();
-			
 			toReturn = score.getId();
+			
 		}
 		
 		return toReturn;
