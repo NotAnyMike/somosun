@@ -9,6 +9,8 @@ import java.util.logging.Logger;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskHandle;
+import com.somosun.plan.server.control.ScoreServer;
+import com.somosun.plan.server.control.SingleScoreServer;
 import com.somosun.plan.server.dao.GroupDao;
 import com.somosun.plan.server.dao.ScoreDao;
 import com.somosun.plan.server.dao.SubjectDao;
@@ -16,8 +18,6 @@ import com.somosun.plan.server.dao.TeacherDao;
 import com.somosun.plan.server.dummy.GradeDummy;
 import com.somosun.plan.shared.SomosUNUtils;
 import com.somosun.plan.shared.control.Group;
-import com.somosun.plan.shared.control.Score;
-import com.somosun.plan.shared.control.SingleScore;
 import com.somosun.plan.shared.control.Subject;
 import com.somosun.plan.shared.control.Teacher;
 
@@ -72,11 +72,11 @@ public class GradeUpdaterCronJob {
 				if(listWithSameSubject.isEmpty() == false){
 					//Deal with the general grade of a subject
 					//get the score
-					Score score = scoreDao.getBySubjectId(listWithSameSubject.get(0).getSubjectId());
+					ScoreServer score = scoreDao.getBySubjectId(listWithSameSubject.get(0).getSubjectId());
 					if(score == null){
 						Subject subject = subjectDao.getById(listWithSameSubject.get(0).getSubjectId());
 						if(subject != null){							
-							score = new Score();
+							score = new ScoreServer();
 							score.setSubject(subject);
 							score.setId(scoreDao.generateId());
 						}
@@ -119,10 +119,10 @@ public class GradeUpdaterCronJob {
 						score.setTotalAverage(grade);
 						
 						//set the subject with this grade
-						if(amount > 0) score.getSubject().setAverageGrade(grade);
-						else score.getSubject().setAverageGrade(null);
+						if(amount > 0) score.getSubject().get().setAverageGrade(grade);
+						else score.getSubject().get().setAverageGrade(null);
 						
-						subjectDao.save(score.getSubject());
+						subjectDao.save(score.getSubject().get());
 						
 						//sort by group
 						listWithSameSubject = GradeDummy.sortByProfessorId(listWithSameSubject);
@@ -141,11 +141,11 @@ public class GradeUpdaterCronJob {
 								if(listWithSameProfessor.isEmpty() == false || position == listWithSameSubject.size()){
 									/******* <do the stuff for grades with the subject and the professor even if it is null> *********/
 									
-									Score score2 = scoreDao.getBySubjectAndProfesor(listWithSameProfessor.get(0).getSubjectId(), listWithSameProfessor.get(0).getProfessorId());
+									ScoreServer score2 = scoreDao.getBySubjectAndProfesor(listWithSameProfessor.get(0).getSubjectId(), listWithSameProfessor.get(0).getProfessorId());
 									if(score2 == null){
 										Subject subject = subjectDao.getById(listWithSameProfessor.get(0).getSubjectId());
 										if(subject != null){							
-											score2 = new Score();
+											score2 = new ScoreServer();
 											score2.setSubject(subject);
 											
 											if(listWithSameProfessor.get(0).getProfessorId() != null){												
@@ -220,7 +220,7 @@ public class GradeUpdaterCronJob {
 											}
 											
 											//Do something with the this semester
-											SingleScore singleScore2 = score2.getSemester(listWithSameProfessor.get(pos).getSemesterNumber());
+											SingleScoreServer singleScore2 = score2.getSemester(listWithSameProfessor.get(pos).getSemesterNumber());
 											if(singleScore2 != null) singleScore2.sumToAmountAndAverage(amount3 - amountOld3, grade3 - gradeOld3);
 											
 											amount3 = 0;

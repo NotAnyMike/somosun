@@ -5,18 +5,19 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;import com.googlecode.objectify.Ref;
-import com.somosun.plan.shared.control.Score;
+import com.somosun.plan.server.control.ScoreServer;
+import com.somosun.plan.server.control.SingleScoreServer;
 import com.somosun.plan.shared.control.SingleScore;
 import com.somosun.plan.shared.control.Subject;
 
-public class ScoreDao implements Dao<Score>{
+public class ScoreDao implements Dao<ScoreServer>{
 	
 	static{
-		ObjectifyService.register(Score.class);
+		ObjectifyService.register(ScoreServer.class);
 	}
 
 	@Override
-	public Long save(Score score) {
+	public Long save(ScoreServer score) {
 		Long toReturn = null;
 		
 		if(score != null && score.getSubject() != null){
@@ -24,22 +25,22 @@ public class ScoreDao implements Dao<Score>{
 			
 			if(score.getScores() != null && score.getScores().isEmpty() == false){				
 				SingleScoreDao sSDao = new SingleScoreDao();
-				for(SingleScore sS : score.getScores()){
-					if(sS.getId() == null) sS.setId(sSDao.save(sS));
+				for(Ref<SingleScoreServer> sS : score.getScores()){
+					if(sS.get().getId() == null) sS.get().setId(sSDao.save(sS.get()));
 				}
 			}
 			
 			if(score.getTeacher() != null){				
-				if(score.getTeacher().getIdSun() == null) {
+				if(score.getTeacher().get().getIdSun() == null) {
 					TeacherDao teacherDao = new TeacherDao();
-					score.getTeacher().setIdSun(teacherDao.save(score.getTeacher()));
+					score.getTeacher().get().setIdSun(teacherDao.save(score.getTeacher().get()));
 				}
 //				score.setTeacherRef(Ref.create(score.getTeacher()));
 			}
 			
-			if(score.getSubject().getId() == null) {
+			if(score.getSubject().get().getId() == null) {
 				SubjectDao subjectDao = new SubjectDao();
-				score.getSubject().setId(subjectDao.save(score.getSubject()));
+				score.getSubject().get().setId(subjectDao.save(score.getSubject().get()));
 			}
 //			score.setSubjectRef(Ref.create(score.getSubject()));
 			
@@ -54,7 +55,7 @@ public class ScoreDao implements Dao<Score>{
 
 	public Long generateId() {
 		ObjectifyFactory f = new ObjectifyFactory();
-		Key<Score> key = f.allocateId(Score.class);
+		Key<ScoreServer> key = f.allocateId(ScoreServer.class);
 		return key.getId();
 	}
 
@@ -63,7 +64,7 @@ public class ScoreDao implements Dao<Score>{
 		boolean toReturn = false;
 		
 		if(id != null){
-			Key<Score> key = Key.create(Score.class, id);
+			Key<ScoreServer> key = Key.create(ScoreServer.class, id);
 			ofy().delete().key(key).now();
 			toReturn = true;
 		}
@@ -71,12 +72,12 @@ public class ScoreDao implements Dao<Score>{
 		return toReturn;
 	}
 
-	public Score getById(Long id) {
-		Score toReturn = null;
+	public ScoreServer getById(Long id) {
+		ScoreServer toReturn = null;
 		
 		if(id != null){
-			Key<Score> key = Key.create(Score.class, id);
-			toReturn = (Score) ofy().load().key(key).now();
+			Key<ScoreServer> key = Key.create(ScoreServer.class, id);
+			toReturn = (ScoreServer) ofy().load().key(key).now();
 		}
 		
 		return toReturn;
@@ -87,12 +88,12 @@ public class ScoreDao implements Dao<Score>{
 	 * @param subjectId
 	 * @return
 	 */
-	public Score getBySubjectId(Long subjectId) {
+	public ScoreServer getBySubjectId(Long subjectId) {
 		
-		Score toReturn = null;
+		ScoreServer toReturn = null;
 		
 		if(subjectId != null){
-			toReturn = (Score) ofy().load().type(Score.class).filter("subject.idCopy", subjectId).filter("teacher", null).first().now();
+			toReturn = (ScoreServer) ofy().load().type(ScoreServer.class).filter("subject.idCopy", subjectId).filter("teacher", null).first().now();
 		}
 		
 		return toReturn;
@@ -108,11 +109,11 @@ public class ScoreDao implements Dao<Score>{
 	 * @param professorId
 	 * @return
 	 */
-	public Score getBySubjectAndProfesor(Long subjectId, Long professorId) {
-		Score toReturn = null;
+	public ScoreServer getBySubjectAndProfesor(Long subjectId, Long professorId) {
+		ScoreServer toReturn = null;
 		
 		if(professorId != null && subjectId != null){
-			toReturn = (Score) ofy().load().type(Score.class).filter("subject.idCopy", subjectId).filter("teacher.idCopy", professorId).first().now();
+			toReturn = (ScoreServer) ofy().load().type(ScoreServer.class).filter("subject.idCopy", subjectId).filter("teacher.idCopy", professorId).first().now();
 		}
 		
 		return toReturn;
@@ -123,12 +124,12 @@ public class ScoreDao implements Dao<Score>{
 	 * @param code
 	 * @return
 	 */
-	public Score getByCode(String code) {
+	public ScoreServer getByCode(String code) {
 		
-		Score toReturn = null;
+		ScoreServer toReturn = null;
 		
 		if(code != null){
-			toReturn = (Score) ofy().load().type(Score.class).filter("subject.code", code).filter("teacher", null).first().now();
+			toReturn = (ScoreServer) ofy().load().type(ScoreServer.class).filter("subject.code", code).filter("teacher", null).first().now();
 		}
 		
 		return toReturn;

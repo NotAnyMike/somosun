@@ -9,22 +9,13 @@ import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Load;
 import com.googlecode.objectify.annotation.OnLoad;
+import com.somosun.plan.shared.control.incomplete.SingleScoreIncomplete;
 
-@Entity
-public class SingleScore implements Serializable{
-
-	@Id private Long id = null;
-//	@Load @Index private Ref<SemesterValue> semesterValueRef = null;
-	@Index private SemesterValue semesterValue = null;
-	private Double average = null;
-	private int amount = 0;
+public class SingleScore extends SingleScoreIncomplete implements Serializable{
+	
+	private SemesterValue semesterValue = null;
 	
 	public SingleScore(){}
-	
-//	@OnLoad
-//	private void onLoad(){
-//		semesterValue = semesterValueRef.get();
-//	}
 
 	public SemesterValue getSemesterValue() {
 		return semesterValue;
@@ -34,39 +25,6 @@ public class SingleScore implements Serializable{
 		this.semesterValue = semesterValue;
 	}
 
-	public Double getAverage() {
-		return average;
-	}
-
-	public void setAverage(Double average) {
-		this.average = average;
-	}
-
-	public int getAmount() {
-		return amount;
-	}
-
-	public void setAmount(int amount) {
-		this.amount = amount;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	/**
-	 * 
-	 * @param amountToAdd
-	 * @param averageToAdd
-	 */
-	public void sumToAmountAndAverage(int amountToAdd, double averageAgregatedToAdd) {
-		setAverage((getAverage()*getAmount() + averageAgregatedToAdd)/(getAmount() + amountToAdd));
-		setAmount(getAmount() + amountToAdd);
-		
-	}
+	
 	
 }

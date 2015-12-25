@@ -5,11 +5,12 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.Ref;
+import com.somosun.plan.server.control.SingleScoreServer;
 import com.somosun.plan.shared.control.SingleScore;
 
-public class SingleScoreDao implements Dao<SingleScore> {
+public class SingleScoreDao implements Dao<SingleScoreServer> {
 
-	public Long save(SingleScore singleScore) {
+	public Long save(SingleScoreServer singleScore) {
 		Long toReturn = null;
 		
 		if(singleScore != null){
@@ -17,15 +18,9 @@ public class SingleScoreDao implements Dao<SingleScore> {
 			
 			if(singleScore.getSemesterValue() != null){
 				SemesterValueDao sVDao = new SemesterValueDao();
-				if(singleScore.getSemesterValue().getId() == null) singleScore.getSemesterValue().setId(sVDao.generateId());
-				sVDao.save(singleScore.getSemesterValue());
+				if(singleScore.getSemesterValue().get().getId() == null) singleScore.getSemesterValue().get().setId(sVDao.generateId());
+				sVDao.save(singleScore.getSemesterValue().get());
 			}
-			
-//			if(singleScore.getSemesterValue() != null){				
-//				singleScore.setSemesterValueRef(Ref.create(singleScore.getSemesterValue()));
-//			}else{
-//				singleScore.setSemesterValueRef(null);
-//			}
 			
 			ofy().save().entity(singleScore).now();
 			toReturn = singleScore.getId();
@@ -58,12 +53,12 @@ public class SingleScoreDao implements Dao<SingleScore> {
 	}
 
 	@Override
-	public SingleScore getById(Long id) {
-		SingleScore toReturn = null;
+	public SingleScoreServer getById(Long id) {
+		SingleScoreServer toReturn = null;
 		
 		if(id != null){
-			Key<SingleScore> key = Key.create(SingleScore.class, id);
-			toReturn = (SingleScore) ofy().load().key(key).now();
+			Key<SingleScoreServer> key = Key.create(SingleScoreServer.class, id);
+			toReturn = (SingleScoreServer) ofy().load().key(key).now();
 		}
 		
 		return toReturn;

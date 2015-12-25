@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -14,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -27,6 +24,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import com.somosun.plan.server.control.ScoreServer;
 import com.somosun.plan.server.dao.BlockDao;
 import com.somosun.plan.server.dao.CareerDao;
 import com.somosun.plan.server.dao.ComplementaryValueDao;
@@ -47,7 +45,6 @@ import com.somosun.plan.shared.control.Block;
 import com.somosun.plan.shared.control.Career;
 import com.somosun.plan.shared.control.ComplementaryValue;
 import com.somosun.plan.shared.control.Group;
-import com.somosun.plan.shared.control.Score;
 import com.somosun.plan.shared.control.Student;
 import com.somosun.plan.shared.control.Subject;
 import com.somosun.plan.shared.control.SubjectGroup;
@@ -618,7 +615,7 @@ public class SiaProxy {
 					}
 				}
 				
-				Score scoreTemporary = null;
+				ScoreServer scoreTemporary = null;
 				if(subject != null && subject.getId() != null && teacher != null && teacher.getIdSun() != null){					
 					scoreTemporary = scoreDao.getBySubjectAndProfesor(subject.getId(), teacher.getIdSun());
 				}

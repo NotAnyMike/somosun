@@ -11,46 +11,17 @@ import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Load;
 import com.googlecode.objectify.annotation.OnLoad;
+import com.somosun.plan.shared.control.incomplete.ScoreIncomplete;
 
 @Entity
-public class Score implements Serializable {
+public class Score extends ScoreIncomplete implements Serializable {
 
-	@Id private Long id = null;
-//	@Index @Load private Ref<Teacher> teacherRef = null;
-//	@Index @Load private Ref<Subject> subjectRef = null;
-//	@Load private List<Ref<SingleScore>> scoresRef = null;
-	@Index private Teacher teacher = null;
-	@Index private Subject subject = null;
-	@Index private double totalAverage = 0.0;
-	private int totalAmount = 0;
-	@Index private List<SingleScore> scores = null;
+	private Teacher teacher = null;
+	private Subject subject = null;
+	private List<SingleScore> scores = null;
 	
 	public Score(){}
 	
-//	@OnLoad
-//	private void onLoad(){
-//		
-//		if(scoresRef != null && scoresRef.isEmpty() == false){
-//			setScores(new ArrayList<SingleScore>());
-//			for(Ref<SingleScore> ref : scoresRef){
-//				SingleScore sS = ref.get();
-//				if(sS != null) getScores().add(sS);
-//			}
-//		}
-//		
-//		if(teacherRef != null) teacher = teacherRef.get();
-//		
-//		subject = subjectRef.get();
-//	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
 	public Teacher getTeacher() {
 		return teacher;
 	}
@@ -66,23 +37,7 @@ public class Score implements Serializable {
 	public void setSubject(Subject subject) {
 		this.subject = subject;
 	}
-
-	public Double getTotalAverage() {
-		return totalAverage;
-	}
-
-	public void setTotalAverage(double totalAverage) {
-		this.totalAverage = totalAverage;
-	}
-
-	public int getTotalAmount() {
-		return totalAmount;
-	}
-
-	public void setTotalAmount(int totalAmount) {
-		this.totalAmount = totalAmount;
-	}
-
+	
 	public List<SingleScore> getScores() {
 		return scores;
 	}
@@ -95,7 +50,7 @@ public class Score implements Serializable {
 		if(scores == null) scores = new ArrayList<SingleScore>();
 		scores.add(singleScore);
 	}
-
+	
 	public SingleScore getSemester(Double semesterNumber) {
 		SingleScore toReturn = null;
 		

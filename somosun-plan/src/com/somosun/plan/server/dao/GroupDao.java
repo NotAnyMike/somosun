@@ -7,8 +7,8 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.cmd.Query;
+import com.somosun.plan.server.control.ScoreServer;
 import com.somosun.plan.shared.control.Group;
-import com.somosun.plan.shared.control.Score;
 import com.somosun.plan.shared.control.SemesterValue;
 import com.somosun.plan.shared.control.Subject;
 import com.somosun.plan.shared.control.Teacher;
@@ -110,7 +110,7 @@ public class GroupDao implements Dao<Group> {
 			
 			if(group.getAverageGrade() == null && group.getTeacher() != null){
 				ScoreDao scoreDao = new ScoreDao();
-				Score score = scoreDao.getBySubjectAndProfesor(group.getSubject().getId(), group.getTeacher().getIdSun());
+				ScoreServer score = scoreDao.getBySubjectAndProfesor(group.getSubject().getId(), group.getTeacher().getIdSun());
 				if(score != null && score.getTotalAverage() != null){
 					groupToReturn.setAverageGrade(score.getTotalAverage());
 				}
@@ -171,7 +171,7 @@ public class GroupDao implements Dao<Group> {
 		//Adding the average grade to the group #80
 		if(group.getAverageGrade() == null && group.getTeacher() != null){
 			ScoreDao scoreDao = new ScoreDao();
-			Score score = scoreDao.getBySubjectAndProfesor(group.getSubject().getId(), group.getTeacher().getIdSun());
+			ScoreServer score = scoreDao.getBySubjectAndProfesor(group.getSubject().getId(), group.getTeacher().getIdSun());
 			if(score != null){
 				group.setAverageGrade(score.getTotalAverage());
 			}

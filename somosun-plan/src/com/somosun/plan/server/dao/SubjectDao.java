@@ -7,8 +7,8 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.VoidWork;
+import com.somosun.plan.server.control.ScoreServer;
 import com.somosun.plan.shared.SomosUNUtils;
-import com.somosun.plan.shared.control.Score;
 import com.somosun.plan.shared.control.Subject;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
@@ -150,7 +150,7 @@ public class SubjectDao implements Dao<Subject> {
 			//Adding the averageGrade if it is empty
 			if(subject.getAverageGrade() == null && subject.getId() != null){
 				ScoreDao scoreDao = new ScoreDao();
-				Score score = scoreDao.getBySubjectId(subject.getId());
+				ScoreServer score = scoreDao.getBySubjectId(subject.getId());
 				if(score != null){
 					subject.setAverageGrade(score.getTotalAverage());
 				}
@@ -159,7 +159,7 @@ public class SubjectDao implements Dao<Subject> {
 			//Addding the averageGrade if it is empty (this time search for code and not by id)
 			if(subject.getAverageGrade() == null && subject.getCode() != null){
 				ScoreDao scoreDao = new ScoreDao();
-				Score score = scoreDao.getByCode(subject.getCode());
+				ScoreServer score = scoreDao.getByCode(subject.getCode());
 				if(score != null){
 					subject.setAverageGrade(score.getTotalAverage());
 				}
