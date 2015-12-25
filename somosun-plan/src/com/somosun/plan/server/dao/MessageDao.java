@@ -7,7 +7,9 @@ import java.util.List;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
+import com.googlecode.objectify.Ref;
 import com.somosun.plan.server.control.MessageServer;
+import com.somosun.plan.shared.control.Student;
 import com.somosun.plan.shared.values.MessageTypeCodes;
 
 
@@ -83,7 +85,12 @@ public class MessageDao implements Dao<MessageServer> {
 		if(username == null || username.isEmpty() == true){
 			toReturn =  ofy().load().type(MessageServer.class).filter("student", null).list();
 		}else{			
-			toReturn =  ofy().load().type(MessageServer.class).filter("student.username", username).list();
+			StudentDao studentDao = new StudentDao();
+			Student student = studentDao.getStudentByUserName(username);
+			if(student != null){		
+				Ref<Student> ref = Ref.create(student);
+				toReturn =  ofy().load().type(MessageServer.class).filter("student", ref).list();
+			}
 		}
 		return toReturn;
 	}
