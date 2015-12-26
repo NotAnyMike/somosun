@@ -405,7 +405,7 @@ ComplementaryValueView.Presenter{
 	}
 	
 	public void planChanged(String triggered){
-		
+		GWT.debugger();
 		Callable<Void> toSave = new Callable<Void>(){
 			
 			public Void call(){				

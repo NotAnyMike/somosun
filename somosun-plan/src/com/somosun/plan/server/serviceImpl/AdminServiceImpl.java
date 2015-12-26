@@ -12,6 +12,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.somosun.plan.client.admin.service.AdminService;
 import com.somosun.plan.server.SiaProxy;
 import com.somosun.plan.server.control.MessageServer;
+import com.somosun.plan.server.control.PlanServer;
 import com.somosun.plan.server.dao.BlockDao;
 import com.somosun.plan.server.dao.CareerDao;
 import com.somosun.plan.server.dao.GroupDao;
@@ -432,8 +433,8 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 		if(getUserLogged().isAdmin() == true){
 			toReturn = new ArrayList<Plan>();
 			PlanDao planDao = new PlanDao();
-			for(Plan p : planDao.getPlansByUsername(username)){
-				toReturn.add(p);
+			for(PlanServer p : planDao.getPlansByUsername(username)){
+				toReturn.add(p.getClientInstance());
 			}
 		}
 		return toReturn;
@@ -444,7 +445,8 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 		Plan plan = null;
 		if(getUserLogged().isAdmin() == true){			
 			PlanDao planDao = new PlanDao();
-			plan = planDao.getById(Long.valueOf(id));
+			PlanServer planServer = planDao.getById(Long.valueOf(id));
+			if(planServer != null) plan = planServer.getClientInstance(); 
 		}
 		return plan;
 	}

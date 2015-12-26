@@ -2,13 +2,10 @@ package com.somosun.plan.server.dao;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -18,10 +15,10 @@ import org.json.JSONObject;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
+import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.VoidWork;
-import com.googlecode.objectify.cmd.Deferred;
-import com.somosun.plan.server.SiaProxy;
 import com.somosun.plan.server.SomosUNServerUtils;
+import com.somosun.plan.server.control.PlanServer;
 import com.somosun.plan.server.dummy.SemesterDummy;
 import com.somosun.plan.server.dummy.SubjectDummy;
 import com.somosun.plan.server.serviceImpl.LoginServiceImpl;
@@ -30,7 +27,6 @@ import com.somosun.plan.shared.SomosUNUtils;
 import com.somosun.plan.shared.control.Career;
 import com.somosun.plan.shared.control.ComplementaryValue;
 import com.somosun.plan.shared.control.Group;
-import com.somosun.plan.shared.control.Plan;
 import com.somosun.plan.shared.control.Semester;
 import com.somosun.plan.shared.control.SemesterValue;
 import com.somosun.plan.shared.control.Student;
@@ -39,7 +35,7 @@ import com.somosun.plan.shared.control.SubjectGroup;
 import com.somosun.plan.shared.control.SubjectValue;
 import com.somosun.plan.shared.values.TypologyCodes;
 
-public class PlanDao implements Dao<Plan>{
+public class PlanDao implements Dao<PlanServer>{
 	
 	private static final Logger log = Logger.getLogger("PlanDao");
 	
@@ -47,16 +43,16 @@ public class PlanDao implements Dao<Plan>{
 	private final String CAREERS_DEFAULTS[] = {ECONOMIA};
 	
 	static{
-		ObjectifyService.register(Plan.class);
+		ObjectifyService.register(PlanServer.class);
 	}
 	
-	public Plan createPlanFromDefaultString(String careerCode){
+	public PlanServer createPlanFromDefaultString(String careerCode){
 		
 		CareerDao careerDao = new CareerDao();
 		SubjectDao subjectDao = new SubjectDao();
 		ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
 		
-		Plan plan = new Plan();
+		PlanServer plan = new PlanServer();
 		Career career = null;
 		String sede = "";
 		String name = "";
@@ -114,9 +110,9 @@ public class PlanDao implements Dao<Plan>{
 			semesters.add(semester);
 		}
 		//plan.setValuesAndSubjectMap(subjectMap);
-		plan.setSemesters(semesters);
+		plan.setSemestersNoRef(semesters);
 		
-		if(career != null)	plan.setCareer(career);
+		if(career != null)	plan.setCareerNoRef(career);
 		return plan;
 	}
 
@@ -130,7 +126,7 @@ public class PlanDao implements Dao<Plan>{
 		return intToReturn;
 	}
 	
-	public Long save(Plan plan){
+	public Long save(PlanServer plan){
 		
 		Long id = null;
 		
@@ -138,106 +134,145 @@ public class PlanDao implements Dao<Plan>{
 			if(plan.getCareer() != null){
 				//save everything inside
 				
+				/*********** the new method using ref ***************/
 				SemesterDao semesterDao = new SemesterDao();
-				ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
 				SubjectValueDao subjectValueDao = new SubjectValueDao();
+				ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
 				SubjectDao subjectDao = new SubjectDao();
-//				GroupDao groupDao = new GroupDao();
-//				BlockDao blockDao = new BlockDao();
-//				TeacherDao teacherDao = new TeacherDao();
-//				SemesterValueDao  semesterValueDao = new SemesterValueDao();
-
-				List<Semester> semesters = plan.getSemesters();
-				List<SubjectValue> sVToRemoveList = new ArrayList<SubjectValue>();
-				
-				for(Semester s : semesters){
-					//be careful because I can be saving more than once the same semester
-					sVToRemoveList.clear();
-
-					List<SubjectValue> subjectValuesList = s.getSubjects();
+				SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
+				for(Ref<Semester> semester : plan.getSemesters()){
+					semesterDao.save(semester.safe());
 					
-						if(subjectValuesList != null){
-							if(subjectValuesList.size() != 0){
-								for(SubjectValue sV : subjectValuesList){
-									
-										ComplementaryValue cV = sV.getComplementaryValue();
-										if(cV != null){
-											
-												if(cV.getCareer() != null && cV.getSubject() != null){
-
-													Subject s2 = cV.getSubject();
-													if(s2 != null){
-														if(s2.getId() == null){
-															Subject sT = null;
-															if(s2.getCode().isEmpty() == false) sT = subjectDao.getByCode(s2.getCode());
-															else sT = subjectDao.getByName(s2.getName());
-															
-															if(sT.getId() == null){
-																s2.setId(subjectDao.generateId());
-																subjectDao.save(s2);																
-															}
-														}
-													}
-													
-													List<Subject> requisitesList = cV.getListCorequisites();
-													requisitesList.addAll(cV.getListCorequisitesOf());
-													requisitesList.addAll(cV.getListPrerequisites());
-													requisitesList.addAll(cV.getListPrerequisitesOf());
-													
-													for(Subject s3 : requisitesList){
-														if(s3 != null && s3.getId() == null){
-															
-															Subject sT = null;
-															if(s3.getCode().isEmpty() == false) sT = subjectDao.getByCode(s3.getCode());
-															else sT = subjectDao.getByName(s3.getName());
-															
-															//OLD if(sR == null){
-															if(s3.getId() == null){
-																s3.setId(subjectDao.generateId());
-																subjectDao.save(s3);																
-															}
-															
-														}
-													}
-													
-													if(cV.getId() == null){														
-														cV.setId(complementaryValueDao.generateId());
-													}
-													complementaryValueDao.save(cV);
-												}else{
-													sV.setComplementaryValue(null);
-												}
-											
-											if(sV.getId() == null){												
-												sV.setId(subjectValueDao.generateId()); 
-											}
-											subjectValueDao.save(sV);
-										}else{
-											sVToRemoveList.add(sV);
-										}
-									
-								}
-							}
-						}
+					for(SubjectValue sV : semester.get().getSubjects()){
+						subjectValueDao.save(sV);
 						
-						if(s.getId() == null){
-							s.setId(semesterDao.generateId());
+						ComplementaryValue cV = sV.getComplementaryValue();
+						complementaryValueDao.save(cV);
+						
+						subjectGroupDao.save(cV.getSubjectGroup());
+						
+						List<Subject> list = new ArrayList<Subject>();
+						list.add(cV.getSubject());
+						list.addAll(cV.getListCorequisites());
+						list.addAll(cV.getListPrerequisites());
+						list.addAll(cV.getListCorequisitesOf());
+						list.addAll(cV.getListPrerequisitesOf());
+						
+						for(Subject subject : list){
+							subjectDao.save(subject);
 						}
-						semesterDao.save(s);
-					
-					
-						for(SubjectValue sVT : sVToRemoveList){						
-							s.getSubjects().remove(sVT);
-						}
-					
+					}
 				}
 				
-				if(plan.getId() == null){
-					plan.setId(generateId());
+				
+				//Saving the plan if it changed
+				PlanServer originPlan = getById(plan.getId());
+				if(originPlan != null){
+					if(plan.compare(plan) == false){
+						ofy().defer().save().entity(plan);
+					}
+				}else{
+					ofy().defer().save().entity(plan);
 				}
-				//TODO not sure of the functionality of Defer
-				ofy().defer().save().entity(plan);
 				id = plan.getId();
+				/****************************************************/
+				
+//				SemesterDao semesterDao = new SemesterDao();
+//				ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
+//				SubjectValueDao subjectValueDao = new SubjectValueDao();
+//				SubjectDao subjectDao = new SubjectDao();
+//
+//				List<Ref<Semester>> semesters = plan.getSemesters();
+//				List<SubjectValue> sVToRemoveList = new ArrayList<SubjectValue>();
+//				
+//				for(Ref<Semester> s : semesters){
+//					//be careful because I can be saving more than once the same semester
+//					sVToRemoveList.clear();
+//
+//					List<SubjectValue> subjectValuesList = s.get().getSubjects();
+//					
+//						if(subjectValuesList != null){
+//							if(subjectValuesList.size() != 0){
+//								for(SubjectValue sV : subjectValuesList){
+//									
+//										ComplementaryValue cV = sV.getComplementaryValue();
+//										if(cV != null){
+//											
+//												if(cV.getCareer() != null && cV.getSubject() != null){
+//
+//													Subject s2 = cV.getSubject();
+//													if(s2 != null){
+//														if(s2.getId() == null){
+//															Subject sT = null;
+//															if(s2.getCode().isEmpty() == false) sT = subjectDao.getByCode(s2.getCode());
+//															else sT = subjectDao.getByName(s2.getName());
+//															
+//															if(sT.getId() == null){
+//																s2.setId(subjectDao.generateId());
+//																subjectDao.save(s2);																
+//															}
+//														}
+//													}
+//													
+//													List<Subject> requisitesList = cV.getListCorequisites();
+//													requisitesList.addAll(cV.getListCorequisitesOf());
+//													requisitesList.addAll(cV.getListPrerequisites());
+//													requisitesList.addAll(cV.getListPrerequisitesOf());
+//													
+//													for(Subject s3 : requisitesList){
+//														if(s3 != null && s3.getId() == null){
+//															
+//															Subject sT = null;
+//															if(s3.getCode().isEmpty() == false) sT = subjectDao.getByCode(s3.getCode());
+//															else sT = subjectDao.getByName(s3.getName());
+//															
+//															//OLD if(sR == null){
+//															if(s3.getId() == null){
+//																s3.setId(subjectDao.generateId());
+//																subjectDao.save(s3);																
+//															}
+//															
+//														}
+//													}
+//													
+//													if(cV.getId() == null){														
+//														cV.setId(complementaryValueDao.generateId());
+//													}
+//													complementaryValueDao.save(cV);
+//												}else{
+//													sV.setComplementaryValue(null);
+//												}
+//											
+//											if(sV.getId() == null){												
+//												sV.setId(subjectValueDao.generateId()); 
+//											}
+//											subjectValueDao.save(sV);
+//										}else{
+//											sVToRemoveList.add(sV);
+//										}
+//									
+//								}
+//							}
+//						}
+//						
+//						if(s.get().getId() == null){
+//							s.get().setId(semesterDao.generateId());
+//						}
+//						semesterDao.save(s.get());
+//					
+//					
+//						for(SubjectValue sVT : sVToRemoveList){						
+//							s.get().getSubjects().remove(sVT);
+//						}
+//					
+//				}
+//				
+//				if(plan.getId() == null){
+//					plan.setId(generateId());
+//				}
+//				//TODO not sure of the functionality of Defer
+//				ofy().defer().save().entity(plan);
+//				id = plan.getId();
 			}
 		}
 		
@@ -247,20 +282,21 @@ public class PlanDao implements Dao<Plan>{
 
 	public Long generateId() {
 		ObjectifyFactory f = new ObjectifyFactory();
-		Key<Plan> key = f.allocateId(Plan.class);
+		Key<PlanServer> key = f.allocateId(PlanServer.class);
 		return key.getId();
 	}
 
-	public Plan getPlanDefault(String careerCode) {
-		Plan p = (Plan) ofy().load().type(Plan.class).filter("isDefault", true).filter("career.code", careerCode).first().now();
+	public PlanServer getPlanDefault(String careerCode) {
+		//FIXME fix the career filter
+		PlanServer p = (PlanServer) ofy().load().type(PlanServer.class).filter("isDefault", true).filter("career.code", careerCode).first().now();
 		if(p != null){			
 			p.setUser(null);
 			p.setDefault(false);
 			p.setId(null);
 			if(p != null){
-				for(Semester s : p.getSemesters()){
-					s.setId(null);
-					for(SubjectValue sV : s.getSubjects()){
+				for(Ref<Semester> s : p.getSemesters()){
+					s.get().setId(null);
+					for(SubjectValue sV : s.get().getSubjects()){
 						sV.setId(null);
 					}
 				}
@@ -277,43 +313,44 @@ public class PlanDao implements Dao<Plan>{
 	public boolean delete(Long id) {
 		boolean toReturn = false;
 		if(id != null){			
-			Key<Plan> key = Key.create(Plan.class, id);
+			Key<PlanServer> key = Key.create(PlanServer.class, id);
 			ofy().delete().key(key).now();
 			toReturn = true;
 		}
 		return toReturn;
 	}
 
-	public List<Plan> getPlanByUser(Student s) {
+	public List<PlanServer> getPlanByUser(Student s) {
 		
-		List<Plan> plans = null;
+		List<PlanServer> plans = null;
 		
 		if(s != null && s.getIdSun() != null){
-			plans = ofy().load().type(Plan.class).filter("user.idG", s.getIdG()).list();
+			Ref<Student> ref = Ref.create(s);
+			plans = ofy().load().type(PlanServer.class).filter("user", ref).list();
 		}
 		return plans;
 	}
 
-	public Plan getById(Long planId) {
-		Plan pToReturn = null;
+	public PlanServer getById(Long planId) {
+		PlanServer pToReturn = null;
 		if(planId != null){	
-			Key<Plan> key = Key.create(Plan.class, planId);
+			Key<PlanServer> key = Key.create(PlanServer.class, planId);
 			pToReturn = ofy().load().key(key).now();
 			//pToReturn = ofy().load().type(Plan.class).id(planId).now();
 		}
 		return pToReturn;
 	}
 
-	public void delete(Plan plan) {
+	public void delete(PlanServer plan) {
 		if(plan != null){
 			SubjectDao subjectDao = new SubjectDao();
 			ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
 			SemesterDao semesterDao = new SemesterDao();
 			SubjectValueDao subjectValueDao = new SubjectValueDao();
-			List<Semester> semesters = plan.getSemesters();
+			List<Ref<Semester>> semesters = plan.getSemesters();
 			if(semesters != null){
-				for(Semester semester : semesters){
-					List<SubjectValue> subjectValues = semester.getSubjects();
+				for(Ref<Semester> semester : semesters){
+					List<SubjectValue> subjectValues = semester.get().getSubjects();
 					for(SubjectValue subjectValue : subjectValues){
 						ComplementaryValue complementaryValue = subjectValue.getComplementaryValue();
 						
@@ -334,7 +371,7 @@ public class PlanDao implements Dao<Plan>{
 						}
 					}
 					//delete all the semesters
-					semesterDao.delete(semester.getId());
+					semesterDao.delete(semester.get().getId());
 				}
 			}
 			//Delete the plan
@@ -364,9 +401,9 @@ public class PlanDao implements Dao<Plan>{
 		}
 	}
 
-	public Plan generatePlanFromAcademicHistory(String academicHistory) {
+	public PlanServer generatePlanFromAcademicHistory(String academicHistory) {
 		
-		Plan planToReturn = null;
+		PlanServer planToReturn = null;
 
 		if(academicHistory != null){
 			
@@ -430,11 +467,11 @@ public class PlanDao implements Dao<Plan>{
 		return planToReturn;
 	}
 	
-	private Plan generatePlanFromDummies(String careerCode, List<SemesterDummy> semestersD) {
+	private PlanServer generatePlanFromDummies(String careerCode, List<SemesterDummy> semestersD) {
 		
 		long totalStartTime = System.nanoTime();
 		
-		Plan planToReturn = null;
+		PlanServer planToReturn = null;
 		
 		//getCareer
 		CareerDao careerDao = new CareerDao();
@@ -714,14 +751,14 @@ public class PlanDao implements Dao<Plan>{
 			
 			PlanDao planDao = new PlanDao();
 			
-			planToReturn = new Plan();
+			planToReturn = new PlanServer();
 			planToReturn.setId(planDao.generateId());
 			
 			planToReturn.setName(name);
-			planToReturn.setCareer(career);
-			planToReturn.setUser(student);
+			planToReturn.setCareerNoRef(career);
+			planToReturn.setUserNoRef(student);
 			planToReturn.setDefault(isDefault);
-			planToReturn.setSemesters(semesters);
+			planToReturn.setSemestersNoRef(semesters);
 			
 			planDao.save(planToReturn);
 			
@@ -850,11 +887,11 @@ public class PlanDao implements Dao<Plan>{
 	public void deleteAllDefaultPlans() {
 		ofy().transact(new VoidWork(){
 			public void vrun() {
-				List<Plan> plans = getAllDefaultPlans();
-				for(Plan plan : plans){
+				List<PlanServer> plans = getAllDefaultPlans();
+				for(PlanServer plan : plans){
 					delete(plan);
 					CareerDao careerDao = new CareerDao();
-					Career career = plan.getCareer();
+					Career career = plan.getCareer().get();
 					career.setHasDefault(false);
 					careerDao.save(career);
 				}
@@ -863,13 +900,13 @@ public class PlanDao implements Dao<Plan>{
 		});
 	}
 	
-	private List<Plan> getAllDefaultPlans() {
-		List<Plan> plans = ofy().load().type(Plan.class).filter("isDefault", true).list();
+	private List<PlanServer> getAllDefaultPlans() {
+		List<PlanServer> plans = ofy().load().type(PlanServer.class).filter("isDefault", true).list();
 		return plans;
 	}
 
 	public void deleteDefaultPlan(final String careerCode) {
-		final Plan plan = getPlanDefault(careerCode);
+		final PlanServer plan = getPlanDefault(careerCode);
 		if(plan != null){
 			delete(plan);
 			CareerDao careerDao = new CareerDao();
@@ -880,15 +917,15 @@ public class PlanDao implements Dao<Plan>{
 	}
 
 	public void deleteAllPlans() {
-		final List<Plan> plans = getAllPlans();
-		for(Plan plan : plans){
+		final List<PlanServer> plans = getAllPlans();
+		for(PlanServer plan : plans){
 			delete(plan);
 		}
 		log.warning("All plans where deleted");
 	}
 
-	private List<Plan> getAllPlans() {
-		return ofy().load().type(Plan.class).list();
+	private List<PlanServer> getAllPlans() {
+		return ofy().load().type(PlanServer.class).list();
 	}
 
 	/**
@@ -896,12 +933,17 @@ public class PlanDao implements Dao<Plan>{
 	 * @param username
 	 * @return
 	 */
-	public List<Plan> getPlansByUsername(String username) {
-		List<Plan> toReturn = null;
+	public List<PlanServer> getPlansByUsername(String username) {
+		List<PlanServer> toReturn = null;
 		if(username == null || username.isEmpty()){
-			toReturn = ofy().load().type(Plan.class).filter("user", null).list();
+			toReturn = ofy().load().type(PlanServer.class).filter("user", null).list();
 		}else{			
-			toReturn = ofy().load().type(Plan.class).filter("user.username", username).list();
+			StudentDao studentDao = new StudentDao();
+			Student student = studentDao.getStudentByUserName(username);
+			if(student != null){
+				Ref<Student> ref = Ref.create(student);
+				toReturn = ofy().load().type(PlanServer.class).filter("user", ref).list();
+			}
 		}
 		return toReturn;
 	}

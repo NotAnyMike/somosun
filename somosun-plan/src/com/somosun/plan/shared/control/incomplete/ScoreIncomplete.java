@@ -1,9 +1,11 @@
 package com.somosun.plan.shared.control.incomplete;
 
+import java.io.Serializable;
+
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 
-public class ScoreIncomplete {
+public class ScoreIncomplete implements Serializable {
 
 	@Id private Long id = null;
 	@Index private double totalAverage = 0.0;

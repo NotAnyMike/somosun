@@ -25,6 +25,7 @@ import com.somosun.plan.client.index.service.SUNService;
 import com.somosun.plan.server.SiaProxy;
 import com.somosun.plan.server.SomosUNServerUtils;
 import com.somosun.plan.server.control.MessageServer;
+import com.somosun.plan.server.control.PlanServer;
 import com.somosun.plan.server.cronJob.GradeUpdaterCronJob;
 import com.somosun.plan.server.dao.CareerDao;
 import com.somosun.plan.server.dao.ComplementaryValueDao;
@@ -209,7 +210,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 	@Override
 	public Plan getPlanDefaultFromString(String careerCode) {
 		PlanDao planDao = new PlanDao();
-		return (Plan) planDao.createPlanFromDefaultString(careerCode);
+		return (Plan) planDao.createPlanFromDefaultString(careerCode).getClientInstance();
 	}
 
 	@Override
@@ -266,7 +267,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 				c = cDao.getByCode(plan.getCareerCode());
 				c.setHasDefault(true);
 				cDao.save(c);
-				pDao.save(plan);
+				pDao.save(new PlanServer(plan));
 			}
 		}
 	}
@@ -289,7 +290,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 					plan.setUser(student);
 					plan.setDefault(false);
 					
-					id = pDao.save(plan);
+					id = pDao.save(new PlanServer(plan));
 					
 				}
 			}
@@ -304,7 +305,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		Plan p = null;
 		if(careerCode.equals("") == false){
 			PlanDao pDao = new PlanDao();
-			p = pDao.getPlanDefault(careerCode);
+			p = pDao.getPlanDefault(careerCode).getClientInstance();
 		}
 		return p;
 	}
@@ -923,10 +924,10 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		if(s != null){
 			plansToReturn = new ArrayList<Plan>();
 			PlanDao planDao = new PlanDao();
-			List<Plan> plans = planDao.getPlanByUser(s);
+			List<PlanServer> plans = planDao.getPlanByUser(s);
 			
-			for(Plan p : plans){
-				plansToReturn.add(p);
+			for(PlanServer p : plans){
+				plansToReturn.add(p.getClientInstance());
 			}
 		}
 		return plansToReturn;
@@ -954,9 +955,9 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		Student s = loginService.login("").getStudent();
 		
 		PlanDao planDao = new PlanDao();
-		Plan plan = planDao.getById(Long.valueOf(planId));
+		PlanServer plan = planDao.getById(Long.valueOf(planId));
 		
-		if(plan != null && plan.getUser().getIdSun().equals(s.getIdSun()) == true){
+		if(plan != null && plan.getUser().get().getIdSun().equals(s.getIdSun()) == true){
 			planDao.delete(plan);
 		}
 	}
@@ -968,7 +969,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		if(planId != null && planId.isEmpty() == false){
 			
 			PlanDao planDao = new PlanDao();
-			planToReturn = planDao.getById(Long.valueOf(planId));
+			planToReturn = planDao.getById(Long.valueOf(planId)).getClientInstance();
 			
 			if(planToReturn != null){
 				LoginServiceImpl loginService = new LoginServiceImpl();
@@ -990,7 +991,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		
 		if(academicHistory != null){
 			PlanDao planDao = new PlanDao();
-			plan = planDao.generatePlanFromAcademicHistory(academicHistory);
+			plan = planDao.generatePlanFromAcademicHistory(academicHistory).getClientInstance();
 		}
 		return plan;
 	}
@@ -1062,11 +1063,11 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 				
 				if(career.hasDefault() == true){
 					
-					Plan defaultPlan = null;
+					PlanServer defaultPlan = null;
 					PlanDao planDao = new PlanDao();
 					defaultPlan = planDao.getPlanDefault(career.getCode());
 					
-					toReturn.setPlanDefautl(defaultPlan);
+					toReturn.setPlanDefautl(defaultPlan.getClientInstance());
 					
 				}
 			
