@@ -9,6 +9,7 @@ import com.somosun.plan.server.control.ScoreServer;
 import com.somosun.plan.server.control.SingleScoreServer;
 import com.somosun.plan.shared.control.SingleScore;
 import com.somosun.plan.shared.control.Subject;
+import com.somosun.plan.shared.control.Teacher;
 
 public class ScoreDao implements Dao<ScoreServer>{
 	
@@ -89,7 +90,10 @@ public class ScoreDao implements Dao<ScoreServer>{
 		ScoreServer toReturn = null;
 		
 		if(subjectId != null){
-			toReturn = (ScoreServer) ofy().load().type(ScoreServer.class).filter("subject.idCopy", subjectId).filter("teacher", null).first().now();
+			SubjectDao subjectDao = new SubjectDao();
+			Subject subject = subjectDao.getById(subjectId);
+			Ref<Subject> subjectRef = Ref.create(subject);
+			toReturn = (ScoreServer) ofy().load().type(ScoreServer.class).filter("subject", subjectRef).filter("teacher", null).first().now();
 		}
 		
 		return toReturn;
@@ -109,7 +113,14 @@ public class ScoreDao implements Dao<ScoreServer>{
 		ScoreServer toReturn = null;
 		
 		if(professorId != null && subjectId != null){
-			toReturn = (ScoreServer) ofy().load().type(ScoreServer.class).filter("subject.idCopy", subjectId).filter("teacher.idCopy", professorId).first().now();
+			SubjectDao subjectDao = new SubjectDao();
+			Subject subject = subjectDao.getById(subjectId);
+			Ref<Subject> subjectRef = Ref.create(subject);
+			TeacherDao teacherDao = new TeacherDao();
+			Teacher teacher = teacherDao.getById(professorId);
+			Ref<Teacher> teacherRef = Ref.create(teacher);
+			
+			toReturn = (ScoreServer) ofy().load().type(ScoreServer.class).filter("subject", subject).filter("teacher", teacher).first().now();
 		}
 		
 		return toReturn;
@@ -125,7 +136,12 @@ public class ScoreDao implements Dao<ScoreServer>{
 		ScoreServer toReturn = null;
 		
 		if(code != null){
-			toReturn = (ScoreServer) ofy().load().type(ScoreServer.class).filter("subject.code", code).filter("teacher", null).first().now();
+			
+			SubjectDao subjectDao = new SubjectDao();
+			Subject subject = subjectDao.getByCode(code);
+			Ref<Subject> subjectRef = Ref.create(subject);
+			
+			toReturn = (ScoreServer) ofy().load().type(ScoreServer.class).filter("subject", subjectRef).filter("teacher", null).first().now();
 		}
 		
 		return toReturn;

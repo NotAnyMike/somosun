@@ -372,8 +372,10 @@ public class PlanDao implements Dao<PlanServer>{
 	}
 
 	public PlanServer getPlanDefault(String careerCode) {
-		//FIXME fix the career filter
-		PlanServer p = (PlanServer) ofy().load().type(PlanServer.class).filter("isDefault", true).filter("career.code", careerCode).first().now();
+		CareerDao careerDao = new CareerDao();
+		Career career = careerDao.getByCode(careerCode);
+		Ref<Career> ref = Ref.create(career);
+		PlanServer p = (PlanServer) ofy().load().type(PlanServer.class).filter("isDefault", true).filter("career", ref).first().now();
 		if(p != null){			
 			p.setUser(null);
 			p.setDefault(false);
