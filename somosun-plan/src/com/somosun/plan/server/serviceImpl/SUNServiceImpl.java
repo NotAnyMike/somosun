@@ -267,7 +267,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 				c = cDao.getByCode(plan.getCareerCode());
 				c.setHasDefault(true);
 				cDao.save(c);
-				pDao.save(new PlanServer(plan));
+				pDao.save(plan);
 			}
 		}
 	}
@@ -290,7 +290,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 					plan.setUser(student);
 					plan.setDefault(false);
 					
-					id = pDao.save(new PlanServer(plan));
+					id = pDao.save(plan);
 					
 				}
 			}
@@ -957,7 +957,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		PlanDao planDao = new PlanDao();
 		PlanServer plan = planDao.getById(Long.valueOf(planId));
 		
-		if(plan != null && plan.getUser().get().getIdSun().equals(s.getIdSun()) == true){
+		if(plan != null && plan.getUserRef().get().getIdSun().equals(s.getIdSun()) == true){
 			planDao.delete(plan);
 		}
 	}

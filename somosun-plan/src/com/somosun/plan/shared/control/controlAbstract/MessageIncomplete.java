@@ -1,4 +1,4 @@
-package com.somosun.plan.shared.control.incomplete;
+package com.somosun.plan.shared.control.controlAbstract;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -7,7 +7,7 @@ import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import com.somosun.plan.shared.values.MessageTypeCodes;
 
-public class MessageIncomplete implements Serializable{
+public abstract class MessageIncomplete implements Serializable{
 
 	/**
 	 * 

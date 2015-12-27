@@ -11,10 +11,10 @@ import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Load;
 import com.googlecode.objectify.annotation.OnLoad;
-import com.somosun.plan.shared.control.incomplete.ScoreIncomplete;
+import com.somosun.plan.shared.control.controlAbstract.ScoreAbstract;
 
 @Entity
-public class Score extends ScoreIncomplete implements Serializable {
+public class Score extends ScoreAbstract implements Serializable {
 
 	private Teacher teacher = null;
 	private Subject subject = null;

@@ -7,13 +7,13 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Load;
-import com.somosun.plan.shared.control.incomplete.PlanIncomplete;
+import com.somosun.plan.shared.control.controlAbstract.PlanAbstract;
 
 /**
  *
  * @author Mike W
  */
-public class Plan extends PlanIncomplete implements Serializable {
+public class Plan extends PlanAbstract implements Serializable {
 
 	private Career career = null;
 	private Student user = null;

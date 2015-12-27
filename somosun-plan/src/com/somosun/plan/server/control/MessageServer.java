@@ -8,7 +8,7 @@ import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Load;
 import com.somosun.plan.shared.control.Message;
 import com.somosun.plan.shared.control.Student;
-import com.somosun.plan.shared.control.incomplete.MessageIncomplete;
+import com.somosun.plan.shared.control.controlAbstract.MessageIncomplete;
 
 @Entity
 public class MessageServer extends MessageIncomplete implements Serializable {

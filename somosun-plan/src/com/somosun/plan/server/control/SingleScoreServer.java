@@ -5,10 +5,10 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Load;
 import com.somosun.plan.shared.control.SemesterValue;
-import com.somosun.plan.shared.control.incomplete.SingleScoreIncomplete;
+import com.somosun.plan.shared.control.controlAbstract.SingleScoreAbstract;
 
 @Entity
-public class SingleScoreServer extends SingleScoreIncomplete {
+public class SingleScoreServer extends SingleScoreAbstract {
 
 	@Index @Load private Ref<SemesterValue> semesterValue = null;
 	

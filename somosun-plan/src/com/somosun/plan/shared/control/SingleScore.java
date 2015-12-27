@@ -9,9 +9,9 @@ import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Load;
 import com.googlecode.objectify.annotation.OnLoad;
-import com.somosun.plan.shared.control.incomplete.SingleScoreIncomplete;
+import com.somosun.plan.shared.control.controlAbstract.SingleScoreAbstract;
 
-public class SingleScore extends SingleScoreIncomplete implements Serializable{
+public class SingleScore extends SingleScoreAbstract implements Serializable{
 	
 	private SemesterValue semesterValue = null;
 	

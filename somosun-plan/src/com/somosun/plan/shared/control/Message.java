@@ -2,7 +2,7 @@ package com.somosun.plan.shared.control;
 
 import java.io.Serializable;
 
-import com.somosun.plan.shared.control.incomplete.MessageIncomplete;
+import com.somosun.plan.shared.control.controlAbstract.MessageIncomplete;
 
 public class Message extends MessageIncomplete implements Serializable {
 

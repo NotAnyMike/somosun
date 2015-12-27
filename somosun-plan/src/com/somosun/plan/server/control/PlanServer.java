@@ -14,49 +14,55 @@ import com.somosun.plan.shared.control.Semester;
 import com.somosun.plan.shared.control.SemesterValue;
 import com.somosun.plan.shared.control.Student;
 import com.somosun.plan.shared.control.SubjectValue;
-import com.somosun.plan.shared.control.incomplete.PlanIncomplete;
+import com.somosun.plan.shared.control.controlAbstract.PlanAbstract;
 
 @Entity
-public class PlanServer extends PlanIncomplete {
+public class PlanServer extends PlanAbstract {
 
-	@Index @Load private Ref<Career> career = null;
-	@Index @Load private Ref<Student> user = null;
-    @Load private List<Ref<Semester>> semesters = null;
+	@Index private Ref<Career> career = null;
+	@Index private Ref<Student> user = null;
+    private List<Ref<Semester>> semesters = null;
     
     public PlanServer(){}
     
-    public PlanServer(Plan p){
-		this.setId(p.getId());
-		this.setCareerNoRef(p.getCareer());
-		this.setDefault(p.isDefault());
-		this.setGpa(p.getGpa());
-		this.setName(p.getName());
-		this.setUserNoRef(p.getUser());
-		
-		List<Ref<Semester>> list = null;
-		for(Semester s : p.getSemesters()){
-			if(list == null) list = new ArrayList<Ref<Semester>>();
-			if(s.getId() == null){
-				SemesterDao semesterDao = new SemesterDao();
-				s.setId(semesterDao.save(s));
-			}
-			Ref<Semester> ref = Ref.create(s);
-			list.add(ref);
-			
-			//TODO update all the values here I THIKNK ALL VALUES ARE UPDATED
-		}
-		this.setSemesters(list);
-		
-		
-		int x = this.getSemesters().get(0).get().getSubjects().size();
-		x = this.getSemesters().get(1).get().getSubjects().size();
-		x = 0;
-    }
+//    public PlanServer(Plan p){
+//    	
+//		this.setId(p.getId());
+//		this.setCareerNoRef(p.getCareer());
+//		this.setDefault(p.isDefault());
+//		this.setGpa(p.getGpa());
+//		this.setName(p.getName());
+//		this.setUserNoRef(p.getUser());
+//		
+//		List<Ref<Semester>> list = null;
+//		for(Semester s : p.getSemesters()){
+//			if(list == null) list = new ArrayList<Ref<Semester>>();
+//			if(s.getId() == null){
+//				SemesterDao semesterDao = new SemesterDao();
+//				s.setId(semesterDao.save(s));
+//			}
+//			Ref<Semester> ref = Ref.create(s);
+//			list.add(ref);
+//			
+//			//TODO update all the values here I THIKNK ALL VALUES ARE UPDATED
+//		}
+//		this.setSemesters(list);
+//		
+//		//this.getUser().get().setName("test");
+//		
+//		boolean isLoaded = this.getUser().isLoaded();
+//		isLoaded =  this.getSemesters().get(0).isLoaded();
+//		isLoaded =  this.getSemesters().get(1).isLoaded();
+//		
+//		int x = this.getSemesters().get(0).get().getSubjects().size();
+//		x = this.getSemesters().get(1).get().getSubjects().size();
+//		x = 0;
+//    }
     
     public void calculateGpa() {
 		int credits = 0;
 		double sum = 0;
-		for(Ref<Semester> semester : getSemesters()){
+		for(Ref<Semester> semester : getSemestersRef()){
 			for(SubjectValue subjectValue : semester.get().getSubjects()){
 				if(subjectValue.isTaken()){
 					if(subjectValue.getComplementaryValue().getSubject().isApprovenType() == false){						
@@ -69,60 +75,83 @@ public class PlanServer extends PlanIncomplete {
 		this.setGpa((double) sum/credits);
 	}
 
-	public Ref<Career> getCareer() {
+	public Ref<Career> getCareerRef() {
 		return career;
 	}
+	
+	public Career getCareer(){
+		Career toReturn = null;
+		if(career != null) toReturn = career.get();
+		return toReturn;
+	}
 
-	public void setCareer(Ref<Career> career) {
+	public void setCareerRef(Ref<Career> career) {
 		this.career = career;
 	}
 	
-	public void setCareerNoRef(Career career) {
+	public void setCareer(Career career) {
 		if(career != null && career.getId() != null){			
 			this.career = Ref.create(career);
 		}
 	}
 
-	public Ref<Student> getUser() {
+	public Ref<Student> getUserRef() {
 		return user;
 	}
-
-	public void setUser(Ref<Student> user) {
-		this.user = user;
+	
+	public Student getUser(){
+		Student toReturn = null;
+		if(user != null) toReturn = user.get();
+		return toReturn;
 	}
 
-	public List<Ref<Semester>> getSemesters() {
+	public void setUserRef(Ref<Student> user) {
+		this.user = user;
+	}
+	
+	public void setUser(Student user){
+		if(user != null && user.getIdSun() != null){
+			this.setUserRef(Ref.create(user));
+		}else{
+			this.setUserRef(null);
+		}
+	}
+
+	public List<Ref<Semester>> getSemestersRef() {
 		return semesters;
 	}
 
-	public void setSemesters(List<Ref<Semester>> semesters) {
+	public void setSemestersRef(List<Ref<Semester>> semesters) {
 		this.semesters = semesters;
 	}
 	
-	public void setSemestersNoRef(List<Semester> semesters){
+	public void setSemesters(List<Semester> semesters){
 		List<Ref<Semester>> list = null;
 		for(Semester s : semesters){
 			if(list == null) list = new ArrayList<Ref<Semester>>();
 			list.add(Ref.create(s));
 		}
-		setSemesters(list);
+		setSemestersRef(list);
 	}
-
-	public void setUserNoRef(Student student) {
-		if(student != null && student.getIdSun() != null){
-			setUser(Ref.create(student));
+	
+	public List<Semester> getSemesters(){
+		List<Semester> list = null;
+		for(Ref<Semester> semesterRef : semesters){
+			if(list == null) list = new ArrayList<Semester>();
+			list.add(semesterRef.get());
 		}
+		return list;
 	}
 	
 	public Plan getClientInstance(){
 		Plan p = new Plan();
 		
 		p.setId(getId());
-		p.setCareer(getCareer().get());
+		p.setCareer(getCareer());
 		p.setDefault(isDefault());
 		p.setGpa(getGpa());
 		p.setName(getName());
-		p.setUser(getUser().get());
+		p.setUser(getUserRef().get());
 		
 		List<Semester> list = null;
 		for(Ref<Semester> s : semesters){
@@ -134,20 +163,20 @@ public class PlanServer extends PlanIncomplete {
 		return p;
 	}
 	
-	public boolean compare(Plan p){
+	public boolean compare(PlanAbstract p){
 		boolean toReturn = false;
 		
-		if(p != null && this.getName().equals(p.getName()) && this.getUser().equals(p.getUser())  && this.getGpa() == p.getGpa() &&
+		if(p != null && this.getName().equals(p.getName()) && (this.getUser().getIdSun().equals(p.getUser().getIdSun()))  && this.getGpa() == p.getGpa() &&
 				this.getId().equals(p.getId()) && this.getCareer().equals(p.getCareer())){
 			//Check the semesters
 			//if null or empty both
-			if((this.getSemesters() == null && p.getSemesters() == null) || (this.getSemesters() != null && this.getSemesters().isEmpty() && p.getSemesters() != null & p.getSemesters().isEmpty())){
+			if((this.getSemestersRef() == null && p.getSemesters() == null) || (this.getSemestersRef() != null && this.getSemestersRef().isEmpty() && p.getSemesters() != null & p.getSemesters().isEmpty())){
 				toReturn = true;
 			}else{
-				if(this.getSemesters() != null && p.getSemesters() != null && this.getSemesters().size() == p.getSemesters().size()){
+				if(this.getSemestersRef() != null && p.getSemesters() != null && this.getSemestersRef().size() == p.getSemesters().size()){
 					boolean isEqual = true;
-					for(int x = 0; x < this.getSemesters().size(); x++){
-						if(this.getSemesters().get(x).equals(p.getSemesters().get(x)) == false){
+					for(int x = 0; x < this.getSemestersRef().size(); x++){
+						if(this.getSemestersRef().get(x).equals(p.getSemesters().get(x)) == false){
 							isEqual = false;
 							break;
 						}
@@ -159,5 +188,4 @@ public class PlanServer extends PlanIncomplete {
 		
 		return toReturn;
 	}
-    
 }

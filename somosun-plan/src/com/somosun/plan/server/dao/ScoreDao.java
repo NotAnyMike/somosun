@@ -16,7 +16,6 @@ public class ScoreDao implements Dao<ScoreServer>{
 		ObjectifyService.register(ScoreServer.class);
 	}
 
-	@Override
 	public Long save(ScoreServer score) {
 		Long toReturn = null;
 		

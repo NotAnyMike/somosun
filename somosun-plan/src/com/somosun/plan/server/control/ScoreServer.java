@@ -9,10 +9,10 @@ import com.googlecode.objectify.annotation.Load;
 import com.somosun.plan.shared.control.Score;
 import com.somosun.plan.shared.control.Subject;
 import com.somosun.plan.shared.control.Teacher;
-import com.somosun.plan.shared.control.incomplete.ScoreIncomplete;
+import com.somosun.plan.shared.control.controlAbstract.ScoreAbstract;
 
 @Entity
-public class ScoreServer extends ScoreIncomplete{
+public class ScoreServer extends ScoreAbstract{
 
 	@Index @Load private Ref<Teacher> teacher = null;
 	@Index @Load private Ref<Subject> subject = null;
