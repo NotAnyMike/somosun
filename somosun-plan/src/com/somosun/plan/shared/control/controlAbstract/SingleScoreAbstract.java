@@ -2,11 +2,7 @@ package com.somosun.plan.shared.control.controlAbstract;
 
 import java.io.Serializable;
 
-import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Id;
-import com.googlecode.objectify.annotation.Index;
-import com.googlecode.objectify.annotation.Load;
-import com.somosun.plan.shared.control.SemesterValue;
 
 public abstract class SingleScoreAbstract implements Serializable{
 

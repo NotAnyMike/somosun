@@ -6,43 +6,35 @@ import java.util.List;
 
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.somosun.plan.shared.control.controlAbstract.SemesterAbstract;
 
 /**
+ * 
+ * @author MW
  *
- * @author Cesar A. Villamizar C.
  */
-@Entity
-public class Semester implements Serializable {
+public class Semester extends SemesterAbstract implements Serializable {
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	@Id private Long id = null;
 	private List<SubjectValue> subjectValuesList;
 	private SemesterValue semesterValue;
 	
 	public Semester(){
 		subjectValuesList= new ArrayList<>();
 	}
-    
-    public Semester(SemesterValue semesterValue){
+	
+	public Semester(SemesterValue semesterValue){
         subjectValuesList= new ArrayList<>();
         this.semesterValue=semesterValue;
     }
-    
-    public List<SubjectValue> getSubjects(){
+	
+	public List<SubjectValue> getSubjects(){
         return this.subjectValuesList;
     }
-
-	public Long getId() {
-		return id;
-	}
-
+	
 	public SemesterValue getSemesterValue() {
 		return semesterValue;
 	}
-
+	
 	public void setSemesterValue(SemesterValue semesterValue) {
 		this.semesterValue = semesterValue;
 	}
@@ -63,8 +55,5 @@ public class Semester implements Serializable {
 		}
 	}
 
-	public void setId(Long id) {
-		this.id = id;
-	}
     
 }

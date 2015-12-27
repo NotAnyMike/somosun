@@ -9,9 +9,6 @@ import com.somosun.plan.shared.values.MessageTypeCodes;
 
 public abstract class MessageIncomplete implements Serializable{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	@Id private Long id = null; 
 	private String name;

@@ -6,7 +6,6 @@ import java.util.List;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import com.somosun.plan.shared.control.Career;
-import com.somosun.plan.shared.control.Semester;
 import com.somosun.plan.shared.control.Student;
 
 public abstract class PlanAbstract implements Serializable {
@@ -19,8 +18,8 @@ public abstract class PlanAbstract implements Serializable {
     
     public abstract Career getCareer();
     public abstract void setCareer(Career c);
-    public abstract List<Semester> getSemesters();
-    public abstract void setSemesters(List<Semester> semesters);
+    public abstract List<SemesterAbstract> getSemesters();
+    public abstract void setSemesters(List<SemesterAbstract> semesters);
     public abstract void setUser(Student s);
     public abstract Student getUser();
 

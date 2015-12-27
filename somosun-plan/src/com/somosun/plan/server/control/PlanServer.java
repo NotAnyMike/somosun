@@ -6,12 +6,9 @@ import java.util.List;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Index;
-import com.googlecode.objectify.annotation.Load;
-import com.somosun.plan.server.dao.SemesterDao;
 import com.somosun.plan.shared.control.Career;
 import com.somosun.plan.shared.control.Plan;
 import com.somosun.plan.shared.control.Semester;
-import com.somosun.plan.shared.control.SemesterValue;
 import com.somosun.plan.shared.control.Student;
 import com.somosun.plan.shared.control.SubjectValue;
 import com.somosun.plan.shared.control.controlAbstract.PlanAbstract;
@@ -21,7 +18,7 @@ public class PlanServer extends PlanAbstract {
 
 	@Index private Ref<Career> career = null;
 	@Index private Ref<Student> user = null;
-    private List<Ref<Semester>> semesters = null;
+    private List<Ref<SemesterServer>> semesters = null;
     
     public PlanServer(){}
     
@@ -62,7 +59,7 @@ public class PlanServer extends PlanAbstract {
     public void calculateGpa() {
 		int credits = 0;
 		double sum = 0;
-		for(Ref<Semester> semester : getSemestersRef()){
+		for(Ref<SemesterServer> semester : getSemestersRef()){
 			for(SubjectValue subjectValue : semester.get().getSubjects()){
 				if(subjectValue.isTaken()){
 					if(subjectValue.getComplementaryValue().getSubject().isApprovenType() == false){						
@@ -117,27 +114,27 @@ public class PlanServer extends PlanAbstract {
 		}
 	}
 
-	public List<Ref<Semester>> getSemestersRef() {
+	public List<Ref<SemesterServer>> getSemestersRef() {
 		return semesters;
 	}
 
-	public void setSemestersRef(List<Ref<Semester>> semesters) {
+	public void setSemestersRef(List<Ref<SemesterServer>> semesters) {
 		this.semesters = semesters;
 	}
 	
 	public void setSemesters(List<Semester> semesters){
-		List<Ref<Semester>> list = null;
+		List<Ref<SemesterServer>> list = null;
 		for(Semester s : semesters){
-			if(list == null) list = new ArrayList<Ref<Semester>>();
+			if(list == null) list = new ArrayList<Ref<SemesterServer>>();
 			list.add(Ref.create(s));
 		}
 		setSemestersRef(list);
 	}
 	
 	public List<Semester> getSemesters(){
-		List<Semester> list = null;
-		for(Ref<Semester> semesterRef : semesters){
-			if(list == null) list = new ArrayList<Semester>();
+		List<SemesterServer> list = null;
+		for(Ref<SemesterServer> semesterRef : semesters){
+			if(list == null) list = new ArrayList<SemesterServer>();
 			list.add(semesterRef.get());
 		}
 		return list;
@@ -153,9 +150,9 @@ public class PlanServer extends PlanAbstract {
 		p.setName(getName());
 		p.setUser(getUserRef().get());
 		
-		List<Semester> list = null;
-		for(Ref<Semester> s : semesters){
-			if(list == null) list = new ArrayList<Semester>();
+		List<SemesterServer> list = null;
+		for(Ref<SemesterServer> s : semesters){
+			if(list == null) list = new ArrayList<SemesterServer>();
 			list.add(s.get());
 		}
 		p.setSemesters(list);

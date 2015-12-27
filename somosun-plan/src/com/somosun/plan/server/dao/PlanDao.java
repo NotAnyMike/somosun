@@ -194,6 +194,7 @@ public class PlanDao implements Dao<PlanServer>{
 				ofy().defer().save().entity(original);
 				
 			}
+			id = original.getId();
 			/**************************************/
 			
 		}
