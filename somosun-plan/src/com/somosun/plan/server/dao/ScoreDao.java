@@ -117,10 +117,13 @@ public class ScoreDao implements Dao<ScoreServer>{
 		if(professorId != null && subjectId != null){
 			SubjectDao subjectDao = new SubjectDao();
 			Subject subject = subjectDao.getById(subjectId);
-			Ref<Subject> subjectRef = Ref.create(subject);
+			Ref<Subject> subjectRef = null;
+			if(subject != null) Ref.create(subject);
+			
 			TeacherDao teacherDao = new TeacherDao();
 			Teacher teacher = teacherDao.getById(professorId);
-			Ref<Teacher> teacherRef = Ref.create(teacher);
+			Ref<Teacher> teacherRef = null;
+			if(teacher != null) Ref.create(teacher);
 			
 			toReturn = (ScoreServer) ofy().load().type(ScoreServer.class).filter("subject", subject).filter("teacher", teacher).first().now();
 		}

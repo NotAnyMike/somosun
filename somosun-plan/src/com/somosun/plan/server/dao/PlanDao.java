@@ -373,7 +373,9 @@ public class PlanDao implements Dao<PlanServer>{
 	public PlanServer getPlanDefault(String careerCode) {
 		CareerDao careerDao = new CareerDao();
 		Career career = careerDao.getByCode(careerCode);
-		Ref<Career> ref = Ref.create(career);
+		Ref<Career> ref = null;
+		if(career != null) Ref.create(career);
+		
 		PlanServer p = (PlanServer) ofy().load().type(PlanServer.class).filter("isDefault", true).filter("career", ref).first().now();
 		if(p != null){			
 			p.setUser(null);
