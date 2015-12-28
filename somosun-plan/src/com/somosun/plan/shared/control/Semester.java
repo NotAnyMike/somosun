@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.somosun.plan.server.control.SubjectValueServer;
 import com.somosun.plan.shared.control.controlAbstract.SemesterAbstract;
 
 /**
@@ -52,6 +53,5 @@ public class Semester extends SemesterAbstract implements Serializable {
 			subjectValuesList.add(subjectValues);
 		}
 	}
-
     
 }

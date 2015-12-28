@@ -20,6 +20,7 @@ import com.googlecode.objectify.VoidWork;
 import com.somosun.plan.server.SomosUNServerUtils;
 import com.somosun.plan.server.control.PlanServer;
 import com.somosun.plan.server.control.SemesterServer;
+import com.somosun.plan.server.control.SubjectValueServer;
 import com.somosun.plan.server.dummy.SemesterDummy;
 import com.somosun.plan.server.dummy.SubjectDummy;
 import com.somosun.plan.server.serviceImpl.LoginServiceImpl;
@@ -29,13 +30,11 @@ import com.somosun.plan.shared.SomosUNUtils;
 import com.somosun.plan.shared.control.Career;
 import com.somosun.plan.shared.control.ComplementaryValue;
 import com.somosun.plan.shared.control.Group;
-import com.somosun.plan.shared.control.Plan;
 import com.somosun.plan.shared.control.Semester;
 import com.somosun.plan.shared.control.SemesterValue;
 import com.somosun.plan.shared.control.Student;
 import com.somosun.plan.shared.control.Subject;
 import com.somosun.plan.shared.control.SubjectGroup;
-import com.somosun.plan.shared.control.SubjectValue;
 import com.somosun.plan.shared.control.controlAbstract.PlanAbstract;
 import com.somosun.plan.shared.values.TypologyCodes;
 
@@ -48,8 +47,9 @@ public class PlanDao implements Dao<PlanServer>{
 	
 	static{
 		ObjectifyService.register(PlanServer.class);
-		ObjectifyService.register(SubjectValue.class);
 		ObjectifyService.register(SemesterServer.class);
+		ObjectifyService.register(SubjectValueServer.class);
+		ObjectifyService.register(ComplementaryValue.class);
 	}
 	
 	public PlanServer createPlanFromDefaultString(String careerCode){
@@ -62,13 +62,13 @@ public class PlanDao implements Dao<PlanServer>{
 		Career career = null;
 		String sede = "";
 		String name = "";
-		List<Semester> semesters = new ArrayList<Semester>();
-		Semester semester = null;
-		List<SubjectValue> subjects = null;
+		List<SemesterServer> semesters = new ArrayList<SemesterServer>();
+		SemesterServer semester = null;
+		List<SubjectValueServer> subjects = null;
 		Subject subject = null;
 		ComplementaryValue complementaryValue = null;
-		SubjectValue subjectValues = null;
-		HashMap<SubjectValue, Subject> subjectMap = new HashMap<SubjectValue, Subject>();;
+		SubjectValueServer subjectValues = null;
+		HashMap<SubjectValueServer, Subject> subjectMap = new HashMap<SubjectValueServer, Subject>();;
 	
 		JSONObject jsonPlan = new JSONObject(CAREERS_DEFAULTS[getCareerIndex(careerCode)]);
 		JSONArray jsonSemesters = jsonPlan.getJSONArray("semesters");
@@ -82,9 +82,9 @@ public class PlanDao implements Dao<PlanServer>{
 		name = jsonPlan.getString("name");
 		
 		for(int i = 0; i < jsonSemesters.length(); i++){
-			semester = new Semester(/*Integer.toString(i)*/);
+			semester = new SemesterServer(/*Integer.toString(i)*/);
 			jsonSubjects = jsonSemesters.getJSONObject(i).getJSONArray("courses");
-			subjects = new ArrayList<SubjectValue>();
+			subjects = new ArrayList<SubjectValueServer>();
 			
 			for(int j = 0; j < jsonSubjects.length(); j++){
 				jsonSubject = jsonSubjects.getJSONObject(j);
@@ -93,7 +93,7 @@ public class PlanDao implements Dao<PlanServer>{
 				}else{
 					subject = new Subject(jsonSubject.getInt("credits"), jsonSubject.getString("code"), jsonSubject.getString("code"), jsonSubject.getString("code"), sede);
 				}
-				subjectValues = new SubjectValue();
+				subjectValues = new SubjectValueServer();
 				//getting the complementary values
 				if(subject!= null){
 					complementaryValue = complementaryValueDao.get(career, subject);
@@ -112,11 +112,11 @@ public class PlanDao implements Dao<PlanServer>{
 					subjectMap.put(subjectValues, subject);
 				}
 			}
-			semester.setSubjects(subjects);
+			semester.setSubjectServers(subjects);
 			semesters.add(semester);
 		}
 		//plan.setValuesAndSubjectMap(subjectMap);
-		plan.setSemesters(semesters);
+		plan.setSemesterServers(semesters);
 		
 		if(career != null)	plan.setCareer(career);
 		return plan;
@@ -384,7 +384,7 @@ public class PlanDao implements Dao<PlanServer>{
 			if(p != null){
 				for(Ref<SemesterServer> s : p.getSemestersRef()){
 					s.get().setId(null);
-					for(SubjectValue sV : s.get().getSubjects()){
+					for(SubjectValueServer sV : s.get().getSubjectValuesListLoaded()){
 						sV.setId(null);
 					}
 				}
@@ -438,8 +438,8 @@ public class PlanDao implements Dao<PlanServer>{
 			List<Ref<SemesterServer>> semesters = plan.getSemestersRef();
 			if(semesters != null){
 				for(Ref<SemesterServer> semester : semesters){
-					List<SubjectValue> subjectValues = semester.get().getSubjects();
-					for(SubjectValue subjectValue : subjectValues){
+					List<SubjectValueServer> subjectValues = semester.get().getSubjectValuesListLoaded();
+					for(SubjectValueServer subjectValue : subjectValues){
 						ComplementaryValue complementaryValue = subjectValue.getComplementaryValue();
 						
 						if(complementaryValue != null){						
@@ -588,11 +588,11 @@ public class PlanDao implements Dao<PlanServer>{
 			SemesterValueDao semesterValueDao = new SemesterValueDao();
 			ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
 			
-			List<Semester> semesters = new ArrayList<Semester>();
+			List<SemesterServer> semesters = new ArrayList<SemesterServer>();
 			List<SubjectDummy> problematicSubjects = new ArrayList<SubjectDummy>();
 			List<Subject> subjectsToUpdate = new ArrayList<Subject>();
 			for(SemesterDummy semesterD : semestersD){
-				Semester semester = new Semester();
+				SemesterServer semester = new SemesterServer();
 				semester.setId(semesterDao.generateId());
 				semesters.add(semester);
 				
@@ -600,7 +600,7 @@ public class PlanDao implements Dao<PlanServer>{
 //				semester.setSemesterValue(/*semesterD.getYear() + "-" + semesterD.getSemester()*/);
 				
 				//for subjects
-				List<SubjectValue> subjects = new ArrayList<SubjectValue>();
+				List<SubjectValueServer> subjects = new ArrayList<SubjectValueServer>();
 				for(SubjectDummy subjectD : semesterD.getSubjects()){
 					
 					//Get subject
@@ -609,7 +609,7 @@ public class PlanDao implements Dao<PlanServer>{
 					assert subject != null;
 					
 					if(subject != null){
-						SubjectValue subjectV = new SubjectValue();
+						SubjectValueServer subjectV = new SubjectValueServer();
 						subjectV.setId(subjectValueDao.generateId());
 						
 						//  Get semesterValue
@@ -648,7 +648,7 @@ public class PlanDao implements Dao<PlanServer>{
 					
 				}
 				
-				semester.setSubjects(subjects);
+				semester.setSubjectServers(subjects);
 				
 			}
 			
@@ -697,7 +697,7 @@ public class PlanDao implements Dao<PlanServer>{
 						
 						if(semesterDummyT != null){
 							
-							SubjectValue subjectValuesT = new SubjectValue();
+							SubjectValueServer subjectValuesT = new SubjectValueServer();
 							subjectValuesT.setId(subjectValueDao.generateId());
 							
 							subjectValuesT.setComplementaryValue(complementaryValuesT);
@@ -713,8 +713,8 @@ public class PlanDao implements Dao<PlanServer>{
 							
 							subjectValuesT.setTaken(true);
 							
-							Semester semester = semesters.get(semesterDummyT.getPosition()-1);
-							semester.addSubject(subjectValuesT);
+							SemesterServer semester = semesters.get(semesterDummyT.getPosition()-1);
+							semester.addSubjectServer(subjectValuesT);
 							
 						}
 					}
@@ -728,7 +728,7 @@ public class PlanDao implements Dao<PlanServer>{
 						boolean isProblematic = false;
 						
 						//new subjectValue
-						SubjectValue subjectValuesT = new SubjectValue();
+						SubjectValueServer subjectValuesT = new SubjectValueServer();
 						subjectValuesT.setId(subjectValueDao.generateId());
 						
 						//get complementaryValue
@@ -752,10 +752,10 @@ public class PlanDao implements Dao<PlanServer>{
 								}
 								subjectValuesT.setTaken(true);
 								
-								Semester semester = semesters.get(semesterDummyT.getPosition()-1);
+								SemesterServer semester = semesters.get(semesterDummyT.getPosition()-1);
 								
 								if(semester != null){
-									semester.addSubject(subjectValuesT);
+									semester.addSubjectServer(subjectValuesT);
 								}
 							}else{
 								isProblematic = true;
@@ -799,7 +799,7 @@ public class PlanDao implements Dao<PlanServer>{
 						SemesterValue semesterValue = semesterValueDao.getOrCreateSemester(semesterDummyT.getYear(), semesterDummyT.getSemester());
 						Group group = groupDao.getOrCreateGroup(subject, semesterValue, subjectD.getGroup());
 						
-						SubjectValue subjectValuesT = new SubjectValue();
+						SubjectValueServer subjectValuesT = new SubjectValueServer();
 						subjectValuesT.setId(subjectValueDao.generateId());
 						subjectValuesT.setComplementaryValue(complementaryValue);
 						subjectValuesT.setGrade(subjectD.getGrade());
@@ -813,10 +813,10 @@ public class PlanDao implements Dao<PlanServer>{
 						complementaryValueDao.save(complementaryValue);
 						subjectValueDao.save(subjectValuesT);
 						
-						Semester semester = semesters.get(semesterDummyT.getPosition()-1);
+						SemesterServer semester = semesters.get(semesterDummyT.getPosition()-1);
 
 						if(semester != null){
-							semester.addSubject(subjectValuesT);
+							semester.addSubjectServer(subjectValuesT);
 						}
 						
 					}
@@ -831,8 +831,8 @@ public class PlanDao implements Dao<PlanServer>{
 			}
 			
 			//Create a task and add it to the cron job
-			for(Semester semesterTemporary : semesters){
-				for(SubjectValue subjectValue : semesterTemporary.getSubjects()){
+			for(SemesterServer semesterTemporary : semesters){
+				for(SubjectValueServer subjectValue : semesterTemporary.getSubjectValuesListLoaded()){
 					SomosUNServerUtils.createGradeUpdaterTask(subjectValue.getGroup().getTeacher(), subjectValue.getGroup().getSemesterValue(), null, subjectValue.getGrade(), subjectValue.getComplementaryValue().getSubject());					
 				}
 			}
@@ -846,7 +846,7 @@ public class PlanDao implements Dao<PlanServer>{
 			planToReturn.setCareer(career);
 			planToReturn.setUser(student);
 			planToReturn.setDefault(isDefault);
-			planToReturn.setSemesters(semesters);
+			planToReturn.setSemesterServers(semesters);
 			
 			planDao.save(planToReturn);
 			

@@ -6,6 +6,7 @@ import java.util.List;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Load;
+import com.somosun.plan.server.dao.SubjectValueDao;
 import com.somosun.plan.shared.control.Semester;
 import com.somosun.plan.shared.control.SemesterValue;
 import com.somosun.plan.shared.control.SubjectValue;
@@ -14,23 +15,31 @@ import com.somosun.plan.shared.control.controlAbstract.SemesterAbstract;
 @Entity
 public class SemesterServer extends SemesterAbstract{
 
-	@Load private List<Ref<SubjectValue>> subjectValuesList;
+	@Load private List<Ref<SubjectValueServer>> subjectValuesList;
 	@Load private Ref<SemesterValue> semesterValue;
 	
 	public SemesterServer(){
-		subjectValuesList= new ArrayList<Ref<SubjectValue>>();
+		subjectValuesList= new ArrayList<Ref<SubjectValueServer>>();
 	}
 	
 	public SemesterServer(SemesterValue semesterValue){
-        subjectValuesList= new ArrayList<Ref<SubjectValue>>();
+        subjectValuesList= new ArrayList<Ref<SubjectValueServer>>();
         setSemesterValue(semesterValue);
     }
 	
-	public List<Ref<SubjectValue>> getSubjectValuesListRef() {
+	public List<Ref<SubjectValueServer>> getSubjectValuesListRef() {
 		return subjectValuesList;
 	}
 	
-	public void setSubjectValuesListRef(List<Ref<SubjectValue>> subjectValuesList) {
+	public List<SubjectValueServer> getSubjectValuesListLoaded(){
+		List<SubjectValueServer> list = new ArrayList<SubjectValueServer>();
+		for(Ref<SubjectValueServer> s : subjectValuesList){
+			list.add(s.get());
+		}
+		return list;
+	}
+	
+	public void setSubjectValuesListRef(List<Ref<SubjectValueServer>> subjectValuesList) {
 		this.subjectValuesList = subjectValuesList;
 	}
 	
@@ -46,8 +55,8 @@ public class SemesterServer extends SemesterAbstract{
 	public List<SubjectValue> getSubjects() {
 		List<SubjectValue> list = new ArrayList<SubjectValue>();
 		if(subjectValuesList != null){			
-			for(Ref<SubjectValue> subjectValueRef : subjectValuesList){
-				list.add(subjectValueRef.get());
+			for(Ref<SubjectValueServer> subjectValueRef : subjectValuesList){
+				list.add(subjectValueRef.get().getClientInstance());
 			}
 		}
 		return list;
@@ -71,10 +80,24 @@ public class SemesterServer extends SemesterAbstract{
 
 	@Override
 	public void setSubjects(List<SubjectValue> subjects) {
-		List<Ref<SubjectValue>> list = new ArrayList<Ref<SubjectValue>>();
+		List<Ref<SubjectValueServer>> list = new ArrayList<Ref<SubjectValueServer>>();
 		for(SubjectValue subjectValue : subjects){
 			if(subjectValue.getId() != null){
-				list.add(Ref.create(subjectValue));
+				SubjectValueDao subjectValueDao = new SubjectValueDao();
+				SubjectValueServer subjectValueServer = subjectValueDao.getById(subjectValue.getId());
+				if(subjectValueServer != null){					
+					list.add(Ref.create(subjectValueServer));
+				}
+			}
+		}
+		setSubjectValuesListRef(list);
+	}
+	
+	public void setSubjectServers(List<SubjectValueServer> subjects) {
+		List<Ref<SubjectValueServer>> list = new ArrayList<Ref<SubjectValueServer>>();
+		for(SubjectValueServer subjectValue : subjects){
+			if(subjectValue.getId() != null){
+				list.add(Ref.create(subjectValue));									
 			}
 		}
 		setSubjectValuesListRef(list);
@@ -82,9 +105,9 @@ public class SemesterServer extends SemesterAbstract{
 
 	@Override
 	public void deleteSubject(SubjectValue subjectValue) {
-		List<Ref<SubjectValue>> listToRemove = new ArrayList<Ref<SubjectValue>>();
+		List<Ref<SubjectValueServer>> listToRemove = new ArrayList<Ref<SubjectValueServer>>();
 		if(subjectValue != null && subjectValue.getId() != null){
-			for(Ref<SubjectValue> subjectValueRef : subjectValuesList){
+			for(Ref<SubjectValueServer> subjectValueRef : subjectValuesList){
 				if(subjectValueRef.get().getId().equals(subjectValue.getId()) == true){
 					listToRemove.add(subjectValueRef);
 				}
@@ -96,7 +119,17 @@ public class SemesterServer extends SemesterAbstract{
 	@Override
 	public void addSubject(SubjectValue subjectValue) {
 		if(subjectValue != null && subjectValue.getId() != null){
-			subjectValuesList.add(Ref.create(subjectValue));
+			SubjectValueDao subjectValueDao = new SubjectValueDao();
+			SubjectValueServer subjectValueServer = subjectValueDao.getById(subjectValue.getId());
+			if(subjectValueServer != null){				
+				subjectValuesList.add(Ref.create(subjectValueServer));
+			}
+		}
+	}
+	
+	public void addSubjectServer(SubjectValueServer subjectValue) {
+		if(subjectValue != null && subjectValue.getId() != null){
+			subjectValuesList.add(Ref.create(subjectValue));							
 		}
 	}
 	
@@ -135,10 +168,10 @@ public class SemesterServer extends SemesterAbstract{
 		
 		List<SubjectValue> list = new ArrayList<SubjectValue>();
 		if(subjectValuesList != null){			
-			for(Ref<SubjectValue> ref : subjectValuesList){
+			for(Ref<SubjectValueServer> ref : subjectValuesList){
 				if(list == null) list = new ArrayList<SubjectValue>();
 				boolean isLoaded = ref.isLoaded();
-				list.add(ref.get());
+				list.add(ref.get().getClientInstance());
 			}
 		}
 		semester.setSubjects(list);
