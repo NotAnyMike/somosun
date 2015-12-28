@@ -6,6 +6,7 @@ import java.util.List;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Load;
+import com.somosun.plan.shared.control.Semester;
 import com.somosun.plan.shared.control.SemesterValue;
 import com.somosun.plan.shared.control.SubjectValue;
 import com.somosun.plan.shared.control.controlAbstract.SemesterAbstract;
@@ -15,6 +16,15 @@ public class SemesterServer extends SemesterAbstract{
 
 	@Load private List<Ref<SubjectValue>> subjectValuesList;
 	@Load private Ref<SemesterValue> semesterValue;
+	
+	public SemesterServer(){
+		subjectValuesList= new ArrayList<Ref<SubjectValue>>();
+	}
+	
+	public SemesterServer(SemesterValue semesterValue){
+        subjectValuesList= new ArrayList<Ref<SubjectValue>>();
+        setSemesterValue(semesterValue);
+    }
 	
 	public List<Ref<SubjectValue>> getSubjectValuesListRef() {
 		return subjectValuesList;
@@ -34,10 +44,11 @@ public class SemesterServer extends SemesterAbstract{
 
 	@Override
 	public List<SubjectValue> getSubjects() {
-		List<SubjectValue> list = null;
-		for(Ref<SubjectValue> subjectValueRef : subjectValuesList){
-			if(list == null) list = new ArrayList<SubjectValue>();
-			list.add(subjectValueRef.get());
+		List<SubjectValue> list = new ArrayList<SubjectValue>();
+		if(subjectValuesList != null){			
+			for(Ref<SubjectValue> subjectValueRef : subjectValuesList){
+				list.add(subjectValueRef.get());
+			}
 		}
 		return list;
 	}
@@ -60,9 +71,8 @@ public class SemesterServer extends SemesterAbstract{
 
 	@Override
 	public void setSubjects(List<SubjectValue> subjects) {
-		List<Ref<SubjectValue>> list = null;
+		List<Ref<SubjectValue>> list = new ArrayList<Ref<SubjectValue>>();
 		for(SubjectValue subjectValue : subjects){
-			if(list == null) list = new ArrayList<Ref<SubjectValue>>();
 			if(subjectValue.getId() != null){
 				list.add(Ref.create(subjectValue));
 			}
@@ -115,6 +125,25 @@ public class SemesterServer extends SemesterAbstract{
 		}
 		
 		return toReturn;
+	}
+	
+	public Semester getClientInstance(){
+		Semester semester = new Semester();
+		
+		semester.setId(this.getId());
+		semester.setSemesterValue(getSemesterValue());
+		
+		List<SubjectValue> list = new ArrayList<SubjectValue>();
+		if(subjectValuesList != null){			
+			for(Ref<SubjectValue> ref : subjectValuesList){
+				if(list == null) list = new ArrayList<SubjectValue>();
+				boolean isLoaded = ref.isLoaded();
+				list.add(ref.get());
+			}
+		}
+		semester.setSubjects(list);
+		
+		return semester; 
 	}
 	
 }

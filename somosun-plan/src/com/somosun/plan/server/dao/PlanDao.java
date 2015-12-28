@@ -19,6 +19,7 @@ import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.VoidWork;
 import com.somosun.plan.server.SomosUNServerUtils;
 import com.somosun.plan.server.control.PlanServer;
+import com.somosun.plan.server.control.SemesterServer;
 import com.somosun.plan.server.dummy.SemesterDummy;
 import com.somosun.plan.server.dummy.SubjectDummy;
 import com.somosun.plan.server.serviceImpl.LoginServiceImpl;
@@ -47,6 +48,8 @@ public class PlanDao implements Dao<PlanServer>{
 	
 	static{
 		ObjectifyService.register(PlanServer.class);
+		ObjectifyService.register(SubjectValue.class);
+		ObjectifyService.register(SemesterServer.class);
 	}
 	
 	public PlanServer createPlanFromDefaultString(String careerCode){
@@ -183,12 +186,7 @@ public class PlanDao implements Dao<PlanServer>{
 				}
 				
 				//set semesters
-				List<Ref<Semester>> list = null;
-				for(Semester semester : plan.getSemesters()){
-					if(list == null) list = new ArrayList<Ref<Semester>>();
-					list.add(Ref.create(semester));
-				}
-				original.setSemestersRef(list);
+				original.setSemesters(plan.getSemesters());
 				
 				//save original
 				ofy().defer().save().entity(original);
@@ -382,7 +380,7 @@ public class PlanDao implements Dao<PlanServer>{
 			p.setDefault(false);
 			p.setId(null);
 			if(p != null){
-				for(Ref<Semester> s : p.getSemestersRef()){
+				for(Ref<SemesterServer> s : p.getSemestersRef()){
 					s.get().setId(null);
 					for(SubjectValue sV : s.get().getSubjects()){
 						sV.setId(null);
@@ -435,9 +433,9 @@ public class PlanDao implements Dao<PlanServer>{
 			ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
 			SemesterDao semesterDao = new SemesterDao();
 			SubjectValueDao subjectValueDao = new SubjectValueDao();
-			List<Ref<Semester>> semesters = plan.getSemestersRef();
+			List<Ref<SemesterServer>> semesters = plan.getSemestersRef();
 			if(semesters != null){
-				for(Ref<Semester> semester : semesters){
+				for(Ref<SemesterServer> semester : semesters){
 					List<SubjectValue> subjectValues = semester.get().getSubjects();
 					for(SubjectValue subjectValue : subjectValues){
 						ComplementaryValue complementaryValue = subjectValue.getComplementaryValue();

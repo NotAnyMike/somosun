@@ -6,6 +6,7 @@ import java.util.List;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Index;
+import com.somosun.plan.server.dao.SemesterDao;
 import com.somosun.plan.shared.control.Career;
 import com.somosun.plan.shared.control.Plan;
 import com.somosun.plan.shared.control.Semester;
@@ -124,18 +125,22 @@ public class PlanServer extends PlanAbstract {
 	
 	public void setSemesters(List<Semester> semesters){
 		List<Ref<SemesterServer>> list = null;
+		SemesterDao semesterDao = new SemesterDao();
 		for(Semester s : semesters){
-			if(list == null) list = new ArrayList<Ref<SemesterServer>>();
-			list.add(Ref.create(s));
+			if(s.getId() != null){				
+				if(list == null) list = new ArrayList<Ref<SemesterServer>>();
+				SemesterServer semesterServer = semesterDao.getById(s.getId());
+				list.add(Ref.create(semesterServer));
+			}
 		}
 		setSemestersRef(list);
 	}
 	
 	public List<Semester> getSemesters(){
-		List<SemesterServer> list = null;
+		List<Semester> list = null;
 		for(Ref<SemesterServer> semesterRef : semesters){
-			if(list == null) list = new ArrayList<SemesterServer>();
-			list.add(semesterRef.get());
+			if(list == null) list = new ArrayList<Semester>();
+			list.add(semesterRef.get().getClientInstance());
 		}
 		return list;
 	}
@@ -150,10 +155,10 @@ public class PlanServer extends PlanAbstract {
 		p.setName(getName());
 		p.setUser(getUserRef().get());
 		
-		List<SemesterServer> list = null;
+		List<Semester> list = null;
 		for(Ref<SemesterServer> s : semesters){
-			if(list == null) list = new ArrayList<SemesterServer>();
-			list.add(s.get());
+			if(list == null) list = new ArrayList<Semester>();
+			list.add(s.get().getClientInstance());
 		}
 		p.setSemesters(list);
 		

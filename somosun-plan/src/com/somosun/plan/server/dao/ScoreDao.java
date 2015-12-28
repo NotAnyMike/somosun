@@ -92,7 +92,9 @@ public class ScoreDao implements Dao<ScoreServer>{
 		if(subjectId != null){
 			SubjectDao subjectDao = new SubjectDao();
 			Subject subject = subjectDao.getById(subjectId);
-			Ref<Subject> subjectRef = Ref.create(subject);
+			Ref<Subject> subjectRef = null;
+			if(subject != null) subjectRef = Ref.create(subject);
+			
 			toReturn = (ScoreServer) ofy().load().type(ScoreServer.class).filter("subject", subjectRef).filter("teacher", null).first().now();
 		}
 		
@@ -139,7 +141,8 @@ public class ScoreDao implements Dao<ScoreServer>{
 			
 			SubjectDao subjectDao = new SubjectDao();
 			Subject subject = subjectDao.getByCode(code);
-			Ref<Subject> subjectRef = Ref.create(subject);
+			Ref<Subject> subjectRef = null;
+			if(subject != null) subjectRef = Ref.create(subject);
 			
 			toReturn = (ScoreServer) ofy().load().type(ScoreServer.class).filter("subject", subjectRef).filter("teacher", null).first().now();
 		}

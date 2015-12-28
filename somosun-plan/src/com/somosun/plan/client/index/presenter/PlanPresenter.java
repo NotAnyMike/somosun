@@ -340,11 +340,13 @@ ComplementaryValueView.Presenter{
 				
 				for(Semester semester2 : semesterListPlan){
 					createSemester(semester2, false);
-					for(SubjectValue subjectValues2 : semester2.getSubjects()){
-						if(subjectValues2 != null){
-							if(subjectValues2.getComplementaryValue() != null){
-								if(subjectValues2.getComplementaryValue().getSubject() != null ){
-									createSubject(subjectValues2.getComplementaryValue().getSubject() ,subjectValues2, semester2);								
+					if( semester2.getSubjects() != null){						
+						for(SubjectValue subjectValues2 : semester2.getSubjects()){
+							if(subjectValues2 != null){
+								if(subjectValues2.getComplementaryValue() != null){
+									if(subjectValues2.getComplementaryValue().getSubject() != null ){
+										createSubject(subjectValues2.getComplementaryValue().getSubject() ,subjectValues2, semester2);								
+									}
 								}
 							}
 						}
@@ -996,11 +998,12 @@ ComplementaryValueView.Presenter{
 		int[] array = null;
 		int optative = 0;
 		for(Semester semester : plan.getSemesters()){
-			for(SubjectValue subjectValue : semester.getSubjects()){
-				String typology = subjectValue.getComplementaryValue().getTypology();
-				
-				//Assigning the right array to @param array
-				switch(typology){
+			if(semester.getSubjects() != null){
+				for(SubjectValue subjectValue : semester.getSubjects()){
+					String typology = subjectValue.getComplementaryValue().getTypology();
+					
+					//Assigning the right array to @param array
+					switch(typology){
 					case TypologyCodes.FUNDAMENTACION:
 						optative = foundationOptative;
 						array = foundationCredits;
@@ -1017,26 +1020,27 @@ ComplementaryValueView.Presenter{
 						optative = disciplinaryOptative;
 						array = disciplinaryCredits;
 						break;
-				}
-				
-				int credits = subjectValue.getComplementaryValue().getSubject().getCredits();
-				
-				//Add it to the total 
-				array[0] += credits;
-				
-				if(subjectValue.isTaken() && subjectValue.getGrade() >= 3){
-					array[1] += credits;
-				}
-				if(subjectValue.isTaken() && subjectValue.getGrade() >= 3){						
-					if(subjectValue.getComplementaryValue().isMandatory()){
-						array[3] += credits;
-					}else{
-						optative += credits;
 					}
+					
+					int credits = subjectValue.getComplementaryValue().getSubject().getCredits();
+					
+					//Add it to the total 
+					array[0] += credits;
+					
+					if(subjectValue.isTaken() && subjectValue.getGrade() >= 3){
+						array[1] += credits;
+					}
+					if(subjectValue.isTaken() && subjectValue.getGrade() >= 3){						
+						if(subjectValue.getComplementaryValue().isMandatory()){
+							array[3] += credits;
+						}else{
+							optative += credits;
+						}
+					}
+					
+					//TODO finish this method
+					
 				}
-				
-				//TODO finish this method
-				
 			}
 		}
 	}

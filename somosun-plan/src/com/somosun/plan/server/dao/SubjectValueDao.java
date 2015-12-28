@@ -35,13 +35,19 @@ public class SubjectValueDao implements Dao<SubjectValue> {
 			}
 			
 			if(sV.getGroup().getId() == null){
-				groupDao.save(sV.getGroup());
+				sV.getGroup().setId(groupDao.save(sV.getGroup()));
 			}
 
 			if(sV.getGrade() > 5 || sV.getGrade() < 0){
 				sV.setTaken(false);
 			}
 			
+			if(sV.getComplementaryValue() != null && sV.getComplementaryValue().getId() == null){
+				ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
+				sV.getComplementaryValue().setId(complementaryValueDao.save(sV.getComplementaryValue()));
+			}
+			
+			if(sV.getId() == null) sV.setId(generateId());
 			ofy().save().entity(sV).now();
 			toReturn = sV.getId();
 			

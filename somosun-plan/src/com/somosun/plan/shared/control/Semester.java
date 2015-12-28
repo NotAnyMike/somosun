@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.googlecode.objectify.annotation.Entity;
-import com.googlecode.objectify.annotation.Id;
 import com.somosun.plan.shared.control.controlAbstract.SemesterAbstract;
 
 /**
@@ -19,11 +17,11 @@ public class Semester extends SemesterAbstract implements Serializable {
 	private SemesterValue semesterValue;
 	
 	public Semester(){
-		subjectValuesList= new ArrayList<>();
+		subjectValuesList= new ArrayList<SubjectValue>();
 	}
 	
 	public Semester(SemesterValue semesterValue){
-        subjectValuesList= new ArrayList<>();
+        subjectValuesList= new ArrayList<SubjectValue>();
         this.semesterValue=semesterValue;
     }
 	
