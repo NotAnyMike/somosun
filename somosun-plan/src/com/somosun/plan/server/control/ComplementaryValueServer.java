@@ -10,6 +10,7 @@ import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Load;
 import com.googlecode.objectify.annotation.Serialize;
 import com.somosun.plan.shared.control.Career;
+import com.somosun.plan.shared.control.ComplementaryValue;
 import com.somosun.plan.shared.control.Subject;
 import com.somosun.plan.shared.control.SubjectGroup;
 import com.somosun.plan.shared.control.controlAbstract.ComplementaryValueAbstract;
@@ -37,7 +38,7 @@ public class ComplementaryValueServer extends ComplementaryValueAbstract {
     public ComplementaryValueServer(){
     	
     	this.setPrerequisitesListsRef(new ArrayList<List<Ref<Subject>>>());
-		this.corequisitesLists = new ArrayList<List<Ref<Subject>>>();
+		this.setCorequisitesListsRef(new ArrayList<List<Ref<Subject>>>());
 		this.listPrerequisitesOf = new ArrayList<Ref<Subject>>();
 		this.listCorequisitesOf = new ArrayList<Ref<Subject>>();
     }
@@ -76,8 +77,8 @@ public class ComplementaryValueServer extends ComplementaryValueAbstract {
 		setTypology(typology);
 		setMandatory(mandatory);
 		
-		this.prerequisitesLists = new ArrayList<List<Ref<Subject>>>();
-		this.corequisitesLists = new ArrayList<List<Ref<Subject>>>();
+		this.setPrerequisitesListsRef(new ArrayList<List<Ref<Subject>>>());
+		this.setCorequisitesListsRef(new ArrayList<List<Ref<Subject>>>());
 		this.listPrerequisitesOf = new ArrayList<Ref<Subject>>();
 		this.listCorequisitesOf = new ArrayList<Ref<Subject>>();
 		
@@ -91,8 +92,8 @@ public class ComplementaryValueServer extends ComplementaryValueAbstract {
 		setMandatory(mandatory);
 		setSubjectGroup(subjectGroup);
 		
-		this.prerequisitesLists = new ArrayList<List<Ref<Subject>>>();
-		this.corequisitesLists = new ArrayList<List<Ref<Subject>>>();
+		this.setPrerequisitesListsRef(new ArrayList<List<Ref<Subject>>>());
+		this.setCorequisitesListsRef(new ArrayList<List<Ref<Subject>>>());
 		this.listPrerequisitesOf = new ArrayList<Ref<Subject>>();
 		this.listCorequisitesOf = new ArrayList<Ref<Subject>>();
 		
@@ -104,7 +105,7 @@ public class ComplementaryValueServer extends ComplementaryValueAbstract {
 		setSubject(subject);
 		
 		this.setPrerequisitesListsRef(new ArrayList<List<Ref<Subject>>>());
-		this.corequisitesLists = new ArrayList<List<Ref<Subject>>>();
+		this.setCorequisitesListsRef(new ArrayList<List<Ref<Subject>>>());
 		this.listPrerequisitesOf = new ArrayList<Ref<Subject>>();
 		this.listCorequisitesOf = new ArrayList<Ref<Subject>>();
 	}
@@ -168,15 +169,15 @@ public class ComplementaryValueServer extends ComplementaryValueAbstract {
 	@Override
 	public void addPrerequisites(List<List<Subject>> lists) {
 		if(lists != null){
-			if(prerequisitesLists  == null) prerequisitesLists = new ArrayList<List<Ref<Subject>>>();
+			if(getPrerequisitesListsRef()  == null) setPrerequisitesListsRef(new ArrayList<List<Ref<Subject>>>());
 			for(List<Subject> list : lists){
 				List<Ref<Subject>> listToAdd = new ArrayList<Ref<Subject>>();
 				for(Subject s : list){
-					if(s.getId() != null && containsSubject(prerequisitesLists, s.getId()) == false){
+					if(s.getId() != null && containsSubject(getPrerequisitesListsRef(), s.getId()) == false){
 						listToAdd.add(Ref.create(s));						
 					}
 				}
-				prerequisitesLists.add(listToAdd);
+				getPrerequisitesListsRef().add(listToAdd);
 			}
 		}
 	}
@@ -184,12 +185,12 @@ public class ComplementaryValueServer extends ComplementaryValueAbstract {
 	@Override
 	public void addPrerequisite(Subject subject) {
 		if(subject != null && subject.getId() != null){			
-			if(prerequisitesLists == null) prerequisitesLists = new ArrayList<List<Ref<Subject>>>();
-			boolean containsSubject = containsSubject(prerequisitesLists, subject.getId());
+			if(getPrerequisitesListsRef() == null) setPrerequisitesListsRef(new ArrayList<List<Ref<Subject>>>());
+			boolean containsSubject = containsSubject(getPrerequisitesListsRef(), subject.getId());
 			if(containsSubject == false){
 				List<Ref<Subject>> list = new ArrayList<Ref<Subject>>();
 				list.add(Ref.create(subject));
-				prerequisitesLists.add(list);
+				getPrerequisitesListsRef().add(list);
 			}
 		}
 	}
@@ -197,7 +198,7 @@ public class ComplementaryValueServer extends ComplementaryValueAbstract {
 	@Override
 	public void removePrerequisite(Subject subject) {
 		if(subject != null && subject.getId() != null){
-			for(List<Ref<Subject>> list : prerequisitesLists){
+			for(List<Ref<Subject>> list : getPrerequisitesListsRef()){
 				removeFromList(list, subject.getId());
 			}
 		}
@@ -233,12 +234,12 @@ public class ComplementaryValueServer extends ComplementaryValueAbstract {
 	@Override
 	public void addCorequisite(Subject subject) {
 		if(subject != null && subject.getId() != null){			
-			if(corequisitesLists == null) corequisitesLists = new ArrayList<List<Ref<Subject>>>();
-			boolean containsSubject = containsSubject(corequisitesLists, subject.getId());
+			if(getCorequisitesListsRef() == null) setCorequisitesListsRef(new ArrayList<List<Ref<Subject>>>());
+			boolean containsSubject = containsSubject(getCorequisitesListsRef(), subject.getId());
 			if(containsSubject == false){
 				List<Ref<Subject>> list = new ArrayList<Ref<Subject>>();
 				list.add(Ref.create(subject));
-				corequisitesLists.add(list);
+				getCorequisitesListsRef().add(list);
 			}
 		}
 	}
@@ -246,15 +247,15 @@ public class ComplementaryValueServer extends ComplementaryValueAbstract {
 	@Override
 	public void addCorequisites(List<List<Subject>> lists) {
 		if(lists != null){
-			if(corequisitesLists  == null) corequisitesLists = new ArrayList<List<Ref<Subject>>>();
+			if(getCorequisitesListsRef()  == null) setCorequisitesListsRef(new ArrayList<List<Ref<Subject>>>());
 			for(List<Subject> list : lists){
 				List<Ref<Subject>> listToAdd = new ArrayList<Ref<Subject>>();
 				for(Subject s : list){
-					if(s.getId() != null && containsSubject(corequisitesLists, s.getId()) == false){
+					if(s.getId() != null && containsSubject(getCorequisitesListsRef(), s.getId()) == false){
 						listToAdd.add(Ref.create(s));						
 					}
 				}
-				corequisitesLists.add(listToAdd);
+				getCorequisitesListsRef().add(listToAdd);
 			}
 		}
 	}
@@ -262,7 +263,7 @@ public class ComplementaryValueServer extends ComplementaryValueAbstract {
 	@Override
 	public void removeCorequisite(Subject subject) {
 		if(subject != null && subject.getId() != null){
-			for(List<Ref<Subject>> list : corequisitesLists){
+			for(List<Ref<Subject>> list : getCorequisitesListsRef()){
 				removeFromList(list, subject.getId());
 			}
 		}
@@ -285,86 +286,226 @@ public class ComplementaryValueServer extends ComplementaryValueAbstract {
 
 	@Override
 	public List<Subject> getListCorequisites() {
-		// TODO Auto-generated method stub
-		return null;
+		List<Subject> toReturn = null;
+		
+		if(getCorequisitesListsRef() != null){
+			toReturn = new ArrayList<Subject>();
+			for(List<Ref<Subject>> list : getCorequisitesListsRef()){
+				for(Ref<Subject> ref : list){
+					toReturn.add(ref.get());
+				}
+			}
+			
+		}
+		
+		return toReturn;
 	}
 
 	@Override
 	public void setListCorequisites(List<List<Subject>> corequisitesLists) {
-		// TODO Auto-generated method stub
-		
+		if(corequisitesLists != null){
+			List<List<Ref<Subject>>> listsToAdd = transformToRefLists(corequisitesLists);
+			setCorequisitesListsRef(listsToAdd);
+		}
 	}
 
 	@Override
 	public void addListToCorequisites(List<Subject> list) {
-		// TODO Auto-generated method stub
+		if(list != null && !list.isEmpty()){
+			List<Ref<Subject>> listToAdd = new ArrayList<Ref<Subject>>();
+			for(Subject s : list){
+				if(containsSubject(corequisitesLists, s.getId()) == false) listToAdd.add(Ref.create(s));
+			}
+			if(corequisitesLists == null) corequisitesLists = new ArrayList<List<Ref<Subject>>>();
+			corequisitesLists.add(listToAdd);
+		}
 		
 	}
 
 	@Override
 	public List<Subject> getListCorequisitesOf() {
-		// TODO Auto-generated method stub
-		return null;
+		List<Subject> listToReturn = null;
+		if(listCorequisitesOf != null){
+			if(listToReturn == null) listToReturn = new ArrayList<Subject>();
+			for(Ref<Subject> ref : listCorequisitesOf){
+				listToReturn.add(ref.get());
+			}
+		}
+		return listToReturn;
 	}
 
 	@Override
 	public void setListCorequisitesOf(List<Subject> listCorequisitesOf) {
-		// TODO Auto-generated method stub
-		
+		if(listCorequisitesOf != null){	
+			List<Ref<Subject>> listToAdd = transformToRefList(listCorequisitesOf);
+			if(listToAdd != null) setListCorequisitesOfRef(listToAdd);
+		}
 	}
 
 	@Override
 	public List<Subject> getListPrerequisites() {
-		// TODO Auto-generated method stub
-		return null;
+		List<Subject> toReturn = null;
+		
+		if(getCorequisitesListsRef() != null){
+			toReturn = new ArrayList<Subject>();
+			for(List<Ref<Subject>> list : getPrerequisitesListsRef()){
+				for(Ref<Subject> ref : list){
+					toReturn.add(ref.get());
+				}
+			}
+			
+		}
+		
+		return toReturn;
+	}
+	
+	private List<List<Ref<Subject>>> transformToRefLists(List<List<Subject>> lists){
+		List<List<Ref<Subject>>> listsToReturn = null;
+		if(lists != null){
+			if(listsToReturn == null) listsToReturn = new ArrayList<List<Ref<Subject>>>();
+			for(List<Subject> list : lists){
+				
+				List<Ref<Subject>> listToAdd = transformToRefList(list);
+				listsToReturn.add(listToAdd);
+			}
+		}
+		return listsToReturn;
+	}
+	
+	private List<Ref<Subject>> transformToRefList(List<Subject> list){
+		List<Ref<Subject>> listToReturn = null;
+		for(Subject s : list){
+			if(listToReturn == null) listToReturn = new ArrayList<Ref<Subject>>();
+			if(s.getId() != null){
+				listToReturn.add(Ref.create(s));
+			}
+		}
+		return listToReturn;
 	}
 
 	@Override
 	public void setListPrerequisites(List<List<Subject>> prerequisitesLists) {
-		// TODO Auto-generated method stub
+		if(prerequisitesLists != null){
+			List<List<Ref<Subject>>> lists = transformToRefLists(prerequisitesLists);
+			setPrerequisitesListsRef(lists);
+		}
 		
 	}
 
 	@Override
 	public void addListToPrerequisites(List<Subject> list) {
-		// TODO Auto-generated method stub
+		List<Ref<Subject>> listToAdd = transformToRefList(list);
+		if(listToAdd != null){
+			if(prerequisitesLists == null) prerequisitesLists = new ArrayList<List<Ref<Subject>>>();
+			prerequisitesLists.add(listToAdd);
+		}
 		
 	}
 
 	@Override
 	public List<Subject> getListPrerequisitesOf() {
-		// TODO Auto-generated method stub
-		return null;
+		List<Subject> listToReturn = null;
+		if(listPrerequisitesOf != null){
+			listToReturn = transformToList(listPrerequisitesOf);
+		}
+		return listToReturn;
 	}
 
 	@Override
-	public void setListPrerequisitesOf(List<Subject> listPosrequisitesOf) {
-		// TODO Auto-generated method stub
+	public void setListPrerequisitesOf(List<Subject> listPrerequisitesOf) {
+		if(listPrerequisitesOf != null){
+			List<Ref<Subject>> listToAdd = transformToRefList(listPrerequisitesOf);
+			if(listToAdd != null) setListPrerequisitesOfRef(listToAdd);
+		}
 		
 	}
 
 	@Override
 	public List<List<Subject>> getCorequisitesLists() {
-		// TODO Auto-generated method stub
-		return null;
+		List<List<Subject>> toReturn = null;
+		if(corequisitesLists != null){
+			toReturn = transformToLists(corequisitesLists);
+		}
+		return toReturn;
 	}
 
 	@Override
 	public List<List<Subject>> getPrerequisitesLists() {
-		// TODO Auto-generated method stub
-		return null;
+		List<List<Subject>> toReturn = null;
+		if(corequisitesLists != null){
+			if(toReturn == null) toReturn = new ArrayList<List<Subject>>();
+			for(List<Ref<Subject>> list : corequisitesLists){
+				List<Subject> listToAdd = new ArrayList<Subject>();
+				for(Ref<Subject> ref : list){
+					listToAdd.add(ref.get());
+				}
+				toReturn.add(listToAdd);
+			}
+		}
+		return toReturn;
+	}
+	
+	private List<List<Subject>> transformToLists(List<List<Ref<Subject>>> lists){
+		List<List<Subject>> toReturn = null;
+		if(lists != null){
+			if(toReturn == null) toReturn = new ArrayList<List<Subject>>();
+			for(List<Ref<Subject>> list : lists){
+				List<Subject> toAdd = transformToList(list);
+				if(toAdd != null) toReturn.add(toAdd);
+			}
+		}
+		return toReturn;
+	}
+	
+	private List<Subject> transformToList(List<Ref<Subject>> list){
+		List<Subject> toReturn = null;
+		if(list != null){
+			if(toReturn == null) toReturn = new ArrayList<Subject>();
+			for(Ref<Subject> ref : list){
+				toReturn.add(ref.get());
+			}
+		}
+		return toReturn;
 	}
 
 	@Override
 	public String getPrerequisitesString() {
-		// TODO Auto-generated method stub
-		return null;
+		String toReturn = null;
+		
+		for(List<Ref<Subject>> list : prerequisitesLists){
+			if(toReturn != null) toReturn = toReturn.concat("; y ");
+			
+			for(Ref<Subject> ref : list){
+				if(toReturn == null){
+					toReturn = "";
+				}else{
+					toReturn = toReturn.concat("o");					
+				}
+				toReturn = toReturn.concat(ref.get().getName() + " ");
+			}
+		}
+		
+		return toReturn;
 	}
 
 	@Override
 	public String getCorequisitesString() {
-		// TODO Auto-generated method stub
-		return null;
+		String toReturn = null;
+		
+		for(List<Ref<Subject>> list : corequisitesLists){
+			if(toReturn != null) toReturn = toReturn.concat("; y ");
+			
+			for(Ref<Subject> ref : list){
+				if(toReturn == null){
+					toReturn = "";
+				}else{
+					toReturn = toReturn.concat("o");					
+				}
+				toReturn = toReturn.concat(ref.get().getName() + " ");
+			}
+		}
+		
+		return toReturn;
 	}
 
 	public List<List<Ref<Subject>>> getPrerequisitesListsRef() {
@@ -401,6 +542,118 @@ public class ComplementaryValueServer extends ComplementaryValueAbstract {
 		}
 		
 		return toReturn;
+	}
+
+	public List<List<Ref<Subject>>> getCorequisitesListsRef() {
+		return corequisitesLists;
+	}
+
+	public void setCorequisitesListsRef(List<List<Ref<Subject>>> corequisitesLists) {
+		this.corequisitesLists = corequisitesLists;
+	}
+	
+	public void setListPrerequisitesOfRef(List<Ref<Subject>> list){
+		this.listPrerequisitesOf = list;
+	}
+	
+	public List<Ref<Subject>> getListPrerequisitesOfRef(){
+		return listPrerequisitesOf;
+	}
+	
+	public void setListCorequisitesOfRef(List<Ref<Subject>> list){
+		this.listCorequisitesOf = list;
+	}
+	
+	public List<Ref<Subject>> getListCorequisitesOfRef(){
+		return listCorequisitesOf;
+	}
+	
+	/**
+	 * THis will only compare ids and the order of the subjects
+	 * 
+	 * @param list1
+	 * @param list2
+	 * @return
+	 */
+	private boolean compare2Lists(List<List<Subject>> list1, List<List<Subject>> list2){
+		boolean toReturn = false;
+		
+		if(list1 == null && list2 == null) toReturn = true;
+		else if(list1 != null && list2 != null && list1.size() == list2.size()){
+			boolean equals = true;
+			for(int x = 0; x < list1.size(); x++){
+				if(compare2List(list1.get(x),list2.get(x)) == false){
+					equals = false;
+					break;
+				}
+			}
+			if(equals == true) toReturn = true;
+		}
+		
+		return toReturn;
+	}
+	
+	private boolean compare2List(List<Subject> list1, List<Subject> list2){
+		boolean toReturn = false;
+
+		if(list1 == null && list2 == null) toReturn = true;
+		else if(list1 != null && list2 != null && list1.size() == list2.size()){
+			boolean equals = true;
+			for(int x = 0; x < list1.size(); x++){
+				if(list1.get(x).getId().equals(list2.get(x).getId()) == false){
+					equals = false;
+					break;
+				}
+			}
+			if(equals == true) toReturn = true;
+		}
+		
+		return toReturn;
+	}
+
+	public boolean compare(ComplementaryValueAbstract cV) {
+		boolean toReturn = false;
+		if(cV != null && this.getId() != null && cV.getId() != null){
+			if((this.getTypology()== null && cV.getTypology() == null) || (this.getTypology() != null && cV.getTypology() != null && this.getTypology().equals(cV.getTypology()) == true) && this.isMandatory() == cV.isMandatory()){
+				//compare career subject and subjectGroup
+				if((this.getCareerRef() == null && cV.getCareer() == null) ||
+						(this.getCareerRef() != null && cV.getCareer() != null && this.getCareer().getId().equals(cV.getCareer().getId()))){
+					if((this.getSubjectRef() == null && cV.getSubject() == null) ||
+							(this.getSubjectRef() != null && cV.getSubject() != null && this.getSubject().getId().equals(cV.getSubject().getId()))){
+						if((this.getSubjectGroupRef() == null && cV.getSubjectGroup() == null) ||
+								(this.getSubjectGroupRef() != null && cV.getSubjectGroup() != null && this.getSubjectGroup().getId().equals(cV.getSubjectGroup().getId()))){
+							//compare requisites
+							if(compare2Lists(this.getPrerequisitesLists(), cV.getPrerequisitesLists()) == true)
+								if(compare2Lists(this.getCorequisitesLists(), cV.getCorequisitesLists()) == true)
+									if(compare2List(this.getListCorequisitesOf(), cV.getListCorequisitesOf()) == true)
+										if(compare2List(this.getListPrerequisitesOf(), cV.getListPrerequisitesOf()) == true)
+											toReturn = true;							
+						}
+					}
+				}
+			}
+		}
+		return toReturn;
+	}
+
+	public ComplementaryValue getClientInstance() {
+		
+		ComplementaryValue complementaryValue = new ComplementaryValue();
+		
+		complementaryValue.setId(getId());
+		complementaryValue.setMandatory(isMandatory());
+		complementaryValue.setTypology(getTypology());
+		
+		complementaryValue.setCareer(getCareer());
+		complementaryValue.setSubject(getSubject());
+		complementaryValue.setSubjectGroup(getSubjectGroup());
+		
+		complementaryValue.setListPrerequisites(getPrerequisitesLists());
+		complementaryValue.setListCorequisites(getCorequisitesLists());
+		complementaryValue.setListCorequisitesOf(getListCorequisitesOf());
+		complementaryValue.setListPrerequisitesOf(getListPrerequisitesOf());
+		
+		return complementaryValue;
 	}
 	
 }

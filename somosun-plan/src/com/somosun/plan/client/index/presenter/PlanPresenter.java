@@ -407,7 +407,7 @@ ComplementaryValueView.Presenter{
 	}
 	
 	public void planChanged(String triggered){
-		GWT.debugger();
+
 		Callable<Void> toSave = new Callable<Void>(){
 			
 			public Void call(){				
@@ -1178,7 +1178,7 @@ ComplementaryValueView.Presenter{
 		
 		boolean isFirst = true;
 		for(Subject s : subjectList){
-			GWT.debugger();
+			
 			SubjectAccordionViewImpl accordion = new SubjectAccordionViewImpl(searchSubjectView.getSubjectsAmmount());
 			accordion.setPresenter(this);
 			accordion.setHeader(s.getCode(), s.getName(), "L", Integer.toString(s.getCredits()), careerCode);
@@ -1466,8 +1466,6 @@ ComplementaryValueView.Presenter{
 	private void populateAccordionWithComplementaryValue(SubjectAccordionViewImpl accordion, ComplementaryValueViewImpl cVView, ComplementaryValue complementaryValue) {
 		//SubjectGroup, pre-co requisites (Of) TODO
 		
-		GWT.debugger();
-		
 		if(complementaryValue != null && complementaryValue.getSubject() != null){
 			
 			String subjectGroupName = null;
@@ -1477,7 +1475,6 @@ ComplementaryValueView.Presenter{
 				subjectGroupName = "Desconocido";
 			}
 			
-			GWT.debugger();
 			Double grade = complementaryValue.getSubject().getAverageGrade();
 			
 			cVView.setSubjectGroupName(subjectGroupName);
@@ -1959,7 +1956,7 @@ ComplementaryValueView.Presenter{
 			/***** Adding the subjects left (i.e. not added) ******/
 			//In order to test this comment the two big while previous to this part in this method
 			if(mandatoryComplementaryValues_copy.size() != 0){
-				GWT.debugger();
+				
 				//start from the last semester and add them
 				int usefulSemesterNumber = currentSemesterNumber;
 				Integer numberOfSubjects = null;
@@ -2078,7 +2075,7 @@ ComplementaryValueView.Presenter{
 							boolean toContinue = true;
 							int counter = 0;
 							while(bestSuggestedPosition == -1 && toContinue){
-								if(s.getName().equals("libre eleccion")) GWT.debugger();
+//								if(s.getName().equals("libre eleccion")) GWT.debugger();
 								for(int inCase = 0; inCase < 3; inCase ++){
 									int semesterPositionToTryNext = suggestedPosition + counter +1;
 									int semesterPositionToTryPrevious = suggestedPosition - ((counter*2) + counter+1);
@@ -2705,8 +2702,6 @@ ComplementaryValueView.Presenter{
 	}
 
 	public void onGradeAdded(String publicId, String grade){
-		
-		GWT.debugger();
 		
 		if(publicId != null && publicId.isEmpty() == false){	
 			

@@ -1,5 +1,6 @@
 package com.somosun.plan.shared.control.controlAbstract;
 
+import java.io.Serializable;
 import java.util.List;
 
 import com.googlecode.objectify.annotation.Id;
@@ -9,14 +10,13 @@ import com.somosun.plan.shared.control.ComplementaryValue;
 import com.somosun.plan.shared.control.Subject;
 import com.somosun.plan.shared.control.SubjectGroup;
 
-public abstract class ComplementaryValueAbstract {
+public abstract class ComplementaryValueAbstract implements Serializable{
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	@Id private Long id = null;
-	
 	@Index private String typology = null;
     @Index private boolean mandatory = false;
     

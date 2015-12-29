@@ -4,6 +4,7 @@ import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Index;
+import com.somosun.plan.server.dao.ComplementaryValueDao;
 import com.somosun.plan.shared.control.ComplementaryValue;
 import com.somosun.plan.shared.control.Group;
 import com.somosun.plan.shared.control.SubjectValue;
@@ -14,31 +15,31 @@ import com.somosun.plan.shared.control.controlAbstract.SubjectValueAbstract;
 public class SubjectValueServer extends SubjectValueAbstract {
 
 	@Index private Ref<Group> group = null;
-	private Ref<ComplementaryValue> complementaryValue = null;
+	private Ref<ComplementaryValueServer> complementaryValue = null;
 	
     public SubjectValueServer(){
-    	this.setComplementaryValue(new ComplementaryValue());
+    	this.setComplementaryValueServer(new ComplementaryValueServer());
     }
     
-    public SubjectValueServer(Group group, double grade,boolean taken, ComplementaryValue complementaryValue) {
+    public SubjectValueServer(Group group, double grade,boolean taken, ComplementaryValueServer complementaryValue) {
         setGroup(group);
         setGrade(grade);
         setTaken(taken);
-        setComplementaryValue(complementaryValue);
+        setComplementaryValueServer(complementaryValue);
     }
     
-    public SubjectValueServer(double grade,boolean taken, ComplementaryValue complementaryValue) {
+    public SubjectValueServer(double grade,boolean taken, ComplementaryValueServer complementaryValue) {
     	setGroup(null);
         setGrade(grade);
         setTaken(taken);
-        setComplementaryValue(complementaryValue);
+        setComplementaryValueServer(complementaryValue);
     }
     
     public SubjectValueServer(Group group, double grade,boolean taken) {
     	setGroup(group);
         setGrade(grade);
         setTaken(taken);
-        setComplementaryValue(new ComplementaryValue());
+        setComplementaryValueServer(new ComplementaryValueServer());
     }
 
 	public Ref<Group> getGroupRef() {
@@ -49,12 +50,16 @@ public class SubjectValueServer extends SubjectValueAbstract {
 		this.group = group;
 	}
 
-	public Ref<ComplementaryValue> getComplementaryValueRef() {
+	public Ref<ComplementaryValueServer> getComplementaryValueRef() {
 		return complementaryValue;
 	}
 
-	public void setComplementaryValueRef(Ref<ComplementaryValue> complementaryValue) {
+	public void setComplementaryValueRef(Ref<ComplementaryValueServer> complementaryValue) {
 		this.complementaryValue = complementaryValue;
+	}
+	
+	public void setComplementaryValueServer(ComplementaryValueServer complementaryValue) {
+		if(complementaryValue != null && complementaryValue.getId() != null) this.complementaryValue = Ref.create(complementaryValue);
 	}
 
 	@Override
@@ -74,14 +79,18 @@ public class SubjectValueServer extends SubjectValueAbstract {
 	@Override
 	public ComplementaryValue getComplementaryValue() {
 		ComplementaryValue toReturn = null;
-		if(complementaryValue != null) toReturn = complementaryValue.get();
+		if(complementaryValue != null) toReturn = complementaryValue.get().getClientInstance();
 		return toReturn;
 	}
 
 	@Override
 	public void setComplementaryValue(ComplementaryValue complementaryValue) {
 		if(complementaryValue != null && complementaryValue.getId() != null){
-			setComplementaryValueRef(Ref.create(complementaryValue));
+			ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
+			ComplementaryValueServer cV = complementaryValueDao.getById(complementaryValue.getId());
+			if(cV != null){
+				setComplementaryValueRef(Ref.create(cV));
+			}				
 		}
 		
 	}
@@ -94,7 +103,7 @@ public class SubjectValueServer extends SubjectValueAbstract {
 		subjectValue.setSubjectValuesPublicId(getSubjectValuePublicId());
 		subjectValue.setTaken(isTaken());
 		subjectValue.setGroup(getGroup());
-		subjectValue.setComplementaryValue(getComplementaryValue());
+		subjectValue.setComplementaryValue(getComplementaryValueRef().get().getClientInstance());
 		
 		return subjectValue;
 	}

@@ -4,12 +4,18 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
+import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.Ref;
 import com.somosun.plan.server.control.SingleScoreServer;
+import com.somosun.plan.shared.control.SemesterValue;
 import com.somosun.plan.shared.control.SingleScore;
 
 public class SingleScoreDao implements Dao<SingleScoreServer> {
 
+	static{
+		ObjectifyService.register(SingleScoreServer.class);
+	}
+	
 	public Long save(SingleScoreServer singleScore) {
 		Long toReturn = null;
 		

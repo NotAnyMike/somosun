@@ -13,16 +13,6 @@
 		<property name="year" direction="asc" />
 		<property name="numberSemester" direction="asc" />
 	</datastore-index>
-
-	<datastore-index kind="ComplementaryValues" ancestor="false">
-		<property name="career.code" direction="asc" />
-		<property name="subject.code" direction="asc" />
-	</datastore-index>
-	
-	<datastore-index kind="ComplementaryValues" ancestor="false">
-		<property name="career.code" direction="asc" />
-		<property name="mandatory" direction="asc" />
-	</datastore-index>
 	
     <datastore-index kind="Subject" ancestor="false">
 		<property name="isDummy" direction="asc"/>
@@ -39,6 +29,16 @@
 	    <property name="name" direction="asc"/>
 	    <property name="career.code" direction="asc"/>
 	    <property name="fundamental" direction="asc"/>
+	</datastore-index>
+	
+	<datastore-index kind="ComplementaryValueServer" ancestor="false">
+		<property name="career" direction="asc" />
+		<property name="subject" direction="asc" />
+	</datastore-index>
+	
+	<datastore-index kind="ComplementaryValueServer" ancestor="false">
+		<property name="career" direction="asc" />
+		<property name="mandatory" direction="asc" />
 	</datastore-index>
 	
     <datastore-index kind="PlanServer" ancestor="false">

@@ -148,6 +148,7 @@ public class SubjectWidget extends FlowPanel implements HasClickHandlers, HasDou
 		if(typology == null){
 			GWT.debugger();
 		}
+		if(typology == null) typology = "";
 		typology = typology.toLowerCase();
 		int i = 0;
 		switch(typology)

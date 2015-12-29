@@ -7,6 +7,7 @@ import java.util.List;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
+import com.somosun.plan.server.control.ComplementaryValueServer;
 import com.somosun.plan.server.control.SemesterServer;
 import com.somosun.plan.shared.control.ComplementaryValue;
 import com.somosun.plan.shared.control.SubjectValue;
@@ -16,7 +17,7 @@ public class SemesterDao implements Dao<SemesterServer> {
 	
 	static{
 		ObjectifyService.register(SemesterServer.class);
-		ObjectifyService.register(ComplementaryValue.class);
+		ObjectifyService.register(ComplementaryValueServer.class);
 	}
 	
 	public Long save(SemesterAbstract s){

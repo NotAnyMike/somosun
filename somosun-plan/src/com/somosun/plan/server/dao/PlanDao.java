@@ -18,6 +18,7 @@ import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.VoidWork;
 import com.somosun.plan.server.SomosUNServerUtils;
+import com.somosun.plan.server.control.ComplementaryValueServer;
 import com.somosun.plan.server.control.PlanServer;
 import com.somosun.plan.server.control.SemesterServer;
 import com.somosun.plan.server.control.SubjectValueServer;
@@ -49,7 +50,10 @@ public class PlanDao implements Dao<PlanServer>{
 		ObjectifyService.register(PlanServer.class);
 		ObjectifyService.register(SemesterServer.class);
 		ObjectifyService.register(SubjectValueServer.class);
-		ObjectifyService.register(ComplementaryValue.class);
+		ObjectifyService.register(ComplementaryValueServer.class);
+		ObjectifyService.register(Subject.class);
+		ObjectifyService.register(SubjectGroup.class);
+		ObjectifyService.register(Career.class);
 	}
 	
 	public PlanServer createPlanFromDefaultString(String careerCode){
@@ -66,7 +70,7 @@ public class PlanDao implements Dao<PlanServer>{
 		SemesterServer semester = null;
 		List<SubjectValueServer> subjects = null;
 		Subject subject = null;
-		ComplementaryValue complementaryValue = null;
+		ComplementaryValueServer complementaryValue = null;
 		SubjectValueServer subjectValues = null;
 		HashMap<SubjectValueServer, Subject> subjectMap = new HashMap<SubjectValueServer, Subject>();;
 	
@@ -97,10 +101,10 @@ public class PlanDao implements Dao<PlanServer>{
 				//getting the complementary values
 				if(subject!= null){
 					complementaryValue = complementaryValueDao.get(career, subject);
-					if(complementaryValue != null) {subjectValues.setComplementaryValue(complementaryValue);}
-					else 
-					{
-						complementaryValue = new ComplementaryValue(career, subject);
+					if(complementaryValue != null) {
+						subjectValues.setComplementaryValueServer(complementaryValue);
+					}else{
+						complementaryValue = new ComplementaryValueServer(career, subject);
 						subjectValues.getComplementaryValue().setMandatory(jsonSubject.getBoolean("oblig"));
 						subjectValues.getComplementaryValue().setTypology(jsonSubject.getString("type"));
 						if(jsonSubject.getBoolean("normal") == true && subject != null) complementaryValueDao.save(complementaryValue);
@@ -440,7 +444,7 @@ public class PlanDao implements Dao<PlanServer>{
 				for(Ref<SemesterServer> semester : semesters){
 					List<SubjectValueServer> subjectValues = semester.get().getSubjectValuesListLoaded();
 					for(SubjectValueServer subjectValue : subjectValues){
-						ComplementaryValue complementaryValue = subjectValue.getComplementaryValue();
+						ComplementaryValueServer complementaryValue = subjectValue.getComplementaryValueRef().get();
 						
 						if(complementaryValue != null){						
 							Subject subject = complementaryValue.getSubject();
@@ -623,10 +627,10 @@ public class PlanDao implements Dao<PlanServer>{
 						}						
 						
 						//Get complementaryValue
-						ComplementaryValue complementaryValue = complementaryValueDao.get(careerCode, subject.getCode());
+						ComplementaryValueServer complementaryValue = complementaryValueDao.get(careerCode, subject.getCode());
 						if(complementaryValue != null){
 							
-							subjectV.setComplementaryValue(complementaryValue);
+							subjectV.setComplementaryValueServer(complementaryValue);
 							subjectV.setGrade(subjectD.getGrade());
 							if(subjectD.getApproved()){								
 								subject.setApprovenType(true);
@@ -659,7 +663,7 @@ public class PlanDao implements Dao<PlanServer>{
 			List<SubjectDummy> subjectToBeDummy = new ArrayList<SubjectDummy>();
 			if(problematicSubjects.size() > 0){
 				
-				List<ComplementaryValue> complementaryValuesProblematics = null;
+				List<ComplementaryValueServer> complementaryValuesProblematics = null;
 				List<String> subjectCodes = new ArrayList<String>();
 				List<String> careerCodes = new ArrayList<String>(); //in order to be send to the function in the siaProxy
 				for(SubjectDummy subjectDT : problematicSubjects){
@@ -679,14 +683,15 @@ public class PlanDao implements Dao<PlanServer>{
 				
 
 					siaSearchStartTime = System.nanoTime();
-				SUNServiceImpl service = new SUNServiceImpl();
-				complementaryValuesProblematics = service.getComplementaryValues(subjectCodes, careerCodes, careerCode);
+				
+				ComplementaryValueDao cVDao = new ComplementaryValueDao();
+				complementaryValuesProblematics  = cVDao.getComplementaryValues(careerCode);
 					siaSearchEndTime = System.nanoTime();
 				
 				//Add the cV to the subjectValue 
 				//add it to the subject and add it to a semester in the plan
 				
-				for(ComplementaryValue complementaryValuesT : complementaryValuesProblematics){
+				for(ComplementaryValueServer complementaryValuesT : complementaryValuesProblematics){
 					
 					SubjectDummy subjectDummyT = getSubjectDummy(problematicSubjects, complementaryValuesT.getSubject().getCode());
 					assert subjectDummyT != null;
@@ -700,7 +705,7 @@ public class PlanDao implements Dao<PlanServer>{
 							SubjectValueServer subjectValuesT = new SubjectValueServer();
 							subjectValuesT.setId(subjectValueDao.generateId());
 							
-							subjectValuesT.setComplementaryValue(complementaryValuesT);
+							subjectValuesT.setComplementaryValueServer(complementaryValuesT);
 							subjectValuesT.setGrade(subjectDummyT.getGrade());
 							if(subjectDummyT.getApproved() == true){
 								complementaryValuesT.getSubject().setApprovenType(true);
@@ -732,7 +737,7 @@ public class PlanDao implements Dao<PlanServer>{
 						subjectValuesT.setId(subjectValueDao.generateId());
 						
 						//get complementaryValue
-						ComplementaryValue complementaryValuesT = complementaryValueDao.get(career.getCode(), subjectDummyT.getCode());
+						ComplementaryValueServer complementaryValuesT = complementaryValueDao.get(career.getCode(), subjectDummyT.getCode());
 						
 						if(complementaryValuesT != null){
 
@@ -743,7 +748,7 @@ public class PlanDao implements Dao<PlanServer>{
 								SemesterValue semesterValueT = semesterValueDao.getOrCreateSemester(semesterDummyT.getYear(), semesterDummyT.getSemester());
 								Group groupT = groupDao.getOrCreateGroup(complementaryValuesT.getSubject(), semesterValueT, subjectDummyT.getGroup());
 								
-								subjectValuesT.setComplementaryValue(complementaryValuesT);
+								subjectValuesT.setComplementaryValueServer(complementaryValuesT);
 								subjectValuesT.setGroup(groupT);
 								subjectValuesT.setGrade(subjectDummyT.getGrade());
 								if(subjectDummyT.getApproved() == true){
@@ -793,7 +798,7 @@ public class PlanDao implements Dao<PlanServer>{
 						boolean mandatory = false;
 						String typology = TypologyCodes.getTypology(subjectD.getTypology());
 						SubjectGroup subjectGroup = subjectGroupDao.getSubjectGroupFromTypology(career, typology);
-						ComplementaryValue complementaryValue = new ComplementaryValue(career, subject, typology, mandatory, subjectGroup);
+						ComplementaryValueServer complementaryValue = new ComplementaryValueServer(career, subject, typology, mandatory, subjectGroup);
 						complementaryValue.setId(complementaryValueDao.generateId());
 						
 						SemesterValue semesterValue = semesterValueDao.getOrCreateSemester(semesterDummyT.getYear(), semesterDummyT.getSemester());
@@ -801,7 +806,7 @@ public class PlanDao implements Dao<PlanServer>{
 						
 						SubjectValueServer subjectValuesT = new SubjectValueServer();
 						subjectValuesT.setId(subjectValueDao.generateId());
-						subjectValuesT.setComplementaryValue(complementaryValue);
+						subjectValuesT.setComplementaryValueServer(complementaryValue);
 						subjectValuesT.setGrade(subjectD.getGrade());
 						if(subjectD.getApproved() == true){
 							subject.setApprovenType(true);

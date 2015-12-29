@@ -24,6 +24,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.somosun.plan.client.index.service.SUNService;
 import com.somosun.plan.server.SiaProxy;
 import com.somosun.plan.server.SomosUNServerUtils;
+import com.somosun.plan.server.control.ComplementaryValueServer;
 import com.somosun.plan.server.control.MessageServer;
 import com.somosun.plan.server.control.PlanServer;
 import com.somosun.plan.server.cronJob.GradeUpdaterCronJob;
@@ -221,8 +222,8 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 	@Override
 	public List<ComplementaryValue> getComplementaryValueFromMisPlanes(String career, List<String> codes) {
 		List<ComplementaryValue> toReturn = new ArrayList<ComplementaryValue>();
-		List<ComplementaryValue> list = (List<ComplementaryValue>) SiaProxy.getRequisitesFromMisPlanes(codes, career);
-		for(ComplementaryValue cV : list) toReturn.add(cV);
+		List<ComplementaryValueServer> list = (List<ComplementaryValueServer>) SiaProxy.getRequisitesFromMisPlanes(codes, career);
+		for(ComplementaryValueServer cV : list) toReturn.add(cV.getClientInstance());
 		return toReturn;
 	}
 	
@@ -243,10 +244,10 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 	@Override
 	public List<ComplementaryValue> getComplementaryValuesFromMisPlanes(String careerCode) {
 		ComplementaryValueDao cVDao = new ComplementaryValueDao();
-		List<ComplementaryValue> cVList = cVDao.getComplementaryValues(careerCode);
+		List<ComplementaryValueServer> cVList = cVDao.getComplementaryValues(careerCode);
 		List<ComplementaryValue> cVListToReturn = new ArrayList<ComplementaryValue>();
-		for(ComplementaryValue cV : cVList){
-			cVListToReturn.add(cV);
+		for(ComplementaryValueServer cV : cVList){
+			cVListToReturn.add(cV.getClientInstance());
 		}
 		return cVListToReturn;
 	}
@@ -344,17 +345,17 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 			if(career != null || careerCode.equals("") == true){ //it will be almost all of the times true
 				Subject subject = subjectDao.getByCode(subjectCode);
 				if(subject != null){
-					ComplementaryValue complementaryValue = complementaryValueDao.get(mainCareer.getCode(), subject.getCode());
+					ComplementaryValueServer complementaryValue = complementaryValueDao.get(mainCareer.getCode(), subject.getCode());
 					if(complementaryValue != null){
-						cVListToReturn.add(complementaryValue);
+						cVListToReturn.add(complementaryValue.getClientInstance());
 					}else{
 						String typology = TypologyCodes.LIBRE_ELECCION;
 						boolean mandatory = false;
 						SubjectGroup subjectGroup = subjectGroupDao.getSubjectGroupFromTypology(mainCareer, typology); 
 						if(subjectGroup != null && subjectGroup.getName() != null && subjectGroup.getName().isEmpty() == false){
 							//Look create an complementaryVALUE as a free election to mainCareer
-							complementaryValue = new ComplementaryValue(mainCareer, subject,  typology, mandatory, subjectGroup);
-							cVListToReturn.add(complementaryValue);
+							complementaryValue = new ComplementaryValueServer(mainCareer, subject,  typology, mandatory, subjectGroup);
+							cVListToReturn.add(complementaryValue.getClientInstance());
 						}else{
 							//if there is no code or name or credits then it is problematic
 							isProblematic = true;							
@@ -406,14 +407,14 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 					if(subjectCodeString.equals(subjectT.getCode())){
 						
 						
-						ComplementaryValue complementaryValue = complementaryValueDao.get(currentCareerCode, subjectCodeString);
+						ComplementaryValueServer complementaryValue = complementaryValueDao.get(currentCareerCode, subjectCodeString);
 						
 						if(complementaryValue == null){
 							//create the complementaryValues
 							Subject subjectFromDb = subjectDao.getDummySubjectByCode(subjectCodeString);
 							if(subjectFromDb == null) subjectFromDb = subjectT;
 							
-							complementaryValue = new ComplementaryValue(career, subjectFromDb);
+							complementaryValue = new ComplementaryValueServer(career, subjectFromDb);
 							complementaryValue.setId(complementaryValueDao.generateId());
 							complementaryValue.setMandatory(false);
 														
@@ -432,7 +433,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 							
 						}
 						
-						cVListToReturn.add(complementaryValue);
+						cVListToReturn.add(complementaryValue.getClientInstance());
 						
 						subjectProblematicToDelete.add(subjectCodeString);
 						subjectFound = subjectT;
@@ -550,9 +551,9 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 			if(career != null){
 				Subject subject = subjectDao.getByCode(subjectCode);
 				if(subject != null){
-					ComplementaryValue complementaryValue = complementaryValueDao.get(career.getCode(), subject.getCode());
+					ComplementaryValueServer complementaryValue = complementaryValueDao.get(career.getCode(), subject.getCode());
 					if(complementaryValue != null){
-						cVList.add(complementaryValue);
+						cVList.add(complementaryValue.getClientInstance());
 					}
 				}				
 			}
@@ -626,7 +627,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 						
 						//for nivelación
 						Subject subject = null;
-						ComplementaryValue cV = null;
+						ComplementaryValueServer cV = null;
 						SubjectGroup subjectGroup = null;
 						for(Subject sT : levelingList){
 							if(subjectCodeT.equals(sT.getCode()) == true){
@@ -639,7 +640,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 									subjectGroup = subjectGroupDao.get(SubjectGroupCodes.NIVELACION_NAME, careerCodeT);
 									
 									if(subjectGroup != null){										
-										cV = new ComplementaryValue(career, subject, "b", false, subjectGroup);
+										cV = new ComplementaryValueServer(career, subject, "b", false, subjectGroup);
 										cV.setId(complementaryValueDao.generateId());
 										complementaryValueDao.save(cV);
 									}else{
@@ -651,7 +652,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 							}
 						}
 						if(cV != null){
-							cVList.add(cV);
+							cVList.add(cV.getClientInstance());
 							oldCareer = careerCodeT;
 							continue;
 						}
@@ -668,7 +669,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 									subjectGroup = subjectGroupDao.get(SubjectGroupCodes.NIVELACION_NAME, careerCodeT);
 									
 									if(subjectGroup != null){										
-										cV = new ComplementaryValue(career, subject, "l", false, subjectGroup);
+										cV = new ComplementaryValueServer(career, subject, "l", false, subjectGroup);
 										cV.setId(complementaryValueDao.generateId());
 										complementaryValueDao.save(cV);
 									}else{
@@ -681,7 +682,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 						}
 						
 						if(cV != null){							
-							cVList.add(cV);
+							cVList.add(cV.getClientInstance());
 							oldCareer = careerCodeT;
 							continue;
 						}
@@ -708,7 +709,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 												subjectGroup = subjectGroupDao.getUnkownSubjectGroup(careerCodeT, true);
 												
 												if(subjectGroup != null){										
-													cV = new ComplementaryValue(career, subject, SomosUNUtils.getTypology("f"), false, subjectGroup);
+													cV = new ComplementaryValueServer(career, subject, SomosUNUtils.getTypology("f"), false, subjectGroup);
 													cV.setId(complementaryValueDao.generateId());
 													complementaryValueDao.save(cV);
 												}
@@ -719,7 +720,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 									}
 									
 									if(cV != null){							
-										cVList.add(cV);
+										cVList.add(cV.getClientInstance());
 										oldCareer = careerCodeT;
 										continue;
 									}
@@ -747,7 +748,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 												subjectGroup = subjectGroupDao.getUnkownSubjectGroup(careerCodeT, false);
 												
 												if(subjectGroup != null){										
-													cV = new ComplementaryValue(career, subject, SomosUNUtils.getTypology("d"), false, subjectGroup);
+													cV = new ComplementaryValueServer(career, subject, SomosUNUtils.getTypology("d"), false, subjectGroup);
 													cV.setId(complementaryValueDao.generateId());
 													complementaryValueDao.save(cV);
 												}
@@ -758,7 +759,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 									}
 									
 									if(cV != null){							
-										cVList.add(cV);
+										cVList.add(cV.getClientInstance());
 										oldCareer = careerCodeT;
 										continue;
 									}
@@ -902,12 +903,12 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		
 		if(careerCode != null){
 			ComplementaryValueDao cVDao = new ComplementaryValueDao();
-			List<ComplementaryValue> cVListT = cVDao.getMandatoryComplementaryValues(careerCode);
+			List<ComplementaryValueServer> cVListT = cVDao.getMandatoryComplementaryValues(careerCode);
 			
 			if(cVListT != null && cVListT.size() > 0){
 				listToReturn = new ArrayList<ComplementaryValue>();
-				for(ComplementaryValue cVT : cVListT){
-					listToReturn.add(cVT);
+				for(ComplementaryValueServer cVT : cVListT){
+					listToReturn.add(cVT.getClientInstance());
 				}
 			}
 		}
@@ -1000,7 +1001,9 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 	public ComplementaryValue getComplementaryValueFromDb(String careerCode, String subjectCode) {
 		// TODO Auto-generated method stub
 		ComplementaryValueDao cVDao = new ComplementaryValueDao();
-		ComplementaryValue toReturn = cVDao.get(careerCode, subjectCode);
+		ComplementaryValueServer cVS = cVDao.get(careerCode, subjectCode);
+		ComplementaryValue toReturn = null;
+		if(cVS != null) toReturn = cVS.getClientInstance();
 		return toReturn;
 	}
 
@@ -1052,11 +1055,11 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 				toReturn.setSubjectGroups(subjectGroupsToReturn);
 						
 				ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
-				List<ComplementaryValue> mandatoryComplementaryValues = complementaryValueDao.getMandatoryComplementaryValues(career.getCode());
+				List<ComplementaryValueServer> mandatoryComplementaryValues = complementaryValueDao.getMandatoryComplementaryValues(career.getCode());
 				List<ComplementaryValue> mandatoryComplementaryValuesToReturn = new ArrayList<ComplementaryValue>();
 				
-				for(ComplementaryValue cV : mandatoryComplementaryValues){
-					mandatoryComplementaryValuesToReturn.add(cV);
+				for(ComplementaryValueServer cV : mandatoryComplementaryValues){
+					mandatoryComplementaryValuesToReturn.add(cV.getClientInstance());
 				}
 				
 				toReturn.setMandatoryComplementaryValues(mandatoryComplementaryValuesToReturn);
@@ -1117,7 +1120,13 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 				}
 				//Getting the cV for those subjectsToSearch
 				if(subjectsToSearch.isEmpty() == false){					
-					List<ComplementaryValue> complementaryValuesLeftout = SiaProxy.getRequisitesFromMisPlanes(subjectsToSearch, careerCode);
+					List<ComplementaryValueServer> complementaryValuesServerLeftout = SiaProxy.getRequisitesFromMisPlanes(subjectsToSearch, careerCode);
+					List<ComplementaryValue> complementaryValuesLeftout = new ArrayList<ComplementaryValue>();
+					if(complementaryValuesServerLeftout != null){
+						for(ComplementaryValueServer cVS : complementaryValuesServerLeftout){
+							complementaryValuesLeftout.add(cVS.getClientInstance());
+						}
+					}
 					
 					for(ComplementaryValue cV : subjectsIncomplete){
 						List<List<Subject>> listOfListsToSearch = new ArrayList<List<Subject>>();
