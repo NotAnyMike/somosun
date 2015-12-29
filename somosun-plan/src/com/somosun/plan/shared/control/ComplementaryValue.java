@@ -6,39 +6,25 @@ import java.util.List;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
+import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Serialize;
+import com.somosun.plan.shared.control.controlAbstract.ComplementaryValueAbstract;
 
-/**
- * This class holds the complementary information about a subject based on a career
- * @author Mike
- *
- */
-@Cache(expirationSeconds=9000)
-@Entity
-public class ComplementaryValue implements Serializable {
+public class ComplementaryValue extends ComplementaryValueAbstract implements Serializable {
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	@Id private Long id = null;
-	@Index private Career career = null;;
-	@Index private Subject subject = null;
-	
-	@Serialize private List<List<Subject>> prerequisitesLists = null;
-	@Serialize private List<List<Subject>> corequisitesLists = null;
+	private Career career = null;;
+	private Subject subject = null;
+	private List<List<Subject>> prerequisitesLists = null;
+	private List<List<Subject>> corequisitesLists = null;
 	private List<Subject> listPrerequisitesOf = null;
 	private List<Subject> listCorequisitesOf = null;
+	private SubjectGroup subjectGroup = null;
 	
-	@Index private String typology = null;
-    @Index private boolean mandatory = false;
-    @Index private SubjectGroup subjectGroup = null;
-    
-    /**
+	/**
      * Do NOT use this method
      */
     public ComplementaryValue(){
@@ -58,7 +44,7 @@ public class ComplementaryValue implements Serializable {
 		this.listCorequisitesOf = new ArrayList<Subject>();
 		this.corequisitesLists = listCorequisites;
 		this.setTypology(typology);
-		this.mandatory = mandatory;
+		setMandatory(mandatory);
 	}
 	
 	public ComplementaryValue(Career career, Subject subject,	List<List<Subject>> listPrerequisites, List<List<Subject>> listCorequisites, String typology,	boolean mandatory, SubjectGroup subjectGroup) {
@@ -70,7 +56,7 @@ public class ComplementaryValue implements Serializable {
 		this.listCorequisitesOf = new ArrayList<Subject>();
 		this.corequisitesLists = listCorequisites;
 		this.setTypology(typology);
-		this.mandatory = mandatory;
+		setMandatory(mandatory);
 		this.subjectGroup = subjectGroup;
 	}
 
@@ -85,7 +71,7 @@ public class ComplementaryValue implements Serializable {
 		this.listCorequisitesOf = new ArrayList<Subject>();
 		
 		this.setTypology(typology);
-		this.mandatory = mandatory;
+		setMandatory(mandatory);
 	}
 	
 	public ComplementaryValue(Career career, Subject subject,	String typology, boolean mandatory, SubjectGroup subjectGroup) {
@@ -99,7 +85,7 @@ public class ComplementaryValue implements Serializable {
 		this.listCorequisitesOf = new ArrayList<Subject>();
 		
 		this.setTypology(typology);
-		this.mandatory = mandatory;
+		setMandatory(mandatory);
 		this.subjectGroup = subjectGroup;
 	}
 	
@@ -114,23 +100,6 @@ public class ComplementaryValue implements Serializable {
 		this.listCorequisitesOf = new ArrayList<Subject>();
 	}
 	
-	/**
-	 * @param cV
-	 * @return true if career, subjectGroup, subject, mandatory, and the four lists are the exact sames 
-	 */
-	public boolean equals(ComplementaryValue cV){
-		
-		boolean toReturn = false;
-		
-		if(this.getCareer().equals(cV.getCareer()) && this.getSubjectGroup().equals(cV.getCareer())
-				&& this.getSubject().equals(cV.getSubject()) && this.isMandatory() == cV.isMandatory()
-				&& this.getListCorequisites().equals(cV.getListCorequisites()) && this.getListCorequisitesOf().equals(cV.getListCorequisitesOf())
-				&& this.getListPrerequisites().equals(cV.getListPrerequisites()) && this.getListPrerequisitesOf().equals(cV.getListPrerequisitesOf()))
-			toReturn = true;
-		
-		return toReturn;
-	}
-
 	public Career getCareer() {
 		return career;
 	}
@@ -185,7 +154,7 @@ public class ComplementaryValue implements Serializable {
 		if(listPrerequisitesOf == null) {
 			listPrerequisitesOf = new ArrayList<Subject>();
 		}
-		boolean containsSubject = containSubject(listPrerequisitesOf, subject);
+		boolean containsSubject = containsSubjectInList(listPrerequisitesOf, subject);
 		if(containsSubject == false){
 			listPrerequisitesOf.add(subject);
 		}
@@ -228,7 +197,7 @@ public class ComplementaryValue implements Serializable {
 	
 	public void addCorequisiteOf(Subject subject){
 		if(listCorequisitesOf == null) listCorequisitesOf = new ArrayList<Subject>();
-		boolean containsSubject = containSubject(listCorequisitesOf, subject);
+		boolean containsSubject = containsSubjectInList(listCorequisitesOf, subject);
 		if(containsSubject == false){
 			listCorequisitesOf.add(subject);
 		}
@@ -239,23 +208,7 @@ public class ComplementaryValue implements Serializable {
 			listCorequisitesOf.remove(subject);
 		}
 	}
-
-	public String getTypology() {
-		return typology;
-	}
-
-	public void setTypology(String typology) {
-		this.typology = typology;
-	}
-
-	public boolean isMandatory() {
-		return mandatory;
-	}
-
-	public void setMandatory(boolean mandatory) {
-		this.mandatory = mandatory;
-	}
-
+	
 	/**
 	 * this method will return one list with every corequisite there, without differencing the AND and OR correquisites
 	 * @return
@@ -343,48 +296,7 @@ public class ComplementaryValue implements Serializable {
 	public void setSubjectGroup(SubjectGroup subjectGroup) {
 		this.subjectGroup = subjectGroup;
 	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
 	
-	private boolean containsSubject(List<List<Subject>> lists, Subject subject) {
-		boolean toReturn = false;
-		
-		for(List<Subject> list : lists){			
-			toReturn = containSubject(list, subject);
-			if(toReturn == true){
-				break;
-			}
-		}
-		
-		return toReturn;
-	}
-	
-	private boolean containSubject(List<Subject> list, Subject subject){
-		boolean toReturn = false;
-		
-		for(Subject s : list){
-			if(s.getCode().isEmpty() == false){
-				if(s.getCode().equals(subject.getCode()) == true){
-					toReturn = true;
-					break;
-				}
-			}else{
-				if(s.getName().equals(subject.getName()) == true){
-					toReturn = true;
-					break;
-				}
-			}
-		}
-		
-		return toReturn;
-	}
-
 	public List<List<Subject>> getCorequisitesLists() {
 		return corequisitesLists;
 	}
@@ -425,6 +337,19 @@ public class ComplementaryValue implements Serializable {
 					toReturn = toReturn.concat("o");					
 				}
 				toReturn = toReturn.concat(subject.getName() + " ");
+			}
+		}
+		
+		return toReturn;
+	}
+	
+	public boolean containsSubject(List<List<Subject>> lists, Subject subject) {
+		boolean toReturn = false;
+		
+		for(List<Subject> list : lists){			
+			toReturn = containsSubjectInList(list, subject);
+			if(toReturn == true){
+				break;
 			}
 		}
 		
