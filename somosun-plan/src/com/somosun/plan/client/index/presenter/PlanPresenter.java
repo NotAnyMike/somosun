@@ -57,6 +57,7 @@ import com.somosun.plan.client.index.widget.PlanWidget;
 import com.somosun.plan.client.index.widget.SemesterWidget;
 import com.somosun.plan.client.index.widget.SubjectWidget;
 import com.somosun.plan.shared.CompletePlanInfo;
+import com.somosun.plan.shared.IdContainer;
 import com.somosun.plan.shared.SiaResultGroups;
 import com.somosun.plan.shared.SiaResultSubjects;
 import com.somosun.plan.shared.SomosUNUtils;
@@ -406,8 +407,67 @@ ComplementaryValueView.Presenter{
 		
 	}
 	
-	public void planChanged(String triggered){
+	public void planChanged(final String triggered){
+		
+		/******** taking care of null ids *********/
+		int amountSemesters = 0;
+		int amountSubjectValues = 0;
+		int amountComplementaryValues = 0;
+		final List<Semester> semesterToAddId = new ArrayList<Semester>();
+		final List<SubjectValue> subjectValueToAddId = new ArrayList<SubjectValue>();
+		final List<ComplementaryValue> complementaryValueToAddId = new ArrayList<ComplementaryValue>();
+		for(Semester semester : semesterList){
+			if(semester.getId() == null) {
+				amountSemesters++;
+				semesterToAddId.add(semester);
+			}
+			for(SubjectValue sV : semester.getSubjects()){
+				if(sV.getId() == null) {
+					amountSubjectValues++;
+					subjectValueToAddId.add(sV);
+				}
+				if(sV.getComplementaryValue() != null && sV.getComplementaryValue().getId() == null){
+					amountComplementaryValues++;
+					complementaryValueToAddId.add(sV.getComplementaryValue());
+				}
+			}
+		}
+		if(amountSemesters > 0 || amountSubjectValues > 0 || amountComplementaryValues > 0){
+			rpcService.getIds(amountSemesters, amountSubjectValues, amountComplementaryValues, new AsyncCallback<IdContainer>(){
 
+				@Override
+				public void onFailure(Throwable caught) {
+					GWT.log("Plan cannot be saved in order to avoid entity repetitions");
+				}
+
+				@Override
+				public void onSuccess(IdContainer result) {
+					//take care of the ids
+					for(int x = 0; x < semesterToAddId.size(); x++){
+						semesterToAddId.get(x).setId(result.getSemestersIds().get(x));
+					}
+					for(int x = 0; x < subjectValueToAddId.size(); x++){
+						subjectValueToAddId.get(x).setId(result.getSubjectValuesIds().get(x));
+					}
+					for(int x = 0; x < complementaryValueToAddId.size(); x++){
+						complementaryValueToAddId.get(x).setId(result.getComplementaryValuesIds().get(x));
+					}
+					
+					//CONTINUE WITH METHOD
+					continueSaving(triggered);
+				}});
+		}else{
+			continueSaving(triggered);
+		}
+		/******************************************/
+
+		
+	}
+	
+	/**
+	 * This method will save no matter what, so it could create any entity repetition error if used directly
+	 */
+	private void continueSaving(String triggered){
 		Callable<Void> toSave = new Callable<Void>(){
 			
 			public Void call(){				
@@ -1365,24 +1425,29 @@ ComplementaryValueView.Presenter{
 		addSubjectsToPlan(result, semesterString, true);
 	}
 	
-	private void addSubjectsToPlan(List<ComplementaryValue> result, String semesterString, boolean toSave) {
+	private void addSubjectsToPlan(final List<ComplementaryValue> result, String semesterString, final boolean toSave) {
 		
-		int semesterNumber = Integer.valueOf(semesterString);
-		Semester semester = semesterList.get(semesterNumber);
-		
-		/**
-		 * for each
-		 * 1. Create a subjectValues obj
-		 * 2. Add the cV to the sV
-		 * 3. call createSUbject(subject, CV, semester) 
-		 */
-		for(ComplementaryValue cVT : result){
-			SubjectValue sV = new SubjectValue(0.0 , false, cVT);
-			createSubject(sV.getComplementaryValue().getSubject(), sV, semester);
-		}
-		
-		if(toSave == true){			
-			planChanged(PlanCodes.CHANGE_BY_NEW_SUBJECTS);
+		if(result.size() > 0){
+			int semesterNumber = Integer.valueOf(semesterString);
+			final Semester semester = semesterList.get(semesterNumber);
+			
+			/**
+			 * for each
+			 * 0. Get the id in order to avoid entity repetition and optimize db operations
+			 * 1. Create a subjectValues obj
+			 * 2. Add the cV to the sV
+			 * 3. call createSUbject(subject, CV, semester) 
+			 */
+			
+
+			for(ComplementaryValue cVT : result){
+				SubjectValue sV = new SubjectValue(0.0 , false, cVT);
+				createSubject(sV.getComplementaryValue().getSubject(), sV, semester);
+			}
+			
+			if(toSave == true){			
+				planChanged(PlanCodes.CHANGE_BY_NEW_SUBJECTS);
+			}
 		}
 
 	}
@@ -1397,7 +1462,7 @@ ComplementaryValueView.Presenter{
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Window.alert("sorry, an error ocurred, take a picture of you with this error and send it to @MikeWoodcockC");
+				Window.alert("sorry, an error ocurred, take a picture of you with this error and send it to @NotAnyMike");
 			}
 
 			@Override
@@ -1801,6 +1866,7 @@ ComplementaryValueView.Presenter{
 				}
 				//Create semesters if none is empty
 				if(firstEmptySemesterPosition == semesterList.size()){
+					
 					createSemester(new Semester());
 				}
 				

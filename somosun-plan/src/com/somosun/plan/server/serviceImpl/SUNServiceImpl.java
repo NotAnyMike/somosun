@@ -33,11 +33,14 @@ import com.somosun.plan.server.dao.ComplementaryValueDao;
 import com.somosun.plan.server.dao.MessageDao;
 import com.somosun.plan.server.dao.PlanDao;
 import com.somosun.plan.server.dao.ScoreDao;
+import com.somosun.plan.server.dao.SemesterDao;
 import com.somosun.plan.server.dao.SemesterValueDao;
 import com.somosun.plan.server.dao.StudentDao;
 import com.somosun.plan.server.dao.SubjectDao;
 import com.somosun.plan.server.dao.SubjectGroupDao;
+import com.somosun.plan.server.dao.SubjectValueDao;
 import com.somosun.plan.shared.CompletePlanInfo;
+import com.somosun.plan.shared.IdContainer;
 import com.somosun.plan.shared.LoginInfo;
 import com.somosun.plan.shared.PlanValuesResult;
 import com.somosun.plan.shared.RandomPhrase;
@@ -1225,6 +1228,24 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		}
 		
 		return savePlan(student, plan);
+	}
+
+	@Override
+	public IdContainer getIds(int amountOfSemesterIds, int amountOfSubjectValueIds, int amountOfComplementaryValueIds) {
+		IdContainer toReturn = new IdContainer();
+		SemesterDao sDao = new SemesterDao();
+		for(int x = 0; x < amountOfSemesterIds; x++){
+			toReturn.addSemesterId(sDao.generateId());
+		}
+		SubjectValueDao sVDao = new SubjectValueDao();
+		for(int x = 0; x < amountOfSubjectValueIds; x++){
+			toReturn.addSemesterId(sVDao.generateId());
+		}
+		ComplementaryValueDao cVDao = new ComplementaryValueDao();
+		for(int x = 0; x < amountOfComplementaryValueIds; x++){
+			toReturn.addSemesterId(cVDao.generateId());
+		}
+		return toReturn;
 	}
 
 }

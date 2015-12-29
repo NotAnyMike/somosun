@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.somosun.plan.shared.CompletePlanInfo;
+import com.somosun.plan.shared.IdContainer;
 import com.somosun.plan.shared.PlanValuesResult;
 import com.somosun.plan.shared.RandomPhrase;
 import com.somosun.plan.shared.SiaResultGroups;
@@ -106,4 +107,8 @@ public interface SUNServiceAsync {
 
 	void savePlanAndGrade(Student student, Plan plan, Group group, Double oldGrade, Double newGrade,
 			AsyncCallback<Long> callback);
+
+	void getIds(int amountOfSemesterIds, int amountOfSubjectValueIds, int amountOfComplementaryValueIds,
+			AsyncCallback<IdContainer> callback);
+
 }
