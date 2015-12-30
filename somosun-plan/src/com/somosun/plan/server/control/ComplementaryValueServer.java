@@ -9,6 +9,7 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Load;
 import com.googlecode.objectify.annotation.Serialize;
+import com.somosun.plan.server.dao.SubjectGroupDao;
 import com.somosun.plan.shared.control.Career;
 import com.somosun.plan.shared.control.ComplementaryValue;
 import com.somosun.plan.shared.control.Subject;
@@ -26,7 +27,7 @@ public class ComplementaryValueServer extends ComplementaryValueAbstract {
 
 	@Index @Load private Ref<Career> career = null;;
 	@Index @Load private Ref<Subject> subject = null;
-	@Index @Load private Ref<SubjectGroup> subjectGroup = null;
+	@Index @Load private Ref<SubjectGroupServer> subjectGroup = null;
 	@Serialize private List<List<Ref<Subject>>> prerequisitesLists = null;
 	@Serialize private List<List<Ref<Subject>>> corequisitesLists = null;
 	private List<Ref<Subject>> listPrerequisitesOf = null;
@@ -56,13 +57,13 @@ public class ComplementaryValueServer extends ComplementaryValueAbstract {
 		this.listCorequisitesOf = new ArrayList<Ref<Subject>>();
 	}
 	
-	public ComplementaryValueServer(Career career, Subject subject,	List<List<Subject>> listPrerequisites, List<List<Subject>> listCorequisites, String typology,	boolean mandatory, SubjectGroup subjectGroup) {
+	public ComplementaryValueServer(Career career, Subject subject,	List<List<Subject>> listPrerequisites, List<List<Subject>> listCorequisites, String typology,	boolean mandatory, SubjectGroupServer subjectGroup) {
 		
 		setCareer(career);
 		setSubject(subject);
 		setTypology(typology);
 		setMandatory(mandatory);
-		setSubjectGroup(subjectGroup);
+		setSubjectGroupServer(subjectGroup);
 		setListPrerequisites(listPrerequisites);
 		setListCorequisites(listCorequisites);
 		
@@ -70,7 +71,11 @@ public class ComplementaryValueServer extends ComplementaryValueAbstract {
 		this.listCorequisitesOf = new ArrayList<Ref<Subject>>();
 	}
 
-	public ComplementaryValueServer(Career career, Subject subject, String typology,	boolean mandatory) {
+	public void setSubjectGroupServer(SubjectGroupServer subjectGroup) {
+		if(subjectGroup != null && subjectGroup.getId() != null) setSubjectGroupRef(Ref.create(subjectGroup));
+	}
+
+	public ComplementaryValueServer(Career career, Subject subject, String typology, boolean mandatory) {
 		
 		setCareer(career);
 		setSubject(subject);
@@ -84,13 +89,13 @@ public class ComplementaryValueServer extends ComplementaryValueAbstract {
 		
 	}
 	
-	public ComplementaryValueServer(Career career, Subject subject,	String typology, boolean mandatory, SubjectGroup subjectGroup) {
+	public ComplementaryValueServer(Career career, Subject subject,	String typology, boolean mandatory, SubjectGroupServer subjectGroup) {
 		
 		setCareer(career);
 		setSubject(subject);
 		setTypology(typology);
 		setMandatory(mandatory);
-		setSubjectGroup(subjectGroup);
+		setSubjectGroupServer(subjectGroup);
 		
 		this.setPrerequisitesListsRef(new ArrayList<List<Ref<Subject>>>());
 		this.setCorequisitesListsRef(new ArrayList<List<Ref<Subject>>>());
@@ -148,21 +153,27 @@ public class ComplementaryValueServer extends ComplementaryValueAbstract {
 		return toReturn;
 	}
 
-	public Ref<SubjectGroup> getSubjectGroupRef() {
+	public Ref<SubjectGroupServer> getSubjectGroupRef() {
 		return subjectGroup;
 	}
 
-	public void setSubjectGroupRef(Ref<SubjectGroup> subjectGroup) {
+	public void setSubjectGroupRef(Ref<SubjectGroupServer> subjectGroup) {
 		this.subjectGroup = subjectGroup;
 	}
 	
 	public void setSubjectGroup(SubjectGroup subjectGroup){
-		if(subjectGroup != null && subjectGroup.getId() != null) setSubjectGroupRef(Ref.create(subjectGroup));
+		if(subjectGroup != null && subjectGroup.getId() != null){
+			SubjectGroupDao sGDao = new SubjectGroupDao();
+			SubjectGroupServer sGS = sGDao.getById(subjectGroup.getId());
+			Ref<SubjectGroupServer> ref = null;
+			if(sGS != null) ref = Ref.create(sGS);
+			setSubjectGroupRef(ref);
+		}
 	}
 	
 	public SubjectGroup getSubjectGroup(){
 		SubjectGroup toReturn = null;
-		if(subjectGroup != null) toReturn = subjectGroup.get();
+		if(subjectGroup != null) toReturn = subjectGroup.get().getClientInstance();
 		return toReturn;
 	}
 

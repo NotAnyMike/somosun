@@ -10,12 +10,12 @@ import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.VoidWork;
 import com.somosun.plan.server.control.ComplementaryValueServer;
+import com.somosun.plan.server.control.SubjectGroupServer;
 import com.somosun.plan.server.control.SubjectValueServer;
 import com.somosun.plan.shared.SomosUNUtils;
 import com.somosun.plan.shared.control.Block;
 import com.somosun.plan.shared.control.Career;
 import com.somosun.plan.shared.control.Subject;
-import com.somosun.plan.shared.control.SubjectGroup;
 import com.somosun.plan.shared.control.controlAbstract.ComplementaryValueAbstract;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
@@ -26,9 +26,9 @@ public class ComplementaryValueDao implements Dao<ComplementaryValueServer> {
 	
 	static{
 		ObjectifyService.register(ComplementaryValueServer.class);
+		ObjectifyService.register(SubjectGroupServer.class);
 		ObjectifyService.register(Career.class);
 		ObjectifyService.register(Subject.class);
-		ObjectifyService.register(SubjectGroup.class);
 	}
 	
 	public Long save(ComplementaryValueAbstract cV){
@@ -199,11 +199,12 @@ public class ComplementaryValueDao implements Dao<ComplementaryValueServer> {
 				if(toReturn.getSubjectGroup() != null){
 					SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
 					
-					SubjectGroup subjectGroupUpdated = subjectGroupDao.getById(toReturn.getSubjectGroup().getId());
+					SubjectGroupServer subjectGroupUpdated = subjectGroupDao.getById(toReturn.getSubjectGroup().getId());
 					if(subjectGroupUpdated != null){
-						toReturn.setSubjectGroup(subjectGroupUpdated);						
+						toReturn.setSubjectGroup(subjectGroupUpdated.getClientInstance());						
 					}else{						
-						toReturn.setSubjectGroup(subjectGroupDao.get(toReturn.getSubjectGroup().getName(), toReturn.getSubjectGroup().isFundamental(), toReturn.getCareer().getCode()));
+						SubjectGroupServer sGST = subjectGroupDao.get(toReturn.getSubjectGroup().getName(), toReturn.getSubjectGroup().isFundamental(), toReturn.getCareer().getCode()); 
+						toReturn.setSubjectGroup((sGST == null ? null : sGST.getClientInstance()));
 					}
 					
 					
@@ -228,7 +229,7 @@ public class ComplementaryValueDao implements Dao<ComplementaryValueServer> {
 			SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
 			Career c = careerDao.getByCode(careerCode);
 			Subject s = subjectDao.getDummySubjectByCode(SomosUNUtils.LIBRE_CODE);
-			SubjectGroup sG = subjectGroupDao.get(SomosUNUtils.LIBRE_CODE, careerCode);
+			SubjectGroupServer sG = subjectGroupDao.get(SomosUNUtils.LIBRE_CODE, careerCode);
 			
 			if(s != null && c != null && sG != null){				
 				ComplementaryValueServer cVT = new ComplementaryValueServer(c, s, "l", false, sG);
@@ -247,7 +248,7 @@ public class ComplementaryValueDao implements Dao<ComplementaryValueServer> {
 			SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
 			Career c = careerDao.getByCode(careerCode);
 			Subject s = subjectDao.getDummySubjectByCode(SomosUNUtils.OPTATIVA_CODE);
-			SubjectGroup sG = subjectGroupDao.getById(subjectGroupId);
+			SubjectGroupServer sG = subjectGroupDao.getById(subjectGroupId);
 			
 			if(s != null && c != null && sG != null){				
 				ComplementaryValueServer cVT = new ComplementaryValueServer(c, s, (sG.isFundamental() == true ? "b" : "p"), false, sG);

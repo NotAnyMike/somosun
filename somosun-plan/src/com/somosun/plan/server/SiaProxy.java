@@ -26,6 +26,7 @@ import org.jsoup.select.Elements;
 
 import com.somosun.plan.server.control.ComplementaryValueServer;
 import com.somosun.plan.server.control.ScoreServer;
+import com.somosun.plan.server.control.SubjectGroupServer;
 import com.somosun.plan.server.dao.BlockDao;
 import com.somosun.plan.server.dao.CareerDao;
 import com.somosun.plan.server.dao.ComplementaryValueDao;
@@ -47,7 +48,6 @@ import com.somosun.plan.shared.control.Career;
 import com.somosun.plan.shared.control.Group;
 import com.somosun.plan.shared.control.Student;
 import com.somosun.plan.shared.control.Subject;
-import com.somosun.plan.shared.control.SubjectGroup;
 import com.somosun.plan.shared.control.Teacher;
 import com.somosun.plan.shared.values.SubjectGroupCodes;
 import com.somosun.plan.shared.values.TypologyCodes;
@@ -702,7 +702,7 @@ public class SiaProxy {
 				boolean isFundamental = false;
 				String typology = null;
 				Subject mainSubject = null;
-				SubjectGroup subjectGroup = null;
+				SubjectGroupServer subjectGroup = null;
 				String career = mainCareer.getCode();
 				
 				List<String> requisitesList = new ArrayList<String>();
@@ -994,11 +994,11 @@ public class SiaProxy {
 					/**** <adding the known subjectGroup to the complementaryValue> *****/
 					if(complementaryValue.getSubjectGroup() == null){
 						if(subjectGroup != null){
-							complementaryValue.setSubjectGroup(subjectGroup);
+							complementaryValue.setSubjectGroupServer(subjectGroup);
 						}else{
 							subjectGroup = subjectGroupDao.getUnkownSubjectGroup(career, isFundamental);
 							if(subjectGroup != null){
-								complementaryValue.setSubjectGroup(subjectGroup);
+								complementaryValue.setSubjectGroupServer(subjectGroup);
 							}else{
 								log.warning("SiaProxy - getRequisitesFromSia(String,String) : error getting the subjectGroup for subject " + code + " for career " + career);
 							}
@@ -1199,7 +1199,7 @@ public class SiaProxy {
 		Document docPlan = null;
 		Document docRequisites = null;
 		
-		Map<SubjectGroupDummy, SubjectGroup> mapSGDSGFinal = null; //To save the SubjectGroup (no Dummy final, getting them from the DB or updating them)
+		Map<SubjectGroupDummy, SubjectGroupServer> mapSGDSGFinal = null; //To save the SubjectGroup (no Dummy final, getting them from the DB or updating them)
 		
 		List<SubjectGroupDummy> subjectGroups1 = new ArrayList<SubjectGroupDummy>(); //To save the subjectGroups found in plan url
 		List<SubjectGroupDummy> subjectGroups2 = new ArrayList<SubjectGroupDummy>(); //To save the subjectGroups found in requisites url
@@ -1772,7 +1772,7 @@ public class SiaProxy {
 				career.setFreeElectionCredits(freeElectionValue);
 				
 				//Take the subjectGroup of freeElection and add the optative value This is done outside the saveSubjectGroupsAndReturnThem because it needs the freeElectionValue value
-				SubjectGroup subjectGroupFreeElection = subjectGroupDao.getSubjectGroupFromTypology(career, TypologyCodes.LIBRE_ELECCION);
+				SubjectGroupServer subjectGroupFreeElection = subjectGroupDao.getSubjectGroupFromTypology(career, TypologyCodes.LIBRE_ELECCION);
 				subjectGroupFreeElection.setOptativeCredits(freeElectionValue);
 				subjectGroupDao.save(subjectGroupFreeElection);
 				
@@ -1845,7 +1845,7 @@ public class SiaProxy {
 	 * @param career
 	 * @param mapSGDSG
 	 */
-	private static void saveSubjectsAndComplementaryValues(List<SubjectDummy> subjectsD, Career career, Map<SubjectGroupDummy, SubjectGroup> mapSGDSG, SubjectGroupDao subjectGroupDao, SiaResultSubjects allSiaResult, String htmlMisPlanes) {
+	private static void saveSubjectsAndComplementaryValues(List<SubjectDummy> subjectsD, Career career, Map<SubjectGroupDummy, SubjectGroupServer> mapSGDSG, SubjectGroupDao subjectGroupDao, SiaResultSubjects allSiaResult, String htmlMisPlanes) {
 		
 		SubjectDao subjectDao = new SubjectDao();
 		ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
@@ -1924,7 +1924,7 @@ public class SiaProxy {
 			String typology = (sD.getSubjectGroupDummy().isFundamental() == true ? "B" : "C");	
 			boolean mandatory = (sD.getMandatory() == true ? true : false); //because it is a Boolean and not a boolean
 			
-			SubjectGroup subjectGroup = mapSGDSG.get(sD.getSubjectGroupDummy()); 
+			SubjectGroupServer subjectGroup = mapSGDSG.get(sD.getSubjectGroupDummy()); 
 			
 			if(subjectGroup == null){
 				throw new RuntimeException("There is not such SubjectGroup for this SubjectGroupDummy in mapSGDSG, see comment in saveSubjectsAndComplementaryValues");
@@ -2141,23 +2141,23 @@ public class SiaProxy {
 		return sToReturn;
 	}
 
-	private static Map<SubjectGroupDummy, SubjectGroup> saveSubjectGroupsAndReturnThem(List<SubjectGroupDummy> subjectGroupsFinal, Career career, SubjectGroupDao subjectGroupDao) {
+	private static Map<SubjectGroupDummy, SubjectGroupServer> saveSubjectGroupsAndReturnThem(List<SubjectGroupDummy> subjectGroupsFinal, Career career, SubjectGroupDao subjectGroupDao) {
 		
 		//SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
 		
-		List<SubjectGroup> sGFromDB = subjectGroupDao.getList(career.getCode());
+		List<SubjectGroupServer> sGFromDB = subjectGroupDao.getList(career.getCode());
 		//List<SubjectGroup> sGFinal = new ArrayList<SubjectGroup>();
-		Map<SubjectGroupDummy, SubjectGroup> mapSGDSG = new HashMap<SubjectGroupDummy, SubjectGroup>();
+		Map<SubjectGroupDummy, SubjectGroupServer> mapSGDSG = new HashMap<SubjectGroupDummy, SubjectGroupServer>();
 				
 		for(SubjectGroupDummy sGD : subjectGroupsFinal){
 			
-			SubjectGroup sGFinal = null;
+			SubjectGroupServer sGFinal = null;
 			
 			boolean isInDb = false;
 			String name = SomosUNUtils.standardizeString(sGD.getName(), false, false);
-			SubjectGroup sG = new SubjectGroup( sGD.getName(), career, sGD.isFundamental(), sGD.getObligatoryCredits(), sGD.getOptativeCredits(), sGD.getError());
+			SubjectGroupServer sG = new SubjectGroupServer( sGD.getName(), career, sGD.isFundamental(), sGD.getObligatoryCredits(), sGD.getOptativeCredits(), sGD.getError());
 			
-			for(SubjectGroup sGDb : sGFromDB){
+			for(SubjectGroupServer sGDb : sGFromDB){
 				String nameDb = SomosUNUtils.standardizeString(sGDb.getName(), false, false);
 				if(nameDb.equals(name)){
 					if((sGD.isFundamental() != null && sGD.isFundamental().equals(sGDb.isFundamental()) == false) || 
@@ -2187,17 +2187,17 @@ public class SiaProxy {
 		 * TODO: SearchFor the libre elección and the Nivelación subjectGroups. if found, do nothing, otherwise create them
 		 */
 		//for libre eleccion
-		SubjectGroup subjectGroupIndividual = subjectGroupDao.get(SubjectGroupCodes.LIBRE_NAME, career.getCode());
+		SubjectGroupServer subjectGroupIndividual = subjectGroupDao.get(SubjectGroupCodes.LIBRE_NAME, career.getCode());
 		if(subjectGroupIndividual == null)
 		{
-			subjectGroupIndividual = new SubjectGroup(SubjectGroupCodes.LIBRE_NAME, career, false, 0, 0, false);
+			subjectGroupIndividual = new SubjectGroupServer(SubjectGroupCodes.LIBRE_NAME, career, false, 0, 0, false);
 			subjectGroupDao.save(subjectGroupIndividual);
 		}
 		//for nivelación
 			subjectGroupIndividual = subjectGroupDao.get(SubjectGroupCodes.NIVELACION_NAME, career.getCode());
 			if(subjectGroupIndividual == null)
 			{
-				subjectGroupIndividual = new SubjectGroup(SubjectGroupCodes.NIVELACION_NAME, career, false, 0, 0, false);
+				subjectGroupIndividual = new SubjectGroupServer(SubjectGroupCodes.NIVELACION_NAME, career, false, 0, 0, false);
 				subjectGroupDao.save(subjectGroupIndividual);
 			}
 		
@@ -2694,7 +2694,7 @@ public class SiaProxy {
 									 * Otherwise the val is null
 									 */
 									
-									SubjectGroup sG = null;
+									SubjectGroupServer sG = null;
 									if(typology.equals("P"))
 									{
 										//get the Nivelación subjectGroup

@@ -75,8 +75,6 @@ public interface SUNServiceAsync {
 
 	void getSubjectFromSia(String nameOrCode, String typology, String career,String scheduleCP, int page, int ammount, String sede,	Student student, AsyncCallback<SiaResultSubjects> callback);
 
-	void createDefaultSubject(String subjectGroupName, String credits,String careerCode, Student student,AsyncCallback<ComplementaryValue> callback);
-
 	void getSubjectGroups(String careerCode, AsyncCallback<List<SubjectGroup>> callback);
 
 	void getCareerToUse(String careerCode, AsyncCallback<Career> callback);
@@ -110,5 +108,8 @@ public interface SUNServiceAsync {
 
 	void getIds(int amountOfSemesterIds, int amountOfSubjectValueIds, int amountOfComplementaryValueIds,
 			AsyncCallback<IdContainer> callback);
+
+	void createDefaultSubject(String subjectGroupName, String credits, String careerCode, Student student,
+			AsyncCallback<ComplementaryValue> callback);
 
 }

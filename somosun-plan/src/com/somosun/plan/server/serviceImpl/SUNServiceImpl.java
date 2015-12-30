@@ -27,6 +27,7 @@ import com.somosun.plan.server.SomosUNServerUtils;
 import com.somosun.plan.server.control.ComplementaryValueServer;
 import com.somosun.plan.server.control.MessageServer;
 import com.somosun.plan.server.control.PlanServer;
+import com.somosun.plan.server.control.SubjectGroupServer;
 import com.somosun.plan.server.cronJob.GradeUpdaterCronJob;
 import com.somosun.plan.server.dao.CareerDao;
 import com.somosun.plan.server.dao.ComplementaryValueDao;
@@ -354,7 +355,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 					}else{
 						String typology = TypologyCodes.LIBRE_ELECCION;
 						boolean mandatory = false;
-						SubjectGroup subjectGroup = subjectGroupDao.getSubjectGroupFromTypology(mainCareer, typology); 
+						SubjectGroupServer subjectGroup = subjectGroupDao.getSubjectGroupFromTypology(mainCareer, typology); 
 						if(subjectGroup != null && subjectGroup.getName() != null && subjectGroup.getName().isEmpty() == false){
 							//Look create an complementaryVALUE as a free election to mainCareer
 							complementaryValue = new ComplementaryValueServer(mainCareer, subject,  typology, mandatory, subjectGroup);
@@ -427,10 +428,10 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 							}
 							complementaryValue.setTypology(SomosUNUtils.getTypology(typology));
 							
-							SubjectGroup subjectGroup = subjectGroupDao.getSubjectGroupFromTypology(career, typology);
+							SubjectGroupServer subjectGroup = subjectGroupDao.getSubjectGroupFromTypology(career, typology);
 							//if the subject is libre or niv get the sujectgroup libre or niv, and if it is the other to add it to unkown subjectgroup
 							
-							complementaryValue.setSubjectGroup(subjectGroup);
+							complementaryValue.setSubjectGroupServer(subjectGroup);
 							
 							complementaryValueDao.save(complementaryValue);
 							
@@ -631,7 +632,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 						//for nivelación
 						Subject subject = null;
 						ComplementaryValueServer cV = null;
-						SubjectGroup subjectGroup = null;
+						SubjectGroupServer subjectGroup = null;
 						for(Subject sT : levelingList){
 							if(subjectCodeT.equals(sT.getCode()) == true){
 								subject = subjectDao.getByCode(sT.getCode());
@@ -779,15 +780,22 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		
 		return cVList;
 	}
+	
+	public ComplementaryValue createDefaultSubject(String subjectGroupName, String credits, String careerCode, Student student) {
+		ComplementaryValueServer cVS = createDefaultSubjectServer(subjectGroupName, credits, careerCode, student);
+		ComplementaryValue toReturn = null;
+		if(cVS != null) toReturn = cVS.getClientInstance();
+		return toReturn; 
+	}
 
 	/**
 	 * Be really careful because here to send the code it is used the SomosUNUtils.LIBRE_CODE and the SubjetGroupCodes.LIBRE_NAME 
 	 */
-	public ComplementaryValue createDefaultSubject(String subjectGroupName, String credits, String careerCode, Student student) {
+	public ComplementaryValueServer createDefaultSubjectServer(String subjectGroupName, String credits, String careerCode, Student student) {
 		
 		SubjectGroupDao subjectGroupDao = new SubjectGroupDao(); 
 		
-		SubjectGroup subjectGroup = null;
+		SubjectGroupServer subjectGroup = null;
 		if(subjectGroupName.equals(SomosUNUtils.LIBRE_CODE) == true || subjectGroupName.equals(SubjectGroupCodes.LIBRE_NAME) == true){
 			subjectGroup = subjectGroupDao.get(SubjectGroupCodes.LIBRE_NAME, careerCode);
 		}else{						
@@ -799,15 +807,15 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 	}
 	
 	/**
-	 * This method will create acomplementaryValue (the old version it was just if you're logged as an admin, cuz the option 
+	 * This method will create a complementaryValue (the old version it was just if you're logged as an admin, cuz the option 
 	 * to add default subjects were only for admins when they're creating the default plans) [The old code is commented]
 	 * 
 	 * @param subjectGroupName -> please use the values from SomosUNUtils
 	 * @param student -> can be null (for retro-compatibility)
 	 */
-	public ComplementaryValue createDefaultSubject(SubjectGroup subjectGroup, String credits, String careerCode, Student student) {
+	public ComplementaryValueServer createDefaultSubject(SubjectGroupServer subjectGroup, String credits, String careerCode, Student student) {
 		
-		ComplementaryValue complementaryValue = null;
+		ComplementaryValueServer complementaryValue = null;
 		
 		if(subjectGroup != null && credits.isEmpty() == false && careerCode.isEmpty() == false /*&& student != null*/){
 			/*StudentDao studentDao = new StudentDao();
@@ -828,7 +836,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 				
 				//if(subjectGroup.getName().equals(SomosUNUtils.LIBRE_CODE) == true){
 				if(subjectGroup.getName().equals(SubjectGroupCodes.LIBRE_NAME) == true){
-					subjectDefault = new Subject(Integer.valueOf(credits), SomosUNUtils.LIBRE_CODE, SomosUNUtils.LIBRE_CODE, SubjectGroupCodes.LIBRE_NAME, "bog");
+					subjectDefault = new Subject(Integer.valueOf(credits), SomosUNUtils.LIBRE_CODE, SomosUNUtils.LIBRE_CODE, SubjectGroupCodes.LIBRE_NAME, "bog");  
 					subjectGroup = subjectGroupDao.get(SubjectGroupCodes.LIBRE_NAME, careerCode);
 				}else{						
 					subjectDefault = new Subject(Integer.valueOf(credits), SomosUNUtils.OPTATIVA_CODE, SomosUNUtils.OPTATIVA_CODE, SomosUNUtils.OPTATIVA_NAME, "bog");
@@ -846,7 +854,7 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 					if(subjectGroup.getName().equals(SubjectGroupCodes.LIBRE_NAME) == true) t = SomosUNUtils.getTypology("l");
 					else t = (subjectGroup.isFundamental()== true ? SomosUNUtils.getTypology("f") : SomosUNUtils.getTypology("c"));
 					
-					complementaryValue = new ComplementaryValue(career, subjectDefault, t, false, subjectGroup);
+					complementaryValue = new ComplementaryValueServer(career, subjectDefault, t, false, subjectGroup);
 					complementaryValue.setId(complementaryValueDao.generateId());
 					complementaryValueDao.save(complementaryValue);
 					
@@ -867,9 +875,9 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		
 		if(careerCode != null){
 			SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
-			List<SubjectGroup> subjectGroupsList = subjectGroupDao.getList(careerCode);
-			for(SubjectGroup sG : subjectGroupsList){				
-				subjectGroupsListToReturn.add(sG);
+			List<SubjectGroupServer> subjectGroupsList = subjectGroupDao.getList(careerCode);
+			for(SubjectGroupServer sG : subjectGroupsList){				
+				subjectGroupsListToReturn.add(sG.getClientInstance());
 			}
 		}
 		
@@ -1048,11 +1056,11 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 				toReturn.setCareer(career);
 
 				SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
-				List<SubjectGroup> subjectGroups = subjectGroupDao.getList(career.getCode());
+				List<SubjectGroupServer> subjectGroups = subjectGroupDao.getList(career.getCode());
 				List<SubjectGroup> subjectGroupsToReturn = new ArrayList<SubjectGroup>();
 				
-				for(SubjectGroup sG : subjectGroups){
-					subjectGroupsToReturn.add(sG);
+				for(SubjectGroupServer sG : subjectGroups){
+					subjectGroupsToReturn.add(sG.getClientInstance());
 				}
 				
 				toReturn.setSubjectGroups(subjectGroupsToReturn);
@@ -1194,14 +1202,14 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 						String credits = "" + creditsToAdd;
 						
 						//Create a default subject (cV) for sG with creditsToAdd credits and add it to the mandatorySubjectList
-						ComplementaryValue cVDefault = null;
+						ComplementaryValueServer cVDefault = null;
 						if(sG.getName().equals(SubjectGroupCodes.LIBRE_NAME)){
-							cVDefault = createDefaultSubject(SubjectGroupCodes.LIBRE_NAME, credits, careerCode, null);
+							cVDefault = createDefaultSubjectServer(SubjectGroupCodes.LIBRE_NAME, credits, careerCode, null);
 							log.info("There is one libre elección");
 						}else{							
-							cVDefault =	createDefaultSubject(sG, credits, careerCode, null);
+							cVDefault =	createDefaultSubjectServer(sG.getName(), credits, careerCode, null);
 						}
-						toReturn.getMandatoryComplementaryValues().add(cVDefault);
+						toReturn.getMandatoryComplementaryValues().add(cVDefault.getClientInstance());
 					}
 				}
 				/******** </taking care of the subjects groups> ********/

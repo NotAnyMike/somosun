@@ -19,16 +19,10 @@
 		<property name="code" direction="asc"/>
 	</datastore-index>	
 
-	<datastore-index kind="SubjectGroup" ancestor="false">
+	<datastore-index kind="SubjectGroupServer" ancestor="false">
 		<property name="name" direction="asc" />
-		<property name="career.code" direction="asc" />
+		<property name="career" direction="asc" />
 		<property name="fundamental" direction="asc" />
-	</datastore-index>
-    
-    <datastore-index kind="SubjectGroup" ancestor="false">
-	    <property name="name" direction="asc"/>
-	    <property name="career.code" direction="asc"/>
-	    <property name="fundamental" direction="asc"/>
 	</datastore-index>
 	
 	<datastore-index kind="ComplementaryValueServer" ancestor="false">

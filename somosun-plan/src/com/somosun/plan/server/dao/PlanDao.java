@@ -21,21 +21,19 @@ import com.somosun.plan.server.SomosUNServerUtils;
 import com.somosun.plan.server.control.ComplementaryValueServer;
 import com.somosun.plan.server.control.PlanServer;
 import com.somosun.plan.server.control.SemesterServer;
+import com.somosun.plan.server.control.SubjectGroupServer;
 import com.somosun.plan.server.control.SubjectValueServer;
 import com.somosun.plan.server.dummy.SemesterDummy;
 import com.somosun.plan.server.dummy.SubjectDummy;
 import com.somosun.plan.server.serviceImpl.LoginServiceImpl;
-import com.somosun.plan.server.serviceImpl.SUNServiceImpl;
 import com.somosun.plan.shared.LoginInfo;
 import com.somosun.plan.shared.SomosUNUtils;
 import com.somosun.plan.shared.control.Career;
-import com.somosun.plan.shared.control.ComplementaryValue;
 import com.somosun.plan.shared.control.Group;
 import com.somosun.plan.shared.control.Semester;
 import com.somosun.plan.shared.control.SemesterValue;
 import com.somosun.plan.shared.control.Student;
 import com.somosun.plan.shared.control.Subject;
-import com.somosun.plan.shared.control.SubjectGroup;
 import com.somosun.plan.shared.control.controlAbstract.PlanAbstract;
 import com.somosun.plan.shared.values.TypologyCodes;
 
@@ -51,8 +49,8 @@ public class PlanDao implements Dao<PlanServer>{
 		ObjectifyService.register(SemesterServer.class);
 		ObjectifyService.register(SubjectValueServer.class);
 		ObjectifyService.register(ComplementaryValueServer.class);
+		ObjectifyService.register(SubjectGroupServer.class);
 		ObjectifyService.register(Subject.class);
-		ObjectifyService.register(SubjectGroup.class);
 		ObjectifyService.register(Career.class);
 	}
 	
@@ -797,7 +795,7 @@ public class PlanDao implements Dao<PlanServer>{
 						
 						boolean mandatory = false;
 						String typology = TypologyCodes.getTypology(subjectD.getTypology());
-						SubjectGroup subjectGroup = subjectGroupDao.getSubjectGroupFromTypology(career, typology);
+						SubjectGroupServer subjectGroup = subjectGroupDao.getSubjectGroupFromTypology(career, typology);
 						ComplementaryValueServer complementaryValue = new ComplementaryValueServer(career, subject, typology, mandatory, subjectGroup);
 						complementaryValue.setId(complementaryValueDao.generateId());
 						
