@@ -19,6 +19,7 @@ import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.VoidWork;
 import com.somosun.plan.server.SomosUNServerUtils;
 import com.somosun.plan.server.control.ComplementaryValueServer;
+import com.somosun.plan.server.control.GroupServer;
 import com.somosun.plan.server.control.PlanServer;
 import com.somosun.plan.server.control.SemesterServer;
 import com.somosun.plan.server.control.SubjectGroupServer;
@@ -29,7 +30,6 @@ import com.somosun.plan.server.serviceImpl.LoginServiceImpl;
 import com.somosun.plan.shared.LoginInfo;
 import com.somosun.plan.shared.SomosUNUtils;
 import com.somosun.plan.shared.control.Career;
-import com.somosun.plan.shared.control.Group;
 import com.somosun.plan.shared.control.Semester;
 import com.somosun.plan.shared.control.SemesterValue;
 import com.somosun.plan.shared.control.Student;
@@ -618,7 +618,7 @@ public class PlanDao implements Dao<PlanServer>{
 						SemesterValue semesterValue = semesterValueDao.getOrCreateSemester(semesterD.getYear(), semesterD.getSemester());
 
 						//Get group
-						Group group = groupDao.getOrCreateGroup(subject, semesterValue, subjectD.getGroup());
+						GroupServer group = groupDao.getOrCreateGroup(subject, semesterValue, subjectD.getGroup());
 						//  Add career to careers list
 						if(group.containsCareer(career.getCode()) == false){
 							group.addCareer(career);
@@ -635,7 +635,7 @@ public class PlanDao implements Dao<PlanServer>{
 								subjectsToUpdate.add(subject);
 							}
 							subjectV.setTaken(true);
-							subjectV.setGroup(group);
+							subjectV.setGroupServer(group);
 							
 							subjects.add(subjectV);
 							
@@ -711,8 +711,8 @@ public class PlanDao implements Dao<PlanServer>{
 							}
 							
 							SemesterValue semesterValueT = semesterValueDao.getOrCreateSemester(semesterDummyT.getYear(), semesterDummyT.getSemester());
-							Group groupT = groupDao.getOrCreateGroup(complementaryValuesT.getSubject(), semesterValueT, subjectDummyT.getGroup());
-							subjectValuesT.setGroup(groupT);
+							GroupServer groupT = groupDao.getOrCreateGroup(complementaryValuesT.getSubject(), semesterValueT, subjectDummyT.getGroup());
+							subjectValuesT.setGroupServer(groupT);
 							
 							subjectValuesT.setTaken(true);
 							
@@ -744,10 +744,10 @@ public class PlanDao implements Dao<PlanServer>{
 							
 							if(semesterDummyT != null){
 								SemesterValue semesterValueT = semesterValueDao.getOrCreateSemester(semesterDummyT.getYear(), semesterDummyT.getSemester());
-								Group groupT = groupDao.getOrCreateGroup(complementaryValuesT.getSubject(), semesterValueT, subjectDummyT.getGroup());
+								GroupServer groupT = groupDao.getOrCreateGroup(complementaryValuesT.getSubject(), semesterValueT, subjectDummyT.getGroup());
 								
 								subjectValuesT.setComplementaryValueServer(complementaryValuesT);
-								subjectValuesT.setGroup(groupT);
+								subjectValuesT.setGroupServer(groupT);
 								subjectValuesT.setGrade(subjectDummyT.getGrade());
 								if(subjectDummyT.getApproved() == true){
 									complementaryValuesT.getSubject().setApprovenType(true);
@@ -800,7 +800,7 @@ public class PlanDao implements Dao<PlanServer>{
 						complementaryValue.setId(complementaryValueDao.generateId());
 						
 						SemesterValue semesterValue = semesterValueDao.getOrCreateSemester(semesterDummyT.getYear(), semesterDummyT.getSemester());
-						Group group = groupDao.getOrCreateGroup(subject, semesterValue, subjectD.getGroup());
+						GroupServer group = groupDao.getOrCreateGroup(subject, semesterValue, subjectD.getGroup());
 						
 						SubjectValueServer subjectValuesT = new SubjectValueServer();
 						subjectValuesT.setId(subjectValueDao.generateId());
@@ -809,7 +809,7 @@ public class PlanDao implements Dao<PlanServer>{
 						if(subjectD.getApproved() == true){
 							subject.setApprovenType(true);
 						}
-						subjectValuesT.setGroup(group);
+						subjectValuesT.setGroupServer(group);
 						subjectValuesT.setTaken(true);
 						
 						subjectDao.save(subject);

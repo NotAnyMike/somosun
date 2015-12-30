@@ -25,6 +25,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.somosun.plan.server.control.ComplementaryValueServer;
+import com.somosun.plan.server.control.GroupServer;
 import com.somosun.plan.server.control.ScoreServer;
 import com.somosun.plan.server.control.SubjectGroupServer;
 import com.somosun.plan.server.dao.BlockDao;
@@ -414,7 +415,7 @@ public class SiaProxy {
 	public static SiaResultGroups getGroupsFromSubject(Subject subject, String sede){
 		
 		String respString = null;
-		List<Group> groupList = new ArrayList<Group>();
+		List<GroupServer> groupList = new ArrayList<GroupServer>();
 		SiaResultGroups siaResult = new SiaResultGroups();
 		String data = "{method:buscador.obtenerGruposAsignaturas,params:['"+subject.getSiaCode()+"','0']}";
 		
@@ -547,12 +548,12 @@ public class SiaProxy {
 		JSONArray careersJSON = null;
 		JSONObject careerJSON = null; 
 		
-		List<Group> listFromDb = groupDao.getGroups(subject); //To compare the two lists
+		List<GroupServer> listFromDb = groupDao.getGroups(subject); //To compare the two lists
 		
 		if(subject != null){
 		
-		List<Group> groupList = new ArrayList<Group>();
-		Group group = null;
+		List<GroupServer> groupList = new ArrayList<GroupServer>();
+		GroupServer group = null;
 		Teacher teacher = null;
 		List<Block> blocks = null;
 		List<Career> careers = null;
@@ -561,7 +562,7 @@ public class SiaProxy {
 			for(int i = 0; i<jsonArray.length(); i++){
 				
 				j = jsonArray.getJSONObject(i);
-				group = new Group();
+				group = new GroupServer();
 	
 				blocks = new ArrayList<Block>();
 				careers = new ArrayList<Career>();
@@ -642,7 +643,14 @@ public class SiaProxy {
 				if(group.getId() != null) bullshit = group.getId() + " ";
 			}
 		
-		siaResult.setList(groupList);
+			List<Group> groupClientList = null;
+			if(groupList != null){
+				groupClientList =  new ArrayList<Group>();
+				for(GroupServer gS : groupList){
+					groupClientList.add(gS.getClientInstance());
+				}
+			}
+			siaResult.setList(groupClientList);
 		}
 		return siaResult;
 		

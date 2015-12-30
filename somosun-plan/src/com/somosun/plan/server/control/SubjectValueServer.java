@@ -5,6 +5,7 @@ import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Index;
 import com.somosun.plan.server.dao.ComplementaryValueDao;
+import com.somosun.plan.server.dao.GroupDao;
 import com.somosun.plan.shared.control.ComplementaryValue;
 import com.somosun.plan.shared.control.Group;
 import com.somosun.plan.shared.control.SubjectValue;
@@ -14,39 +15,45 @@ import com.somosun.plan.shared.control.controlAbstract.SubjectValueAbstract;
 @Entity
 public class SubjectValueServer extends SubjectValueAbstract {
 
-	@Index private Ref<Group> group = null;
+	@Index private Ref<GroupServer> group = null;
 	private Ref<ComplementaryValueServer> complementaryValue = null;
 	
     public SubjectValueServer(){
     	this.setComplementaryValueServer(new ComplementaryValueServer());
     }
     
-    public SubjectValueServer(Group group, double grade,boolean taken, ComplementaryValueServer complementaryValue) {
-        setGroup(group);
+    public SubjectValueServer(GroupServer group, double grade,boolean taken, ComplementaryValueServer complementaryValue) {
+        setGroupServer(group);
+        setGrade(grade);
+        setTaken(taken);
+        setComplementaryValueServer(complementaryValue);
+    }
+
+	public SubjectValueServer(double grade,boolean taken, ComplementaryValueServer complementaryValue) {
+    	setGroupServer(null);
         setGrade(grade);
         setTaken(taken);
         setComplementaryValueServer(complementaryValue);
     }
     
-    public SubjectValueServer(double grade,boolean taken, ComplementaryValueServer complementaryValue) {
-    	setGroup(null);
-        setGrade(grade);
-        setTaken(taken);
-        setComplementaryValueServer(complementaryValue);
-    }
-    
-    public SubjectValueServer(Group group, double grade,boolean taken) {
-    	setGroup(group);
+    public SubjectValueServer(GroupServer group, double grade,boolean taken) {
+    	setGroupServer(group);
         setGrade(grade);
         setTaken(taken);
         setComplementaryValueServer(new ComplementaryValueServer());
     }
 
-	public Ref<Group> getGroupRef() {
+    public void setGroupServer(GroupServer group) {
+		if(group != null && group.getId() != null){
+			setGroupRef(Ref.create(group));
+		}
+	}
+    
+	public Ref<GroupServer> getGroupRef() {
 		return group;
 	}
 
-	public void setGroupRef(Ref<Group> group) {
+	public void setGroupRef(Ref<GroupServer> group) {
 		this.group = group;
 	}
 
@@ -65,14 +72,16 @@ public class SubjectValueServer extends SubjectValueAbstract {
 	@Override
 	public Group getGroup() {
 		Group toReturn = null;
-		if(group != null) toReturn = group.get();
+		if(group != null) toReturn = group.get().getClientInstance();
 		return toReturn;
 	}
 
 	@Override
 	public void setGroup(Group group) {
 		if(group != null && group.getId()!= null){
-			setGroupRef(Ref.create(group));
+			GroupDao gDao = new GroupDao();
+			GroupServer gS = gDao.getById(group.getId());
+			setGroupRef((gS == null ? null : Ref.create(gS)));
 		}
 	}
 

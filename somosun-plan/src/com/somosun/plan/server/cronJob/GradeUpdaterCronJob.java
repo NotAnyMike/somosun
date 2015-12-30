@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskHandle;
+import com.somosun.plan.server.control.GroupServer;
 import com.somosun.plan.server.control.ScoreServer;
 import com.somosun.plan.server.control.SingleScoreServer;
 import com.somosun.plan.server.dao.GroupDao;
@@ -17,7 +18,6 @@ import com.somosun.plan.server.dao.SubjectDao;
 import com.somosun.plan.server.dao.TeacherDao;
 import com.somosun.plan.server.dummy.GradeDummy;
 import com.somosun.plan.shared.SomosUNUtils;
-import com.somosun.plan.shared.control.Group;
 import com.somosun.plan.shared.control.Subject;
 import com.somosun.plan.shared.control.Teacher;
 
@@ -191,9 +191,9 @@ public class GradeUpdaterCronJob {
 									 /*
 									  * Update the grade for all groups which have this professor and this subject if not null
 									  */
-									List<Group> groups = groupDao.getGroups(listWithSameProfessor.get(0).getSubjectId(), listWithSameProfessor.get(0).getProfessorId());
+									List<GroupServer> groups = groupDao.getGroups(listWithSameProfessor.get(0).getSubjectId(), listWithSameProfessor.get(0).getProfessorId());
 									if(groups != null && groups.isEmpty() == false){
-										for(Group g : groups){
+										for(GroupServer g : groups){
 											g.setAverageGrade(score2.getTotalAverage());
 											groupDao.save(g);
 										}										
