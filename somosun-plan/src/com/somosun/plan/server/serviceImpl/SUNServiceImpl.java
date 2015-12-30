@@ -1247,11 +1247,11 @@ public class SUNServiceImpl extends RemoteServiceServlet implements SUNService {
 		}
 		SubjectValueDao sVDao = new SubjectValueDao();
 		for(int x = 0; x < amountOfSubjectValueIds; x++){
-			toReturn.addSemesterId(sVDao.generateId());
+			toReturn.addSubjectValueId(sVDao.generateId());
 		}
 		ComplementaryValueDao cVDao = new ComplementaryValueDao();
 		for(int x = 0; x < amountOfComplementaryValueIds; x++){
-			toReturn.addSemesterId(cVDao.generateId());
+			toReturn.addComplementaryValueId(cVDao.generateId());
 		}
 		return toReturn;
 	}

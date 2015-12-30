@@ -50,7 +50,7 @@ public class IdContainer implements Serializable {
 		if(id != null) subjectValuesIds.add(id);
 	}
 	
-	public void addComplementaryValueIds(Long id){
+	public void addComplementaryValueId(Long id){
 		if(id != null) complementaryValuesIds.add(id);
 	}
 	
