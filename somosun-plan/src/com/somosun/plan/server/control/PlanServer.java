@@ -116,6 +116,7 @@ public class PlanServer extends PlanAbstract {
 	}
 
 	public List<Ref<SemesterServer>> getSemestersRef() {
+		if(semesters == null) semesters = new ArrayList<Ref<SemesterServer>>();
 		return semesters;
 	}
 
@@ -126,11 +127,13 @@ public class PlanServer extends PlanAbstract {
 	public void setSemesters(List<Semester> semesters){
 		List<Ref<SemesterServer>> list = null;
 		SemesterDao semesterDao = new SemesterDao();
-		for(Semester s : semesters){
-			if(s.getId() != null){				
-				if(list == null) list = new ArrayList<Ref<SemesterServer>>();
-				SemesterServer semesterServer = semesterDao.getById(s.getId());
-				list.add(Ref.create(semesterServer));
+		if(semesters != null){			
+			for(Semester s : semesters){
+				if(s.getId() != null){				
+					if(list == null) list = new ArrayList<Ref<SemesterServer>>();
+					SemesterServer semesterServer = semesterDao.getById(s.getId());
+					list.add(Ref.create(semesterServer));
+				}
 			}
 		}
 		setSemestersRef(list);
@@ -138,8 +141,8 @@ public class PlanServer extends PlanAbstract {
 	
 	public void setSemesterServers(List<SemesterServer> semesters) {
 		List<Ref<SemesterServer>> list = null;
-		SemesterDao semesterDao = new SemesterDao();
 		for(SemesterServer s : semesters){
+			list = new ArrayList<Ref<SemesterServer>>();
 			if(s.getId() != null){				
 				list.add(Ref.create(s));
 			}
@@ -148,10 +151,17 @@ public class PlanServer extends PlanAbstract {
 	}
 	
 	public List<Semester> getSemesters(){
-		List<Semester> list = null;
+		List<Semester> list = new ArrayList<Semester>();
 		for(Ref<SemesterServer> semesterRef : semesters){
-			if(list == null) list = new ArrayList<Semester>();
-			list.add(semesterRef.get().getClientInstance());
+			if(semesterRef != null){				
+				SemesterServer semesterServer = semesterRef.get();
+				Semester semester = null;
+				if(semesterServer != null) semester = semesterServer.getClientInstance();
+				if(semester != null){					
+					if(list == null) list = new ArrayList<Semester>();
+					list.add(semester);
+				}
+			}
 		}
 		return list;
 	}
@@ -167,9 +177,13 @@ public class PlanServer extends PlanAbstract {
 		p.setUser(getUserRef().get());
 		
 		List<Semester> list = null;
-		for(Ref<SemesterServer> s : semesters){
-			if(list == null) list = new ArrayList<Semester>();
-			list.add(s.get().getClientInstance());
+		if(semesters != null){			
+			for(Ref<SemesterServer> s : semesters){
+				if(s != null && s.get() != null){					
+					if(list == null) list = new ArrayList<Semester>();
+					list.add(s.get().getClientInstance());
+				}
+			}
 		}
 		p.setSemesters(list);
 		

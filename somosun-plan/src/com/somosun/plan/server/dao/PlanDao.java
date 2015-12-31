@@ -836,7 +836,9 @@ public class PlanDao implements Dao<PlanServer>{
 			//Create a task and add it to the cron job
 			for(SemesterServer semesterTemporary : semesters){
 				for(SubjectValueServer subjectValue : semesterTemporary.getSubjectValuesListLoaded()){
-					SomosUNServerUtils.createGradeUpdaterTask(subjectValue.getGroup().getTeacher(), subjectValue.getGroup().getSemesterValue(), null, subjectValue.getGrade(), subjectValue.getComplementaryValue().getSubject());					
+					if(subjectValue != null){						
+						SomosUNServerUtils.createGradeUpdaterTask(subjectValue.getGroup().getTeacher(), subjectValue.getGroup().getSemesterValue(), null, subjectValue.getGrade(), subjectValue.getComplementaryValue().getSubject());					
+					}
 				}
 			}
 			
