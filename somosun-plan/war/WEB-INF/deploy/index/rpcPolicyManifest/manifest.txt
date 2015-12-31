@@ -1,4 +1,4 @@
 # Module index
 # RPC service class, partial path of RPC policy file
 com.somosun.plan.client.index.service.LoginService, 488B4C7F720D974A0FBD90D583CA371E.gwt.rpc
-com.somosun.plan.client.index.service.SUNService, 64041727D549003337904E07F72EDD52.gwt.rpc
+com.somosun.plan.client.index.service.SUNService, 8215BF687BEED21735C6D53809F9B04B.gwt.rpc

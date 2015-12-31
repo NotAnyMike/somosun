@@ -6,11 +6,13 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 import com.somosun.plan.server.control.ComplementaryValueServer;
+import com.somosun.plan.server.control.GroupServer;
 import com.somosun.plan.server.control.PlanServer;
 import com.somosun.plan.server.control.SubjectGroupServer;
 import com.somosun.plan.server.control.SubjectValueServer;
 import com.somosun.plan.server.serviceImpl.LoginServiceImpl;
 import com.somosun.plan.shared.LoginInfo;
+import com.somosun.plan.shared.control.Block;
 import com.somosun.plan.shared.control.Career;
 import com.somosun.plan.shared.control.ComplementaryValue;
 import com.somosun.plan.shared.control.Group;
@@ -25,8 +27,9 @@ public class SubjectValueDao implements Dao<SubjectValueServer> {
 		ObjectifyService.register(SubjectValueServer.class);
 		ObjectifyService.register(ComplementaryValueServer.class);
 		ObjectifyService.register(SubjectGroupServer.class);
+		ObjectifyService.register(GroupServer.class);
 		ObjectifyService.register(Career.class);
-		ObjectifyService.register(Group.class);
+		ObjectifyService.register(Block.class);
 	}
 	
 	public SubjectValueServer getById(Long id){

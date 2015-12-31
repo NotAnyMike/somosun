@@ -8,10 +8,13 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 import com.somosun.plan.server.control.ComplementaryValueServer;
+import com.somosun.plan.server.control.GroupServer;
 import com.somosun.plan.server.control.SemesterServer;
+import com.somosun.plan.server.control.SubjectGroupServer;
 import com.somosun.plan.server.control.SubjectValueServer;
 import com.somosun.plan.shared.control.Career;
 import com.somosun.plan.shared.control.ComplementaryValue;
+import com.somosun.plan.shared.control.Subject;
 import com.somosun.plan.shared.control.SubjectValue;
 import com.somosun.plan.shared.control.controlAbstract.SemesterAbstract;
 
@@ -21,7 +24,10 @@ public class SemesterDao implements Dao<SemesterServer> {
 		ObjectifyService.register(SemesterServer.class);
 		ObjectifyService.register(ComplementaryValueServer.class);
 		ObjectifyService.register(SubjectValueServer.class);
+		ObjectifyService.register(SubjectGroupServer.class);
+		ObjectifyService.register(GroupServer.class);
 		ObjectifyService.register(Career.class);
+		ObjectifyService.register(Subject.class);
 	}
 	
 	public Long save(SemesterAbstract s){

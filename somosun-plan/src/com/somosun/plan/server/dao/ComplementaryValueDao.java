@@ -10,6 +10,7 @@ import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.VoidWork;
 import com.somosun.plan.server.control.ComplementaryValueServer;
+import com.somosun.plan.server.control.GroupServer;
 import com.somosun.plan.server.control.SubjectGroupServer;
 import com.somosun.plan.server.control.SubjectValueServer;
 import com.somosun.plan.shared.SomosUNUtils;
@@ -27,8 +28,10 @@ public class ComplementaryValueDao implements Dao<ComplementaryValueServer> {
 	static{
 		ObjectifyService.register(ComplementaryValueServer.class);
 		ObjectifyService.register(SubjectGroupServer.class);
+		ObjectifyService.register(GroupServer.class);
 		ObjectifyService.register(Career.class);
 		ObjectifyService.register(Subject.class);
+		ObjectifyService.register(Block.class);
 	}
 	
 	public Long save(ComplementaryValueAbstract cV){
