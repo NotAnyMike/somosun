@@ -153,7 +153,8 @@ public class PlanDao implements Dao<PlanServer>{
 			if(plan.getId() == null) plan.setId(generateId());
 
 			/******** check for the references' values (i.e. only for Ref<Semester> ********/
-			if(plan.getSemesters() != null && plan.getSemesters().isEmpty() == false){
+			List<Semester> semesters = plan.getSemesters(); 
+			if(semesters != null && semesters.isEmpty() == false){
 				SemesterDao semesterDao = new SemesterDao();
 				//for(int x = 0; x < plan.getSemesters().size(); x++){
 				for(Semester semester : plan.getSemesters()){
