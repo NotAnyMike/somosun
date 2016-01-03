@@ -124,15 +124,14 @@ public class PlanServer extends PlanAbstract {
 		this.semesters = semesters;
 	}
 	
-	public void setSemesters(List<Semester> semesters){
+	public void setSemesters(List<SemesterServer> semesters){
 		List<Ref<SemesterServer>> list = null;
 		SemesterDao semesterDao = new SemesterDao();
 		if(semesters != null){			
-			for(Semester s : semesters){
+			for(SemesterServer s : semesters){
 				if(s.getId() != null){				
 					if(list == null) list = new ArrayList<Ref<SemesterServer>>();
-					SemesterServer semesterServer = semesterDao.getById(s.getId());
-					list.add(Ref.create(semesterServer));
+					list.add(Ref.create(s));
 				}
 			}
 		}

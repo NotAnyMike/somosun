@@ -161,12 +161,10 @@ public class ComplementaryValueServer extends ComplementaryValueAbstract {
 		this.subjectGroup = subjectGroup;
 	}
 	
-	public void setSubjectGroup(SubjectGroup subjectGroup){
+	public void setSubjectGroup(SubjectGroupServer subjectGroup){
 		if(subjectGroup != null && subjectGroup.getId() != null){
-			SubjectGroupDao sGDao = new SubjectGroupDao();
-			SubjectGroupServer sGS = sGDao.getById(subjectGroup.getId());
 			Ref<SubjectGroupServer> ref = null;
-			if(sGS != null) ref = Ref.create(sGS);
+			if(subjectGroup != null) ref = Ref.create(subjectGroup);
 			setSubjectGroupRef(ref);
 		}
 	}

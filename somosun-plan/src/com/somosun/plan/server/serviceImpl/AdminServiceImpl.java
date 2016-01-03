@@ -284,8 +284,8 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 		if(getUserLogged().isAdmin() == true){			
 			toReturn = new ArrayList<Message>();
 			MessageDao messageDao = new MessageDao();
-			for(MessageServer m : messageDao.getAllMessages()){
-				toReturn.add(m.getShared());
+			for(Message m : messageDao.getAllMessages()){
+				toReturn.add(m);
 			}
 			
 		}
@@ -301,8 +301,8 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 		if(getUserLogged().isAdmin() == true){			
 			toReturn = new ArrayList<Message>();
 			MessageDao messageDao = new MessageDao();
-			for(MessageServer m : messageDao.getAllErrorMessages()){
-				toReturn.add(m.getShared());
+			for(Message m : messageDao.getAllErrorMessages()){
+				toReturn.add(m);
 			}
 			
 		}
@@ -318,8 +318,8 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 		if(getUserLogged().isAdmin() == true){			
 			toReturn = new ArrayList<Message>();
 			MessageDao messageDao = new MessageDao();
-			for(MessageServer m : messageDao.getAllSuggestionMessages()){
-				toReturn.add(m.getShared());
+			for(Message m : messageDao.getAllSuggestionMessages()){
+				toReturn.add(m);
 			}
 			
 		}
@@ -335,8 +335,8 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 		if(getUserLogged().isAdmin() == true){			
 			toReturn = new ArrayList<Message>();
 			MessageDao messageDao = new MessageDao();
-			for(MessageServer m : messageDao.getAllOtherMessages()){
-				toReturn.add(m.getShared());
+			for(Message m : messageDao.getAllOtherMessages()){
+				toReturn.add(m);
 			}
 			
 		}
@@ -352,8 +352,8 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 		if(getUserLogged().isAdmin() == true){			
 			toReturn = new ArrayList<Message>();
 			MessageDao messageDao = new MessageDao();
-			for(MessageServer m : messageDao.getUserMessages(username)){
-				toReturn.add(m.getShared());
+			for(Message m : messageDao.getUserMessages(username)){
+				toReturn.add(m);
 			}
 			
 		}
@@ -367,7 +367,7 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 		Message toReturn = null;
 		if(getUserLogged().isAdmin() == true){
 			MessageDao messageDao = new MessageDao();
-			toReturn = messageDao.getById(id).getShared();
+			toReturn = messageDao.getById(id);
 		}
 		return toReturn;
 	}
@@ -378,8 +378,8 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 	public void deleteAllMessages() {
 		if(getUserLogged().isAdmin() == true){
 			MessageDao messageDao = new MessageDao();
-			List<MessageServer> list = messageDao.getAllMessages();
-			for(MessageServer m : list){
+			List<Message> list = messageDao.getAllMessages();
+			for(Message m : list){
 				messageDao.delete(m.getId());
 			}
 		}
@@ -391,8 +391,8 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 	public void deleteSuggestionMessages() {
 		if(getUserLogged().isAdmin() == true){
 			MessageDao messageDao = new MessageDao();
-			List<MessageServer> list = messageDao.getAllSuggestionMessages();
-			for(MessageServer m : list){
+			List<Message> list = messageDao.getAllSuggestionMessages();
+			for(Message m : list){
 				messageDao.delete(m.getId());
 			}
 		}
@@ -404,8 +404,8 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 	public void deleteErrorMessages() {
 		if(getUserLogged().isAdmin() == true){
 			MessageDao messageDao = new MessageDao();
-			List<MessageServer> list = messageDao.getAllErrorMessages();
-			for(MessageServer m : list){
+			List<Message> list = messageDao.getAllErrorMessages();
+			for(Message m : list){
 				messageDao.delete(m.getId());
 			}
 		}
@@ -417,8 +417,8 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 	public void deleteOtherMessages() {
 		if(getUserLogged().isAdmin() == true){
 			MessageDao messageDao = new MessageDao();
-			List<MessageServer> list = messageDao.getAllOtherMessages();
-			for(MessageServer m : list){
+			List<Message> list = messageDao.getAllOtherMessages();
+			for(Message m : list){
 				messageDao.delete(m.getId());
 			}
 		}
@@ -433,8 +433,8 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 		if(getUserLogged().isAdmin() == true){
 			toReturn = new ArrayList<Plan>();
 			PlanDao planDao = new PlanDao();
-			for(PlanServer p : planDao.getPlansByUsername(username)){
-				toReturn.add(p.getClientInstance());
+			for(Plan p : planDao.getPlansByUsername(username)){
+				toReturn.add(p);
 			}
 		}
 		return toReturn;
@@ -445,8 +445,8 @@ public class AdminServiceImpl extends RemoteServiceServlet implements AdminServi
 		Plan plan = null;
 		if(getUserLogged().isAdmin() == true){			
 			PlanDao planDao = new PlanDao();
-			PlanServer planServer = planDao.getById(Long.valueOf(id));
-			if(planServer != null) plan = planServer.getClientInstance(); 
+			Plan planServer = planDao.getById(Long.valueOf(id));
+			if(planServer != null) plan = planServer; 
 		}
 		return plan;
 	}

@@ -8,10 +8,10 @@ import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Load;
 import com.somosun.plan.shared.control.Message;
 import com.somosun.plan.shared.control.Student;
-import com.somosun.plan.shared.control.controlAbstract.MessageIncomplete;
+import com.somosun.plan.shared.control.controlAbstract.MessageAbstract;
 
 @Entity
-public class MessageServer extends MessageIncomplete implements Serializable {
+public class MessageServer extends MessageAbstract implements Serializable {
 
 	@Index @Load private Ref<Student> student = null;
 	
@@ -41,9 +41,17 @@ public class MessageServer extends MessageIncomplete implements Serializable {
 		this.student = student;
 	}
 	
-	public Message getShared(){
+	public Message getClientInstance(){
 		Message m = new Message();
+		
 		m.setId(getId());
-		return new Message(getName(), getTopic(), getType(), getMessage(), (student == null ? null : getStudent().get()));
+		m.setDate(getDate());
+		m.setMessage(getMessage());
+		m.setName(getName());
+		m.setStudent(getStudent().get());
+		m.setTopic(getTopic());
+		m.setType(getType());
+		
+		return m;
 	}
 }

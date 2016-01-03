@@ -71,5 +71,31 @@ public class Plan extends PlanAbstract implements Serializable {
 		}
 		this.setGpa((double) sum/credits);
 	}
+	
+	public boolean compare(PlanAbstract p){
+		boolean toReturn = false;
+		
+		if(p != null && this.getName().equals(p.getName()) && (this.getUser().getIdSun().equals(p.getUser().getIdSun()))  && this.getGpa() == p.getGpa() &&
+				this.getId().equals(p.getId()) && this.getCareer().equals(p.getCareer())){
+			//Check the semesters
+			//if null or empty both
+			if((this.getSemesters() == null && p.getSemesters() == null) || (this.getSemesters() != null && this.getSemesters().isEmpty() && p.getSemesters() != null & p.getSemesters().isEmpty())){
+				toReturn = true;
+			}else{
+				if(this.getSemesters() != null && p.getSemesters() != null && this.getSemesters().size() == p.getSemesters().size()){
+					boolean isEqual = true;
+					for(int x = 0; x < this.getSemesters().size(); x++){
+						if(this.getSemesters().get(x).equals(p.getSemesters().get(x)) == false){
+							isEqual = false;
+							break;
+						}
+					}
+					if(isEqual == true) toReturn = true;
+				}
+			}
+		}
+		
+		return toReturn;
+	}
 
 }

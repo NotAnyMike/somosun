@@ -16,9 +16,9 @@ public abstract class SubjectValueAbstract implements Serializable{
     private boolean taken = false;
 
 	abstract public Group getGroup();
-	abstract public void setGroup(Group group);
+//	abstract public void setGroup(Group group);
 	abstract public ComplementaryValue getComplementaryValue();
-	abstract public void setComplementaryValue(ComplementaryValue complementaryValue);
+//	abstract public void setComplementaryValue(ComplementaryValue complementaryValue);
 
 	public double getGrade() {
 		return grade;

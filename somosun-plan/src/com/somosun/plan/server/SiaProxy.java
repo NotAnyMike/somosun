@@ -24,10 +24,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import com.somosun.plan.server.control.ComplementaryValueServer;
-import com.somosun.plan.server.control.GroupServer;
-import com.somosun.plan.server.control.ScoreServer;
-import com.somosun.plan.server.control.SubjectGroupServer;
 import com.somosun.plan.server.dao.BlockDao;
 import com.somosun.plan.server.dao.CareerDao;
 import com.somosun.plan.server.dao.ComplementaryValueDao;
@@ -46,9 +42,12 @@ import com.somosun.plan.shared.SiaResultSubjects;
 import com.somosun.plan.shared.SomosUNUtils;
 import com.somosun.plan.shared.control.Block;
 import com.somosun.plan.shared.control.Career;
+import com.somosun.plan.shared.control.ComplementaryValue;
 import com.somosun.plan.shared.control.Group;
+import com.somosun.plan.shared.control.Score;
 import com.somosun.plan.shared.control.Student;
 import com.somosun.plan.shared.control.Subject;
+import com.somosun.plan.shared.control.SubjectGroup;
 import com.somosun.plan.shared.control.Teacher;
 import com.somosun.plan.shared.values.SubjectGroupCodes;
 import com.somosun.plan.shared.values.TypologyCodes;
@@ -415,7 +414,7 @@ public class SiaProxy {
 	public static SiaResultGroups getGroupsFromSubject(Subject subject, String sede){
 		
 		String respString = null;
-		List<GroupServer> groupList = new ArrayList<GroupServer>();
+		List<Group> groupList = new ArrayList<Group>();
 		SiaResultGroups siaResult = new SiaResultGroups();
 		String data = "{method:buscador.obtenerGruposAsignaturas,params:['"+subject.getSiaCode()+"','0']}";
 		
@@ -548,12 +547,12 @@ public class SiaProxy {
 		JSONArray careersJSON = null;
 		JSONObject careerJSON = null; 
 		
-		List<GroupServer> listFromDb = groupDao.getGroups(subject); //To compare the two lists
+		List<Group> listFromDb = groupDao.getGroups(subject); //To compare the two lists
 		
 		if(subject != null){
 		
-		List<GroupServer> groupList = new ArrayList<GroupServer>();
-		GroupServer group = null;
+		List<Group> groupList = new ArrayList<Group>();
+		Group group = null;
 		Teacher teacher = null;
 		List<Block> blocks = null;
 		List<Career> careers = null;
@@ -562,7 +561,7 @@ public class SiaProxy {
 			for(int i = 0; i<jsonArray.length(); i++){
 				
 				j = jsonArray.getJSONObject(i);
-				group = new GroupServer();
+				group = new Group();
 	
 				blocks = new ArrayList<Block>();
 				careers = new ArrayList<Career>();
@@ -616,7 +615,7 @@ public class SiaProxy {
 					}
 				}
 				
-				ScoreServer scoreTemporary = null;
+				Score scoreTemporary = null;
 				if(subject != null && subject.getId() != null && teacher != null && teacher.getIdSun() != null){					
 					scoreTemporary = scoreDao.getBySubjectAndProfesor(subject.getId(), teacher.getIdSun());
 				}
@@ -644,13 +643,7 @@ public class SiaProxy {
 			}
 		
 			List<Group> groupClientList = null;
-			if(groupList != null){
-				groupClientList =  new ArrayList<Group>();
-				for(GroupServer gS : groupList){
-					groupClientList.add(gS.getClientInstance());
-				}
-			}
-			siaResult.setList(groupClientList);
+			siaResult.setList(groupList);
 		}
 		return siaResult;
 		
@@ -699,9 +692,9 @@ public class SiaProxy {
 	 * @param subjectGroupDao
 	 * @return
 	 */
-	private static ComplementaryValueServer analyseMisPlanesStringToGetCV(String mainHtmlString, Document doc , Career mainCareer, String code, SubjectDao subjectDao, ComplementaryValueDao complementaryValueDao, SubjectGroupDao subjectGroupDao){
+	private static ComplementaryValue analyseMisPlanesStringToGetCV(String mainHtmlString, Document doc , Career mainCareer, String code, SubjectDao subjectDao, ComplementaryValueDao complementaryValueDao, SubjectGroupDao subjectGroupDao){
 		
-		ComplementaryValueServer complementaryValue = null;
+		ComplementaryValue complementaryValue = null;
 
 		if(code != null && code.trim().isEmpty() == false){	
 			
@@ -710,7 +703,7 @@ public class SiaProxy {
 				boolean isFundamental = false;
 				String typology = null;
 				Subject mainSubject = null;
-				SubjectGroupServer subjectGroup = null;
+				SubjectGroup subjectGroup = null;
 				String career = mainCareer.getCode();
 				
 				List<String> requisitesList = new ArrayList<String>();
@@ -766,7 +759,7 @@ public class SiaProxy {
 							
 							complementaryValue = complementaryValueDao.get(mainCareer, mainSubject);
 							if(complementaryValue == null){
-								complementaryValue = new ComplementaryValueServer(mainCareer, mainSubject);
+								complementaryValue = new ComplementaryValue(mainCareer, mainSubject);
 							}
 							
 							/***** <getting the subjectGroup for this subject> *****/
@@ -980,20 +973,20 @@ public class SiaProxy {
 					}
 					
 					//Adding this subject @param code to requisiteOf list of its pre and co requisites (to save the pos requisites = pre requisites of)
-					ComplementaryValueServer posRequisiteComplementeryValues = null;
+					ComplementaryValue posRequisiteComplementeryValues = null;
 					for(Subject preRequisiteSubject : prerequisitesSubjectList){
 						posRequisiteComplementeryValues = complementaryValueDao.get(mainCareer, preRequisiteSubject);
-						if(posRequisiteComplementeryValues == null) posRequisiteComplementeryValues = new ComplementaryValueServer(mainCareer, preRequisiteSubject);
+						if(posRequisiteComplementeryValues == null) posRequisiteComplementeryValues = new ComplementaryValue(mainCareer, preRequisiteSubject);
 						posRequisiteComplementeryValues.addPrerequisiteOf(mainSubject);
 						complementaryValueDao.save(posRequisiteComplementeryValues);
 						posRequisiteComplementeryValues = null;
 					}
 					
 					//To save the co requisites of
-					ComplementaryValueServer coRequisiteOfComplementeryValues = null;
+					ComplementaryValue coRequisiteOfComplementeryValues = null;
 					for(Subject coRequisiteSubject : corequisitesSubjectList){
 						coRequisiteOfComplementeryValues = complementaryValueDao.get(mainCareer, coRequisiteSubject);
-						if(coRequisiteOfComplementeryValues == null) coRequisiteOfComplementeryValues = new ComplementaryValueServer(mainCareer, coRequisiteSubject);
+						if(coRequisiteOfComplementeryValues == null) coRequisiteOfComplementeryValues = new ComplementaryValue(mainCareer, coRequisiteSubject);
 						coRequisiteOfComplementeryValues.addCorequisiteOf(mainSubject);
 						complementaryValueDao.save(coRequisiteOfComplementeryValues);
 						coRequisiteOfComplementeryValues = null;
@@ -1002,11 +995,11 @@ public class SiaProxy {
 					/**** <adding the known subjectGroup to the complementaryValue> *****/
 					if(complementaryValue.getSubjectGroup() == null){
 						if(subjectGroup != null){
-							complementaryValue.setSubjectGroupServer(subjectGroup);
+							complementaryValue.setSubjectGroup(subjectGroup);
 						}else{
 							subjectGroup = subjectGroupDao.getUnkownSubjectGroup(career, isFundamental);
 							if(subjectGroup != null){
-								complementaryValue.setSubjectGroupServer(subjectGroup);
+								complementaryValue.setSubjectGroup(subjectGroup);
 							}else{
 								log.warning("SiaProxy - getRequisitesFromSia(String,String) : error getting the subjectGroup for subject " + code + " for career " + career);
 							}
@@ -1061,9 +1054,9 @@ public class SiaProxy {
 	 * 
 	 * @return a complementaryValues with the pos-requisite list empty
 	 */
-	public static List<ComplementaryValueServer> getRequisitesFromMisPlanes(List<String> codes, String career){
+	public static List<ComplementaryValue> getRequisitesFromMisPlanes(List<String> codes, String career){
 		
-		List<ComplementaryValueServer> toReturn = null;
+		List<ComplementaryValue> toReturn = null;
 		ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
 		SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
 		SubjectDao subjectDao = new SubjectDao();
@@ -1083,10 +1076,10 @@ public class SiaProxy {
 			
 			Document doc = Jsoup.parse(mainHtmlString);
 			
-			toReturn = new ArrayList<ComplementaryValueServer>();
+			toReturn = new ArrayList<ComplementaryValue>();
 			
 			for(String code : codes){				
-				ComplementaryValueServer complementaryValue = analyseMisPlanesStringToGetCV(mainHtmlString, doc, mainCareer, code, subjectDao, complementaryValueDao, subjectGroupDao);
+				ComplementaryValue complementaryValue = analyseMisPlanesStringToGetCV(mainHtmlString, doc, mainCareer, code, subjectDao, complementaryValueDao, subjectGroupDao);
 				if(complementaryValue != null) toReturn.add(complementaryValue);
 			}
 		}
@@ -1207,7 +1200,7 @@ public class SiaProxy {
 		Document docPlan = null;
 		Document docRequisites = null;
 		
-		Map<SubjectGroupDummy, SubjectGroupServer> mapSGDSGFinal = null; //To save the SubjectGroup (no Dummy final, getting them from the DB or updating them)
+		Map<SubjectGroupDummy, SubjectGroup> mapSGDSGFinal = null; //To save the SubjectGroup (no Dummy final, getting them from the DB or updating them)
 		
 		List<SubjectGroupDummy> subjectGroups1 = new ArrayList<SubjectGroupDummy>(); //To save the subjectGroups found in plan url
 		List<SubjectGroupDummy> subjectGroups2 = new ArrayList<SubjectGroupDummy>(); //To save the subjectGroups found in requisites url
@@ -1780,7 +1773,7 @@ public class SiaProxy {
 				career.setFreeElectionCredits(freeElectionValue);
 				
 				//Take the subjectGroup of freeElection and add the optative value This is done outside the saveSubjectGroupsAndReturnThem because it needs the freeElectionValue value
-				SubjectGroupServer subjectGroupFreeElection = subjectGroupDao.getSubjectGroupFromTypology(career, TypologyCodes.LIBRE_ELECCION);
+				SubjectGroup subjectGroupFreeElection = subjectGroupDao.getSubjectGroupFromTypology(career, TypologyCodes.LIBRE_ELECCION);
 				subjectGroupFreeElection.setOptativeCredits(freeElectionValue);
 				subjectGroupDao.save(subjectGroupFreeElection);
 				
@@ -1853,14 +1846,14 @@ public class SiaProxy {
 	 * @param career
 	 * @param mapSGDSG
 	 */
-	private static void saveSubjectsAndComplementaryValues(List<SubjectDummy> subjectsD, Career career, Map<SubjectGroupDummy, SubjectGroupServer> mapSGDSG, SubjectGroupDao subjectGroupDao, SiaResultSubjects allSiaResult, String htmlMisPlanes) {
+	private static void saveSubjectsAndComplementaryValues(List<SubjectDummy> subjectsD, Career career, Map<SubjectGroupDummy, SubjectGroup> mapSGDSG, SubjectGroupDao subjectGroupDao, SiaResultSubjects allSiaResult, String htmlMisPlanes) {
 		
 		SubjectDao subjectDao = new SubjectDao();
 		ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
 		
 		List<Subject> subjectListFinalFromLaw = new ArrayList<Subject>();
 		Map<Subject, SubjectDummy> mapSSD = new HashMap<Subject, SubjectDummy>();
-		Map<Subject, ComplementaryValueServer> mapSCV = new HashMap<Subject, ComplementaryValueServer>();
+		Map<Subject, ComplementaryValue> mapSCV = new HashMap<Subject, ComplementaryValue>();
 
 		String careerString = career.getCode();		
 		String sede = "bog";
@@ -1932,13 +1925,13 @@ public class SiaProxy {
 			String typology = (sD.getSubjectGroupDummy().isFundamental() == true ? "B" : "C");	
 			boolean mandatory = (sD.getMandatory() == true ? true : false); //because it is a Boolean and not a boolean
 			
-			SubjectGroupServer subjectGroup = mapSGDSG.get(sD.getSubjectGroupDummy()); 
+			SubjectGroup subjectGroup = mapSGDSG.get(sD.getSubjectGroupDummy()); 
 			
 			if(subjectGroup == null){
 				throw new RuntimeException("There is not such SubjectGroup for this SubjectGroupDummy in mapSGDSG, see comment in saveSubjectsAndComplementaryValues");
 			}
 			//if there is an error add if(subjectGroup != null)
-			ComplementaryValueServer cV = new ComplementaryValueServer(career, sFinal, typology, mandatory, subjectGroup);
+			ComplementaryValue cV = new ComplementaryValue(career, sFinal, typology, mandatory, subjectGroup);
 			mapSCV.put(sFinal, cV);
 			
 		}
@@ -1960,7 +1953,7 @@ public class SiaProxy {
 			List<SubjectDummy> preSD = mapSSD.get(s).getPreRequisites();
 			List<SubjectDummy> coSD = mapSSD.get(s).getCoRequisites();
 			
-			ComplementaryValueServer cV = mapSCV.get(s);
+			ComplementaryValue cV = mapSCV.get(s);
 			
 			//for each pre and co
 			addRequisitesToBothLists(cV, s, preSD, subjectListFinalFromLaw, allSiaResult, careerSiaResult, subjectDao, mapSCV, htmlMisPlanes, true, complementaryValueDao, subjectGroupDao);
@@ -1977,8 +1970,8 @@ public class SiaProxy {
 		
 		for(Subject s : subjectListFinalFromLaw)
 		{
-			ComplementaryValueServer cV = mapSCV.get(s);
-			ComplementaryValueServer cVT = complementaryValueDao.get(career, s);
+			ComplementaryValue cV = mapSCV.get(s);
+			ComplementaryValue cVT = complementaryValueDao.get(career, s);
 			
 			updateTwoComplementaryValues(cV, cVT, complementaryValueDao);
 		}
@@ -1995,7 +1988,7 @@ public class SiaProxy {
 	 * @param cVFromDb
 	 * @param complementaryValueDao
 	 */
-	private static void updateTwoComplementaryValues(ComplementaryValueServer cV, ComplementaryValueServer cVFromDb, ComplementaryValueDao complementaryValueDao) {
+	private static void updateTwoComplementaryValues(ComplementaryValue cV, ComplementaryValue cVFromDb, ComplementaryValueDao complementaryValueDao) {
 		
 		boolean isUpdated = isLastComplementaryValueUpdated(cV, cVFromDb);
 		if(isUpdated == false){
@@ -2021,7 +2014,7 @@ public class SiaProxy {
 	 * @param cVT
 	 * @return true if cVT is newer than cV, false if the contrary.
 	 */
-	private static boolean isLastComplementaryValueUpdated(ComplementaryValueServer cV, ComplementaryValueServer cVT) {
+	private static boolean isLastComplementaryValueUpdated(ComplementaryValue cV, ComplementaryValue cVT) {
 		
 		boolean toReturn = false;
 		
@@ -2149,23 +2142,23 @@ public class SiaProxy {
 		return sToReturn;
 	}
 
-	private static Map<SubjectGroupDummy, SubjectGroupServer> saveSubjectGroupsAndReturnThem(List<SubjectGroupDummy> subjectGroupsFinal, Career career, SubjectGroupDao subjectGroupDao) {
+	private static Map<SubjectGroupDummy, SubjectGroup> saveSubjectGroupsAndReturnThem(List<SubjectGroupDummy> subjectGroupsFinal, Career career, SubjectGroupDao subjectGroupDao) {
 		
 		//SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
 		
-		List<SubjectGroupServer> sGFromDB = subjectGroupDao.getList(career.getCode());
+		List<SubjectGroup> sGFromDB = subjectGroupDao.getList(career.getCode());
 		//List<SubjectGroup> sGFinal = new ArrayList<SubjectGroup>();
-		Map<SubjectGroupDummy, SubjectGroupServer> mapSGDSG = new HashMap<SubjectGroupDummy, SubjectGroupServer>();
+		Map<SubjectGroupDummy, SubjectGroup> mapSGDSG = new HashMap<SubjectGroupDummy, SubjectGroup>();
 				
 		for(SubjectGroupDummy sGD : subjectGroupsFinal){
 			
-			SubjectGroupServer sGFinal = null;
+			SubjectGroup sGFinal = null;
 			
 			boolean isInDb = false;
 			String name = SomosUNUtils.standardizeString(sGD.getName(), false, false);
-			SubjectGroupServer sG = new SubjectGroupServer( sGD.getName(), career, sGD.isFundamental(), sGD.getObligatoryCredits(), sGD.getOptativeCredits(), sGD.getError());
+			SubjectGroup sG = new SubjectGroup( sGD.getName(), career, sGD.isFundamental(), sGD.getObligatoryCredits(), sGD.getOptativeCredits(), sGD.getError());
 			
-			for(SubjectGroupServer sGDb : sGFromDB){
+			for(SubjectGroup sGDb : sGFromDB){
 				String nameDb = SomosUNUtils.standardizeString(sGDb.getName(), false, false);
 				if(nameDb.equals(name)){
 					if((sGD.isFundamental() != null && sGD.isFundamental().equals(sGDb.isFundamental()) == false) || 
@@ -2195,17 +2188,17 @@ public class SiaProxy {
 		 * TODO: SearchFor the libre elección and the Nivelación subjectGroups. if found, do nothing, otherwise create them
 		 */
 		//for libre eleccion
-		SubjectGroupServer subjectGroupIndividual = subjectGroupDao.get(SubjectGroupCodes.LIBRE_NAME, career.getCode());
+		SubjectGroup subjectGroupIndividual = subjectGroupDao.get(SubjectGroupCodes.LIBRE_NAME, career.getCode());
 		if(subjectGroupIndividual == null)
 		{
-			subjectGroupIndividual = new SubjectGroupServer(SubjectGroupCodes.LIBRE_NAME, career, false, 0, 0, false);
+			subjectGroupIndividual = new SubjectGroup(SubjectGroupCodes.LIBRE_NAME, career, false, 0, 0, false);
 			subjectGroupDao.save(subjectGroupIndividual);
 		}
 		//for nivelación
 			subjectGroupIndividual = subjectGroupDao.get(SubjectGroupCodes.NIVELACION_NAME, career.getCode());
 			if(subjectGroupIndividual == null)
 			{
-				subjectGroupIndividual = new SubjectGroupServer(SubjectGroupCodes.NIVELACION_NAME, career, false, 0, 0, false);
+				subjectGroupIndividual = new SubjectGroup(SubjectGroupCodes.NIVELACION_NAME, career, false, 0, 0, false);
 				subjectGroupDao.save(subjectGroupIndividual);
 			}
 		
@@ -2365,7 +2358,7 @@ public class SiaProxy {
 	 * @param complementaryValueDao
 	 * @param subjectGroupDao
 	 */
-	private static void addRequisitesToBothLists(ComplementaryValueServer cV, Subject s, List<SubjectDummy> listOfRequisitesSD, List<Subject> subjectListFinalFromLaw, SiaResultSubjects allSubjectsSiaResult, SiaResultSubjects careerSubjectsSiaResult, SubjectDao subjectDao, Map<Subject, ComplementaryValueServer> mapSCV, String htmlMisPlanes, boolean isPre, ComplementaryValueDao complementaryValueDao, SubjectGroupDao subjectGroupDao)
+	private static void addRequisitesToBothLists(ComplementaryValue cV, Subject s, List<SubjectDummy> listOfRequisitesSD, List<Subject> subjectListFinalFromLaw, SiaResultSubjects allSubjectsSiaResult, SiaResultSubjects careerSubjectsSiaResult, SubjectDao subjectDao, Map<Subject, ComplementaryValue> mapSCV, String htmlMisPlanes, boolean isPre, ComplementaryValueDao complementaryValueDao, SubjectGroupDao subjectGroupDao)
 	{
 		String sede = "bog";
 		for(SubjectDummy sD : listOfRequisitesSD){
@@ -2671,7 +2664,7 @@ public class SiaProxy {
 								
 								//If it has a complementaryValues the next, else create it
 								
-								ComplementaryValueServer complementaryValueFromMap = null;
+								ComplementaryValue complementaryValueFromMap = null;
 								complementaryValueFromMap = mapSCV.get(subjectTemporary);
 								
 								//this can be another intance of the same object, therefore it could not find the cV, making sure of it
@@ -2702,7 +2695,7 @@ public class SiaProxy {
 									 * Otherwise the val is null
 									 */
 									
-									SubjectGroupServer sG = null;
+									SubjectGroup sG = null;
 									if(typology.equals("P"))
 									{
 										//get the Nivelación subjectGroup
@@ -2717,7 +2710,7 @@ public class SiaProxy {
 									//create the complementaryValue and add it to the mapSCV
 									//FIXME the cV should have been created (a new one) in order to update the info once in a while, be carerful not (perhaps) to update it from somewhere else
 									//SHOULD NOT RETRIVE FROM THE DB BECAUSE THIS IS THE ONLY PLACE WHERE THE CV CAN BE CREATED ComplementaryValue cVFromDb = complementaryValueDao.getComplementaryValues(cV.getCareer(), subjectTemporary);
-									ComplementaryValueServer cVToCreate = new ComplementaryValueServer(cV.getCareer(), subjectTemporary, typology, mandatory, sG);
+									ComplementaryValue cVToCreate = new ComplementaryValue(cV.getCareer(), subjectTemporary, typology, mandatory, sG);
 									
 									//updateTwoComplementaryValues(cVToCreate, cVFromDb, complementaryValueDao);
 									
@@ -2746,7 +2739,7 @@ public class SiaProxy {
 					for(Subject subject : list){
 						if(subject.isSpecial() == false && subject.isDefault() == false)
 						{
-							ComplementaryValueServer cVT = mapSCV.get(subject);
+							ComplementaryValue cVT = mapSCV.get(subject);
 							if(cVT == null){
 								Subject subjectVeryTemporary = getSubjectFromList(subject.getName(), new ArrayList(mapSCV.keySet()), false, false); 
 								if(subjectVeryTemporary != null){										
@@ -2771,7 +2764,7 @@ public class SiaProxy {
 					for(Subject subject : list){
 						if(subject.isSpecial() == false && subject.isDefault() == false)
 						{
-							ComplementaryValueServer cVT = mapSCV.get(subject);
+							ComplementaryValue cVT = mapSCV.get(subject);
 							if(cVT == null){
 								Subject subjectVeryTemporary = getSubjectFromList(subject.getName(), new ArrayList(mapSCV.keySet()), false, false); 
 								if(subjectVeryTemporary != null){										

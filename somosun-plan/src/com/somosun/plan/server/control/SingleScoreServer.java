@@ -5,6 +5,7 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Load;
 import com.somosun.plan.shared.control.SemesterValue;
+import com.somosun.plan.shared.control.SingleScore;
 import com.somosun.plan.shared.control.controlAbstract.SingleScoreAbstract;
 
 @Entity
@@ -14,28 +15,30 @@ public class SingleScoreServer extends SingleScoreAbstract {
 	
 	public SingleScoreServer(){}
 
-	public Ref<SemesterValue> getSemesterValue() {
+	public Ref<SemesterValue> getSemesterValueRef() {
 		return semesterValue;
+	}
+	
+	public SemesterValue getSemesterValue(){
+		SemesterValue sV = null;
+		if(semesterValue != null) sV = semesterValue.get();
+		return sV;
 	}
 
 	public void setSemesterValue(Ref<SemesterValue> semesterValue) {
 		this.semesterValue = semesterValue;
 	}
-	
-	/**
-	 * This method will compare just the direct values [including id] (i.e. will compare the ref value and not the values of the entity referred)
-	 * 
-	 * @param sS
-	 * @return
-	 */
-	public boolean compare(SingleScoreServer sS){
-		boolean toReturn = false;
+
+	public SingleScore getClientInstance() {
+		SingleScore ss = new SingleScore();
 		
-		if(this.getId() == sS.getId() && this.getAmount() == sS.getAmount() && this.getAverage() == sS.getAverage() && this.getSemesterValue() == this.getSemesterValue()){
-			toReturn = true;
-		}
+		ss.setId(this.getId());
+		ss.setAmount(getAmount());
+		ss.setAverage(getAverage());
+		ss.setSemesterValue(this.getSemesterValue());
 		
-		return toReturn;
+		
+		return ss;
 	}
 	
 }

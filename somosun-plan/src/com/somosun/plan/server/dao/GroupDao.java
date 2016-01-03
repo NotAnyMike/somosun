@@ -11,15 +11,16 @@ import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.cmd.Query;
 import com.somosun.plan.server.control.GroupServer;
-import com.somosun.plan.server.control.ScoreServer;
 import com.somosun.plan.shared.control.Block;
 import com.somosun.plan.shared.control.Career;
+import com.somosun.plan.shared.control.Group;
+import com.somosun.plan.shared.control.Score;
 import com.somosun.plan.shared.control.SemesterValue;
 import com.somosun.plan.shared.control.Subject;
 import com.somosun.plan.shared.control.Teacher;
 import com.somosun.plan.shared.control.controlAbstract.GroupAbstract;
 
-public class GroupDao implements Dao<GroupServer> {
+public class GroupDao implements Dao<Group> {
 
 	static{
 		ObjectifyService.register(GroupServer.class);
@@ -81,7 +82,7 @@ public class GroupDao implements Dao<GroupServer> {
 			/*******************************************************************************/
 			
 			/******* save the entity's g *******/
-			GroupServer original = getById(g.getId());
+			GroupServer original = getServerById(g.getId());
 			if(original == null || original.compare(g) == false){
 				
 				if(original == null) original = new GroupServer();
@@ -109,27 +110,43 @@ public class GroupDao implements Dao<GroupServer> {
 		return id;
 	}
 	
-	public GroupServer getById(Long id){
-		GroupServer toReturn = null;
+	private GroupServer getServerById(Long id){
+		GroupServer group = null;
 		if(id != null){
 			Key<GroupServer> key = Key.create(GroupServer.class, id);
-			toReturn = ofy().load().key(key).now();
+			group = ofy().load().key(key).now();
 		}
-		return toReturn;
+		return group;
+	}
+	
+	public Group getById(Long id){
+		GroupServer group = getServerById(id);
+		Group groupToReturn = null;
+		if(group != null) groupToReturn = group.getClientInstance();
+		
+		return groupToReturn;
 	}
 
-	public List<GroupServer> getGroups(Subject subject) {
+	public List<Group> getGroups(Subject subject) {
+		List<GroupServer> list = null;
 		if(subject != null && subject.getId() != null){
 			SubjectDao subjectDao = new SubjectDao();
 			Ref<Subject> ref = null;
 			Subject s = subjectDao.getByCode(subject.getCode());
 			if(s != null) ref = Ref.create(s);
-			return ofy().load().type(GroupServer.class).filter("subject", ref).list();
+			list = ofy().load().type(GroupServer.class).filter("subject", ref).list();
 		}
-		else return null;
+		List<Group> toReturn = null;
+		if(list != null){
+			for(GroupServer gS : list){
+				if(toReturn == null) toReturn = new ArrayList<Group>();
+				toReturn.add(gS.getClientInstance());
+			}
+		}
+		return toReturn;
 	}
 	
-	public GroupServer get(GroupServer g){
+	public Group get(Group g){
 		return get(g.getSubject(), g.getSemesterValue(), g.getGroupNumber());
 	}
 
@@ -140,8 +157,9 @@ public class GroupDao implements Dao<GroupServer> {
 	 * @param groupNumber
 	 * @return
 	 */
-	public GroupServer get(Subject subject, SemesterValue semesterValue, Integer groupNumber){
-		GroupServer toReturn = null;
+	public Group get(Subject subject, SemesterValue semesterValue, Integer groupNumber){
+		GroupServer group = null;
+		Group groupToReturn = null;
 		if(subject != null){			
 			Query<GroupServer> query = ofy().load().type(GroupServer.class).filter("groupNumber", groupNumber);
 			if(subject.getId() != null){
@@ -165,9 +183,11 @@ public class GroupDao implements Dao<GroupServer> {
 				query = query.filter("semesterValue", "null");
 			}
 			
-			toReturn = query.first().now();
+			group = query.first().now();
 		}
-		return toReturn;
+		if(group != null) groupToReturn = group.getClientInstance();
+		
+		return groupToReturn;
 	}
 	
 	/**
@@ -177,14 +197,14 @@ public class GroupDao implements Dao<GroupServer> {
 	 * @param b
 	 * @return
 	 */
-	public GroupServer getByGroup(GroupServer group, boolean isSiaProxy) {
-		GroupServer groupToReturn = get(group);
+	public Group getByGroup(Group group, boolean isSiaProxy) {
+		Group groupToReturn = get(group);
 		if(groupToReturn == null){
 			groupToReturn = group;
 			
 			if(group.getAverageGrade() == null && group.getTeacher() != null){
 				ScoreDao scoreDao = new ScoreDao();
-				ScoreServer score = scoreDao.getBySubjectAndProfesor(group.getSubject().getId(), group.getTeacher().getIdSun());
+				Score score = scoreDao.getBySubjectAndProfesor(group.getSubject().getId(), group.getTeacher().getIdSun());
 				if(score != null && score.getTotalAverage() != null){
 					groupToReturn.setAverageGrade(score.getTotalAverage());
 				}
@@ -203,12 +223,12 @@ public class GroupDao implements Dao<GroupServer> {
 		return groupToReturn;
 	}
 
-	private void updateGroup(GroupServer group) {
+	private void updateGroup(Group group) {
 		delete(group);
 		save(group);
 	}
 
-	private boolean delete(GroupServer group) {
+	private boolean delete(Group group) {
 		boolean toReturn = false;
 		if(group != null) toReturn = delete(group.getId());
 		return toReturn;
@@ -230,13 +250,13 @@ public class GroupDao implements Dao<GroupServer> {
 		return key.getId();
 	}
 
-	public GroupServer getOrCreateGroup(Subject subject, SemesterValue semesterValue, Integer groupInt) {
-		GroupServer group = null;
+	public Group getOrCreateGroup(Subject subject, SemesterValue semesterValue, Integer groupInt) {
+		Group group = null;
 		
 		group = get(subject, semesterValue, groupInt);
 		
 		if(group == null){
-			group = new GroupServer(subject, semesterValue, groupInt);
+			group = new Group(subject, semesterValue, groupInt);
 			group.setId(generateId());
 			
 			save(group);
@@ -245,26 +265,24 @@ public class GroupDao implements Dao<GroupServer> {
 		//Adding the average grade to the group #80
 		if(group.getAverageGrade() == null && group.getTeacher() != null){
 			ScoreDao scoreDao = new ScoreDao();
-			ScoreServer score = scoreDao.getBySubjectAndProfesor(group.getSubject().getId(), group.getTeacher().getIdSun());
+			Score score = scoreDao.getBySubjectAndProfesor(group.getSubject().getId(), group.getTeacher().getIdSun());
 			if(score != null){
 				group.setAverageGrade(score.getTotalAverage());
 			}
 		}
 
-		
-		
 		return group;
 	}
 
 	public void deleteAll() {
 		List<GroupServer> list = ofy().load().type(GroupServer.class).list();
 		for(GroupServer g : list){
-			delete(g);
+			delete(g.getClientInstance());
 		}
 	}
 
-	public List<GroupServer> getGroups(Long subjectId, Long professorId) {
-		List<GroupServer> toReturn = null;
+	public List<Group> getGroups(Long subjectId, Long professorId) {
+		List<GroupServer> list = null;
 		
 		if(subjectId != null && professorId != null){			
 			SubjectDao subjectDao = new SubjectDao();
@@ -283,15 +301,29 @@ public class GroupDao implements Dao<GroupServer> {
 				
 				if(notToReturn != null && notToReturn.isEmpty() == false){
 					for(GroupServer g : notToReturn){
-						if(toReturn == null) toReturn = new ArrayList<GroupServer>();
-						toReturn.add(g);
+						if(list == null) list = new ArrayList<GroupServer>();
+						list.add(g);
 					}
 				}
 				
 			}
 		}
 		
+		List<Group> toReturn = null;
+		if(list != null){
+			for(GroupServer gS : list){
+				if(toReturn == null) toReturn = new ArrayList<Group>();
+				toReturn.add(gS.getClientInstance());
+			}
+		}
 		
+		return toReturn;
+	}
+
+	protected Ref<GroupServer> getRef(Long id) {
+		GroupServer g = getServerById(id);
+		Ref<GroupServer> toReturn = null;
+		if(g != null) toReturn = Ref.create(g);
 		return toReturn;
 	}
 	

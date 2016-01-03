@@ -20,7 +20,7 @@ public abstract class PlanAbstract implements Serializable {
     public abstract Career getCareer();
     public abstract void setCareer(Career c);
     public abstract List<Semester> getSemesters();
-    public abstract void setSemesters(List<Semester> semesters);
+//    public abstract void setSemesters(List<Semester> semesters);
     public abstract void setUser(Student s);
     public abstract Student getUser();
 

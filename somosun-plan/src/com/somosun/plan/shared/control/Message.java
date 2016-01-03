@@ -2,9 +2,9 @@ package com.somosun.plan.shared.control;
 
 import java.io.Serializable;
 
-import com.somosun.plan.shared.control.controlAbstract.MessageIncomplete;
+import com.somosun.plan.shared.control.controlAbstract.MessageAbstract;
 
-public class Message extends MessageIncomplete implements Serializable {
+public class Message extends MessageAbstract implements Serializable {
 
 	private Student student;
 	

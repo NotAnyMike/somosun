@@ -9,14 +9,15 @@ import com.googlecode.objectify.Ref;
 import com.somosun.plan.server.control.SingleScoreServer;
 import com.somosun.plan.shared.control.SemesterValue;
 import com.somosun.plan.shared.control.SingleScore;
+import com.somosun.plan.shared.control.controlAbstract.SingleScoreAbstract;
 
-public class SingleScoreDao implements Dao<SingleScoreServer> {
+public class SingleScoreDao implements Dao<SingleScore> {
 
 	static{
 		ObjectifyService.register(SingleScoreServer.class);
 	}
 	
-	public Long save(SingleScoreServer singleScore) {
+	public Long save(SingleScoreAbstract singleScore) {
 		Long toReturn = null;
 		
 		if(singleScore != null){
@@ -24,13 +25,13 @@ public class SingleScoreDao implements Dao<SingleScoreServer> {
 			
 			if(singleScore.getSemesterValue() != null){
 				SemesterValueDao sVDao = new SemesterValueDao();
-				if(singleScore.getSemesterValue().get().getId() == null) {
-					singleScore.getSemesterValue().get().setId(sVDao.generateId());
+				if(singleScore.getSemesterValue().getId() == null) {
+					singleScore.getSemesterValue().setId(sVDao.generateId());
 				}
-				sVDao.save(singleScore.getSemesterValue().get());
+				sVDao.save(singleScore.getSemesterValue());
 			}
 			
-			SingleScoreServer singleScoreOriginal = getById(singleScore.getId());
+			SingleScoreServer singleScoreOriginal = getServerById(singleScore.getId());
 			if(singleScoreOriginal.compare(singleScore) == false){
 				ofy().save().entity(singleScore).now();
 			}
@@ -63,15 +64,22 @@ public class SingleScoreDao implements Dao<SingleScoreServer> {
 		return toReturn;
 	}
 
-	@Override
-	public SingleScoreServer getById(Long id) {
-		SingleScoreServer toReturn = null;
+	public SingleScoreServer getServerById(Long id) {
+		SingleScoreServer sS = null;
 		
 		if(id != null){
 			Key<SingleScoreServer> key = Key.create(SingleScoreServer.class, id);
-			toReturn = (SingleScoreServer) ofy().load().key(key).now();
+			sS = (SingleScoreServer) ofy().load().key(key).now();
 		}
 		
+		return sS;
+	}
+	
+	@Override
+	public SingleScore getById(Long id){
+		SingleScoreServer sSS = getServerById(id);
+		SingleScore toReturn = null;
+		if(sSS != null) toReturn = sSS.getClientInstance();
 		return toReturn;
 	}
 

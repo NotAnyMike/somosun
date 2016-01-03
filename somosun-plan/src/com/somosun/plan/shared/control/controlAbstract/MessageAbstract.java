@@ -7,7 +7,7 @@ import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import com.somosun.plan.shared.values.MessageTypeCodes;
 
-public abstract class MessageIncomplete implements Serializable{
+public abstract class MessageAbstract implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	@Id private Long id = null; 
@@ -17,7 +17,7 @@ public abstract class MessageIncomplete implements Serializable{
 	private String message;
 	@Index private Date date;
 	
-	public MessageIncomplete(){
+	public MessageAbstract(){
 		setName(null);
 		setTopic(null);
 		setType(MessageTypeCodes.SUGGESTION);
@@ -25,7 +25,7 @@ public abstract class MessageIncomplete implements Serializable{
 		setDate(new Date());
 	}
 
-	public MessageIncomplete(String name, String topic, String type, String message) {
+	public MessageAbstract(String name, String topic, String type, String message) {
 		setName(name);
 		this.setTopic(topic);
 		this.setType(type);

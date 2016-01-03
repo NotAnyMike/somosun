@@ -2,11 +2,13 @@ package com.somosun.plan.server.dao;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
+import com.googlecode.objectify.Ref;
 import com.somosun.plan.server.control.ComplementaryValueServer;
 import com.somosun.plan.server.control.GroupServer;
 import com.somosun.plan.server.control.SemesterServer;
@@ -14,11 +16,12 @@ import com.somosun.plan.server.control.SubjectGroupServer;
 import com.somosun.plan.server.control.SubjectValueServer;
 import com.somosun.plan.shared.control.Career;
 import com.somosun.plan.shared.control.ComplementaryValue;
+import com.somosun.plan.shared.control.Semester;
 import com.somosun.plan.shared.control.Subject;
 import com.somosun.plan.shared.control.SubjectValue;
 import com.somosun.plan.shared.control.controlAbstract.SemesterAbstract;
 
-public class SemesterDao implements Dao<SemesterServer> {
+public class SemesterDao implements Dao<Semester> {
 	
 	static{
 		ObjectifyService.register(SemesterServer.class);
@@ -57,14 +60,26 @@ public class SemesterDao implements Dao<SemesterServer> {
 			/*******************************************************************************/
 			
 			/******* save the entity's plan *******/
-			SemesterServer original = getById(s.getId());
+			SemesterServer original = getServerById(s.getId());
 			if(original == null || original.compare(s) == false){
 				
 				if(original == null) original = new SemesterServer();
 				
+				SubjectValueDao sVDao = new SubjectValueDao();
+				
 				original.setId(s.getId());
 				original.setSemesterValue(s.getSemesterValue());
-				original.setSubjects(s.getSubjects());
+				List<Ref<SubjectValueServer>> subjects = null;
+				if(s.getSubjects() != null){
+					for(SubjectValue sV : s.getSubjects()){
+						if(subjects == null) subjects = new ArrayList<Ref<SubjectValueServer>>();
+						if(sV.getId() != null){
+							Ref<SubjectValueServer> ref = sVDao.getRef(sV.getId());
+							if(ref != null) subjects.add(ref);
+						}
+					}
+				}
+				original.setSubjectValuesListRef(subjects);
 				
 				//save original
 				ofy().defer().save().entity(original);
@@ -134,23 +149,45 @@ public class SemesterDao implements Dao<SemesterServer> {
 	}
 
 	public void deleteAllSemesters() {
-		List<SemesterServer> list = getAllSemesters();
-		for(SemesterServer s : list){
+		List<Semester> list = getAllSemesters();
+		for(Semester s : list){
 			delete(s.getId());
 		}
 	}
 
-	private List<SemesterServer> getAllSemesters() {
-		return ofy().load().type(SemesterServer.class).list(); 
+	private List<Semester> getAllSemesters() {
+		List<SemesterServer> list = ofy().load().type(SemesterServer.class).list();
+		List<Semester> toReturn = null;
+		if(list != null){
+			for(SemesterServer sS : list){
+				if(toReturn == null) toReturn = new ArrayList<Semester>();
+				toReturn.add(sS.getClientInstance());
+			}
+		}
+		return toReturn; 
 	}
 
-	public SemesterServer getById(Long id){
-		SemesterServer toReturn = null;
+	private SemesterServer getServerById(Long id){
+		SemesterServer semester = null;
+		Semester toReturn = null;
 		if(id != null){
 			Key<SemesterServer> key = Key.create(SemesterServer.class, id);
-			toReturn = ofy().load().key(key).now();
+			semester = ofy().load().key(key).now();
 		}
+		return semester;
+	}
+	
+	public Semester getById(Long id){
+		Semester toReturn = null;
+		SemesterServer sS = getServerById(id);
+		if(sS != null) toReturn = sS.getClientInstance();
 		return toReturn;
+	}
+
+	protected Ref<SemesterServer> getRef(Long id) {
+		SemesterServer s = getServerById(id);
+		Ref<SemesterServer> ref = (s == null ? null : Ref.create(s));
+		return ref;
 	}
 	
 }

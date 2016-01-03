@@ -1,13 +1,14 @@
 package com.somosun.plan.server.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
+import com.googlecode.objectify.Ref;
 import com.somosun.plan.server.control.ComplementaryValueServer;
 import com.somosun.plan.server.control.GroupServer;
-import com.somosun.plan.server.control.PlanServer;
 import com.somosun.plan.server.control.SubjectGroupServer;
 import com.somosun.plan.server.control.SubjectValueServer;
 import com.somosun.plan.server.serviceImpl.LoginServiceImpl;
@@ -17,11 +18,12 @@ import com.somosun.plan.shared.control.Career;
 import com.somosun.plan.shared.control.ComplementaryValue;
 import com.somosun.plan.shared.control.Group;
 import com.somosun.plan.shared.control.Student;
+import com.somosun.plan.shared.control.SubjectValue;
 import com.somosun.plan.shared.control.controlAbstract.SubjectValueAbstract;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
-public class SubjectValueDao implements Dao<SubjectValueServer> {
+public class SubjectValueDao implements Dao<SubjectValue> {
 	
 	static{
 		ObjectifyService.register(SubjectValueServer.class);
@@ -32,7 +34,7 @@ public class SubjectValueDao implements Dao<SubjectValueServer> {
 		ObjectifyService.register(Block.class);
 	}
 	
-	public SubjectValueServer getById(Long id){
+	private SubjectValueServer getServerById(Long id){
 		SubjectValueServer toReturn = null;
 		if(id != null){
 			Key<SubjectValueServer> key = Key.create(SubjectValueServer.class, id);
@@ -40,7 +42,15 @@ public class SubjectValueDao implements Dao<SubjectValueServer> {
 		}
 		return toReturn;
 	}
-
+	
+	@Override
+	public SubjectValue getById(Long id) {
+		SubjectValueServer sVS = getServerById(id);
+		SubjectValue toReturn = null;
+		if(sVS != null) toReturn = sVS.getClientInstance();
+		return toReturn;
+	}
+	
 //	public Long save(SubjectValueServer sV){
 //		Long toReturn = null;
 //		if(sV != null){
@@ -94,16 +104,19 @@ public class SubjectValueDao implements Dao<SubjectValueServer> {
 			/******************************/
 			
 			/******* save the entity's plan *******/
-			SubjectValueServer original = getById(sV.getId());
+			SubjectValueServer original = getServerById(sV.getId());
 			if(original == null || original.compare(sV) == false){
 				
 				if(original == null) original = new SubjectValueServer();
 				
+				ComplementaryValueDao cVDao = new ComplementaryValueDao();
+				GroupDao gDao = new GroupDao();
+				
 				original.setId(sV.getId());
 				original.setGrade(sV.getGrade());
 				original.setTaken(sV.isTaken());
-				original.setComplementaryValue(sV.getComplementaryValue());
-				original.setGroup(sV.getGroup());
+				original.setComplementaryValueRef(cVDao.getRef(sV.getComplementaryValue().getId()));
+				original.setGroupRef((sV.getGroup() == null ? null : gDao.getRef(sV.getGroup().getId())));
 				
 				//save original
 				ofy().defer().save().entity(original);
@@ -124,8 +137,14 @@ public class SubjectValueDao implements Dao<SubjectValueServer> {
 	 * @param g
 	 * @return
 	 */
-	public SubjectValueServer getByGroup(Group g){
-		return (SubjectValueServer) ofy().load().type(SubjectValueServer.class).filter("group", g).first().now();
+	public SubjectValue getByGroup(Group g){
+		return toSubjectValue((SubjectValueServer) ofy().load().type(SubjectValueServer.class).filter("group", g).first().now());
+	}
+
+	private SubjectValue toSubjectValue(SubjectValueServer sVS) {
+		SubjectValue toReturn = null;
+		if(sVS != null) toReturn = sVS.getClientInstance();
+		return toReturn;
 	}
 
 	public Long generateId() {
@@ -145,13 +164,28 @@ public class SubjectValueDao implements Dao<SubjectValueServer> {
 	}
 
 	public void deleteAllSubjectValues() {
-		List<SubjectValueServer> list = getAllSubjectValues();
-		for(SubjectValueServer sV : list){
+		List<SubjectValue> list = getAllSubjectValues();
+		for(SubjectValue sV : list){
 			delete(sV.getId());
 		}
 	}
 
-	private List<SubjectValueServer> getAllSubjectValues() {
-		return ofy().load().type(SubjectValueServer.class).list();
+	private List<SubjectValue> getAllSubjectValues() {
+		List<SubjectValueServer> list = ofy().load().type(SubjectValueServer.class).list();
+		List<SubjectValue> toReturn = null;
+		if(list != null){
+			for(SubjectValueServer sVS : list){
+				if(toReturn == null) toReturn = new ArrayList<SubjectValue>();
+				toReturn.add(sVS.getClientInstance());
+			}
+		}
+		return toReturn;
 	}
+
+	protected Ref<SubjectValueServer> getRef(Long id) {
+		SubjectValueServer sV = getServerById(id);
+		Ref<SubjectValueServer> ref = (sV == null ? null : Ref.create(sV));
+		return ref;
+	}
+
 }

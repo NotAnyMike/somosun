@@ -447,7 +447,7 @@ ComplementaryValueView.Presenter{
 						semesterToAddId.get(x).setId(result.getSemestersIds().get(x));
 					}
 					for(int x = 0; x < subjectValueToAddId.size(); x++){
-						GWT.debugger();
+
 						subjectValueToAddId.get(x).setId(result.getSubjectValuesIds().get(x));
 					}
 					for(int x = 0; x < complementaryValueToAddId.size(); x++){

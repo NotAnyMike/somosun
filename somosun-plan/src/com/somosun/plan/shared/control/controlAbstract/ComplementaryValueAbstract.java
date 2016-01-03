@@ -45,7 +45,7 @@ public abstract class ComplementaryValueAbstract implements Serializable{
 	abstract public List<Subject> getListPrerequisitesOf();
 	abstract public void setListPrerequisitesOf(List<Subject> listPosrequisitesOf);
 	abstract public SubjectGroup getSubjectGroup();
-	abstract public void setSubjectGroup(SubjectGroup subjectGroup);
+//	abstract public void setSubjectGroup(SubjectGroup subjectGroup);
 	abstract public List<List<Subject>> getCorequisitesLists();
 	abstract public List<List<Subject>> getPrerequisitesLists();
 	abstract public String getPrerequisitesString();

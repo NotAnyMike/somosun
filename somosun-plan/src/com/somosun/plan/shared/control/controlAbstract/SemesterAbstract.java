@@ -18,9 +18,9 @@ public abstract class SemesterAbstract implements Serializable {
     abstract public List<SubjectValue> getSubjects();
     abstract public SemesterValue getSemesterValue();
     abstract public void setSemesterValue(SemesterValue semesterValue);
-    abstract public void setSubjects(List<SubjectValue> subjects);
-    abstract public void deleteSubject(SubjectValue subjectValues);
-    abstract public void addSubject(SubjectValue subjectValues);
+//    abstract public void setSubjects(List<SubjectValue> subjects);
+//    abstract public void deleteSubject(SubjectValue subjectValues);
+//    abstract public void addSubject(SubjectValue subjectValues);
 
 	public Long getId() {
 		return id;

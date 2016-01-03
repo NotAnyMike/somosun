@@ -12,16 +12,17 @@ import com.googlecode.objectify.VoidWork;
 import com.somosun.plan.server.control.ComplementaryValueServer;
 import com.somosun.plan.server.control.GroupServer;
 import com.somosun.plan.server.control.SubjectGroupServer;
-import com.somosun.plan.server.control.SubjectValueServer;
 import com.somosun.plan.shared.SomosUNUtils;
 import com.somosun.plan.shared.control.Block;
 import com.somosun.plan.shared.control.Career;
+import com.somosun.plan.shared.control.ComplementaryValue;
 import com.somosun.plan.shared.control.Subject;
+import com.somosun.plan.shared.control.SubjectGroup;
 import com.somosun.plan.shared.control.controlAbstract.ComplementaryValueAbstract;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
-public class ComplementaryValueDao implements Dao<ComplementaryValueServer> {
+public class ComplementaryValueDao implements Dao<ComplementaryValue> {
 
 	private static final Logger log = Logger.getLogger("ComplementaryValueDao");
 	
@@ -76,17 +77,19 @@ public class ComplementaryValueDao implements Dao<ComplementaryValueServer> {
 			/******************************/
 			
 			/******* save the entity's plan *******/
-			ComplementaryValueServer original = getById(cV.getId());
+			ComplementaryValueServer original = getServerById(cV.getId());
 			if(original == null || original.compare(cV) == false){
 				
 				if(original == null) original = new ComplementaryValueServer();
+				
+				SubjectGroupDao sGDao = new SubjectGroupDao();
 				
 				original.setId(cV.getId());
 				original.setTypology(cV.getTypology());
 				original.setMandatory(cV.isMandatory());
 				original.setCareer(cV.getCareer());
 				original.setSubject(cV.getSubject());
-				original.setSubjectGroup(cV.getSubjectGroup());
+				original.setSubjectGroupRef((cV.getSubjectGroup() == null ? null : sGDao.getRef(cV.getSubjectGroup().getId())));
 				original.setListPrerequisites(cV.getPrerequisitesLists());
 				original.setListCorequisites(cV.getCorequisitesLists());
 				original.setListPrerequisitesOf(cV.getListPrerequisitesOf());
@@ -142,13 +145,14 @@ public class ComplementaryValueDao implements Dao<ComplementaryValueServer> {
 //		return toReturn;
 //	}
 	
-	public ComplementaryValueServer get(Career career, Subject subject){
+	public ComplementaryValue get(Career career, Subject subject){
 		return get(career.getCode(), subject.getCode());
 	}
 	
-	public void deleteComplementaryValues(ComplementaryValueServer cV){
+	public void deleteComplementaryValues(ComplementaryValue cV){
 		if(cV != null)
 		{
+			//FIXME
 			ofy().delete().entity(cV).now();			
 		}
 	}
@@ -168,13 +172,21 @@ public class ComplementaryValueDao implements Dao<ComplementaryValueServer> {
 		
 	}
 
-	public List<ComplementaryValueServer> getComplementaryValues(String code) {
-		return ofy().load().type(ComplementaryValueServer.class).filter("career.code", code).list();
+	public List<ComplementaryValue> getComplementaryValues(String code) {
+		List<ComplementaryValueServer> list = ofy().load().type(ComplementaryValueServer.class).filter("career.code", code).list();
+		List<ComplementaryValue> listToReturn = null;
+		if(list != null){
+			for(ComplementaryValueServer cVS : list){
+				if(listToReturn == null) listToReturn = new ArrayList<ComplementaryValue>();
+				listToReturn.add(cVS.getClientInstance());
+			}
+		}
+		return listToReturn;
 	}
 
-	public ComplementaryValueServer get(String careerCode, String subjectCode) {
+	public ComplementaryValue get(String careerCode, String subjectCode) {
 		
-		ComplementaryValueServer toReturn = null;
+		ComplementaryValue complementaryValue = null;
 		if(subjectCode != null && careerCode != null){
 			
 			CareerDao careerDao = new CareerDao();
@@ -187,41 +199,43 @@ public class ComplementaryValueDao implements Dao<ComplementaryValueServer> {
 			Subject subject = subjectDao.getByCode(subjectCode);
 			if(subject != null) subjectRef = Ref.create(subject);
 			
-			toReturn = (ComplementaryValueServer) ofy().load().type(ComplementaryValueServer.class).filter("career", careerRef).filter("subject", subjectRef).first().now();
-			if(toReturn != null){
-				if(toReturn.getSubject() != null) {
+			ComplementaryValueServer complementaryValueServer = (ComplementaryValueServer) ofy().load().type(ComplementaryValueServer.class).filter("career", careerRef).filter("subject", subjectRef).first().now();
+			
+			if(complementaryValueServer != null){
+				complementaryValue = complementaryValueServer.getClientInstance();
+				if(complementaryValue.getSubject() != null) {
 					
-					Subject subjectUpdated = subjectDao.getById(toReturn.getSubject().getId());
+					Subject subjectUpdated = subjectDao.getById(complementaryValue.getSubject().getId());
 					if(subjectUpdated != null){
-						toReturn.setSubject(subjectUpdated);						
+						complementaryValue.setSubject(subjectUpdated);						
 					}else{						
-						toReturn.setSubject(subjectDao.getByCode(toReturn.getSubject().getCode()));
+						complementaryValue.setSubject(subjectDao.getByCode(complementaryValue.getSubject().getCode()));
 					}
 					
 				}
-				if(toReturn.getSubjectGroup() != null){
+				if(complementaryValue.getSubjectGroup() != null){
 					SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
 					
-					SubjectGroupServer subjectGroupUpdated = subjectGroupDao.getById(toReturn.getSubjectGroup().getId());
+					SubjectGroup subjectGroupUpdated = subjectGroupDao.getById(complementaryValue.getSubjectGroup().getId());
 					if(subjectGroupUpdated != null){
-						toReturn.setSubjectGroup(subjectGroupUpdated.getClientInstance());						
+						complementaryValue.setSubjectGroup(subjectGroupUpdated);						
 					}else{						
-						SubjectGroupServer sGST = subjectGroupDao.get(toReturn.getSubjectGroup().getName(), toReturn.getSubjectGroup().isFundamental(), toReturn.getCareer().getCode()); 
-						toReturn.setSubjectGroup((sGST == null ? null : sGST.getClientInstance()));
+						SubjectGroup sGST = subjectGroupDao.get(complementaryValue.getSubjectGroup().getName(), complementaryValue.getSubjectGroup().isFundamental(), complementaryValue.getCareer().getCode()); 
+						complementaryValue.setSubjectGroup((sGST == null ? null : sGST));
 					}
 					
 					
 				}
-				if(toReturn.getSubject() != null && toReturn.getSubject().getId() != null){
+				if(complementaryValue.getSubject() != null && complementaryValue.getSubject().getId() != null){
 					//Update the new values
-					Subject s = subjectDao.getById(toReturn.getSubject().getId());
-					toReturn.setSubject(s);
+					Subject s = subjectDao.getById(complementaryValue.getSubject().getId());
+					complementaryValue.setSubject(s);
 				}
-				save(toReturn);
+				complementaryValue.setId(save(complementaryValue));
 			}
 		}
 		
-		return toReturn;
+		return complementaryValue;
 		
 	}
 
@@ -232,10 +246,10 @@ public class ComplementaryValueDao implements Dao<ComplementaryValueServer> {
 			SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
 			Career c = careerDao.getByCode(careerCode);
 			Subject s = subjectDao.getDummySubjectByCode(SomosUNUtils.LIBRE_CODE);
-			SubjectGroupServer sG = subjectGroupDao.get(SomosUNUtils.LIBRE_CODE, careerCode);
+			SubjectGroup sG = subjectGroupDao.get(SomosUNUtils.LIBRE_CODE, careerCode);
 			
 			if(s != null && c != null && sG != null){				
-				ComplementaryValueServer cVT = new ComplementaryValueServer(c, s, "l", false, sG);
+				ComplementaryValue cVT = new ComplementaryValue(c, s, "l", false, sG);
 				ComplementaryValueDao cVDao = new ComplementaryValueDao();
 				cVDao.save(cVT);
 			}
@@ -251,10 +265,10 @@ public class ComplementaryValueDao implements Dao<ComplementaryValueServer> {
 			SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
 			Career c = careerDao.getByCode(careerCode);
 			Subject s = subjectDao.getDummySubjectByCode(SomosUNUtils.OPTATIVA_CODE);
-			SubjectGroupServer sG = subjectGroupDao.getById(subjectGroupId);
+			SubjectGroup sG = subjectGroupDao.getById(subjectGroupId);
 			
 			if(s != null && c != null && sG != null){				
-				ComplementaryValueServer cVT = new ComplementaryValueServer(c, s, (sG.isFundamental() == true ? "b" : "p"), false, sG);
+				ComplementaryValue cVT = new ComplementaryValue(c, s, (sG.isFundamental() == true ? "b" : "p"), false, sG);
 				ComplementaryValueDao cVDao = new ComplementaryValueDao();
 				cVDao.save(cVT);
 			}
@@ -263,16 +277,23 @@ public class ComplementaryValueDao implements Dao<ComplementaryValueServer> {
 		
 	}
 
-	public List<ComplementaryValueServer> getMandatoryComplementaryValues(String careerCode) {
+	public List<ComplementaryValue> getMandatoryComplementaryValues(String careerCode) {
 		
 		List<ComplementaryValueServer> list = null;
+		List<ComplementaryValue> toReturn = null;
 		CareerDao careerDao = new CareerDao();
 		Career career = careerDao.getByCode(careerCode);
 		Ref<Career> ref = null;
 		if(career != null) ref = Ref.create(career);
 		list = ofy().load().type(ComplementaryValueServer.class).filter("career", ref).filter("mandatory", true).list();
-				
-		return list;
+		if(list != null){
+			for(ComplementaryValueServer cVS : list){
+				if(toReturn == null) toReturn = new ArrayList<ComplementaryValue>();
+				toReturn.add(cVS.getClientInstance());
+			}
+		}
+		
+		return toReturn;
 	}
 
 	public boolean delete(Long id) {
@@ -317,14 +338,27 @@ public class ComplementaryValueDao implements Dao<ComplementaryValueServer> {
 		return ofy().load().type(ComplementaryValueServer.class).filter("career", ref).list();
 	}
 
-	@Override
-	public ComplementaryValueServer getById(Long id) {
+	private ComplementaryValueServer getServerById(Long id) {
 		ComplementaryValueServer toReturn = null;
 		if(id!=null){
 			Key<ComplementaryValueServer> key = Key.create(ComplementaryValueServer.class, id);
 			toReturn = (ComplementaryValueServer) ofy().load().key(key).now();
 		}
 		return toReturn;
+	}
+	
+	public ComplementaryValue getById(Long id){
+		ComplementaryValueServer cVS = getServerById(id);
+		ComplementaryValue toReturn = null;
+		if(cVS != null) toReturn = cVS.getClientInstance();
+		return toReturn;
+	}
+
+	protected Ref<ComplementaryValueServer> getRef(Long id) {
+		Ref<ComplementaryValueServer> ref = null;
+		ComplementaryValueServer cVS = getServerById(id);
+		if(cVS != null) ref = Ref.create(cVS);
+		return ref;
 	}
 
 	

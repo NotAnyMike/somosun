@@ -78,13 +78,10 @@ public class SemesterServer extends SemesterAbstract{
 		}
 	}
 
-	@Override
-	public void setSubjects(List<SubjectValue> subjects) {
+	public void setSubjects(List<SubjectValueServer> subjects) {
 		List<Ref<SubjectValueServer>> list = new ArrayList<Ref<SubjectValueServer>>();
-		for(SubjectValue subjectValue : subjects){
-			if(subjectValue.getId() != null){
-				SubjectValueDao subjectValueDao = new SubjectValueDao();
-				SubjectValueServer subjectValueServer = subjectValueDao.getById(subjectValue.getId());
+		for(SubjectValueServer subjectValueServer : subjects){
+			if(subjectValueServer.getId() != null){
 				if(subjectValueServer != null){					
 					list.add(Ref.create(subjectValueServer));
 				}
@@ -103,29 +100,29 @@ public class SemesterServer extends SemesterAbstract{
 		setSubjectValuesListRef(list);
 	}
 
-	@Override
-	public void deleteSubject(SubjectValue subjectValue) {
-		List<Ref<SubjectValueServer>> listToRemove = new ArrayList<Ref<SubjectValueServer>>();
-		if(subjectValue != null && subjectValue.getId() != null){
-			for(Ref<SubjectValueServer> subjectValueRef : subjectValuesList){
-				if(subjectValueRef.get().getId().equals(subjectValue.getId()) == true){
-					listToRemove.add(subjectValueRef);
-				}
-			}
-		}
-		subjectValuesList.removeAll(listToRemove);
-	}
+//	@Override
+//	public void deleteSubject(SubjectValue subjectValue) {
+//		List<Ref<SubjectValueServer>> listToRemove = new ArrayList<Ref<SubjectValueServer>>();
+//		if(subjectValue != null && subjectValue.getId() != null){
+//			for(Ref<SubjectValueServer> subjectValueRef : subjectValuesList){
+//				if(subjectValueRef.get().getId().equals(subjectValue.getId()) == true){
+//					listToRemove.add(subjectValueRef);
+//				}
+//			}
+//		}
+//		subjectValuesList.removeAll(listToRemove);
+//	}
 
-	@Override
-	public void addSubject(SubjectValue subjectValue) {
-		if(subjectValue != null && subjectValue.getId() != null){
-			SubjectValueDao subjectValueDao = new SubjectValueDao();
-			SubjectValueServer subjectValueServer = subjectValueDao.getById(subjectValue.getId());
-			if(subjectValueServer != null){				
-				subjectValuesList.add(Ref.create(subjectValueServer));
-			}
-		}
-	}
+//	@Override
+//	public void addSubject(SubjectValue subjectValue) {
+//		if(subjectValue != null && subjectValue.getId() != null){
+//			SubjectValueDao subjectValueDao = new SubjectValueDao();
+//			SubjectValueServer subjectValueServer = subjectValueDao.getById(subjectValue.getId());
+//			if(subjectValueServer != null){				
+//				subjectValuesList.add(Ref.create(subjectValueServer));
+//			}
+//		}
+//	}
 	
 	public void addSubjectServer(SubjectValueServer subjectValue) {
 		if(subjectValue != null && subjectValue.getId() != null){

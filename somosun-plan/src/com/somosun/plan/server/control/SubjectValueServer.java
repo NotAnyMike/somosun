@@ -76,12 +76,9 @@ public class SubjectValueServer extends SubjectValueAbstract {
 		return toReturn;
 	}
 
-	@Override
-	public void setGroup(Group group) {
+	public void setGroup(GroupServer group) {
 		if(group != null && group.getId()!= null){
-			GroupDao gDao = new GroupDao();
-			GroupServer gS = gDao.getById(group.getId());
-			setGroupRef((gS == null ? null : Ref.create(gS)));
+			setGroupRef((group == null ? null : Ref.create(group)));
 		}
 	}
 
@@ -92,14 +89,9 @@ public class SubjectValueServer extends SubjectValueAbstract {
 		return toReturn;
 	}
 
-	@Override
-	public void setComplementaryValue(ComplementaryValue complementaryValue) {
+	public void setComplementaryValue(ComplementaryValueServer complementaryValue) {
 		if(complementaryValue != null && complementaryValue.getId() != null){
-			ComplementaryValueDao complementaryValueDao = new ComplementaryValueDao();
-			ComplementaryValueServer cV = complementaryValueDao.getById(complementaryValue.getId());
-			if(cV != null){
-				setComplementaryValueRef(Ref.create(cV));
-			}				
+				setComplementaryValueRef(Ref.create(complementaryValue));				
 		}
 		
 	}

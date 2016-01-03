@@ -1,5 +1,6 @@
 package com.somosun.plan.server.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -7,7 +8,6 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.Ref;
-import com.somosun.plan.server.control.PlanServer;
 import com.somosun.plan.server.control.SubjectGroupServer;
 import com.somosun.plan.server.serviceImpl.LoginServiceImpl;
 import com.somosun.plan.shared.LoginInfo;
@@ -15,13 +15,14 @@ import com.somosun.plan.shared.SomosUNUtils;
 import com.somosun.plan.shared.control.Career;
 import com.somosun.plan.shared.control.Semester;
 import com.somosun.plan.shared.control.Student;
+import com.somosun.plan.shared.control.SubjectGroup;
 import com.somosun.plan.shared.control.controlAbstract.SubjectGroupAbstract;
 import com.somosun.plan.shared.values.SubjectGroupCodes;
 import com.somosun.plan.shared.values.TypologyCodes;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
-public class SubjectGroupDao implements Dao<SubjectGroupServer> {
+public class SubjectGroupDao implements Dao<SubjectGroup> {
 
 	private static final Logger log = Logger.getLogger("SubjectGroupDao");
 	
@@ -48,7 +49,7 @@ public class SubjectGroupDao implements Dao<SubjectGroupServer> {
 			/*******************************************************************************/
 			
 			/******* save the entity's plan *******/
-			SubjectGroupServer original = getById(sG.getId());
+			SubjectGroupServer original = getServerById(sG.getId());
 			if(original == null || original.compare(sG) == false){
 				
 				if(original == null) original = new SubjectGroupServer();
@@ -85,34 +86,53 @@ public class SubjectGroupDao implements Dao<SubjectGroupServer> {
 //		return toReturn;
 //	}
 	
-	public SubjectGroupServer get(String name, String careerCode){
+	public SubjectGroup get(String name, String careerCode){
 		CareerDao cDao = new CareerDao();
 		Career c = cDao.getByCode(careerCode);
 		Ref<Career> ref = null;
 		if(c != null) ref = Ref.create(c);
-		return (SubjectGroupServer) ofy().load().type(SubjectGroupServer.class).filter("name", name).filter("career", ref).first().now();
+		SubjectGroupServer sGS =(SubjectGroupServer) ofy().load().type(SubjectGroupServer.class).filter("name", name).filter("career", ref).first().now();
+		SubjectGroup toReturn = null;
+		if(sGS != null) toReturn = sGS.getClientInstance();
+		return toReturn;
 	}
 	
-	public SubjectGroupServer get(String name, boolean isFundamental, String careerCode){
+	public SubjectGroup get(String name, boolean isFundamental, String careerCode){
 		CareerDao cDao = new CareerDao();
 		Career c = cDao.getByCode(careerCode);
 		Ref<Career> ref = null;
 		if(c != null) ref = Ref.create(c);
-		return (SubjectGroupServer) ofy().load().type(SubjectGroupServer.class).filter("name", name).filter("career", ref).filter("fundamental", isFundamental).first().now();
+		SubjectGroupServer sGS = (SubjectGroupServer) ofy().load().type(SubjectGroupServer.class).filter("name", name).filter("career", ref).filter("fundamental", isFundamental).first().now(); 
+		SubjectGroup toReturn = null;
+		if(sGS != null) toReturn = sGS.getClientInstance();
+		return toReturn;
 	}
 	
-	public List<SubjectGroupServer> getList(String careerCode){
+	public List<SubjectGroup> getList(String careerCode){
 		CareerDao cDao = new CareerDao();
 		Career c = cDao.getByCode(careerCode);
 		Ref<Career> ref = null;
 		if(c != null) ref = Ref.create(c);
-		List<SubjectGroupServer> toReturn = ofy().load().type(SubjectGroupServer.class).filter("career", ref).list();
+		List<SubjectGroupServer> list = ofy().load().type(SubjectGroupServer.class).filter("career", ref).list();
+		List<SubjectGroup> toReturn = toClientList(list);
+		
+		return toReturn;
+	}
+	
+	private List<SubjectGroup> toClientList(List<SubjectGroupServer> list){
+		List<SubjectGroup> toReturn = null;
+		if(list != null){
+			for(SubjectGroupServer sGS : list){
+				if(toReturn == null) toReturn = new ArrayList<SubjectGroup>();
+				toReturn.add(sGS.getClientInstance());
+			}
+		}
 		return toReturn;
 	}
 	
 	public boolean delete(String name, boolean isFundamental, String careerCode){
 		boolean toReturn = false;
-		SubjectGroupServer toDelete = get(name, isFundamental, careerCode);
+		SubjectGroup toDelete = get(name, isFundamental, careerCode);
 		if(toDelete != null)
 		{
 			toReturn = delete(toDelete.getId());
@@ -145,7 +165,7 @@ public class SubjectGroupDao implements Dao<SubjectGroupServer> {
 		
 	}
 
-	public SubjectGroupServer getById(String id) {
+	private SubjectGroupServer getServerById(Long id) {
 		SubjectGroupServer sG = null;
 		if(id!= null){			
 			Key<SubjectGroupServer> key = Key.create(SubjectGroupServer.class, id);
@@ -154,22 +174,28 @@ public class SubjectGroupDao implements Dao<SubjectGroupServer> {
 		return sG;
 	}
 	
-	public SubjectGroupServer getById(Long id){
+	public SubjectGroup getById(String id){
+		SubjectGroupServer sGS = getServerById(Long.getLong(id));
+		SubjectGroup toReturn = null;
+		if(sGS != null) toReturn = sGS.getClientInstance();
+		return toReturn;
+	}
+	
+	public SubjectGroup getById(Long id){
 		SubjectGroupServer sG = null;
-		if(id!= null){			
-			Key<SubjectGroupServer> key = Key.create(SubjectGroupServer.class, id);
-			sG = ofy().load().key(key).now();
-		}
-		return sG;
+		SubjectGroupServer sGS = getServerById(id);
+		SubjectGroup toReturn = null;
+		if(sGS != null) toReturn = sGS.getClientInstance();
+		return toReturn;
 	}
 
-	public SubjectGroupServer getUnkownSubjectGroup(String careerCode, boolean isFundamental) {
-		SubjectGroupServer sG = null;
+	public SubjectGroup getUnkownSubjectGroup(String careerCode, boolean isFundamental) {
+		SubjectGroup sG = null;
 		sG = this.get(SubjectGroupCodes.UNKNOWN_NAME, isFundamental, careerCode);
 		if(sG == null){
 			CareerDao cDao = new CareerDao();
 			Career career = cDao.getByCode(careerCode);
-			sG = new SubjectGroupServer(SubjectGroupCodes.UNKNOWN_NAME, career, isFundamental, 0, 0, true);
+			sG = new SubjectGroup(SubjectGroupCodes.UNKNOWN_NAME, career, isFundamental, 0, 0, true);
 			sG.setId(generateId());
 			save(sG);
 		}
@@ -185,37 +211,37 @@ public class SubjectGroupDao implements Dao<SubjectGroupServer> {
 	 * @param typology
 	 * @return
 	 */
-	public SubjectGroupServer getSubjectGroupFromTypology(Career career, String typology){
+	public SubjectGroup getSubjectGroupFromTypology(Career career, String typology){
 		
-		SubjectGroupServer subjectGroup = null;
+		SubjectGroup subjectGroup = null;
 		String careerCode = career.getCode();
 		SubjectGroupDao subjectGroupDao = new SubjectGroupDao();
 		
 		if(typology == null || typology.equals(TypologyCodes.LIBRE_ELECCION) == true){
 			subjectGroup = subjectGroupDao.get(SubjectGroupCodes.LIBRE_NAME, careerCode);
 			if(subjectGroup == null){
-				subjectGroup = new SubjectGroupServer(SubjectGroupCodes.LIBRE_NAME, career, false, 0, 0, true);
+				subjectGroup = new SubjectGroup(SubjectGroupCodes.LIBRE_NAME, career, false, 0, 0, true);
 				subjectGroup.setId(subjectGroupDao.generateId());
 				subjectGroupDao.save(subjectGroup);
 			}
 		}else if(typology.equals(TypologyCodes.NIVELACION) == true){
 			subjectGroup = subjectGroupDao.get(SubjectGroupCodes.NIVELACION_NAME, careerCode);
 			if(subjectGroup == null){
-				subjectGroup = new SubjectGroupServer(SubjectGroupCodes.NIVELACION_NAME, career, false, 0, 0, true);
+				subjectGroup = new SubjectGroup(SubjectGroupCodes.NIVELACION_NAME, career, false, 0, 0, true);
 				subjectGroup.setId(subjectGroupDao.generateId());
 				subjectGroupDao.save(subjectGroup);
 			}
 		}else if(typology.equals(TypologyCodes.FUNDAMENTACION) == true){
 			subjectGroup = subjectGroupDao.get(SubjectGroupCodes.UNKNOWN_NAME, true, careerCode);
 			if(subjectGroup == null){
-				subjectGroup = new SubjectGroupServer(SubjectGroupCodes.UNKNOWN_NAME, career, true, 0, 0, true);
+				subjectGroup = new SubjectGroup(SubjectGroupCodes.UNKNOWN_NAME, career, true, 0, 0, true);
 				subjectGroup.setId(subjectGroupDao.generateId());
 				subjectGroupDao.save(subjectGroup);
 			}
 		}else if(typology.equals(TypologyCodes.PROFESIONAL) == true){
 			subjectGroup = subjectGroupDao.get(SubjectGroupCodes.UNKNOWN_NAME, false, careerCode);
 			if(subjectGroup == null){
-				subjectGroup = new SubjectGroupServer(SubjectGroupCodes.UNKNOWN_NAME, career, false, 0, 0, true);
+				subjectGroup = new SubjectGroup(SubjectGroupCodes.UNKNOWN_NAME, career, false, 0, 0, true);
 				subjectGroup.setId(subjectGroupDao.generateId());
 				subjectGroupDao.save(subjectGroup);
 			}
@@ -225,14 +251,20 @@ public class SubjectGroupDao implements Dao<SubjectGroupServer> {
 	}
 
 	public void deleteAllSubjectGroups() {
-		final List<SubjectGroupServer> list = getAllSubjectGroups();
-		for(SubjectGroupServer sG : list){
+		final List<SubjectGroup> list = getAllSubjectGroups();
+		for(SubjectGroup sG : list){
 			delete(sG.getId());
 		}
 		log.warning("All subjectGroup deleted");
 	}
 
-	private List<SubjectGroupServer> getAllSubjectGroups() {
-		return ofy().load().type(SubjectGroupServer.class).list();
+	private List<SubjectGroup> getAllSubjectGroups() {
+		return toClientList(ofy().load().type(SubjectGroupServer.class).list());
+	}
+
+	public Ref<SubjectGroupServer> getRef(Long id) {
+		SubjectGroupServer sGS = getServerById(id);
+		Ref<SubjectGroupServer> toReturn = (sGS == null ? null : Ref.create(sGS));
+		return toReturn;
 	}
 }
