@@ -785,13 +785,15 @@ public class PlanDao implements Dao<Plan>{
 							if(semesterDummyT != null){
 								SemesterValue semesterValueT = semesterValueDao.getOrCreateSemester(semesterDummyT.getYear(), semesterDummyT.getSemester());
 								Group groupT = groupDao.getOrCreateGroup(complementaryValuesT.getSubject(), semesterValueT, subjectDummyT.getGroup());
-								
+
 								subjectValuesT.setComplementaryValue(complementaryValuesT);
 								subjectValuesT.setGroup(groupT);
 								subjectValuesT.setGrade(subjectDummyT.getGrade());
 								if(subjectDummyT.getApproved() == true){
-									complementaryValuesT.getSubject().setApprovenType(true);
-									subjectsToUpdate.add(complementaryValuesT.getSubject());
+									if(complementaryValuesT != null && complementaryValuesT.getSubject() != null){		
+										complementaryValuesT.getSubject().setApprovenType(true);
+										subjectsToUpdate.add(complementaryValuesT.getSubject());
+									}
 								}
 								subjectValuesT.setTaken(true);
 								

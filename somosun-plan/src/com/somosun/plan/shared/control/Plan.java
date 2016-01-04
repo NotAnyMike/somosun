@@ -62,9 +62,11 @@ public class Plan extends PlanAbstract implements Serializable {
 		for(Semester semester : semesters){
 			for(SubjectValue subjectValue : semester.getSubjects()){
 				if(subjectValue.isTaken()){
-					if(subjectValue.getComplementaryValue().getSubject().isApprovenType() == false){						
-						sum += (subjectValue.getGrade()*(subjectValue.getComplementaryValue().getSubject().getCredits()));
-						credits += subjectValue.getComplementaryValue().getSubject().getCredits();
+					if(subjectValue != null && subjectValue.getComplementaryValue() != null && subjectValue.getComplementaryValue().getSubject() != null){						
+						if(subjectValue.getComplementaryValue().getSubject().isApprovenType() == false){						
+							sum += (subjectValue.getGrade()*(subjectValue.getComplementaryValue().getSubject().getCredits()));
+							credits += subjectValue.getComplementaryValue().getSubject().getCredits();
+						}
 					}
 				}
 			}

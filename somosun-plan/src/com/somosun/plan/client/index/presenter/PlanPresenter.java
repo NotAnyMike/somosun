@@ -1112,11 +1112,13 @@ ComplementaryValueView.Presenter{
 		
 		for(Semester semester : plan.getSemesters()){
 			for(SubjectValue subjectValue : semester.getSubjects()){
-				if(subjectValue.isTaken()){
-					if(subjectValue.getGrade() >=3){
-						toReturn += subjectValue.getComplementaryValue().getSubject().getCredits();
-					}else{
-						toRemove += subjectValue.getComplementaryValue().getSubject().getCredits();
+				if(subjectValue != null && subjectValue.getComplementaryValue() != null && subjectValue.getComplementaryValue().getSubject() != null){					
+					if(subjectValue.isTaken()){
+						if(subjectValue.getGrade() >=3){
+							toReturn += subjectValue.getComplementaryValue().getSubject().getCredits();
+						}else{
+							toRemove += subjectValue.getComplementaryValue().getSubject().getCredits();
+						}
 					}
 				}
 			}
